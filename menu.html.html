@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Menu</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: sans-serif; background: #fafafa; margin: 0; padding: 15px; }
+    .header { text-align: center; background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .menu-card { background: white; padding: 12px; border-radius: 8px; margin-top: 10px; display: flex; justify-content: space-between; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+    .price { font-weight: bold; color: #198754; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1 id="rest-title">Loading...</h1>
+    <p id="rest-phone"></p>
+  </div>
+
+  <h3 style="margin-top:20px;">Menu Items</h3>
+  <div id="menu-container"></div>
+
+  <script>
+    const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const slug = urlParams.get('slug');
+
+    window.onload = async () => {
+      if (!slug) return alert("Invalid Restaurant URL");
+
+      // Fetch Restaurant Details
+      const { data: rest } = await db.from('restaurants').select('*').eq('slug', slug).single();
+      if (!rest) return alert("Restaurant not found!");
+
+      document.getElementById('rest-title').innerText = rest.name;
+      document.getElementById('rest-phone').innerText = "📞 " + (rest.phone || 'N/A');
+
+      // Fetch Menu Items
+      const { data: items } = await db.from('menu_items').select('*').eq('restaurant_id', rest.id);
+      const container = document.getElementById('menu-container');
+      
+      items.forEach(item => {
+        container.innerHTML += `
+          <div class="menu-card">
+            <span>${item.is_veg ? '🟢' : '🔴'} <strong>${item.title}</strong></span>
+            <span class="price">₹${item.price}</span>
+          </div>
+        `;
+      });
+    };
+  </script>
+</body>
+</html>
