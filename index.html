@@ -52,9 +52,8 @@
   </div>
 
   <script>
-    // ⚠️ Apne Supabase details yahan dalein
-    const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
-    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const SUPABASE_URL = 'https://pfsrpowopbrevocwsuii.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let userId = null, restaurantId = null;
@@ -128,12 +127,14 @@
       const { data } = await db.from('menu_items').select('*').eq('restaurant_id', restaurantId);
       const list = document.getElementById('items-list');
       list.innerHTML = '';
-      data.forEach(item => {
-        list.innerHTML += `<div class="item-row">
-          <span>${item.is_veg ? '🟢' : '🔴'} ${item.title}</span>
-          <strong>₹${item.price}</strong>
-        </div>`;
-      });
+      if(data) {
+        data.forEach(item => {
+          list.innerHTML += `<div class="item-row">
+            <span>${item.is_veg ? '🟢' : '🔴'} ${item.title}</span>
+            <strong>₹${item.price}</strong>
+          </div>`;
+        });
+      }
     }
 
     async function logout() { await db.auth.signOut(); location.reload(); }
