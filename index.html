@@ -6,63 +6,116 @@
     <title>Urban Punjab Restaurant</title>
     <link rel="stylesheet" href="./style.css">
     <style>
+        /* --- General Mobile-First Styling --- */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 15px;
-            background-color: #f9f9f9;
+            padding: 10px;
+            background-color: #f4f4f4;
             color: #333;
             text-align: center;
         }
 
         header {
             margin-bottom: 20px;
+            padding: 10px;
         }
 
         .logo {
-            max-width: 130px;
+            max-width: 120px;
             height: auto;
             margin-bottom: 10px;
         }
 
         h1 {
-            font-size: 24px;
+            font-size: 22px;
             margin: 5px 0;
+            color: #2c3e50;
         }
 
         header p {
-            font-size: 14px;
-            color: #666;
+            font-size: 13px;
+            color: #7f8c8d;
             margin: 0;
         }
 
-        .menu-images {
-            max-width: 600px;
-            margin: 0 auto;
+        h2 {
+            font-size: 18px;
+            color: #e67e22; /* Optional color for heading */
+            margin-bottom: 15px;
         }
 
-        .menu-images img {
+        /* --- Menu Images Container --- */
+        .menu-images-container {
             width: 100%;
+            max-width: 100%; /* Default for mobile */
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        /* Styling for the Images */
+        .menu-images-container img {
+            width: 100%; /* Take full width of container */
             height: auto;
             border-radius: 8px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            margin-bottom: 15px; /* Space between images */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Nice shadow */
             display: block;
         }
 
+        /* --- Footer --- */
         footer {
             margin-top: 30px;
-            padding-top: 15px;
+            padding: 20px 10px;
             border-top: 1px solid #ddd;
-            font-size: 13px;
+            background-color: #fff;
+            font-size: 12px;
             color: #555;
             line-height: 1.6;
+            border-radius: 8px;
         }
 
         footer a {
             color: #0066cc;
             text-decoration: none;
             font-weight: bold;
+        }
+
+        /* ========================================================= */
+        /* --- DESKTOP/PC SPECIFIC STYLING (Screen width > 768px) --- */
+        /* ========================================================= */
+        @media screen and (min-width: 769px) {
+            body {
+                padding: 30px;
+            }
+
+            h1 {
+                font-size: 32px; /* Bigger heading on PC */
+            }
+
+            header p {
+                font-size: 16px;
+            }
+
+            /* This is what makes the images big on PC */
+            .menu-images-container {
+                max-width: 1000px; /* Increase this number to make it even bigger */
+                padding: 10px;
+            }
+
+            .logo {
+                max-width: 150px; /* Slightly bigger logo */
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+            
+            footer {
+                max-width: 1000px;
+                margin: 30px auto 0 auto;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -74,7 +127,8 @@
     <p>Family Food Restaurant | Since 1971</p>
 </header>
 
-<main class="menu-images">
+<!-- Wraps both images in one big container -->
+<main class="menu-images-container">
     <h2>Our Full Menu</h2>
     <img src="./img/menu_page1.jpg" alt="Urban Punjab Menu Page 1" loading="lazy">
     <img src="./img/menu_page2.jpg" alt="Urban Punjab Menu Page 2" loading="lazy">
@@ -82,8 +136,7 @@
 
 <footer>
     <p>Address: C-207/208, Jhilmil Colony</p>
-    <p>Phone: <a href="tel:8447000854">8447000854</a></p>
-    <p>Customer Care: <a href="tel:9899200045">9899200045</a></p>
+    <p>Phone: <a href="tel:8447000854">8447000854</a> | Customer Care: <a href="tel:9899200045">9899200045</a></p>
     <p>Online Order Available on Swiggy & Zomato</p>
     <p>© 2026 Urban Punjab Restaurant</p>
 </footer>
