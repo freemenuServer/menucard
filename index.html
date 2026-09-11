@@ -1,145 +1,142 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Urban Punjab Restaurant</title>
-    <link rel="stylesheet" href="./style.css">
-    <style>
-        /* --- General Mobile-First Styling --- */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 10px;
-            background-color: #f4f4f4;
-            color: #333;
-            text-align: center;
-        }
-
-        header {
-            margin-bottom: 20px;
-            padding: 10px;
-        }
-
-        .logo {
-            max-width: 120px;
-            height: auto;
-            margin-bottom: 10px;
-        }
-
-        h1 {
-            font-size: 22px;
-            margin: 5px 0;
-            color: #2c3e50;
-        }
-
-        header p {
-            font-size: 13px;
-            color: #7f8c8d;
-            margin: 0;
-        }
-
-        h2 {
-            font-size: 18px;
-            color: #e67e22; /* Optional color for heading */
-            margin-bottom: 15px;
-        }
-
-        /* --- Menu Images Container --- */
-        .menu-images-container {
-            width: 100%;
-            max-width: 100%; /* Default for mobile */
-            margin: 0 auto;
-            padding: 0;
-        }
-
-        /* Styling for the Images */
-        .menu-images-container img {
-            width: 100%; /* Take full width of container */
-            height: auto;
-            border-radius: 8px;
-            margin-bottom: 15px; /* Space between images */
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Nice shadow */
-            display: block;
-        }
-
-        /* --- Footer --- */
-        footer {
-            margin-top: 30px;
-            padding: 20px 10px;
-            border-top: 1px solid #ddd;
-            background-color: #fff;
-            font-size: 12px;
-            color: #555;
-            line-height: 1.6;
-            border-radius: 8px;
-        }
-
-        footer a {
-            color: #0066cc;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        /* ========================================================= */
-        /* --- DESKTOP/PC SPECIFIC STYLING (Screen width > 768px) --- */
-        /* ========================================================= */
-        @media screen and (min-width: 769px) {
-            body {
-                padding: 30px;
-            }
-
-            h1 {
-                font-size: 32px; /* Bigger heading on PC */
-            }
-
-            header p {
-                font-size: 16px;
-            }
-
-            /* This is what makes the images big on PC */
-            .menu-images-container {
-                max-width: 1000px; /* Increase this number to make it even bigger */
-                padding: 10px;
-            }
-
-            .logo {
-                max-width: 150px; /* Slightly bigger logo */
-            }
-
-            h2 {
-                font-size: 24px;
-            }
-            
-            footer {
-                max-width: 1000px;
-                margin: 30px auto 0 auto;
-                font-size: 14px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurant Owner Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: sans-serif; background: #f4f5f7; margin: 0; padding: 20px; }
+    .card { background: white; max-width: 450px; margin: 20px auto; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+    input, select, button { width: 100%; padding: 12px; margin: 6px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+    button { background: #d63384; color: white; font-weight: bold; border: none; cursor: pointer; }
+    .hidden { display: none; }
+    .item-row { display: flex; justify-content: space-between; background: #f8f9fa; padding: 10px; border-radius: 6px; margin-top: 5px; }
+  </style>
 </head>
 <body>
 
-<header>
-    <img src="./img/logo.png" alt="Urban Punjab Logo" class="logo">
-    <h1>Urban Punjab Restaurant</h1>
-    <p>Family Food Restaurant | Since 1971</p>
-</header>
+  <!-- Auth Screen -->
+  <div id="auth-box" class="card">
+    <h2>Owner Registration / Login</h2>
+    <input type="email" id="email" placeholder="Email Address">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="signUp()">Register New Owner</button>
+    <button onclick="login()" style="background:#0d6efd;">Login</button>
+  </div>
 
-<!-- Wraps both images in one big container -->
-<main class="menu-images-container">
-    <h2>Our Full Menu</h2>
-    <img src="./img/menu_page1.jpg" alt="Urban Punjab Menu Page 1" loading="lazy">
-    <img src="./img/menu_page2.jpg" alt="Urban Punjab Menu Page 2" loading="lazy">
-</main>
+  <!-- Owner Dashboard -->
+  <div id="dashboard-box" class="card hidden">
+    <h2>Restaurant Dashboard</h2>
+    <button onclick="logout()" style="background:#dc3545; padding:6px; font-size:12px;">Logout</button>
+    <hr>
+    
+    <h3>1. Profile Details</h3>
+    <input type="text" id="rest-name" placeholder="Restaurant Name (e.g. Royal Spices)">
+    <input type="text" id="rest-phone" placeholder="Phone Number">
+    <button onclick="saveProfile()">Save Restaurant Profile</button>
+    <p id="public-link" style="font-size:13px; color:#0d6efd; word-break:break-all;"></p>
 
-<footer>
-    <p>Address: C-207/208, Jhilmil Colony</p>
-    <p>Phone: <a href="tel:8447000854">8447000854</a> | Customer Care: <a href="tel:9899200045">9899200045</a></p>
-    <p>Online Order Available on Swiggy & Zomato</p>
-    <p>© 2026 Urban Punjab Restaurant</p>
-</footer>
+    <hr>
+    <h3>2. Add Menu Item</h3>
+    <input type="text" id="item-title" placeholder="Item Name (e.g. Paneer Tikka)">
+    <input type="number" id="item-price" placeholder="Price (₹)">
+    <select id="item-veg">
+      <option value="true">Veg 🟢</option>
+      <option value="false">Non-Veg 🔴</option>
+    </select>
+    <button onclick="addMenuItem()" style="background:#198754;">Add Item</button>
 
+    <h4>Menu Items List</h4>
+    <div id="items-list"></div>
+  </div>
+
+  <script>
+    // ⚠️ Apne Supabase details yahan dalein
+    const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let userId = null, restaurantId = null;
+
+    window.onload = async () => {
+      const { data: { session } } = await db.auth.getSession();
+      if (session) { userId = session.user.id; loadDashboard(); }
+    };
+
+    async function signUp() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const { data, error } = await db.auth.signUp({ email, password });
+      if (error) return alert(error.message);
+      await db.from('profiles').insert([{ id: data.user.id, email }]);
+      alert("Registration success! Now click Login.");
+    }
+
+    async function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const { data, error } = await db.auth.signInWithPassword({ email, password });
+      if (error) return alert(error.message);
+      userId = data.user.id;
+      loadDashboard();
+    }
+
+    async function loadDashboard() {
+      document.getElementById('auth-box').classList.add('hidden');
+      document.getElementById('dashboard-box').classList.remove('hidden');
+
+      const { data } = await db.from('restaurants').select('*').eq('owner_id', userId);
+      if (data && data.length > 0) {
+        restaurantId = data[0].id;
+        document.getElementById('rest-name').value = data[0].name;
+        document.getElementById('rest-phone').value = data[0].phone || '';
+        document.getElementById('public-link').innerHTML = 
+          `Public Menu URL: <a href="menu.html?slug=${data[0].slug}" target="_blank">menu.html?slug=${data[0].slug}</a>`;
+        fetchItems();
+      }
+    }
+
+    async function saveProfile() {
+      const name = document.getElementById('rest-name').value;
+      const phone = document.getElementById('rest-phone').value;
+      const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+
+      if (!restaurantId) {
+        const { data } = await db.from('restaurants').insert([{ owner_id: userId, name, phone, slug }]).select();
+        if (data) restaurantId = data[0].id;
+      } else {
+        await db.from('restaurants').update({ name, phone, slug }).eq('id', restaurantId);
+      }
+      alert("Profile Saved!");
+      loadDashboard();
+    }
+
+    async function addMenuItem() {
+      if (!restaurantId) return alert("Pehle Profile Save Karein!");
+      const title = document.getElementById('item-title').value;
+      const price = document.getElementById('item-price').value;
+      const is_veg = document.getElementById('item-veg').value === 'true';
+
+      await db.from('menu_items').insert([{ restaurant_id: restaurantId, title, price, is_veg }]);
+      document.getElementById('item-title').value = '';
+      document.getElementById('item-price').value = '';
+      fetchItems();
+    }
+
+    async function fetchItems() {
+      const { data } = await db.from('menu_items').select('*').eq('restaurant_id', restaurantId);
+      const list = document.getElementById('items-list');
+      list.innerHTML = '';
+      data.forEach(item => {
+        list.innerHTML += `<div class="item-row">
+          <span>${item.is_veg ? '🟢' : '🔴'} ${item.title}</span>
+          <strong>₹${item.price}</strong>
+        </div>`;
+      });
+    }
+
+    async function logout() { await db.auth.signOut(); location.reload(); }
+  </script>
 </body>
 </html>
