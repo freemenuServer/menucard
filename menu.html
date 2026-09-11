@@ -23,8 +23,8 @@
   <div id="menu-container"></div>
 
   <script>
-    const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
-    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const SUPABASE_URL = 'https://pfsrpowopbrevocwsuii.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -44,14 +44,16 @@
       const { data: items } = await db.from('menu_items').select('*').eq('restaurant_id', rest.id);
       const container = document.getElementById('menu-container');
       
-      items.forEach(item => {
-        container.innerHTML += `
-          <div class="menu-card">
-            <span>${item.is_veg ? '🟢' : '🔴'} <strong>${item.title}</strong></span>
-            <span class="price">₹${item.price}</span>
-          </div>
-        `;
-      });
+      if(items) {
+        items.forEach(item => {
+          container.innerHTML += `
+            <div class="menu-card">
+              <span>${item.is_veg ? '🟢' : '🔴'} <strong>${item.title}</strong></span>
+              <span class="price">₹${item.price}</span>
+            </div>
+          `;
+        });
+      }
     };
   </script>
 </body>
