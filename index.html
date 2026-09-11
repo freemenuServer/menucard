@@ -4,27 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Urban Punjab Restaurant</title>
-    <!-- Style CSS Link -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./style.css">
+    <style>
+        /* Temporary Inline CSS for guaranteed styling */
+        body { font-family: Arial, sans-serif; margin: 0; padding: 15px; background: #f9f9f9; text-align: center; }
+        .logo { max-width: 120px; height: auto; margin-bottom: 10px; }
+        .menu-images img { max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        footer { margin-top: 20px; padding-top: 10px; border-t: 1px solid #ddd; font-size: 14px; color: #555; }
+    </style>
 </head>
 <body>
 
 <header>
+    <!-- Double check exact file name in GitHub img folder -->
     <img src="img/logo.png" alt="Urban Punjab Logo" class="logo">
     <h1>Urban Punjab Restaurant</h1>
     <p>Family Food Restaurant | Since 1971</p>
 </header>
 
-<section class="menu-images">
+<main class="menu-images">
     <h2>Our Full Menu</h2>
-    <img src="img/menu_page1.jpg" alt="Menu Page 1"><br>
+    <img src="img/menu_page1.jpg" alt="Menu Page 1">
     <img src="img/menu_page2.jpg" alt="Menu Page 2">
-</section>
+</main>
 
 <footer>
     <p>Address: C-207/208, Jhilmil Colony</p>
-    <p>Phone: 8447000854</p>
-    <p>Customer Care: 9899200045</p>
+    <p>Phone: <a href="tel:8447000854">8447000854</a></p>
+    <p>Customer Care: <a href="tel:9899200045">9899200045</a></p>
     <p>Online Order Available on Swiggy & Zomato</p>
     <p>© 2026 Urban Punjab Restaurant</p>
 </footer>
