@@ -4,28 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Urban Punjab Restaurant</title>
-    <link rel="stylesheet" href="./style.css">
     <style>
-        /* Temporary Inline CSS for guaranteed styling */
-        body { font-family: Arial, sans-serif; margin: 0; padding: 15px; background: #f9f9f9; text-align: center; }
-        .logo { max-width: 120px; height: auto; margin-bottom: 10px; }
-        .menu-images img { max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        footer { margin-top: 20px; padding-top: 10px; border-t: 1px solid #ddd; font-size: 14px; color: #555; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f9f9f9; text-align: center; }
+        .logo { max-width: 140px; height: auto; margin-bottom: 10px; }
+        .menu-container img { max-width: 100%; width: 600px; height: auto; border-radius: 8px; margin: 10px auto; display: block; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        footer { margin-top: 30px; padding-top: 15px; border-top: 1px solid #ddd; font-size: 14px; color: #444; }
+        a { color: #0066cc; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <header>
-    <!-- Double check exact file name in GitHub img folder -->
-    <img src="img/logo.png" alt="Urban Punjab Logo" class="logo">
+    <img src="./img/logo.png" onerror="this.src='./img/logo.PNG'" alt="Urban Punjab Logo" class="logo">
     <h1>Urban Punjab Restaurant</h1>
     <p>Family Food Restaurant | Since 1971</p>
 </header>
 
-<main class="menu-images">
+<main class="menu-container">
     <h2>Our Full Menu</h2>
-    <img src="img/menu_page1.jpg" alt="Menu Page 1">
-    <img src="img/menu_page2.jpg" alt="Menu Page 2">
+    <img src="./img/menu_page1.jpg" onerror="this.src='./img/menu_page1.JPG'" alt="Menu Page 1">
+    <img src="./img/menu_page2.jpg" onerror="this.src='./img/menu_page2.JPG'" alt="Menu Page 2">
 </main>
 
 <footer>
