@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Owner Dashboard - FreeMenu.in</title>
+  <title>Owner Portal - FreeMenu.in</title>
   <!-- Supabase JS v2 -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- QR Code Library -->
@@ -11,18 +11,21 @@
   <style>
     :root { --primary: #ff4757; --bg: #f8fafc; --text: #0f172a; }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: var(--bg); color: var(--text); padding: 20px; }
+    body { background: var(--bg); color: var(--text); padding: 20px; min-height: 100vh; }
     .container { max-width: 650px; margin: 0 auto; }
     
+    /* Top Header Bar */
     .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .logo-title { font-size: 20px; font-weight: 800; color: var(--primary); text-decoration: none; }
     .logout-btn { background: #e2e8f0; color: #334155; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
     .logout-btn:hover { background: #cbd5e1; }
 
     .card { background: white; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-    h1 { font-size: 22px; font-weight: 700; }
+    h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
     h2 { font-size: 18px; font-weight: 700; margin-bottom: 14px; color: #1e293b; }
-    .status-box { color: #64748b; font-size: 14px; margin-top: 4px; word-break: break-all; }
+    .status-box { color: #64748b; font-size: 14px; word-break: break-all; }
     
+    /* Link & QR Section */
     .link-section { background: #f1f5f9; padding: 16px; border-radius: 10px; border: 1px dashed #cbd5e1; margin-bottom: 20px; }
     .link-title { font-size: 13px; font-weight: 600; text-transform: uppercase; color: #64748b; margin-bottom: 6px; }
     .link-box a { color: var(--primary); font-weight: 700; font-size: 16px; text-decoration: none; word-break: break-all; }
@@ -31,84 +34,117 @@
     #qrcode { display: flex; justify-content: center; margin: 16px 0; }
     #qrcode img { border: 8px solid white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 
-    /* Form Styles */
-    .form-group { margin-bottom: 12px; text-align: left; }
+    /* Form UI */
+    .form-group { margin-bottom: 14px; text-align: left; }
     .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #475569; }
-    .form-input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; }
+    .form-input { width: 100%; padding: 11px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; outline: none; }
     .form-input:focus { border-color: var(--primary); }
     .row { display: flex; gap: 10px; }
 
-    .btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%; }
+    .btn { background: var(--primary); color: white; border: none; padding: 11px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; width: 100%; font-size: 14px; }
     .btn:hover { background: #e03847; }
     .btn-secondary { background: #3b82f6; }
     .btn-secondary:hover { background: #2563eb; }
 
-    .item-list { margin-top: 15px; }
-    .item-card { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #f1f5f9; }
+    /* Menu Items Display */
+    .item-list { margin-top: 10px; }
+    .item-card { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
     .item-info strong { display: block; font-size: 14px; }
     .item-info span { font-size: 12px; color: #64748b; }
     .item-price { font-weight: 700; color: #16a34a; }
 
-    .err-text { color: #dc2626; font-weight: 600; }
-    .warn-text { color: #d97706; font-weight: 600; }
+    .err-text { color: #dc2626; font-weight: 600; font-size: 13px; }
+    .success-text { color: #16a34a; font-weight: 600; font-size: 13px; }
+    
+    /* Toggle Visibility */
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Top Header -->
+    
+    <!-- Top Bar -->
     <div class="header-bar">
-      <div>
-        <h1>Owner Dashboard</h1>
-        <div id="owner-email" class="status-box">Loading account details...</div>
-      </div>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+      <a href="/" class="logo-title">🍽️ freemenu.in</a>
+      <button id="logout-btn" class="logout-btn hidden" onclick="logout()">Logout</button>
     </div>
 
-    <!-- Live Menu Link & QR Section -->
-    <div class="card">
-      <div class="link-section">
-        <div class="link-title">Your Public Menu Link</div>
-        <div class="link-box" id="public-link">Fetching link...</div>
-      </div>
+    <!-- ==================== STATE 1: LOGIN FORM ==================== -->
+    <div id="login-section" class="card hidden">
+      <h1>Owner Login</h1>
+      <p style="color:#64748b; font-size:14px; margin-bottom:20px;">Log in or create account to manage your menu</p>
 
-      <div class="qr-section">
-        <div class="link-title">Table Scan QR Code</div>
-        <div id="qrcode"></div>
-        <button class="btn" style="width: auto;" onclick="downloadQR()">Download QR Code</button>
-      </div>
-    </div>
-
-    <!-- Add Item Form Section -->
-    <div class="card">
-      <h2>+ Add New Menu Item</h2>
-      <form id="add-item-form" onsubmit="addMenuItem(event)">
+      <form id="login-form" onsubmit="handleAuth(event)">
         <div class="form-group">
-          <label>Item Name</label>
-          <input type="text" id="item-name" class="form-input" placeholder="e.g. Paneer Butter Masala" required>
-        </div>
-        
-        <div class="row">
-          <div class="form-group" style="flex:1;">
-            <label>Price (₹)</label>
-            <input type="number" id="item-price" class="form-input" placeholder="240" required>
-          </div>
-          <div class="form-group" style="flex:1;">
-            <label>Category</label>
-            <input type="text" id="item-category" class="form-input" placeholder="e.g. Main Course" required>
-          </div>
+          <label>Email Address</label>
+          <input type="email" id="login-email" class="form-input" placeholder="owner@restaurant.com" required>
         </div>
 
-        <button type="submit" class="btn btn-secondary" id="save-btn">+ Add Item to Menu</button>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" id="auth-submit-btn" class="btn">Login / Sign Up</button>
       </form>
+      <div id="auth-msg" style="margin-top: 12px;"></div>
     </div>
 
-    <!-- Existing Items List Section -->
-    <div class="card">
-      <h2>Current Menu Items</h2>
-      <div id="items-list" class="item-list">
-        <p style="color: #64748b; font-size: 14px;">Loading menu items...</p>
+    <!-- ==================== STATE 2: OWNER DASHBOARD ==================== -->
+    <div id="dashboard-section" class="hidden">
+      <!-- Owner Account Banner -->
+      <div class="card">
+        <h1>Dashboard</h1>
+        <div id="owner-email" class="status-box">Loading...</div>
+      </div>
+
+      <!-- Menu Link & QR Code -->
+      <div class="card">
+        <div class="link-section">
+          <div class="link-title">Your Public Menu Link</div>
+          <div class="link-box" id="public-link">Fetching link...</div>
+        </div>
+
+        <div class="qr-section">
+          <div class="link-title">Table Scan QR Code</div>
+          <div id="qrcode"></div>
+          <button class="btn" style="width: auto; margin-top: 8px;" onclick="downloadQR()">Download QR Code</button>
+        </div>
+      </div>
+
+      <!-- Add New Menu Item Form -->
+      <div class="card">
+        <h2>+ Add New Menu Item</h2>
+        <form id="add-item-form" onsubmit="addMenuItem(event)">
+          <div class="form-group">
+            <label>Item Name</label>
+            <input type="text" id="item-name" class="form-input" placeholder="e.g. Paneer Tikka" required>
+          </div>
+          
+          <div class="row">
+            <div class="form-group" style="flex:1;">
+              <label>Price (₹)</label>
+              <input type="number" id="item-price" class="form-input" placeholder="220" required>
+            </div>
+            <div class="form-group" style="flex:1;">
+              <label>Category</label>
+              <input type="text" id="item-category" class="form-input" placeholder="e.g. Starters" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-secondary" id="save-item-btn">+ Add Item to Menu</button>
+        </form>
+      </div>
+
+      <!-- Current Menu Items List -->
+      <div class="card">
+        <h2>Current Menu Items</h2>
+        <div id="items-list" class="item-list">
+          <p style="color: #64748b; font-size: 14px;">Loading menu items...</p>
+        </div>
       </div>
     </div>
+
   </div>
 
   <script>
@@ -118,66 +154,103 @@
 
     let currentRestaurantId = null;
 
-    async function loadDashboard() {
-      const emailEl = document.getElementById('owner-email');
-      const linkEl = document.getElementById('public-link');
+    // Check Auth Status on Page Load
+    async function initPage() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
 
-      try {
-        // Step 1: Check Auth Session
-        const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
-
-        if (authError || !user) {
-          window.location.href = "/login.html";
-          return;
-        }
-
-        emailEl.innerText = `Logged in as: ${user.email}`;
-
-        // Step 2: Fetch Restaurant Info
-        const { data: restaurant, error: restError } = await supabaseClient
-          .from('restaurants')
-          .select('*')
-          .eq('owner_id', user.id)
-          .maybeSingle();
-
-        if (restError || !restaurant) {
-          linkEl.innerHTML = `<span class="warn-text">No restaurant registered yet.</span>`;
-          return;
-        }
-
-        currentRestaurantId = restaurant.id;
-
-        // Step 3: Display Dynamic URL & QR Code
-        const fullCleanUrl = `${window.location.origin}/menu/${restaurant.slug}`;
-        linkEl.innerHTML = `<a href="${fullCleanUrl}" target="_blank">${fullCleanUrl}</a>`;
-
-        document.getElementById('qrcode').innerHTML = "";
-        new QRCode(document.getElementById("qrcode"), {
-          text: fullCleanUrl,
-          width: 160,
-          height: 160
-        });
-
-        // Step 4: Load existing Menu Items
-        loadMenuItems();
-
-      } catch (err) {
-        console.error("Runtime Error:", err);
+      if (!user) {
+        // User NOT Logged in -> Show Login Section
+        document.getElementById('login-section').classList.remove('hidden');
+        document.getElementById('dashboard-section').classList.add('hidden');
+        document.getElementById('logout-btn').classList.add('hidden');
+      } else {
+        // User IS Logged in -> Show Dashboard
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('dashboard-section').classList.remove('hidden');
+        document.getElementById('logout-btn').classList.remove('hidden');
+        loadDashboardData(user);
       }
     }
 
-    // Add Item Function
+    // Handle Login / Registration
+    async function handleAuth(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const msgEl = document.getElementById('auth-msg');
+      const submitBtn = document.getElementById('auth-submit-btn');
+
+      submitBtn.innerText = "Authenticating...";
+      submitBtn.disabled = true;
+      msgEl.innerHTML = "";
+
+      // Try Login
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        // Try Signup if user does not exist
+        const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({ email, password });
+
+        if (signUpError) {
+          msgEl.innerHTML = `<span class="err-text">${error.message}</span>`;
+          submitBtn.innerText = "Login / Sign Up";
+          submitBtn.disabled = false;
+        } else {
+          msgEl.innerHTML = `<span class="success-text">Account created & Logged in!</span>`;
+          initPage();
+        }
+      } else {
+        msgEl.innerHTML = `<span class="success-text">Logged in successfully!</span>`;
+        initPage();
+      }
+    }
+
+    // Load Dashboard Details
+    async function loadDashboardData(user) {
+      document.getElementById('owner-email').innerText = `Logged in as: ${user.email}`;
+      const linkEl = document.getElementById('public-link');
+
+      // Fetch Restaurant Details
+      const { data: restaurant, error } = await supabaseClient
+        .from('restaurants')
+        .select('*')
+        .eq('owner_id', user.id)
+        .maybeSingle();
+
+      if (error || !restaurant) {
+        linkEl.innerHTML = `<span class="err-text">No restaurant linked to this account.</span>`;
+        return;
+      }
+
+      currentRestaurantId = restaurant.id;
+
+      // Dynamic Menu URL & QR Code Generation
+      const fullCleanUrl = `${window.location.origin}/menu/${restaurant.slug}`;
+      linkEl.innerHTML = `<a href="${fullCleanUrl}" target="_blank">${fullCleanUrl}</a>`;
+
+      document.getElementById('qrcode').innerHTML = "";
+      new QRCode(document.getElementById("qrcode"), {
+        text: fullCleanUrl,
+        width: 160,
+        height: 160
+      });
+
+      // Load Items List
+      loadMenuItems();
+    }
+
+    // Add Menu Item
     async function addMenuItem(e) {
       e.preventDefault();
       if (!currentRestaurantId) {
-        alert("Restaurant ID not found. Please try again.");
+        alert("Restaurant ID not found.");
         return;
       }
 
       const name = document.getElementById('item-name').value;
       const price = parseFloat(document.getElementById('item-price').value);
       const category = document.getElementById('item-category').value;
-      const saveBtn = document.getElementById('save-btn');
+      const saveBtn = document.getElementById('save-item-btn');
 
       saveBtn.innerText = "Saving...";
       saveBtn.disabled = true;
@@ -195,7 +268,6 @@
       saveBtn.disabled = false;
 
       if (error) {
-        console.error("Error adding item:", error);
         alert("Error adding item! Check database permissions.");
       } else {
         document.getElementById('add-item-form').reset();
@@ -203,7 +275,7 @@
       }
     }
 
-    // Load Items List Function
+    // Load Menu Items List
     async function loadMenuItems() {
       const listEl = document.getElementById('items-list');
       
@@ -213,7 +285,7 @@
         .eq('restaurant_id', currentRestaurantId);
 
       if (error || !items) {
-        listEl.innerHTML = `<p style="color:#ef4444; font-size:14px;">Failed to load items.</p>`;
+        listEl.innerHTML = `<p class="err-text">Failed to load items.</p>`;
         return;
       }
 
@@ -236,10 +308,10 @@
     // Logout Function
     async function logout() {
       await supabaseClient.auth.signOut();
-      window.location.href = "/login.html";
+      initPage(); // Reset screen to Login View
     }
 
-    // Download QR Code
+    // Download QR Code Image
     function downloadQR() {
       const qrImg = document.querySelector('#qrcode img');
       if (qrImg) {
@@ -250,7 +322,7 @@
       }
     }
 
-    window.onload = loadDashboard;
+    window.onload = initPage;
   </script>
 </body>
 </html>
