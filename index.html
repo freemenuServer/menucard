@@ -1,300 +1,235 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>freemenu.in - Digital Menu Platform</title>
-    <!-- Supabase JS v2 -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background-color: #f8f9fa; color: #333; }
-        
-        /* Clean Header Bar */
-        header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 14px 5%; 
-            background: #ffffff; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        
-        .logo { 
-            font-size: 22px; 
-            font-weight: 800; 
-            color: #ff4757; 
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .nav-btn { 
-            background: #ff4757; 
-            color: #fff; 
-            padding: 9px 16px; 
-            border-radius: 20px; 
-            text-decoration: none; 
-            font-weight: 600; 
-            font-size: 14px;
-            transition: background 0.2s ease;
-        }
-        
-        .nav-btn:hover { background: #e03847; }
-        
-        /* Hero Section */
-        .hero { text-align: center; padding: 40px 20px 30px; background: #fff; border-bottom: 1px solid #eee; }
-        .hero h1 { margin-bottom: 8px; font-size: 28px; font-weight: 700; color: #1e272e; }
-        .hero p { color: #666; font-size: 15px; }
-        
-        /* Live Search Bar */
-        .search-container { position: relative; max-width: 550px; margin: 24px auto 0; }
-        .search-box { 
-            width: 100%; 
-            padding: 14px 45px 14px 20px; 
-            font-size: 15px; 
-            border: 2px solid #e1e8ed; 
-            border-radius: 30px; 
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .search-box:focus { border-color: #ff4757; }
-        .search-icon { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: #888; }
-        
-        /* Restaurant Grid */
-        .container { max-width: 1200px; margin: 30px auto; padding: 0 15px; }
-        .section-title { 
-            margin-bottom: 20px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            padding: 0 5px;
-        }
-        .section-title h2 { font-size: 18px; color: #2f3542; }
-        
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
-            gap: 15px; 
-        }
-        
-        .card { 
-            background: #fff; 
-            border-radius: 12px; 
-            padding: 15px 10px; 
-            text-align: center; 
-            border: 1px solid #edf2f7; 
-            text-decoration: none; 
-            color: inherit;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
-        .card-img { 
-            width: 70px; 
-            height: 70px; 
-            border-radius: 50%; 
-            background: #ffeaa7; 
-            margin: 0 auto 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-        
-        .card h3 { font-size: 15px; margin-bottom: 4px; color: #2f3542; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card .details { font-size: 12px; color: #747d8c; margin-bottom: 2px; }
-        .card .location { font-size: 12px; color: #ff4757; font-weight: 500; }
-        
-        /* Structured Multi-Column Footer */
-        footer { 
-            background: #1e272e; 
-            color: #a4b0be; 
-            padding: 40px 5% 20px; 
-            margin-top: 50px; 
-        }
-        
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 30px;
-        }
-        
-        .footer-col h4 { 
-            color: #ff4757; 
-            margin-bottom: 15px; 
-            font-size: 16px; 
-        }
-        
-        .footer-col p { 
-            font-size: 14px; 
-            line-height: 1.6; 
-            color: #dcdde1; 
-        }
-        
-        .footer-col a { 
-            color: #dcdde1; 
-            font-size: 14px; 
-            text-decoration: none; 
-            display: block; 
-            margin-bottom: 8px;
-            transition: color 0.2s;
-        }
-        
-        .footer-col a:hover { color: #ff4757; }
-        
-        .copyright { 
-            max-width: 1200px;
-            margin: 30px auto 0;
-            padding-top: 20px;
-            border-top: 1px solid #353b48;
-            font-size: 13px; 
-            text-align: center;
-            color: #718093;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreeMenu.in - Explore Restaurants & Digital Menus</title>
 
-        @media (min-width: 768px) {
-            .grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
-            .card-img { width: 85px; height: 85px; }
-            .card h3 { font-size: 16px; }
-            .hero h1 { font-size: 34px; }
-        }
-    </style>
+  <!-- Supabase JS CDN (UMD Bundle) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #ff4757;
+      --primary-hover: #ff6b81;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: var(--bg); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* Navbar */
+    .navbar {
+      background: #ffffff;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { font-size: 22px; font-weight: 800; color: var(--primary); text-decoration: none; }
+    .logo span { color: var(--text-dark); }
+    .owner-btn {
+      background: var(--text-dark);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .owner-btn:hover { background: #334155; }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 48px 20px 32px;
+      background: #ffffff;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .hero h1 { font-size: 32px; font-weight: 800; margin-bottom: 12px; }
+    .hero p { font-size: 16px; color: var(--text-muted); max-width: 500px; margin: 0 auto; }
+
+    /* Main Container */
+    .container { max-width: 900px; width: 100%; margin: 32px auto; padding: 0 16px; flex: 1; }
+    .section-title { font-size: 20px; font-weight: 700; margin-bottom: 20px; color: var(--text-dark); }
+
+    /* Restaurant Grid */
+    .restaurant-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    
+    .restaurant-card {
+      background: var(--card-bg);
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .restaurant-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+      border-color: #cbd5e1;
+    }
+    .restaurant-name { font-size: 18px; font-weight: 700; margin-bottom: 6px; color: var(--text-dark); }
+    .restaurant-slug { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+    
+    .view-menu-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffe1e4;
+      color: var(--primary);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+      width: 100%;
+    }
+
+    /* Loading and Status */
+    .status-box { text-align: center; padding: 60px 20px; }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 4px solid #cbd5e1;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Footer */
+    footer { text-align: center; padding: 24px; border-top: 1px solid #e2e8f0; font-size: 13px; color: var(--text-muted); }
+  </style>
 </head>
 <body>
 
-    <!-- Header -->
-    <header>
-        <a href="/" class="logo">🍽️ freemenu.in</a>
-        <a href="/owner.html" class="nav-btn">+ Owner Portal</a>
-    </header>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="index.html" class="logo">FreeMenu<span>.in</span></a>
+    <a href="owner.html" class="owner-btn">Owner Portal</a>
+  </nav>
 
-    <!-- Search Section -->
-    <section class="hero">
-        <h1>Find Your Favorite Restaurant Menu</h1>
-        <p>Instant digital menus at your fingertips</p>
-        <div class="search-container">
-            <input type="text" id="search-input" class="search-box" placeholder="Search restaurant name or slug..." oninput="filterRestaurants()">
-            <span class="search-icon">🔍</span>
-        </div>
-    </section>
+  <!-- Hero Section -->
+  <header class="hero">
+    <h1>Explore Digital Menus</h1>
+    <p>Scan QR codes or browse registered restaurants to view contactless menus.</p>
+  </header>
 
-    <!-- Restaurant Grid -->
-    <div class="container">
-        <div class="section-title">
-            <h2>Partner Restaurants</h2>
-            <small id="restaurant-count" style="color:#747d8c;">Loading...</small>
-        </div>
-        
-        <div class="grid" id="restaurant-grid">
-            <!-- Dynamic Database Cards Inject Here -->
-        </div>
+  <!-- Restaurants List Container -->
+  <main class="container">
+    <h2 class="section-title">Featured Restaurants</h2>
+
+    <!-- Loading Indicator -->
+    <div id="loading" class="status-box">
+      <div class="spinner"></div>
+      <p style="color: var(--text-muted);">Loading restaurants...</p>
     </div>
 
-    <!-- Multi-Column Footer -->
-    <footer>
-        <div class="footer-container">
-            <!-- Column 1: Brand Info -->
-            <div class="footer-col">
-                <h4>freemenu.in SaaS</h4>
-                <p>Digital QR Menu Hosting platform for modern restaurants and cafes.</p>
-            </div>
-            
-            <!-- Column 2: Navigation Links -->
-            <div class="footer-col">
-                <h4>Quick Links</h4>
-                <a href="/">Search Menus</a>
-                <a href="/owner.html">Register / Login Restaurant</a>
-                <a href="#">Pricing Plans</a>
-            </div>
-            
-            <!-- Column 3: Contact Details -->
-            <div class="footer-col">
-                <h4>Contact Us</h4>
-                <p>Email: support@freemenu.in</p>
-            </div>
-        </div>
+    <!-- Error View -->
+    <div id="error-view" class="status-box" style="display: none;">
+      <p style="color: #dc2626; font-weight: 600;" id="error-msg">Failed to load restaurants.</p>
+    </div>
 
-        <div class="copyright">
-            © 2026 freemenu.in Platform. All rights reserved.
-        </div>
-    </footer>
+    <!-- Grid View -->
+    <div id="restaurant-grid" class="restaurant-grid" style="display: none;"></div>
+  </main>
 
-    <script>
-        // Embedded Supabase Project Credentials
-        const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co"; 
-        const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE"; 
+  <footer>
+    &copy; FreeMenu.in. All rights reserved.
+  </footer>
 
-        // Initialize Supabase Client
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <script>
+    let supabaseClient = null;
 
-        let allRestaurants = [];
+    // Supabase Initialization
+    function initSupabase() {
+      const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
+      const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
 
-        window.onload = fetchRestaurants;
+      if (window.supabase && typeof window.supabase.createClient === 'function') {
+        return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      } else if (typeof createClient === 'function') {
+        return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+      return null;
+    }
 
-        async function fetchRestaurants() {
-            const grid = document.getElementById('restaurant-grid');
-            const countEl = document.getElementById('restaurant-count');
+    async function fetchRestaurants() {
+      supabaseClient = initSupabase();
 
-            try {
-                // Fetch restaurants list from Supabase
-                const { data: restaurants, error } = await supabaseClient
-                    .from('restaurants')
-                    .select('*');
+      if (!supabaseClient) {
+        showError("Supabase script not loaded. Please refresh.");
+        return;
+      }
 
-                if (error) {
-                    console.error('Error fetching restaurants:', error);
-                    grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #ef4444;">Failed to load restaurants.</p>`;
-                    countEl.innerText = "0 Available";
-                    return;
-                }
+      try {
+        const { data: restaurants, error } = await supabaseClient
+          .from('restaurants')
+          .select('*')
+          .order('name', { ascending: true });
 
-                allRestaurants = restaurants || [];
-                countEl.innerText = `${allRestaurants.length} Available`;
-                renderRestaurants(allRestaurants);
-
-            } catch (err) {
-                console.error('Runtime Error:', err);
-                grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #ef4444;">Error connecting to database.</p>`;
-            }
+        if (error) {
+          showError("Could not fetch restaurants from database.");
+          return;
         }
 
-        function renderRestaurants(list) {
-            const grid = document.getElementById('restaurant-grid');
-            grid.innerHTML = "";
+        renderRestaurants(restaurants);
+      } catch (err) {
+        showError("Network or Database Connection Error.");
+      }
+    }
 
-            if (list.length === 0) {
-                grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #747d8c; padding: 20px;">No restaurants found.</p>`;
-                return;
-            }
+    function renderRestaurants(restaurants) {
+      const grid = document.getElementById('restaurant-grid');
+      const loading = document.getElementById('loading');
 
-            list.forEach(item => {
-                const menuLink = `/menu/${item.slug}`;
-                grid.innerHTML += `
-                    <a href="${menuLink}" class="card">
-                        <div class="card-img">🍲</div>
-                        <h3>${item.name}</h3>
-                        <div class="details">@${item.slug}</div>
-                        <div class="location">📍 Active Menu</div>
-                    </a>
-                `;
-            });
-        }
+      loading.style.display = 'none';
 
-        function filterRestaurants() {
-            const query = document.getElementById('search-input').value.toLowerCase().trim();
-            const filtered = allRestaurants.filter(r => 
-                (r.name && r.name.toLowerCase().includes(query)) || 
-                (r.slug && r.slug.toLowerCase().includes(query))
-            );
-            renderRestaurants(filtered);
-        }
-    </script>
+      if (!restaurants || restaurants.length === 0) {
+        grid.style.display = 'block';
+        grid.innerHTML = '<p style="text-align: center; color: var(--text-muted);">No restaurants added yet.</p>';
+        return;
+      }
+
+      // Generate clickable cards with CORRECT link format: menu.html?r=SLUG
+      grid.innerHTML = restaurants.map(rest => `
+        <a href="menu.html?r=${encodeURIComponent(rest.slug)}" class="restaurant-card">
+          <div>
+            <div class="restaurant-name">${rest.name || 'Unnamed Restaurant'}</div>
+            <div class="restaurant-slug">@${rest.slug}</div>
+          </div>
+          <div class="view-menu-badge">View Menu &rarr;</div>
+        </a>
+      `).join('');
+
+      grid.style.display = 'grid';
+    }
+
+    function showError(message) {
+      document.getElementById('loading').style.display = 'none';
+      const errBox = document.getElementById('error-view');
+      document.getElementById('error-msg').innerText = message;
+      errBox.style.display = 'block';
+    }
+
+    window.addEventListener('load', fetchRestaurants);
+  </script>
 </body>
 </html>
