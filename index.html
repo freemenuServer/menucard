@@ -49,10 +49,10 @@
     }
     .owner-btn:hover { background: #334155; transform: translateY(-1px); }
 
-    /* Hero Section */
+    /* Hero & Search Section */
     .hero {
       text-align: center;
-      padding: 50px 20px 36px;
+      padding: 48px 20px 36px;
       background: #ffffff;
       border-bottom: 1px solid #f1f5f9;
     }
@@ -69,12 +69,44 @@
       letter-spacing: 0.5px;
     }
     .hero h1 { font-size: 32px; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.5px; }
-    .hero p { font-size: 15px; color: var(--text-muted); max-width: 480px; margin: 0 auto; line-height: 1.5; }
+    .hero p { font-size: 15px; color: var(--text-muted); max-width: 480px; margin: 0 auto 24px; line-height: 1.5; }
+
+    /* Search Input Styling */
+    .search-box-wrapper {
+      max-width: 460px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .search-input {
+      width: 100%;
+      padding: 14px 20px 14px 46px;
+      font-size: 15px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      outline: none;
+      transition: all 0.2s ease;
+      background: #f8fafc;
+    }
+    .search-input:focus {
+      border-color: var(--primary);
+      background: #ffffff;
+      box-shadow: 0 4px 12px rgba(255, 71, 87, 0.15);
+    }
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
 
     /* Main Container */
     .container { max-width: 900px; width: 100%; margin: 32px auto; padding: 0 16px; flex: 1; }
-    .section-header { margin-bottom: 24px; }
+    .section-header { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
     .section-title { font-size: 20px; font-weight: 800; color: var(--text-dark); }
+    .count-badge { font-size: 13px; color: var(--text-muted); font-weight: 600; background: #e2e8f0; padding: 3px 10px; border-radius: 12px; }
 
     /* Restaurant Grid */
     .restaurant-grid {
@@ -190,17 +222,30 @@
     <a href="owner.html" class="owner-btn">Owner Portal</a>
   </nav>
 
-  <!-- Hero Section -->
+  <!-- Hero & Search Section -->
   <header class="hero">
     <span class="hero-badge">Digital QR Menu</span>
     <h1>Explore Restaurants</h1>
-    <p>Browse registered places or scan QR codes to view instant digital menus.</p>
+    <p>Browse registered places or search by name to view digital menus.</p>
+    
+    <!-- Search Bar -->
+    <div class="search-box-wrapper">
+      <span class="search-icon">&#128065;</span>
+      <input 
+        type="text" 
+        id="search-input" 
+        class="search-input" 
+        placeholder="Search restaurant by name or code..."
+        oninput="filterRestaurants()"
+      />
+    </div>
   </header>
 
   <!-- Restaurants List Container -->
   <main class="container">
     <div class="section-header">
       <h2 class="section-title">Registered Places</h2>
+      <span id="res-count" class="count-badge">0</span>
     </div>
 
     <!-- Loading -->
@@ -224,6 +269,7 @@
 
   <script>
     let supabaseClient = null;
+    let allRestaurants = []; // Stores fetched list for client-side filtering
 
     function initSupabase() {
       const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
@@ -254,21 +300,34 @@
           return;
         }
 
-        renderRestaurants(restaurants);
+        allRestaurants = restaurants || [];
+        renderRestaurants(allRestaurants);
       } catch (err) {
         showError("Network error. Please try again.");
       }
     }
 
+    function filterRestaurants() {
+      const query = document.getElementById('search-input').value.toLowerCase().trim();
+      const filtered = allRestaurants.filter(rest => {
+        const nameMatch = (rest.name || '').toLowerCase().includes(query);
+        const slugMatch = (rest.slug || '').toLowerCase().includes(query);
+        return nameMatch || slugMatch;
+      });
+      renderRestaurants(filtered);
+    }
+
     function renderRestaurants(restaurants) {
       const grid = document.getElementById('restaurant-grid');
       const loading = document.getElementById('loading');
+      const countBadge = document.getElementById('res-count');
 
       loading.style.display = 'none';
+      countBadge.innerText = restaurants.length;
 
       if (!restaurants || restaurants.length === 0) {
         grid.style.display = 'block';
-        grid.innerHTML = '<p style="text-align: center; color: var(--text-muted);">No restaurants added yet.</p>';
+        grid.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 40px 0;">No matching restaurants found.</p>';
         return;
       }
 
@@ -277,7 +336,6 @@
         const slug = rest.slug || 'menu';
         const firstLetter = name.charAt(0).toUpperCase();
 
-        // Check if database has logo_url, else generate Round Letter Icon
         const logoHtml = rest.logo_url 
           ? `<img src="${rest.logo_url}" alt="${name}" class="round-logo" onerror="this.outerHTML='<div class=\\'round-logo\\'>${firstLetter}</div>'">`
           : `<div class="round-logo">${firstLetter}</div>`;
