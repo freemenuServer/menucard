@@ -1,153 +1,300 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FreeMenu.in | QR Digital Menu SaaS Platform</title>
-  <style>
-    :root {
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
-      --bg-dark: #0f172a;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>freemenu.in - Digital Menu Platform</title>
+    <!-- Supabase JS v2 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background-color: #f8f9fa; color: #333; }
+        
+        /* Clean Header Bar */
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 14px 5%; 
+            background: #ffffff; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .logo { 
+            font-size: 22px; 
+            font-weight: 800; 
+            color: #ff4757; 
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-btn { 
+            background: #ff4757; 
+            color: #fff; 
+            padding: 9px 16px; 
+            border-radius: 20px; 
+            text-decoration: none; 
+            font-weight: 600; 
+            font-size: 14px;
+            transition: background 0.2s ease;
+        }
+        
+        .nav-btn:hover { background: #e03847; }
+        
+        /* Hero Section */
+        .hero { text-align: center; padding: 40px 20px 30px; background: #fff; border-bottom: 1px solid #eee; }
+        .hero h1 { margin-bottom: 8px; font-size: 28px; font-weight: 700; color: #1e272e; }
+        .hero p { color: #666; font-size: 15px; }
+        
+        /* Live Search Bar */
+        .search-container { position: relative; max-width: 550px; margin: 24px auto 0; }
+        .search-box { 
+            width: 100%; 
+            padding: 14px 45px 14px 20px; 
+            font-size: 15px; 
+            border: 2px solid #e1e8ed; 
+            border-radius: 30px; 
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-box:focus { border-color: #ff4757; }
+        .search-icon { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: #888; }
+        
+        /* Restaurant Grid */
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 15px; }
+        .section-title { 
+            margin-bottom: 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 0 5px;
+        }
+        .section-title h2 { font-size: 18px; color: #2f3542; }
+        
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+            gap: 15px; 
+        }
+        
+        .card { 
+            background: #fff; 
+            border-radius: 12px; 
+            padding: 15px 10px; 
+            text-align: center; 
+            border: 1px solid #edf2f7; 
+            text-decoration: none; 
+            color: inherit;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+        .card-img { 
+            width: 70px; 
+            height: 70px; 
+            border-radius: 50%; 
+            background: #ffeaa7; 
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .card h3 { font-size: 15px; margin-bottom: 4px; color: #2f3542; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card .details { font-size: 12px; color: #747d8c; margin-bottom: 2px; }
+        .card .location { font-size: 12px; color: #ff4757; font-weight: 500; }
+        
+        /* Structured Multi-Column Footer */
+        footer { 
+            background: #1e272e; 
+            color: #a4b0be; 
+            padding: 40px 5% 20px; 
+            margin-top: 50px; 
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 30px;
+        }
+        
+        .footer-col h4 { 
+            color: #ff4757; 
+            margin-bottom: 15px; 
+            font-size: 16px; 
+        }
+        
+        .footer-col p { 
+            font-size: 14px; 
+            line-height: 1.6; 
+            color: #dcdde1; 
+        }
+        
+        .footer-col a { 
+            color: #dcdde1; 
+            font-size: 14px; 
+            text-decoration: none; 
+            display: block; 
+            margin-bottom: 8px;
+            transition: color 0.2s;
+        }
+        
+        .footer-col a:hover { color: #ff4757; }
+        
+        .copyright { 
+            max-width: 1200px;
+            margin: 30px auto 0;
+            padding-top: 20px;
+            border-top: 1px solid #353b48;
+            font-size: 13px; 
+            text-align: center;
+            color: #718093;
+        }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background-color: #f8fafc; color: var(--text-main); line-height: 1.6; }
-
-    /* Header Navigation */
-    header {
-      background: white;
-      border-bottom: 1px solid #e2e8f0;
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-    .logo { font-size: 20px; font-weight: 800; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 8px; }
-    .nav-btn { background: var(--primary); color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; transition: 0.2s; }
-    .nav-btn:hover { background: var(--primary-hover); }
-
-    /* Hero Section */
-    .hero {
-      max-width: 1000px;
-      margin: 60px auto 40px;
-      padding: 0 20px;
-      text-align: center;
-    }
-    .hero h1 { font-size: 42px; font-weight: 800; color: #0f172a; margin-bottom: 16px; letter-spacing: -0.5px; }
-    .hero p { font-size: 18px; color: var(--text-muted); max-width: 650px; margin: 0 auto 30px; }
-
-    /* Search Box */
-    .search-container {
-      max-width: 500px;
-      margin: 0 auto 40px;
-      display: flex;
-      gap: 8px;
-      background: white;
-      padding: 6px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01);
-      border: 1px solid #e2e8f0;
-    }
-    .search-container input {
-      flex: 1;
-      border: none;
-      padding: 12px 16px;
-      font-size: 15px;
-      outline: none;
-      border-radius: 8px;
-    }
-    .search-container button {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    /* Features Grid */
-    .features {
-      max-width: 1000px;
-      margin: 60px auto;
-      padding: 0 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 24px;
-    }
-    .feature-card {
-      background: white;
-      padding: 28px;
-      border-radius: 16px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
-    }
-    .feature-card h3 { font-size: 18px; margin-bottom: 8px; color: var(--bg-dark); }
-    .feature-card p { font-size: 14px; color: var(--text-muted); }
-
-    /* Footer */
-    footer { text-align: center; padding: 40px 20px; font-size: 14px; color: var(--text-muted); border-top: 1px solid #e2e8f0; background: white; margin-top: 60px; }
-
-    @media (max-width: 640px) {
-      .hero h1 { font-size: 30px; }
-      .hero p { font-size: 15px; }
-      .search-container { flex-direction: column; }
-    }
-  </style>
+        @media (min-width: 768px) {
+            .grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+            .card-img { width: 85px; height: 85px; }
+            .card h3 { font-size: 16px; }
+            .hero h1 { font-size: 34px; }
+        }
+    </style>
 </head>
 <body>
 
-  <!-- Top Nav Bar -->
-  <header>
-    <a href="/" class="logo">📱 FreeMenu.in</a>
-    <a href="owner.html" class="nav-btn">Partner Login / Signup</a>
-  </header>
+    <!-- Header -->
+    <header>
+        <a href="/" class="logo">🍽️ freemenu.in</a>
+        <a href="/owner.html" class="nav-btn">+ Owner Portal</a>
+    </header>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <h1>Transform Your Restaurant Menu Into a Smart QR Experience</h1>
-    <p>Zero print costs, instant real-time price updates, and effortless digital ordering for your customers.</p>
+    <!-- Search Section -->
+    <section class="hero">
+        <h1>Find Your Favorite Restaurant Menu</h1>
+        <p>Instant digital menus at your fingertips</p>
+        <div class="search-container">
+            <input type="text" id="search-input" class="search-box" placeholder="Search restaurant name or slug..." oninput="filterRestaurants()">
+            <span class="search-icon">🔍</span>
+        </div>
+    </section>
 
-    <!-- Quick Search Restaurant Menu -->
-    <div class="search-container">
-      <input type="text" id="slug-input" placeholder="Enter Restaurant Slug (e.g. royal-spices)">
-      <button onclick="openMenu()">View Menu</button>
+    <!-- Restaurant Grid -->
+    <div class="container">
+        <div class="section-title">
+            <h2>Partner Restaurants</h2>
+            <small id="restaurant-count" style="color:#747d8c;">Loading...</small>
+        </div>
+        
+        <div class="grid" id="restaurant-grid">
+            <!-- Dynamic Database Cards Inject Here -->
+        </div>
     </div>
-  </section>
 
-  <!-- Features Grid -->
-  <section class="features">
-    <div class="feature-card">
-      <h3>🚀 Instant Digital Menu</h3>
-      <p>No app downloads required. Customers scan your QR code and browse the full menu in seconds.</p>
-    </div>
-    <div class="feature-card">
-      <h3>⚡ Real-Time Price Updates</h3>
-      <p>Change prices or hide out-of-stock items instantly from your smartphone owner portal.</p>
-    </div>
-    <div class="feature-card">
-      <h3>📲 WhatsApp Ordering</h3>
-      <p>Allow customers to directly send their order details to your phone or kitchen counter via WhatsApp.</p>
-    </div>
-  </section>
+    <!-- Multi-Column Footer -->
+    <footer>
+        <div class="footer-container">
+            <!-- Column 1: Brand Info -->
+            <div class="footer-col">
+                <h4>freemenu.in SaaS</h4>
+                <p>Digital QR Menu Hosting platform for modern restaurants and cafes.</p>
+            </div>
+            
+            <!-- Column 2: Navigation Links -->
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <a href="/">Search Menus</a>
+                <a href="/owner.html">Register / Login Restaurant</a>
+                <a href="#">Pricing Plans</a>
+            </div>
+            
+            <!-- Column 3: Contact Details -->
+            <div class="footer-col">
+                <h4>Contact Us</h4>
+                <p>Email: support@freemenu.in</p>
+            </div>
+        </div>
 
-  <!-- Footer -->
-  <footer>
-    <p>© 2026 FreeMenu.in — Smart Digital Menu SaaS Platform</p>
-  </footer>
+        <div class="copyright">
+            © 2026 freemenu.in Platform. All rights reserved.
+        </div>
+    </footer>
 
-  <script>
-    function openMenu() {
-      const slug = document.getElementById('slug-input').value.trim();
-      if (!slug) return alert("Please enter a valid restaurant name or slug!");
-      window.location.href = `menu.html?slug=${encodeURIComponent(slug)}`;
-    }
-  </script>
+    <script>
+        // Embedded Supabase Project Credentials
+        const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co"; 
+        const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE"; 
+
+        // Initialize Supabase Client
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let allRestaurants = [];
+
+        window.onload = fetchRestaurants;
+
+        async function fetchRestaurants() {
+            const grid = document.getElementById('restaurant-grid');
+            const countEl = document.getElementById('restaurant-count');
+
+            try {
+                // Fetch restaurants list from Supabase
+                const { data: restaurants, error } = await supabaseClient
+                    .from('restaurants')
+                    .select('*');
+
+                if (error) {
+                    console.error('Error fetching restaurants:', error);
+                    grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #ef4444;">Failed to load restaurants.</p>`;
+                    countEl.innerText = "0 Available";
+                    return;
+                }
+
+                allRestaurants = restaurants || [];
+                countEl.innerText = `${allRestaurants.length} Available`;
+                renderRestaurants(allRestaurants);
+
+            } catch (err) {
+                console.error('Runtime Error:', err);
+                grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #ef4444;">Error connecting to database.</p>`;
+            }
+        }
+
+        function renderRestaurants(list) {
+            const grid = document.getElementById('restaurant-grid');
+            grid.innerHTML = "";
+
+            if (list.length === 0) {
+                grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #747d8c; padding: 20px;">No restaurants found.</p>`;
+                return;
+            }
+
+            list.forEach(item => {
+                const menuLink = `/menu/${item.slug}`;
+                grid.innerHTML += `
+                    <a href="${menuLink}" class="card">
+                        <div class="card-img">🍲</div>
+                        <h3>${item.name}</h3>
+                        <div class="details">@${item.slug}</div>
+                        <div class="location">📍 Active Menu</div>
+                    </a>
+                `;
+            });
+        }
+
+        function filterRestaurants() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            const filtered = allRestaurants.filter(r => 
+                (r.name && r.name.toLowerCase().includes(query)) || 
+                (r.slug && r.slug.toLowerCase().includes(query))
+            );
+            renderRestaurants(filtered);
+        }
+    </script>
 </body>
 </html>
