@@ -15,7 +15,6 @@
     th, td { text-align: left; padding: 12px; border-bottom: 1px solid #374151; }
     th { background: #374151; }
     .del-btn { background: #ef4444; padding: 6px 12px; width: auto; font-size: 12px; }
-    .badge { background: #10b981; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
   </style>
 </head>
 <body>
@@ -23,7 +22,7 @@
   <!-- Admin Login Screen -->
   <div id="auth-box" class="card" style="max-width:400px;">
     <h2>Super Admin Login</h2>
-    <input type="email" id="email" placeholder="Admin Email">
+    <input type="email" id="email" value="athravsharma2828@gmail.com" readonly style="opacity: 0.7;">
     <input type="password" id="password" placeholder="Password">
     <button onclick="adminLogin()">Login as Admin</button>
   </div>
@@ -52,7 +51,6 @@
       <thead>
         <tr>
           <th>Restaurant</th>
-          <th>Owner Email</th>
           <th>Public Link</th>
           <th>Action</th>
         </tr>
@@ -86,14 +84,17 @@
         document.getElementById('admin-dashboard').classList.remove('hidden');
         loadAdminData();
       } else {
-        alert("Access Denied! You are not a Super Admin.");
+        alert("Access Denied! You are not registered as Super Admin in SQL.");
         await db.auth.signOut();
       }
     }
 
     async function loadAdminData() {
-      const { data: restaurants } = await db.from('restaurants').select('*, profiles(email)');
+      // Direct Fetch Without Relying On Table Joins
+      const { data: restaurants, error } = await db.from('restaurants').select('*');
       const { count: itemsCount } = await db.from('menu_items').select('*', { count: 'exact', head: true });
+
+      if (error) console.error("Fetch Error:", error);
 
       document.getElementById('stat-restaurants').innerText = restaurants ? restaurants.length : 0;
       document.getElementById('stat-items').innerText = itemsCount || 0;
@@ -101,22 +102,23 @@
       const tableBody = document.getElementById('restaurants-table');
       tableBody.innerHTML = '';
 
-      if (restaurants) {
+      if (restaurants && restaurants.length > 0) {
         restaurants.forEach(rest => {
           tableBody.innerHTML += `
             <tr>
               <td><strong>${rest.name}</strong><br><small>📞 ${rest.phone || 'N/A'}</small></td>
-              <td>${rest.profiles ? rest.profiles.email : 'N/A'}</td>
               <td><a href="menu.html?slug=${rest.slug}" target="_blank" style="color:#818cf8;">View Menu</a></td>
               <td><button class="del-btn" onclick="deleteRestaurant('${rest.id}')">Delete</button></td>
             </tr>
           `;
         });
+      } else {
+        tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center;">Koi restaurant nahi mila.</td></tr>`;
       }
     }
 
     async function deleteRestaurant(id) {
-      if (confirm("Kya aap sach me is restaurant ko delete karna chahte hain?")) {
+      if (confirm("Kya aap is restaurant ko delete karna chahte hain?")) {
         await db.from('restaurants').delete().eq('id', id);
         alert("Restaurant Deleted!");
         loadAdminData();
