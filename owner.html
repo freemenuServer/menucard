@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Owner Dashboard - FreeMenu.in</title>
+  <!-- Supabase JS v2 -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- QR Code Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
     :root { --primary: #4f46e5; --bg: #f8fafc; --text: #0f172a; }
@@ -13,21 +15,23 @@
     .container { max-width: 800px; margin: 0 auto; }
     .card { background: white; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
     h1, h2 { font-weight: 700; margin-bottom: 12px; }
+    .status-box { margin-top: 10px; font-weight: 600; font-size: 15px; }
     .link-box { background: #e0e7ff; color: #3730a3; padding: 12px 16px; border-radius: 8px; font-weight: 600; display: inline-block; margin-top: 10px; word-break: break-all; }
     .link-box a { color: #3730a3; text-decoration: underline; }
     #qrcode { margin-top: 15px; }
-    .btn { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+    .err-text { color: #dc2626; font-weight: 600; }
+    .warn-text { color: #d97706; font-weight: 600; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="card">
       <h1>Restaurant Owner Dashboard</h1>
-      <p id="owner-email">Loading details...</p>
+      <div id="owner-email" class="status-box">Loading account details...</div>
       
       <!-- Public Clean Link Display -->
       <div class="link-box" id="public-link-container">
-        Live Link: <span id="public-link">Fetching...</span>
+        Live Link: <span id="public-link">Fetching link...</span>
       </div>
 
       <!-- QR Code Section -->
@@ -39,47 +43,64 @@
   </div>
 
   <script>
-    // Supabase Initialization
-    const SUPABASE_URL = "https://YOUR_SUPABASE_PROJECT_URL.supabase.co";
-    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Embedded Supabase Project Credentials
+    const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co"; 
+    const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE"; 
+
+    // Initialize Supabase Client
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     async function loadDashboard() {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      const emailEl = document.getElementById('owner-email');
+      const linkEl = document.getElementById('public-link');
 
-      if (authError || !user) {
-        alert("Please login first!");
-        window.location.href = "/login.html";
-        return;
+      try {
+        // Step A: Check User Auth Session
+        const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+
+        if (authError || !user) {
+          emailEl.innerHTML = `<span class="err-text">🔒 User not logged in! <a href="/login.html">Click here to Login</a></span>`;
+          linkEl.innerText = "Login Required";
+          return;
+        }
+
+        emailEl.innerText = `Logged in as: ${user.email}`;
+
+        // Step B: Fetch Restaurant mapped to this owner_id
+        const { data: restaurant, error: restError } = await supabaseClient
+          .from('restaurants')
+          .select('*')
+          .eq('owner_id', user.id)
+          .maybeSingle();
+
+        if (restError) {
+          console.error("Supabase Error:", restError);
+          linkEl.innerHTML = `<span class="err-text">Database Query Error!</span>`;
+          return;
+        }
+
+        if (!restaurant) {
+          linkEl.innerHTML = `<span class="warn-text">No restaurant registered for this owner ID yet.</span>`;
+          return;
+        }
+
+        // Step C: Set Clean URL Path (/menu/slug)
+        const fullCleanUrl = `${window.location.origin}/menu/${restaurant.slug}`;
+
+        linkEl.innerHTML = `<a href="${fullCleanUrl}" target="_blank">${fullCleanUrl}</a>`;
+
+        // Step D: Render QR Code
+        document.getElementById('qrcode').innerHTML = "";
+        new QRCode(document.getElementById("qrcode"), {
+          text: fullCleanUrl,
+          width: 160,
+          height: 160
+        });
+
+      } catch (err) {
+        console.error("Runtime Error:", err);
+        emailEl.innerText = "Error running script. Open browser console (F12).";
       }
-
-      document.getElementById('owner-email').innerText = `Logged in as: ${user.email}`;
-
-      // Fetch restaurant associated with owner
-      const { data, error } = await supabase
-        .from('restaurants')
-        .select('*')
-        .eq('owner_id', user.id)
-        .single();
-
-      if (error || !data) {
-        document.getElementById('public-link').innerText = "Restaurant profile not found.";
-        return;
-      }
-
-      // Clean Path Format: freemenu.in/menu/urban
-      const fullCleanUrl = `${window.location.origin}/menu/${data.slug}`;
-
-      document.getElementById('public-link').innerHTML = 
-        `<a href="${fullCleanUrl}" target="_blank">${fullCleanUrl}</a>`;
-
-      // Generate QR Code for clean URL
-      document.getElementById('qrcode').innerHTML = "";
-      new QRCode(document.getElementById("qrcode"), {
-        text: fullCleanUrl,
-        width: 160,
-        height: 160
-      });
     }
 
     window.onload = loadDashboard;
