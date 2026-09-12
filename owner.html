@@ -40,6 +40,8 @@
     .btn:hover { background: #e03847; }
     .btn-secondary { background: #3b82f6; }
     .btn-secondary:hover { background: #2563eb; }
+    .btn-edit { background: #f59e0b; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .btn-edit:hover { background: #d97706; }
     
     .delete-btn { background: #fee2e2; color: #dc2626; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; }
     .delete-btn:hover { background: #fca5a5; }
@@ -48,9 +50,10 @@
     .item-card { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
     .item-info strong { display: block; font-size: 14px; }
     .item-info span { font-size: 12px; color: #64748b; }
-    .item-right { display: flex; align-items: center; gap: 12px; }
-    .item-price { font-weight: 700; color: #16a34a; font-size: 15px; }
+    .item-right { display: flex; align-items: center; gap: 8px; }
+    .item-price { font-weight: 700; color: #16a34a; font-size: 15px; margin-right: 6px; }
 
+    .badge { display: inline-block; background: #e2e8f0; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; color: #475569; }
     .err-text { color: #dc2626; font-weight: 600; font-size: 13px; }
     .success-text { color: #16a34a; font-weight: 600; font-size: 13px; }
     .hidden { display: none !important; }
@@ -91,6 +94,21 @@
         <div id="owner-email" class="status-box">Loading...</div>
       </div>
 
+      <!-- EDIT SLUG / RESTAURANT USER ID -->
+      <div class="card">
+        <h2>Restaurant User ID (Slug)</h2>
+        <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">
+          This changes your public URL handle. Remaining changes: <strong id="slug-edits-left" style="color: var(--primary);">5</strong>/5
+        </p>
+        <form onsubmit="updateRestaurantSlug(event)">
+          <div class="row">
+            <input type="text" id="slug-input" class="form-input" placeholder="e.g. urban" required>
+            <button type="submit" id="slug-save-btn" class="btn" style="width: 140px;">Update ID</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- PUBLIC LINK & QR -->
       <div class="card">
         <div class="link-section">
           <div class="link-title">Your Public Menu Link</div>
@@ -104,7 +122,7 @@
         </div>
       </div>
 
-      <!-- Add Category -->
+      <!-- 1. ADD CATEGORY -->
       <div class="card">
         <h2>1. Add Category</h2>
         <form id="add-category-form" onsubmit="addCategory(event)">
@@ -115,7 +133,7 @@
         </form>
       </div>
 
-      <!-- Add Menu Item -->
+      <!-- 2. ADD MENU ITEM -->
       <div class="card">
         <h2>2. Add New Menu Item</h2>
         <form id="add-item-form" onsubmit="addMenuItem(event)">
@@ -141,7 +159,7 @@
         </form>
       </div>
 
-      <!-- Current Items List -->
+      <!-- CURRENT ITEMS LIST -->
       <div class="card">
         <h2>Current Menu Items</h2>
         <div id="items-list" class="item-list">
@@ -157,7 +175,7 @@
     const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE"; 
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let currentRestaurantId = null;
+    let currentRestaurant = null;
 
     async function initPage() {
       const { data: { user } } = await supabaseClient.auth.getUser();
@@ -218,10 +236,21 @@
         return;
       }
 
-      currentRestaurantId = restaurant.id;
+      currentRestaurant = restaurant;
 
-      // Cloudflare Pages Clean URL Format
-      const fullCleanUrl = `${window.location.origin}/menu/${restaurant.slug}`;
+      // Update Slug Edit UI (Limit: 5 edits max)
+      const editsLeft = Math.max(0, 5 - (restaurant.slug_edits || 0));
+      document.getElementById('slug-input').value = restaurant.slug || '';
+      document.getElementById('slug-edits-left').innerText = editsLeft;
+
+      if (editsLeft <= 0) {
+        document.getElementById('slug-input').disabled = true;
+        document.getElementById('slug-save-btn').disabled = true;
+        document.getElementById('slug-save-btn').innerText = "Limit Exceeded";
+      }
+
+      // Query Parameter Format for 100% cloudflare/static compatibility
+      const fullCleanUrl = `${window.location.origin}/menu.html?r=${restaurant.slug}`;
       linkEl.innerHTML = `<a href="${fullCleanUrl}" target="_blank">${fullCleanUrl}</a>`;
 
       document.getElementById('qrcode').innerHTML = "";
@@ -231,9 +260,47 @@
       loadMenuItems();
     }
 
+    // UPDATE RESTAURANT USER ID / SLUG (LIMIT: 5 TIMES)
+    async function updateRestaurantSlug(e) {
+      e.preventDefault();
+      if (!currentRestaurant) return;
+
+      const newSlug = document.getElementById('slug-input').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+      const btn = document.getElementById('slug-save-btn');
+
+      if (!newSlug) return alert("Please enter a valid slug.");
+      
+      const currentEdits = currentRestaurant.slug_edits || 0;
+      if (currentEdits >= 5) {
+        return alert("You have reached the maximum limit of 5 slug edits!");
+      }
+
+      btn.innerText = "Updating...";
+      btn.disabled = true;
+
+      const { error } = await supabaseClient
+        .from('restaurants')
+        .update({ 
+          slug: newSlug,
+          slug_edits: currentEdits + 1 
+        })
+        .eq('id', currentRestaurant.id);
+
+      btn.innerText = "Update ID";
+      btn.disabled = false;
+
+      if (error) {
+        alert("Error updating ID: " + error.message + " (It might already be taken by someone else)");
+      } else {
+        alert("Restaurant User ID updated successfully!");
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        loadDashboardData(user);
+      }
+    }
+
     async function addCategory(e) {
       e.preventDefault();
-      if (!currentRestaurantId) return alert("Restaurant not loaded.");
+      if (!currentRestaurant) return alert("Restaurant not loaded.");
 
       const catInput = document.getElementById('category-name');
       const catBtn = document.getElementById('add-cat-btn');
@@ -246,7 +313,7 @@
 
       const { error } = await supabaseClient
         .from('categories')
-        .insert([{ restaurant_id: currentRestaurantId, name: categoryName }]);
+        .insert([{ restaurant_id: currentRestaurant.id, name: categoryName }]);
 
       catBtn.innerText = "+ Add Category";
       catBtn.disabled = false;
@@ -265,15 +332,10 @@
       const { data: categories, error } = await supabaseClient
         .from('categories')
         .select('*')
-        .eq('restaurant_id', currentRestaurantId)
+        .eq('restaurant_id', currentRestaurant.id)
         .order('created_at', { ascending: true });
 
-      if (error) {
-        selectEl.innerHTML = '<option value="">Error loading categories</option>';
-        return;
-      }
-
-      if (!categories || categories.length === 0) {
+      if (error || !categories || categories.length === 0) {
         selectEl.innerHTML = '<option value="">No categories added yet</option>';
         return;
       }
@@ -286,7 +348,7 @@
 
     async function addMenuItem(e) {
       e.preventDefault();
-      if (!currentRestaurantId) return alert("Restaurant ID missing.");
+      if (!currentRestaurant) return alert("Restaurant ID missing.");
 
       const name = document.getElementById('item-name').value.trim();
       const category = document.getElementById('item-category-select').value;
@@ -301,7 +363,7 @@
       const { error } = await supabaseClient
         .from('menu_items')
         .insert([{ 
-          restaurant_id: currentRestaurantId, 
+          restaurant_id: currentRestaurant.id, 
           name: name, 
           category: category, 
           price: price 
@@ -324,7 +386,7 @@
       const { data: items, error } = await supabaseClient
         .from('menu_items')
         .select('*')
-        .eq('restaurant_id', currentRestaurantId);
+        .eq('restaurant_id', currentRestaurant.id);
 
       if (error || !items) {
         listEl.innerHTML = `<p class="err-text">Failed to load items.</p>`;
@@ -344,10 +406,34 @@
           </div>
           <div class="item-right">
             <span class="item-price">₹${item.price}</span>
+            <button class="btn-edit" onclick="editMenuItem('${item.id}', '${item.name}', '${item.price}', '${item.category || ''}')">✏️ Edit</button>
             <button class="delete-btn" onclick="deleteMenuItem('${item.id}')">🗑️ Delete</button>
           </div>
         </div>
       `).join('');
+    }
+
+    // EDIT MENU ITEM FUNCTION
+    async function editMenuItem(id, oldName, oldPrice, oldCategory) {
+      const newName = prompt("Edit Item Name:", oldName);
+      if (newName === null) return;
+
+      const newPrice = prompt("Edit Price (₹):", oldPrice);
+      if (newPrice === null) return;
+
+      const { error } = await supabaseClient
+        .from('menu_items')
+        .update({ 
+          name: newName.trim(), 
+          price: parseFloat(newPrice) 
+        })
+        .eq('id', id);
+
+      if (error) {
+        alert("Failed to update item: " + error.message);
+      } else {
+        loadMenuItems();
+      }
     }
 
     async function deleteMenuItem(itemId) {
