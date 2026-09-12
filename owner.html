@@ -12,13 +12,24 @@
     :root { --primary: #4f46e5; --bg: #f8fafc; --text: #0f172a; }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { background: var(--bg); color: var(--text); padding: 20px; }
-    .container { max-width: 800px; margin: 0 auto; }
-    .card { background: white; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-    h1, h2 { font-weight: 700; margin-bottom: 12px; }
-    .status-box { margin-top: 10px; font-weight: 600; font-size: 15px; }
-    .link-box { background: #e0e7ff; color: #3730a3; padding: 12px 16px; border-radius: 8px; font-weight: 600; display: inline-block; margin-top: 10px; word-break: break-all; }
-    .link-box a { color: #3730a3; text-decoration: underline; }
-    #qrcode { margin-top: 15px; }
+    .container { max-width: 650px; margin: 0 auto; }
+    .card { background: white; padding: 28px; border-radius: 16px; border: 1px solid #e2e8f0; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    h1 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+    .status-box { color: #64748b; font-size: 14px; margin-bottom: 20px; word-break: break-all; }
+    
+    .link-section { background: #f1f5f9; padding: 16px; border-radius: 10px; border: 1px dashed #cbd5e1; margin-bottom: 24px; }
+    .link-title { font-size: 13px; font-weight: 600; text-transform: uppercase; color: #64748b; margin-bottom: 6px; }
+    .link-box a { color: var(--primary); font-weight: 700; font-size: 16px; text-decoration: none; word-break: break-all; }
+    .link-box a:hover { text-decoration: underline; }
+
+    .qr-section { text-align: center; background: #fafafa; padding: 20px; border-radius: 12px; border: 1px solid #f1f5f9; }
+    .qr-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+    #qrcode { display: flex; justify-content: center; margin: 16px 0; }
+    #qrcode img { border: 8px solid white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+
+    .btn-download { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-top: 8px; }
+    .btn-download:hover { background: #4338ca; }
+    
     .err-text { color: #dc2626; font-weight: 600; }
     .warn-text { color: #d97706; font-weight: 600; }
   </style>
@@ -30,14 +41,16 @@
       <div id="owner-email" class="status-box">Loading account details...</div>
       
       <!-- Public Clean Link Display -->
-      <div class="link-box" id="public-link-container">
-        Live Link: <span id="public-link">Fetching link...</span>
+      <div class="link-section">
+        <div class="link-title">Your Digital Menu Link</div>
+        <div class="link-box" id="public-link">Fetching link...</div>
       </div>
 
       <!-- QR Code Section -->
-      <div id="qrcode-section" style="margin-top: 20px;">
-        <h2>Your Table QR Code</h2>
+      <div class="qr-section">
+        <div class="qr-title">Table Scan QR Code</div>
         <div id="qrcode"></div>
+        <button class="btn-download" onclick="downloadQR()">Download QR Code</button>
       </div>
     </div>
   </div>
@@ -80,7 +93,7 @@
         }
 
         if (!restaurant) {
-          linkEl.innerHTML = `<span class="warn-text">No restaurant registered for this owner ID yet.</span>`;
+          linkEl.innerHTML = `<span class="warn-text">No restaurant registered for this account yet.</span>`;
           return;
         }
 
@@ -93,13 +106,25 @@
         document.getElementById('qrcode').innerHTML = "";
         new QRCode(document.getElementById("qrcode"), {
           text: fullCleanUrl,
-          width: 160,
-          height: 160
+          width: 180,
+          height: 180
         });
 
       } catch (err) {
         console.error("Runtime Error:", err);
         emailEl.innerText = "Error running script. Open browser console (F12).";
+      }
+    }
+
+    function downloadQR() {
+      const qrImg = document.querySelector('#qrcode img');
+      if (qrImg) {
+        const link = document.createElement('a');
+        link.href = qrImg.src;
+        link.download = 'restaurant-menu-qr.png';
+        link.click();
+      } else {
+        alert("QR Code is not ready yet!");
       }
     }
 
