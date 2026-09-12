@@ -58,7 +58,6 @@
 </head>
 <body>
   <div class="container">
-    
     <div class="header-bar">
       <a href="/" class="logo-title">🍽️ freemenu.in</a>
       <button id="logout-btn" class="logout-btn hidden" onclick="logout()">Logout</button>
@@ -105,7 +104,7 @@
         </div>
       </div>
 
-      <!-- Add Category Section -->
+      <!-- Add Category -->
       <div class="card">
         <h2>1. Add Category</h2>
         <form id="add-category-form" onsubmit="addCategory(event)">
@@ -116,7 +115,7 @@
         </form>
       </div>
 
-      <!-- Add Menu Item Section -->
+      <!-- Add Menu Item -->
       <div class="card">
         <h2>2. Add New Menu Item</h2>
         <form id="add-item-form" onsubmit="addMenuItem(event)">
@@ -221,6 +220,7 @@
 
       currentRestaurantId = restaurant.id;
 
+      // Cloudflare Pages Clean URL Format
       const fullCleanUrl = `${window.location.origin}/menu/${restaurant.slug}`;
       linkEl.innerHTML = `<a href="${fullCleanUrl}" target="_blank">${fullCleanUrl}</a>`;
 
@@ -231,7 +231,6 @@
       loadMenuItems();
     }
 
-    // Database mein Permamently Category Add Karein
     async function addCategory(e) {
       e.preventDefault();
       if (!currentRestaurantId) return alert("Restaurant not loaded.");
@@ -260,7 +259,6 @@
       }
     }
 
-    // Database se Categories Load karke Dropdown mein Dikhayein
     async function loadCategories() {
       const selectEl = document.getElementById('item-category-select');
 
@@ -286,12 +284,11 @@
       });
     }
 
-    // Menu Item Add Karein
     async function addMenuItem(e) {
       e.preventDefault();
       if (!currentRestaurantId) return alert("Restaurant ID missing.");
 
-      const name = document.getElementById('item-name').value;
+      const name = document.getElementById('item-name').value.trim();
       const category = document.getElementById('item-category-select').value;
       const price = parseFloat(document.getElementById('item-price').value);
       const saveBtn = document.getElementById('save-item-btn');
@@ -303,7 +300,12 @@
 
       const { error } = await supabaseClient
         .from('menu_items')
-        .insert([{ restaurant_id: currentRestaurantId, name, category, price }]);
+        .insert([{ 
+          restaurant_id: currentRestaurantId, 
+          name: name, 
+          category: category, 
+          price: price 
+        }]);
 
       saveBtn.innerText = "+ Add Item to Menu";
       saveBtn.disabled = false;
@@ -316,7 +318,6 @@
       }
     }
 
-    // Menu Items Load & Delete Action
     async function loadMenuItems() {
       const listEl = document.getElementById('items-list');
       
