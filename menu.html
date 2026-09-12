@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Digital Menu - FreeMenu.in</title>
-  
-  <!-- Supabase CDN (Unpkg for maximum reliability) -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  
+
+  <!-- Correct Supabase UMD Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
   <style>
     :root { 
       --primary: #ff4757; 
@@ -64,7 +64,7 @@
     .item-name { font-size: 16px; font-weight: 600; color: var(--text-dark); margin-bottom: 4px; }
     .item-price { font-size: 16px; font-weight: 700; color: #16a34a; white-space: nowrap; }
 
-    /* States */
+    /* Statuses */
     .status-container { text-align: center; padding: 60px 20px; }
     .status-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
     .status-sub { font-size: 14px; color: var(--text-muted); }
@@ -116,74 +116,85 @@
   <script>
     let supabaseClient = null;
 
-    // Window Load Event to guarantee Supabase CDN is loaded
-    window.addEventListener('load', function() {
-      if (typeof window.supabase !== 'undefined') {
-        const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co"; 
-        const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE"; 
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        loadMenu();
-      } else {
-        showError("Loading Error", "Could not load database library. Please refresh the page.");
-      }
-    });
+    // Helper: Safely initialize Supabase client
+    function initSupabase() {
+      const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co"; 
+      const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE"; 
 
-    // Query Parameter extract function
+      if (window.supabase && typeof window.supabase.createClient === 'function') {
+        return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      } else if (typeof createClient === 'function') {
+        return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+      return null;
+    }
+
+    // Helper: Extract query parameter 'r' or 'restaurant'
     function getSlugFromUrl() {
       const urlParams = new URLSearchParams(window.location.search);
       return urlParams.get('r') || urlParams.get('restaurant');
     }
 
     async function loadMenu() {
+      supabaseClient = initSupabase();
+
+      if (!supabaseClient) {
+        showError("Script Error", "Supabase library could not be loaded. Please refresh the page.");
+        return;
+      }
+
       const slug = getSlugFromUrl();
 
       if (!slug) {
-        showError("Invalid Menu Link", "Please open link with restaurant code, e.g., menu.html?r=urbanpunjab");
+        showError("Invalid Link", "No restaurant code specified in URL (e.g. ?r=urbanpunjab)");
         return;
       }
 
-      // 1. Fetch Restaurant Details
-      const { data: restaurant, error: restError } = await supabaseClient
-        .from('restaurants')
-        .select('*')
-        .eq('slug', slug)
-        .maybeSingle();
+      try {
+        // 1. Fetch Restaurant
+        const { data: restaurant, error: restError } = await supabaseClient
+          .from('restaurants')
+          .select('*')
+          .eq('slug', slug)
+          .maybeSingle();
 
-      if (restError || !restaurant) {
-        showError("Restaurant Not Found", `No restaurant found with code '${slug}'`);
-        return;
+        if (restError || !restaurant) {
+          showError("Restaurant Not Found", `No restaurant found with code '${slug}'`);
+          return;
+        }
+
+        document.getElementById('restaurant-name').innerText = restaurant.name || slug.toUpperCase();
+        document.title = `${restaurant.name || slug} - FreeMenu.in`;
+
+        // 2. Fetch Menu Items
+        const { data: items, error: itemsError } = await supabaseClient
+          .from('menu_items')
+          .select('*')
+          .eq('restaurant_id', restaurant.id);
+
+        if (itemsError || !items || items.length === 0) {
+          document.getElementById('loading-state').style.display = 'none';
+          document.getElementById('menu-view').style.display = 'block';
+          document.getElementById('menu-container').innerHTML = `
+            <div class="status-container" style="padding: 40px 0;">
+              <div class="status-sub">No menu items added yet.</div>
+            </div>
+          `;
+          return;
+        }
+
+        // 3. Group Items by Category
+        const groupedItems = {};
+        items.forEach(item => {
+          const cat = item.category || 'General';
+          if (!groupedItems[cat]) groupedItems[cat] = [];
+          groupedItems[cat].push(item);
+        });
+
+        renderMenuUI(groupedItems);
+      } catch (err) {
+        showError("Connection Error", "Unable to connect to database. Please check your internet or Supabase URL.");
       }
-
-      document.getElementById('restaurant-name').innerText = restaurant.name || "Menu";
-      document.title = `${restaurant.name || 'Menu'} - FreeMenu.in`;
-
-      // 2. Fetch Menu Items
-      const { data: items, error: itemsError } = await supabaseClient
-        .from('menu_items')
-        .select('*')
-        .eq('restaurant_id', restaurant.id);
-
-      if (itemsError || !items || items.length === 0) {
-        document.getElementById('loading-state').style.display = 'none';
-        document.getElementById('menu-view').style.display = 'block';
-        document.getElementById('menu-container').innerHTML = `
-          <div class="status-container" style="padding: 40px 0;">
-            <div class="status-sub">No items found in this menu yet.</div>
-          </div>
-        `;
-        return;
-      }
-
-      // 3. Group By Category
-      const groupedItems = {};
-      items.forEach(item => {
-        const cat = item.category || 'General';
-        if (!groupedItems[cat]) groupedItems[cat] = [];
-        groupedItems[cat].push(item);
-      });
-
-      // 4. Render Items
-      renderMenuUI(groupedItems);
     }
 
     function renderMenuUI(groupedItems) {
@@ -204,7 +215,7 @@
         const itemsHtml = groupedItems[category].map(item => `
           <div class="menu-card">
             <div class="item-info">
-              <div class="item-name">${item.name || item.title}</div>
+              <div class="item-name">${item.name}</div>
             </div>
             <div class="item-price">₹${item.price}</div>
           </div>
@@ -225,6 +236,9 @@
       if (message) document.getElementById('error-sub').innerText = message;
       errEl.style.display = 'block';
     }
+
+    // Run on full page load
+    window.addEventListener('load', loadMenu);
   </script>
 </body>
 </html>
