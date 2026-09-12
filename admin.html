@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Admin Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: sans-serif; background: #111827; color: white; margin: 0; padding: 20px; }
+    .card { background: #1f2937; max-width: 800px; margin: 20px auto; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+    input, button { width: 100%; padding: 12px; margin: 6px 0; border: 1px solid #374151; border-radius: 6px; box-sizing: border-box; background: #374151; color: white; }
+    button { background: #6366f1; color: white; font-weight: bold; border: none; cursor: pointer; }
+    .hidden { display: none; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { text-align: left; padding: 12px; border-bottom: 1px solid #374151; }
+    th { background: #374151; }
+    .del-btn { background: #ef4444; padding: 6px 12px; width: auto; font-size: 12px; }
+    .badge { background: #10b981; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+  </style>
+</head>
+<body>
+
+  <!-- Admin Login Screen -->
+  <div id="auth-box" class="card" style="max-width:400px;">
+    <h2>Super Admin Login</h2>
+    <input type="email" id="email" placeholder="Admin Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="adminLogin()">Login as Admin</button>
+  </div>
+
+  <!-- Main Admin Dashboard -->
+  <div id="admin-dashboard" class="card hidden">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2>👑 Super Admin Panel</h2>
+      <button onclick="logout()" style="background:#ef4444; width:auto; padding:8px 15px;">Logout</button>
+    </div>
+
+    <!-- Stats Section -->
+    <div style="display:flex; gap:15px; margin-top:15px;">
+      <div style="background:#374151; padding:15px; border-radius:8px; flex:1; text-align:center;">
+        <h3 id="stat-restaurants">0</h3>
+        <p style="margin:0; font-size:12px; color:#9ca3af;">Total Restaurants</p>
+      </div>
+      <div style="background:#374151; padding:15px; border-radius:8px; flex:1; text-align:center;">
+        <h3 id="stat-items">0</h3>
+        <p style="margin:0; font-size:12px; color:#9ca3af;">Total Menu Items</p>
+      </div>
+    </div>
+
+    <h3>Registered Restaurants</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Restaurant</th>
+          <th>Owner Email</th>
+          <th>Public Link</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="restaurants-table"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://pfsrpowopbrevocwsuii.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    window.onload = async () => {
+      const { data: { session } } = await db.auth.getSession();
+      if (session) checkAdminStatus(session.user.id);
+    };
+
+    async function adminLogin() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const { data, error } = await db.auth.signInWithPassword({ email, password });
+      if (error) return alert(error.message);
+      checkAdminStatus(data.user.id);
+    }
+
+    async function checkAdminStatus(userId) {
+      const { data } = await db.from('profiles').select('role').eq('id', userId).single();
+      if (data && data.role === 'admin') {
+        document.getElementById('auth-box').classList.add('hidden');
+        document.getElementById('admin-dashboard').classList.remove('hidden');
+        loadAdminData();
+      } else {
+        alert("Access Denied! You are not a Super Admin.");
+        await db.auth.signOut();
+      }
+    }
+
+    async function loadAdminData() {
+      const { data: restaurants } = await db.from('restaurants').select('*, profiles(email)');
+      const { count: itemsCount } = await db.from('menu_items').select('*', { count: 'exact', head: true });
+
+      document.getElementById('stat-restaurants').innerText = restaurants ? restaurants.length : 0;
+      document.getElementById('stat-items').innerText = itemsCount || 0;
+
+      const tableBody = document.getElementById('restaurants-table');
+      tableBody.innerHTML = '';
+
+      if (restaurants) {
+        restaurants.forEach(rest => {
+          tableBody.innerHTML += `
+            <tr>
+              <td><strong>${rest.name}</strong><br><small>📞 ${rest.phone || 'N/A'}</small></td>
+              <td>${rest.profiles ? rest.profiles.email : 'N/A'}</td>
+              <td><a href="menu.html?slug=${rest.slug}" target="_blank" style="color:#818cf8;">View Menu</a></td>
+              <td><button class="del-btn" onclick="deleteRestaurant('${rest.id}')">Delete</button></td>
+            </tr>
+          `;
+        });
+      }
+    }
+
+    async function deleteRestaurant(id) {
+      if (confirm("Kya aap sach me is restaurant ko delete karna chahte hain?")) {
+        await db.from('restaurants').delete().eq('id', id);
+        alert("Restaurant Deleted!");
+        loadAdminData();
+      }
+    }
+
+    async function logout() { await db.auth.signOut(); location.reload(); }
+  </script>
+</body>
+</html>
