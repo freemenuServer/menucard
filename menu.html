@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Menu - FreeMenu.in</title>
-  <!-- Supabase JS v2 -->
+  <title>Digital Menu - FreeMenu.in</title>
+  <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root { 
@@ -17,13 +17,12 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { background: var(--bg); color: var(--text-dark); padding-bottom: 40px; }
 
-    /* Header Banner */
+    /* Header */
     .restaurant-header {
       background: white;
       padding: 24px 20px;
       text-align: center;
       border-bottom: 1px solid #e2e8f0;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
       position: sticky;
       top: 0;
       z-index: 100;
@@ -33,7 +32,7 @@
 
     .container { max-width: 600px; margin: 0 auto; padding: 16px; }
 
-    /* Category Section */
+    /* Categories & Cards */
     .category-section { margin-bottom: 24px; }
     .category-title { 
       font-size: 18px; 
@@ -48,7 +47,6 @@
     }
     .category-count { font-size: 12px; color: var(--text-muted); font-weight: 500; }
 
-    /* Menu Item Card */
     .menu-card {
       background: var(--card-bg);
       border-radius: 12px;
@@ -62,10 +60,9 @@
     }
     .item-info { flex: 1; padding-right: 12px; }
     .item-name { font-size: 16px; font-weight: 600; color: var(--text-dark); margin-bottom: 4px; }
-    .item-category { font-size: 12px; color: var(--text-muted); }
     .item-price { font-size: 16px; font-weight: 700; color: #16a34a; white-space: nowrap; }
 
-    /* Loading & Error States */
+    /* States */
     .status-container { text-align: center; padding: 60px 20px; }
     .status-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
     .status-sub { font-size: 14px; color: var(--text-muted); }
@@ -79,7 +76,6 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Footer Branding */
     .footer-brand { text-align: center; margin-top: 40px; font-size: 12px; color: var(--text-muted); }
     .footer-brand a { color: var(--primary); text-decoration: none; font-weight: 600; }
   </style>
@@ -90,13 +86,13 @@
   <div id="loading-state" class="status-container">
     <div class="spinner"></div>
     <div class="status-title">Loading Menu...</div>
-    <div class="status-sub">Fetching fresh delicious items</div>
+    <div class="status-sub">Fetching delicious items</div>
   </div>
 
   <!-- Error / Not Found State -->
   <div id="error-state" class="status-container" style="display: none;">
-    <div class="status-title" style="color: #dc2626;">Restaurant Not Found</div>
-    <div class="status-sub">The menu link you scanned might be invalid or deleted.</div>
+    <div class="status-title" style="color: #dc2626;" id="error-title">Restaurant Not Found</div>
+    <div class="status-sub" id="error-sub">The menu link you scanned might be invalid or deleted.</div>
   </div>
 
   <!-- Main Menu View -->
@@ -107,7 +103,7 @@
     </header>
 
     <main class="container" id="menu-container">
-      <!-- Categories & Items Render Dynamically Here -->
+      <!-- Items Dynamically Inserted Here -->
     </main>
 
     <footer class="footer-brand">
@@ -116,30 +112,37 @@
   </div>
 
   <script>
+    // Supabase Configuration
     const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co"; 
     const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE"; 
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // 1. URL path se slug Extract karein (e.g. /menu/urban me se 'urban')
+    // URL path se slug extract karne ka function
     function getSlugFromUrl() {
       const pathParts = window.location.pathname.split('/').filter(p => p !== "");
       const menuIndex = pathParts.indexOf('menu');
       
       if (menuIndex !== -1 && pathParts[menuIndex + 1]) {
-        return pathParts[menuIndex + 1];
+        return pathParts[menuIndex + 1]; // E.g., 'urban' from /menu/urban
       }
-      return pathParts[pathParts.length - 1] || null;
+      
+      const lastPart = pathParts[pathParts.length - 1];
+      if (lastPart && lastPart !== 'menu' && lastPart !== 'menu.html') {
+        return lastPart;
+      }
+      return null;
     }
 
-    async function fetchMenu() {
+    async function loadMenu() {
       const slug = getSlugFromUrl();
 
-      if (!slug || slug === 'menu.html') {
-        showError("Invalid Menu Link");
+      // Agar direct /menu khola hai bina slug ke
+      if (!slug) {
+        showError("Invalid Link", "Please open a full restaurant menu link like /menu/urban");
         return;
       }
 
-      // 2. Fetch Restaurant Details using Slug
+      // 1. Fetch Restaurant Details
       const { data: restaurant, error: restError } = await supabaseClient
         .from('restaurants')
         .select('*')
@@ -147,15 +150,14 @@
         .maybeSingle();
 
       if (restError || !restaurant) {
-        showError();
+        showError("Restaurant Not Found", `No restaurant found with slug '${slug}'`);
         return;
       }
 
-      // Update Header Title
-      document.getElementById('restaurant-name').innerText = restaurant.name || "Our Menu";
+      document.getElementById('restaurant-name').innerText = restaurant.name || "Menu";
       document.title = `${restaurant.name || 'Menu'} - FreeMenu.in`;
 
-      // 3. Fetch Menu Items for this Restaurant
+      // 2. Fetch Menu Items
       const { data: items, error: itemsError } = await supabaseClient
         .from('menu_items')
         .select('*')
@@ -166,13 +168,13 @@
         document.getElementById('menu-view').style.display = 'block';
         document.getElementById('menu-container').innerHTML = `
           <div class="status-container" style="padding: 40px 0;">
-            <div class="status-sub">No items available in the menu right now.</div>
+            <div class="status-sub">No menu items found for this restaurant.</div>
           </div>
         `;
         return;
       }
 
-      // 4. Group Items by Category
+      // 3. Group By Category
       const groupedItems = {};
       items.forEach(item => {
         const cat = item.category || 'General';
@@ -180,11 +182,11 @@
         groupedItems[cat].push(item);
       });
 
-      // 5. Render Categorized Menu
-      renderMenu(groupedItems);
+      // 4. Render Items
+      renderMenuUI(groupedItems);
     }
 
-    function renderMenu(groupedItems) {
+    function renderMenuUI(groupedItems) {
       const container = document.getElementById('menu-container');
       container.innerHTML = '';
 
@@ -216,16 +218,15 @@
       document.getElementById('menu-view').style.display = 'block';
     }
 
-    function showError(customMsg) {
+    function showError(title, message) {
       document.getElementById('loading-state').style.display = 'none';
       const errEl = document.getElementById('error-state');
-      if(customMsg) {
-        errEl.querySelector('.status-title').innerText = customMsg;
-      }
+      if (title) document.getElementById('error-title').innerText = title;
+      if (message) document.getElementById('error-sub').innerText = message;
       errEl.style.display = 'block';
     }
 
-    window.onload = fetchMenu;
+    window.onload = loadMenu;
   </script>
 </body>
 </html>
