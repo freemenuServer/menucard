@@ -56,11 +56,15 @@
     const SUPABASE_KEY = 'sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let userId = null, restaurantId = null;
+    let userId = null;
+    let restaurantId = null;
 
     window.onload = async () => {
       const { data: { session } } = await db.auth.getSession();
-      if (session) { userId = session.user.id; loadDashboard(); }
+      if (session) { 
+        userId = session.user.id; 
+        loadDashboard(); 
+      }
     };
 
     async function signUp() {
@@ -85,10 +89,11 @@
       document.getElementById('auth-box').classList.add('hidden');
       document.getElementById('dashboard-box').classList.remove('hidden');
 
-      const { data } = await db.from('restaurants').select('*').eq('owner_id', userId);
+      const { data, error } = await db.from('restaurants').select('*').eq('owner_id', userId);
+      
       if (data && data.length > 0) {
-        restaurantId = data[0].id;
-        document.getElementById('rest-name').value = data[0].name;
+        restaurantId = data[0].id; // Assign ID globally
+        document.getElementById('rest-name').value = data[0].name || '';
         document.getElementById('rest-phone').value = data[0].phone || '';
         document.getElementById('public-link').innerHTML = 
           `Public Menu URL: <a href="menu.html?slug=${data[0].slug}" target="_blank">menu.html?slug=${data[0].slug}</a>`;
@@ -97,47 +102,107 @@
     }
 
     async function saveProfile() {
-      const name = document.getElementById('rest-name').value;
-      const phone = document.getElementById('rest-phone').value;
+      const name = document.getElementById('rest-name').value.trim();
+      const phone = document.getElementById('rest-phone').value.trim();
+
+      if (!name) return alert("Kripya Restaurant Name bharein!");
+
       const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
 
       if (!restaurantId) {
-        const { data } = await db.from('restaurants').insert([{ owner_id: userId, name, phone, slug }]).select();
-        if (data) restaurantId = data[0].id;
+        // Fresh Insert
+        const { data, error } = await db.from('restaurants').insert([{ 
+          owner_id: userId, 
+          name: name, 
+          phone: phone, 
+          slug: slug 
+        }]).select();
+
+        if (error) {
+          console.error(error);
+          return alert("Save Error: " + error.message);
+        }
+
+        if (data && data.length > 0) {
+          restaurantId = data[0].id; // Fix: Set restaurantId immediately
+        }
       } else {
-        await db.from('restaurants').update({ name, phone, slug }).eq('id', restaurantId);
+        // Update Existing
+        const { error } = await db.from('restaurants').update({ 
+          name: name, 
+          phone: phone, 
+          slug: slug 
+        }).eq('id', restaurantId);
+
+        if (error) {
+          console.error(error);
+          return alert("Update Error: " + error.message);
+        }
       }
+
       alert("Profile Saved!");
-      loadDashboard();
+      await loadDashboard(); // Reload dashboard data
     }
 
     async function addMenuItem() {
-      if (!restaurantId) return alert("Pehle Profile Save Karein!");
-      const title = document.getElementById('item-title').value;
+      if (!restaurantId) {
+        // Fallback check: Fetch restaurant ID if still missing in memory
+        const { data } = await db.from('restaurants').select('id').eq('owner_id', userId);
+        if (data && data.length > 0) {
+          restaurantId = data[0].id;
+        } else {
+          return alert("Pehle Profile Save Karein!");
+        }
+      }
+
+      const title = document.getElementById('item-title').value.trim();
       const price = document.getElementById('item-price').value;
       const is_veg = document.getElementById('item-veg').value === 'true';
 
-      await db.from('menu_items').insert([{ restaurant_id: restaurantId, title, price, is_veg }]);
+      if (!title || !price) return alert("Item Name aur Price dono bharein!");
+
+      const { error } = await db.from('menu_items').insert([{ 
+        restaurant_id: restaurantId, 
+        title: title, 
+        price: parseFloat(price), 
+        is_veg: is_veg 
+      }]);
+
+      if (error) {
+        console.error(error);
+        return alert("Item Add Error: " + error.message);
+      }
+
       document.getElementById('item-title').value = '';
       document.getElementById('item-price').value = '';
       fetchItems();
     }
 
     async function fetchItems() {
-      const { data } = await db.from('menu_items').select('*').eq('restaurant_id', restaurantId);
+      if (!restaurantId) return;
+      
+      const { data, error } = await db.from('menu_items').select('*').eq('restaurant_id', restaurantId);
       const list = document.getElementById('items-list');
       list.innerHTML = '';
-      if(data) {
+      
+      if (data && data.length > 0) {
         data.forEach(item => {
-          list.innerHTML += `<div class="item-row">
-            <span>${item.is_veg ? '🟢' : '🔴'} ${item.title}</span>
-            <strong>₹${item.price}</strong>
-          </div>`;
+          list.innerHTML += `
+            <div class="item-row">
+              <span>${item.is_veg ? '🟢' : '🔴'} ${item.title}</span>
+              <strong>₹${item.price}</strong>
+            </div>
+          `;
         });
+      } else {
+        list.innerHTML = '<p style="font-size:12px; color:#888;">Koi item add nahi hua abhi tak.</p>';
       }
     }
 
-    async function logout() { await db.auth.signOut(); location.reload(); }
+    async function logout() { 
+      await db.auth.signOut(); 
+      location.reload(); 
+    }
   </script>
 </body>
 </html>
