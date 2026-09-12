@@ -4,27 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Digital Menu - FreeMenu.in</title>
+  <!-- Supabase JS v2 -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root { --primary: #10b981; --bg: #f8fafc; --text: #0f172a; }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     body { background: var(--bg); color: var(--text); padding: 16px; }
     .menu-container { max-width: 600px; margin: 0 auto; }
-    .header { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px; text-align: center; }
-    .header h1 { font-size: 24px; font-weight: 800; color: #0f172a; }
-    .menu-item { background: white; border-radius: 10px; padding: 14px; border: 1px solid #e2e8f0; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-    .item-name { font-weight: 600; font-size: 16px; }
-    .item-price { font-weight: 700; color: var(--primary); }
-    .badge-veg { color: green; border: 1px solid green; padding: 2px 6px; font-size: 10px; border-radius: 4px; }
-    .badge-nonveg { color: red; border: 1px solid red; padding: 2px 6px; font-size: 10px; border-radius: 4px; }
-    .error-msg { text-align: center; margin-top: 50px; font-size: 18px; color: #ef4444; }
+    .header { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .header h1 { font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+    .header p { color: #64748b; font-size: 14px; }
+    .menu-item { background: white; border-radius: 10px; padding: 14px; border: 1px solid #e2e8f0; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+    .item-name { font-weight: 600; font-size: 16px; margin-top: 4px; }
+    .item-price { font-weight: 700; color: var(--primary); font-size: 17px; }
+    .badge-veg { color: #16a34a; border: 1px solid #16a34a; padding: 2px 6px; font-size: 10px; font-weight: 700; border-radius: 4px; display: inline-block; }
+    .badge-nonveg { color: #dc2626; border: 1px solid #dc2626; padding: 2px 6px; font-size: 10px; font-weight: 700; border-radius: 4px; display: inline-block; }
+    .error-msg { text-align: center; margin-top: 50px; font-size: 18px; color: #ef4444; font-weight: 600; }
   </style>
 </head>
 <body>
   <div class="menu-container">
     <div class="header">
       <h1 id="restaurant-name">Loading Menu...</h1>
-      <p id="restaurant-slug" style="color: #64748b; font-size: 14px;"></p>
+      <p id="restaurant-slug">Please wait</p>
     </div>
 
     <div id="menu-items-list">
@@ -33,10 +35,12 @@
   </div>
 
   <script>
-    // Supabase Initialization
-    const SUPABASE_URL = "https://YOUR_SUPABASE_PROJECT_URL.supabase.co";
-    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Embedded Supabase Project Credentials
+    const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co"; 
+    const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE"; 
+
+    // Initialize Supabase Client
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     window.onload = async () => {
       let slug = null;
@@ -47,7 +51,7 @@
         slug = pathSegments[1];
       }
 
-      // 2. Fallback: Query Parameter Check Karein (e.g. ?slug=urban)
+      // 2. Fallback: Query Parameter Check Karein (e.g. freemenu.in/menu.html?slug=urban)
       if (!slug) {
         const urlParams = new URLSearchParams(window.location.search);
         slug = urlParams.get('slug');
@@ -62,51 +66,57 @@
     };
 
     async function loadRestaurantMenu(slug) {
-      // Step A: Fetch Restaurant Info
-      const { data: restaurant, error: restError } = await supabase
-        .from('restaurants')
-        .select('*')
-        .eq('slug', slug)
-        .single();
+      try {
+        // Step A: Fetch Restaurant Info by Slug
+        const { data: restaurant, error: restError } = await supabaseClient
+          .from('restaurants')
+          .select('*')
+          .eq('slug', slug)
+          .maybeSingle();
 
-      if (restError || !restaurant) {
-        document.body.innerHTML = "<div class='error-msg'>Restaurant Not Found!</div>";
-        return;
-      }
+        if (restError || !restaurant) {
+          document.body.innerHTML = "<div class='error-msg'>Restaurant Not Found!</div>";
+          return;
+        }
 
-      document.getElementById('restaurant-name').innerText = restaurant.name;
-      document.getElementById('restaurant-slug').innerText = `@${restaurant.slug}`;
+        document.getElementById('restaurant-name').innerText = restaurant.name;
+        document.getElementById('restaurant-slug').innerText = `@${restaurant.slug}`;
 
-      // Step B: Fetch Menu Items
-      const { data: items, error: itemsError } = await supabase
-        .from('menu_items')
-        .select('*')
-        .eq('restaurant_id', restaurant.id)
-        .eq('is_available', true);
+        // Step B: Fetch Active Menu Items for this Restaurant
+        const { data: items, error: itemsError } = await supabaseClient
+          .from('menu_items')
+          .select('*')
+          .eq('restaurant_id', restaurant.id)
+          .eq('is_available', true);
 
-      const listContainer = document.getElementById('menu-items-list');
-      listContainer.innerHTML = "";
+        const listContainer = document.getElementById('menu-items-list');
+        listContainer.innerHTML = "";
 
-      if (itemsError || !items || items.length === 0) {
-        listContainer.innerHTML = "<p style='text-align:center;'>No items available in menu right now.</p>";
-        return;
-      }
+        if (itemsError || !items || items.length === 0) {
+          listContainer.innerHTML = "<p style='text-align:center; color:#64748b; margin-top:20px;'>No menu items available currently.</p>";
+          return;
+        }
 
-      // Step C: Render Items
-      items.forEach(item => {
-        const badgeClass = item.is_veg ? 'badge-veg' : 'badge-nonveg';
-        const badgeText = item.is_veg ? 'VEG' : 'NON-VEG';
+        // Step C: Render Menu Items
+        items.forEach(item => {
+          const badgeClass = item.is_veg ? 'badge-veg' : 'badge-nonveg';
+          const badgeText = item.is_veg ? 'VEG' : 'NON-VEG';
 
-        listContainer.innerHTML += `
-          <div class="menu-item">
-            <div>
-              <span class="${badgeClass}">${badgeText}</span>
-              <div class="item-name" style="margin-top: 4px;">${item.name}</div>
+          listContainer.innerHTML += `
+            <div class="menu-item">
+              <div>
+                <span class="${badgeClass}">${badgeText}</span>
+                <div class="item-name">${item.name}</div>
+              </div>
+              <div class="item-price">₹${item.price}</div>
             </div>
-            <div class="item-price">₹${item.price}</div>
-          </div>
-        `;
-      });
+          `;
+        });
+
+      } catch (err) {
+        console.error("Runtime Error:", err);
+        document.body.innerHTML = "<div class='error-msg'>Failed to load menu.</div>";
+      }
     }
   </script>
 </body>
