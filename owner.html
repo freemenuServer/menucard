@@ -4,8 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Owner Portal - FreeMenu.in</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- Supabase JS CDN (Unpkg for high reliability) -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- QRCode CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
   <style>
     :root { --primary: #ff4757; --bg: #f8fafc; --text: #0f172a; }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
@@ -53,7 +57,6 @@
     .item-right { display: flex; align-items: center; gap: 8px; }
     .item-price { font-weight: 700; color: #16a34a; font-size: 15px; margin-right: 6px; }
 
-    .badge { display: inline-block; background: #e2e8f0; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; color: #475569; }
     .err-text { color: #dc2626; font-weight: 600; font-size: 13px; }
     .success-text { color: #16a34a; font-weight: 600; font-size: 13px; }
     .hidden { display: none !important; }
@@ -171,13 +174,24 @@
   </div>
 
   <script>
-    const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co"; 
-    const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE"; 
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+    let supabaseClient = null;
     let currentRestaurant = null;
 
+    // Wait until full DOM and Supabase CDN are completely loaded
+    window.addEventListener('load', function() {
+      if (typeof window.supabase !== 'undefined') {
+        const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co"; 
+        const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE"; 
+        
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        initPage();
+      } else {
+        alert("Supabase library failed to load. Please refresh the page.");
+      }
+    });
+
     async function initPage() {
+      if (!supabaseClient) return;
       const { data: { user } } = await supabaseClient.auth.getUser();
 
       if (!user) {
@@ -238,7 +252,7 @@
 
       currentRestaurant = restaurant;
 
-      // Update Slug Edit UI (Limit: 5 edits max)
+      // Update Slug Limit (Max 5 edits)
       const editsLeft = Math.max(0, 5 - (restaurant.slug_edits || 0));
       document.getElementById('slug-input').value = restaurant.slug || '';
       document.getElementById('slug-edits-left').innerText = editsLeft;
@@ -249,7 +263,7 @@
         document.getElementById('slug-save-btn').innerText = "Limit Exceeded";
       }
 
-      // Query Parameter Format for 100% cloudflare/static compatibility
+      // Public Link Generator
       const fullCleanUrl = `${window.location.origin}/menu.html?r=${restaurant.slug}`;
       linkEl.innerHTML = `<a href="${fullCleanUrl}" target="_blank">${fullCleanUrl}</a>`;
 
@@ -257,10 +271,9 @@
       new QRCode(document.getElementById("qrcode"), { text: fullCleanUrl, width: 160, height: 160 });
 
       await loadCategories();
-      loadMenuItems();
+      await loadMenuItems();
     }
 
-    // UPDATE RESTAURANT USER ID / SLUG (LIMIT: 5 TIMES)
     async function updateRestaurantSlug(e) {
       e.preventDefault();
       if (!currentRestaurant) return;
@@ -290,7 +303,7 @@
       btn.disabled = false;
 
       if (error) {
-        alert("Error updating ID: " + error.message + " (It might already be taken by someone else)");
+        alert("Error updating ID: " + error.message);
       } else {
         alert("Restaurant User ID updated successfully!");
         const { data: { user } } = await supabaseClient.auth.getUser();
@@ -382,19 +395,20 @@
 
     async function loadMenuItems() {
       const listEl = document.getElementById('items-list');
+      if (!listEl || !currentRestaurant) return;
       
       const { data: items, error } = await supabaseClient
         .from('menu_items')
         .select('*')
         .eq('restaurant_id', currentRestaurant.id);
 
-      if (error || !items) {
-        listEl.innerHTML = `<p class="err-text">Failed to load items.</p>`;
+      if (error) {
+        listEl.innerHTML = `<p class="err-text">Failed to load items: ${error.message}</p>`;
         return;
       }
 
-      if (items.length === 0) {
-        listEl.innerHTML = `<p style="color:#64748b; font-size:14px;">No items added yet.</p>`;
+      if (!items || items.length === 0) {
+        listEl.innerHTML = `<p style="color:#64748b; font-size:14px;">No items added yet. Add your first item above!</p>`;
         return;
       }
 
@@ -406,15 +420,14 @@
           </div>
           <div class="item-right">
             <span class="item-price">₹${item.price}</span>
-            <button class="btn-edit" onclick="editMenuItem('${item.id}', '${item.name}', '${item.price}', '${item.category || ''}')">✏️ Edit</button>
+            <button class="btn-edit" onclick="editMenuItem('${item.id}', '${item.name.replace(/'/g, "\\'")}', '${item.price}')">✏️ Edit</button>
             <button class="delete-btn" onclick="deleteMenuItem('${item.id}')">🗑️ Delete</button>
           </div>
         </div>
       `).join('');
     }
 
-    // EDIT MENU ITEM FUNCTION
-    async function editMenuItem(id, oldName, oldPrice, oldCategory) {
+    async function editMenuItem(id, oldName, oldPrice) {
       const newName = prompt("Edit Item Name:", oldName);
       if (newName === null) return;
 
@@ -465,8 +478,6 @@
         link.click();
       }
     }
-
-    window.onload = initPage;
   </script>
 </body>
 </html>
