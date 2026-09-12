@@ -1,208 +1,153 @@
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Restaurant Owner Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    body { font-family: sans-serif; background: #f4f5f7; margin: 0; padding: 20px; }
-    .card { background: white; max-width: 450px; margin: 20px auto; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
-    input, select, button { width: 100%; padding: 12px; margin: 6px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-    button { background: #d63384; color: white; font-weight: bold; border: none; cursor: pointer; }
-    .hidden { display: none; }
-    .item-row { display: flex; justify-content: space-between; background: #f8f9fa; padding: 10px; border-radius: 6px; margin-top: 5px; }
-  </style>
-</head>
-<body>
+<script>
+  const SUPABASE_URL = 'https://pfsrpowopbrevocwsuii.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
+  const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  <!-- Auth Screen -->
-  <div id="auth-box" class="card">
-    <h2>Owner Registration / Login</h2>
-    <input type="email" id="email" placeholder="Email Address">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="signUp()">Register New Owner</button>
-    <button onclick="login()" style="background:#0d6efd;">Login</button>
-  </div>
+  let userId = null;
+  let restaurantId = null;
 
-  <!-- Owner Dashboard -->
-  <div id="dashboard-box" class="card hidden">
-    <h2>Restaurant Dashboard</h2>
-    <button onclick="logout()" style="background:#dc3545; padding:6px; font-size:12px;">Logout</button>
-    <hr>
+  window.onload = async () => {
+    const { data: { session } } = await db.auth.getSession();
+    if (session) { 
+      userId = session.user.id; 
+      loadDashboard(); 
+    }
+  };
+
+  async function signUp() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const { data, error } = await db.auth.signUp({ email, password });
     
-    <h3>1. Profile Details</h3>
-    <input type="text" id="rest-name" placeholder="Restaurant Name (e.g. Royal Spices)">
-    <input type="text" id="rest-phone" placeholder="Phone Number">
-    <button onclick="saveProfile()">Save Restaurant Profile</button>
-    <p id="public-link" style="font-size:13px; color:#0d6efd; word-break:break-all;"></p>
+    if (error) return alert(error.message);
+    
+    alert("Registration successful! Ab Login button par click karein.");
+  }
 
-    <hr>
-    <h3>2. Add Menu Item</h3>
-    <input type="text" id="item-title" placeholder="Item Name (e.g. Paneer Tikka)">
-    <input type="number" id="item-price" placeholder="Price (₹)">
-    <select id="item-veg">
-      <option value="true">Veg 🟢</option>
-      <option value="false">Non-Veg 🔴</option>
-    </select>
-    <button onclick="addMenuItem()" style="background:#198754;">Add Item</button>
+  async function login() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const { data, error } = await db.auth.signInWithPassword({ email, password });
+    
+    if (error) return alert(error.message);
+    
+    userId = data.user.id;
+    loadDashboard();
+  }
 
-    <h4>Menu Items List</h4>
-    <div id="items-list"></div>
-  </div>
+  async function loadDashboard() {
+    document.getElementById('auth-box').classList.add('hidden');
+    document.getElementById('dashboard-box').classList.remove('hidden');
 
-  <script>
-    const SUPABASE_URL = 'https://pfsrpowopbrevocwsuii.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
-    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    let userId = null;
-    let restaurantId = null;
-
-    window.onload = async () => {
-      const { data: { session } } = await db.auth.getSession();
-      if (session) { 
-        userId = session.user.id; 
-        loadDashboard(); 
-      }
-    };
-
-    async function signUp() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const { data, error } = await db.auth.signUp({ email, password });
-      if (error) return alert(error.message);
-      await db.from('profiles').insert([{ id: data.user.id, email }]);
-      alert("Registration success! Now click Login.");
+    const { data, error } = await db.from('restaurants').select('*').eq('owner_id', userId);
+    
+    if (data && data.length > 0) {
+      restaurantId = data[0].id;
+      document.getElementById('rest-name').value = data[0].name || '';
+      document.getElementById('rest-phone').value = data[0].phone || '';
+      document.getElementById('public-link').innerHTML = 
+        `Public Menu URL: <a href="menu.html?slug=${data[0].slug}" target="_blank">menu.html?slug=${data[0].slug}</a>`;
+      fetchItems();
     }
+  }
 
-    async function login() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const { data, error } = await db.auth.signInWithPassword({ email, password });
-      if (error) return alert(error.message);
-      userId = data.user.id;
-      loadDashboard();
-    }
+  async function saveProfile() {
+    const name = document.getElementById('rest-name').value.trim();
+    const phone = document.getElementById('rest-phone').value.trim();
 
-    async function loadDashboard() {
-      document.getElementById('auth-box').classList.add('hidden');
-      document.getElementById('dashboard-box').classList.remove('hidden');
+    if (!name) return alert("Kripya Restaurant Name bharein!");
 
-      const { data, error } = await db.from('restaurants').select('*').eq('owner_id', userId);
-      
-      if (data && data.length > 0) {
-        restaurantId = data[0].id; // Assign ID globally
-        document.getElementById('rest-name').value = data[0].name || '';
-        document.getElementById('rest-phone').value = data[0].phone || '';
-        document.getElementById('public-link').innerHTML = 
-          `Public Menu URL: <a href="menu.html?slug=${data[0].slug}" target="_blank">menu.html?slug=${data[0].slug}</a>`;
-        fetchItems();
-      }
-    }
+    const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
 
-    async function saveProfile() {
-      const name = document.getElementById('rest-name').value.trim();
-      const phone = document.getElementById('rest-phone').value.trim();
-
-      if (!name) return alert("Kripya Restaurant Name bharein!");
-
-      const slug = name.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
-
-      if (!restaurantId) {
-        // Fresh Insert
-        const { data, error } = await db.from('restaurants').insert([{ 
-          owner_id: userId, 
-          name: name, 
-          phone: phone, 
-          slug: slug 
-        }]).select();
-
-        if (error) {
-          console.error(error);
-          return alert("Save Error: " + error.message);
-        }
-
-        if (data && data.length > 0) {
-          restaurantId = data[0].id; // Fix: Set restaurantId immediately
-        }
-      } else {
-        // Update Existing
-        const { error } = await db.from('restaurants').update({ 
-          name: name, 
-          phone: phone, 
-          slug: slug 
-        }).eq('id', restaurantId);
-
-        if (error) {
-          console.error(error);
-          return alert("Update Error: " + error.message);
-        }
-      }
-
-      alert("Profile Saved!");
-      await loadDashboard(); // Reload dashboard data
-    }
-
-    async function addMenuItem() {
-      if (!restaurantId) {
-        // Fallback check: Fetch restaurant ID if still missing in memory
-        const { data } = await db.from('restaurants').select('id').eq('owner_id', userId);
-        if (data && data.length > 0) {
-          restaurantId = data[0].id;
-        } else {
-          return alert("Pehle Profile Save Karein!");
-        }
-      }
-
-      const title = document.getElementById('item-title').value.trim();
-      const price = document.getElementById('item-price').value;
-      const is_veg = document.getElementById('item-veg').value === 'true';
-
-      if (!title || !price) return alert("Item Name aur Price dono bharein!");
-
-      const { error } = await db.from('menu_items').insert([{ 
-        restaurant_id: restaurantId, 
-        title: title, 
-        price: parseFloat(price), 
-        is_veg: is_veg 
-      }]);
+    if (!restaurantId) {
+      const { data, error } = await db.from('restaurants').insert([{ 
+        owner_id: userId, 
+        name: name, 
+        phone: phone, 
+        slug: slug 
+      }]).select();
 
       if (error) {
         console.error(error);
-        return alert("Item Add Error: " + error.message);
+        return alert("Save Error: " + error.message);
       }
 
-      document.getElementById('item-title').value = '';
-      document.getElementById('item-price').value = '';
-      fetchItems();
-    }
-
-    async function fetchItems() {
-      if (!restaurantId) return;
-      
-      const { data, error } = await db.from('menu_items').select('*').eq('restaurant_id', restaurantId);
-      const list = document.getElementById('items-list');
-      list.innerHTML = '';
-      
       if (data && data.length > 0) {
-        data.forEach(item => {
-          list.innerHTML += `
-            <div class="item-row">
-              <span>${item.is_veg ? '🟢' : '🔴'} ${item.title}</span>
-              <strong>₹${item.price}</strong>
-            </div>
-          `;
-        });
-      } else {
-        list.innerHTML = '<p style="font-size:12px; color:#888;">Koi item add nahi hua abhi tak.</p>';
+        restaurantId = data[0].id;
+      }
+    } else {
+      const { error } = await db.from('restaurants').update({ 
+        name: name, 
+        phone: phone, 
+        slug: slug 
+      }).eq('id', restaurantId);
+
+      if (error) {
+        console.error(error);
+        return alert("Update Error: " + error.message);
       }
     }
 
-    async function logout() { 
-      await db.auth.signOut(); 
-      location.reload(); 
+    alert("Profile Saved!");
+    await loadDashboard();
+  }
+
+  async function addMenuItem() {
+    if (!restaurantId) {
+      const { data } = await db.from('restaurants').select('id').eq('owner_id', userId);
+      if (data && data.length > 0) {
+        restaurantId = data[0].id;
+      } else {
+        return alert("Pehle Profile Save Karein!");
+      }
     }
-  </script>
-</body>
-</html>
+
+    const title = document.getElementById('item-title').value.trim();
+    const price = document.getElementById('item-price').value;
+    const is_veg = document.getElementById('item-veg').value === 'true';
+
+    if (!title || !price) return alert("Item Name aur Price dono bharein!");
+
+    const { error } = await db.from('menu_items').insert([{ 
+      restaurant_id: restaurantId, 
+      title: title, 
+      price: parseFloat(price), 
+      is_veg: is_veg 
+    }]);
+
+    if (error) {
+      console.error(error);
+      return alert("Item Add Error: " + error.message);
+    }
+
+    document.getElementById('item-title').value = '';
+    document.getElementById('item-price').value = '';
+    fetchItems();
+  }
+
+  async function fetchItems() {
+    if (!restaurantId) return;
+    
+    const { data, error } = await db.from('menu_items').select('*').eq('restaurant_id', restaurantId);
+    const list = document.getElementById('items-list');
+    list.innerHTML = '';
+    
+    if (data && data.length > 0) {
+      data.forEach(item => {
+        list.innerHTML += `
+          <div class="item-row">
+            <span>${item.is_veg ? '🟢' : '🔴'} ${item.title}</span>
+            <strong>₹${item.price}</strong>
+          </div>
+        `;
+      });
+    } else {
+      list.innerHTML = '<p style="font-size:12px; color:#888;">Koi item add nahi hua abhi tak.</p>';
+    }
+  }
+
+  async function logout() { 
+    await db.auth.signOut(); 
+    location.reload(); 
+  }
+</script>
