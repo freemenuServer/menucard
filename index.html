@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FreeMenu.in - Explore Restaurants & Digital Menus</title>
 
-  <!-- Supabase JS CDN (UMD Bundle) -->
+  <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <style>
@@ -22,9 +22,9 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background: var(--bg); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; }
 
-    /* Modern Glassy Navbar */
+    /* Glassy Navbar */
     .navbar {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
       padding: 16px 24px;
       display: flex;
@@ -52,7 +52,7 @@
     /* Hero Section */
     .hero {
       text-align: center;
-      padding: 56px 20px 40px;
+      padding: 50px 20px 36px;
       background: #ffffff;
       border-bottom: 1px solid #f1f5f9;
     }
@@ -64,19 +64,19 @@
       font-weight: 700;
       padding: 6px 14px;
       border-radius: 20px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    .hero h1 { font-size: 34px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.5px; }
+    .hero h1 { font-size: 32px; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.5px; }
     .hero p { font-size: 15px; color: var(--text-muted); max-width: 480px; margin: 0 auto; line-height: 1.5; }
 
     /* Main Container */
-    .container { max-width: 900px; width: 100%; margin: 36px auto; padding: 0 16px; flex: 1; }
-    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .container { max-width: 900px; width: 100%; margin: 32px auto; padding: 0 16px; flex: 1; }
+    .section-header { margin-bottom: 24px; }
     .section-title { font-size: 20px; font-weight: 800; color: var(--text-dark); }
 
-    /* Modern Card Layout */
+    /* Restaurant Grid */
     .restaurant-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
@@ -87,7 +87,7 @@
       background: var(--card-bg);
       border: 1px solid #f1f5f9;
       border-radius: 16px;
-      padding: 22px;
+      padding: 20px;
       text-decoration: none;
       color: inherit;
       display: flex;
@@ -102,21 +102,52 @@
       box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.08);
       border-color: #cbd5e1;
     }
-    .restaurant-icon {
-      width: 44px; height: 44px;
+
+    /* Round Logo Styling */
+    .card-top {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .round-logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #ffe1e4;
       background: #fff1f2;
-      color: var(--primary);
-      border-radius: 12px;
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 14px;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary);
+      text-transform: uppercase;
     }
-    .restaurant-name { font-size: 18px; font-weight: 800; margin-bottom: 4px; color: var(--text-dark); }
-    .restaurant-slug { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; font-weight: 500; }
     
+    .restaurant-details {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .restaurant-name { 
+      font-size: 17px; 
+      font-weight: 800; 
+      color: var(--text-dark); 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+      line-height: 1.3;
+    }
+    .restaurant-slug { 
+      font-size: 13px; 
+      color: var(--text-muted); 
+      font-weight: 500; 
+      margin-top: 2px;
+    }
+
     .view-menu-badge {
       display: flex;
       align-items: center;
@@ -136,7 +167,7 @@
       border-color: var(--primary);
     }
 
-    /* Loading and Status */
+    /* Statuses */
     .status-box { text-align: center; padding: 60px 20px; }
     .spinner {
       width: 40px; height: 40px;
@@ -148,8 +179,7 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Footer */
-    footer { text-align: center; padding: 28px; border-top: 1px solid #e2e8f0; font-size: 13px; color: var(--text-muted); background: white; }
+    footer { text-align: center; padding: 24px; border-top: 1px solid #e2e8f0; font-size: 13px; color: var(--text-muted); background: white; }
   </style>
 </head>
 <body>
@@ -162,9 +192,9 @@
 
   <!-- Hero Section -->
   <header class="hero">
-    <span class="hero-badge">QR Digital Menu</span>
+    <span class="hero-badge">Digital QR Menu</span>
     <h1>Explore Restaurants</h1>
-    <p>Browse registered restaurants or scan QR codes to view instant digital menus.</p>
+    <p>Browse registered places or scan QR codes to view instant digital menus.</p>
   </header>
 
   <!-- Restaurants List Container -->
@@ -173,23 +203,23 @@
       <h2 class="section-title">Registered Places</h2>
     </div>
 
-    <!-- Loading Indicator -->
+    <!-- Loading -->
     <div id="loading" class="status-box">
       <div class="spinner"></div>
       <p style="color: var(--text-muted); font-size: 14px;">Loading restaurants...</p>
     </div>
 
-    <!-- Error View -->
+    <!-- Error -->
     <div id="error-view" class="status-box" style="display: none;">
       <p style="color: #dc2626; font-weight: 700;" id="error-msg">Failed to load restaurants.</p>
     </div>
 
-    <!-- Grid View -->
+    <!-- Restaurant Grid -->
     <div id="restaurant-grid" class="restaurant-grid" style="display: none;"></div>
   </main>
 
   <footer>
-    &copy; FreeMenu.in &bull; Contactless Digital Menu System
+    &copy; FreeMenu.in &bull; Contactless Digital Menu
   </footer>
 
   <script>
@@ -209,7 +239,7 @@
       supabaseClient = initSupabase();
 
       if (!supabaseClient) {
-        showError("Script Error. Please refresh.");
+        showError("Script loading error. Please refresh.");
         return;
       }
 
@@ -220,13 +250,13 @@
           .order('name', { ascending: true });
 
         if (error) {
-          showError("Could not load restaurants from database.");
+          showError("Could not load restaurants.");
           return;
         }
 
         renderRestaurants(restaurants);
       } catch (err) {
-        showError("Network Error. Please try again.");
+        showError("Network error. Please try again.");
       }
     }
 
@@ -243,14 +273,25 @@
       }
 
       grid.innerHTML = restaurants.map(rest => {
-        const firstLetter = (rest.name || 'R').charAt(0).toUpperCase();
+        const name = rest.name || 'Unnamed Restaurant';
+        const slug = rest.slug || 'menu';
+        const firstLetter = name.charAt(0).toUpperCase();
+
+        // Check if database has logo_url, else generate Round Letter Icon
+        const logoHtml = rest.logo_url 
+          ? `<img src="${rest.logo_url}" alt="${name}" class="round-logo" onerror="this.outerHTML='<div class=\\'round-logo\\'>${firstLetter}</div>'">`
+          : `<div class="round-logo">${firstLetter}</div>`;
+
         return `
-          <a href="menu.html?r=${encodeURIComponent(rest.slug)}" class="restaurant-card">
-            <div>
-              <div class="restaurant-icon">${firstLetter}</div>
-              <div class="restaurant-name">${rest.name || 'Unnamed Restaurant'}</div>
-              <div class="restaurant-slug">@${rest.slug}</div>
+          <a href="menu.html?r=${encodeURIComponent(slug)}" class="restaurant-card">
+            <div class="card-top">
+              ${logoHtml}
+              <div class="restaurant-details">
+                <div class="restaurant-name">${name}</div>
+                <div class="restaurant-slug">@${slug}</div>
+              </div>
             </div>
+
             <div class="view-menu-badge">
               <span>View Menu</span>
               <span>&rarr;</span>
