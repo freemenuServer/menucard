@@ -1,232 +1,106 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digital Menu - FreeMenu.in</title>
-  <!-- Supabase JS CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root { 
-      --primary: #ff4757; 
-      --bg: #f8fafc; 
-      --card-bg: #ffffff; 
-      --text-dark: #0f172a; 
-      --text-muted: #64748b; 
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: var(--bg); color: var(--text-dark); padding-bottom: 40px; }
+<script>
+  const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co"; 
+  const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE"; 
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    /* Header */
-    .restaurant-header {
-      background: white;
-      padding: 24px 20px;
-      text-align: center;
-      border-bottom: 1px solid #e2e8f0;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .restaurant-title { font-size: 24px; font-weight: 800; color: var(--text-dark); margin-bottom: 4px; }
-    .restaurant-tagline { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  // 1. Query parameter (?r=urban ya ?restaurant=urban) se slug extract karne ka code
+  function getSlugFromUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('r') || urlParams.get('restaurant');
+  }
 
-    .container { max-width: 600px; margin: 0 auto; padding: 16px; }
+  async function loadMenu() {
+    const slug = getSlugFromUrl();
 
-    /* Categories & Cards */
-    .category-section { margin-bottom: 24px; }
-    .category-title { 
-      font-size: 18px; 
-      font-weight: 700; 
-      color: var(--primary); 
-      margin-bottom: 12px; 
-      padding-bottom: 6px; 
-      border-bottom: 2px solid #ffe1e4;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .category-count { font-size: 12px; color: var(--text-muted); font-weight: 500; }
-
-    .menu-card {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-    }
-    .item-info { flex: 1; padding-right: 12px; }
-    .item-name { font-size: 16px; font-weight: 600; color: var(--text-dark); margin-bottom: 4px; }
-    .item-price { font-size: 16px; font-weight: 700; color: #16a34a; white-space: nowrap; }
-
-    /* States */
-    .status-container { text-align: center; padding: 60px 20px; }
-    .status-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-    .status-sub { font-size: 14px; color: var(--text-muted); }
-    .spinner {
-      width: 40px; height: 40px;
-      border: 4px solid #cbd5e1;
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 16px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .footer-brand { text-align: center; margin-top: 40px; font-size: 12px; color: var(--text-muted); }
-    .footer-brand a { color: var(--primary); text-decoration: none; font-weight: 600; }
-  </style>
-</head>
-<body>
-
-  <!-- Loading State -->
-  <div id="loading-state" class="status-container">
-    <div class="spinner"></div>
-    <div class="status-title">Loading Menu...</div>
-    <div class="status-sub">Fetching delicious items</div>
-  </div>
-
-  <!-- Error / Not Found State -->
-  <div id="error-state" class="status-container" style="display: none;">
-    <div class="status-title" style="color: #dc2626;" id="error-title">Restaurant Not Found</div>
-    <div class="status-sub" id="error-sub">The menu link you scanned might be invalid or deleted.</div>
-  </div>
-
-  <!-- Main Menu View -->
-  <div id="menu-view" style="display: none;">
-    <header class="restaurant-header">
-      <h1 class="restaurant-title" id="restaurant-name">Restaurant Name</h1>
-      <div class="restaurant-tagline">Digital Menu</div>
-    </header>
-
-    <main class="container" id="menu-container">
-      <!-- Items Dynamically Inserted Here -->
-    </main>
-
-    <footer class="footer-brand">
-      Powered by <a href="/">FreeMenu.in</a>
-    </footer>
-  </div>
-
-  <script>
-    // Supabase Configuration
-    const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co"; 
-    const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE"; 
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // URL path se slug extract karne ka function
-    function getSlugFromUrl() {
-      const pathParts = window.location.pathname.split('/').filter(p => p !== "");
-      const menuIndex = pathParts.indexOf('menu');
-      
-      if (menuIndex !== -1 && pathParts[menuIndex + 1]) {
-        return pathParts[menuIndex + 1]; // E.g., 'urban' from /menu/urban
-      }
-      
-      const lastPart = pathParts[pathParts.length - 1];
-      if (lastPart && lastPart !== 'menu' && lastPart !== 'menu.html') {
-        return lastPart;
-      }
-      return null;
+    // Agar URL me query parameter missing hai
+    if (!slug) {
+      showError("Invalid Menu Link", "Please open link with restaurant code like: /menu.html?r=urban");
+      return;
     }
 
-    async function loadMenu() {
-      const slug = getSlugFromUrl();
+    // 2. Fetch Restaurant Details using Slug
+    const { data: restaurant, error: restError } = await supabaseClient
+      .from('restaurants')
+      .select('*')
+      .eq('slug', slug)
+      .maybeSingle();
 
-      // Agar direct /menu khola hai bina slug ke
-      if (!slug) {
-        showError("Invalid Link", "Please open a full restaurant menu link like /menu/urban");
-        return;
-      }
-
-      // 1. Fetch Restaurant Details
-      const { data: restaurant, error: restError } = await supabaseClient
-        .from('restaurants')
-        .select('*')
-        .eq('slug', slug)
-        .maybeSingle();
-
-      if (restError || !restaurant) {
-        showError("Restaurant Not Found", `No restaurant found with slug '${slug}'`);
-        return;
-      }
-
-      document.getElementById('restaurant-name').innerText = restaurant.name || "Menu";
-      document.title = `${restaurant.name || 'Menu'} - FreeMenu.in`;
-
-      // 2. Fetch Menu Items
-      const { data: items, error: itemsError } = await supabaseClient
-        .from('menu_items')
-        .select('*')
-        .eq('restaurant_id', restaurant.id);
-
-      if (itemsError || !items || items.length === 0) {
-        document.getElementById('loading-state').style.display = 'none';
-        document.getElementById('menu-view').style.display = 'block';
-        document.getElementById('menu-container').innerHTML = `
-          <div class="status-container" style="padding: 40px 0;">
-            <div class="status-sub">No menu items found for this restaurant.</div>
-          </div>
-        `;
-        return;
-      }
-
-      // 3. Group By Category
-      const groupedItems = {};
-      items.forEach(item => {
-        const cat = item.category || 'General';
-        if (!groupedItems[cat]) groupedItems[cat] = [];
-        groupedItems[cat].push(item);
-      });
-
-      // 4. Render Items
-      renderMenuUI(groupedItems);
+    if (restError || !restaurant) {
+      showError("Restaurant Not Found", `No restaurant found with code '${slug}'`);
+      return;
     }
 
-    function renderMenuUI(groupedItems) {
-      const container = document.getElementById('menu-container');
-      container.innerHTML = '';
+    document.getElementById('restaurant-name').innerText = restaurant.name || "Menu";
+    document.title = `${restaurant.name || 'Menu'} - FreeMenu.in`;
 
-      for (const category in groupedItems) {
-        const catSection = document.createElement('div');
-        catSection.className = 'category-section';
+    // 3. Fetch Menu Items
+    const { data: items, error: itemsError } = await supabaseClient
+      .from('menu_items')
+      .select('*')
+      .eq('restaurant_id', restaurant.id);
 
-        const categoryHeader = `
-          <div class="category-title">
-            <span>${category}</span>
-            <span class="category-count">${groupedItems[category].length} items</span>
-          </div>
-        `;
-
-        const itemsHtml = groupedItems[category].map(item => `
-          <div class="menu-card">
-            <div class="item-info">
-              <div class="item-name">${item.name || item.title}</div>
-            </div>
-            <div class="item-price">₹${item.price}</div>
-          </div>
-        `).join('');
-
-        catSection.innerHTML = categoryHeader + itemsHtml;
-        container.appendChild(catSection);
-      }
-
+    if (itemsError || !items || items.length === 0) {
       document.getElementById('loading-state').style.display = 'none';
       document.getElementById('menu-view').style.display = 'block';
+      document.getElementById('menu-container').innerHTML = `
+        <div class="status-container" style="padding: 40px 0;">
+          <div class="status-sub">No items found in this menu.</div>
+        </div>
+      `;
+      return;
     }
 
-    function showError(title, message) {
-      document.getElementById('loading-state').style.display = 'none';
-      const errEl = document.getElementById('error-state');
-      if (title) document.getElementById('error-title').innerText = title;
-      if (message) document.getElementById('error-sub').innerText = message;
-      errEl.style.display = 'block';
+    // 4. Group Items by Category
+    const groupedItems = {};
+    items.forEach(item => {
+      const cat = item.category || 'General';
+      if (!groupedItems[cat]) groupedItems[cat] = [];
+      groupedItems[cat].push(item);
+    });
+
+    // 5. Render Menu UI
+    renderMenuUI(groupedItems);
+  }
+
+  function renderMenuUI(groupedItems) {
+    const container = document.getElementById('menu-container');
+    container.innerHTML = '';
+
+    for (const category in groupedItems) {
+      const catSection = document.createElement('div');
+      catSection.className = 'category-section';
+
+      const categoryHeader = `
+        <div class="category-title">
+          <span>${category}</span>
+          <span class="category-count">${groupedItems[category].length} items</span>
+        </div>
+      `;
+
+      const itemsHtml = groupedItems[category].map(item => `
+        <div class="menu-card">
+          <div class="item-info">
+            <div class="item-name">${item.name || item.title}</div>
+          </div>
+          <div class="item-price">₹${item.price}</div>
+        </div>
+      `).join('');
+
+      catSection.innerHTML = categoryHeader + itemsHtml;
+      container.appendChild(catSection);
     }
 
-    window.onload = loadMenu;
-  </script>
-</body>
-</html>
+    document.getElementById('loading-state').style.display = 'none';
+    document.getElementById('menu-view').style.display = 'block';
+  }
+
+  function showError(title, message) {
+    document.getElementById('loading-state').style.display = 'none';
+    const errEl = document.getElementById('error-state');
+    if (title) document.getElementById('error-title').innerText = title;
+    if (message) document.getElementById('error-sub').innerText = message;
+    errEl.style.display = 'block';
+  }
+
+  window.onload = loadMenu;
+</script>
