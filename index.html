@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreeMenu.in | QR Digital Menu SaaS Platform</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg-dark: #0f172a;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background-color: #f8fafc; color: var(--text-main); line-height: 1.6; }
+
+    /* Header Navigation */
+    header {
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .logo { font-size: 20px; font-weight: 800; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .nav-btn { background: var(--primary); color: white; padding: 10px 18px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; transition: 0.2s; }
+    .nav-btn:hover { background: var(--primary-hover); }
+
+    /* Hero Section */
+    .hero {
+      max-width: 1000px;
+      margin: 60px auto 40px;
+      padding: 0 20px;
+      text-align: center;
+    }
+    .hero h1 { font-size: 42px; font-weight: 800; color: #0f172a; margin-bottom: 16px; letter-spacing: -0.5px; }
+    .hero p { font-size: 18px; color: var(--text-muted); max-width: 650px; margin: 0 auto 30px; }
+
+    /* Search Box */
+    .search-container {
+      max-width: 500px;
+      margin: 0 auto 40px;
+      display: flex;
+      gap: 8px;
+      background: white;
+      padding: 6px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.01);
+      border: 1px solid #e2e8f0;
+    }
+    .search-container input {
+      flex: 1;
+      border: none;
+      padding: 12px 16px;
+      font-size: 15px;
+      outline: none;
+      border-radius: 8px;
+    }
+    .search-container button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Features Grid */
+    .features {
+      max-width: 1000px;
+      margin: 60px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      background: white;
+      padding: 28px;
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+    }
+    .feature-card h3 { font-size: 18px; margin-bottom: 8px; color: var(--bg-dark); }
+    .feature-card p { font-size: 14px; color: var(--text-muted); }
+
+    /* Footer */
+    footer { text-align: center; padding: 40px 20px; font-size: 14px; color: var(--text-muted); border-top: 1px solid #e2e8f0; background: white; margin-top: 60px; }
+
+    @media (max-width: 640px) {
+      .hero h1 { font-size: 30px; }
+      .hero p { font-size: 15px; }
+      .search-container { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Nav Bar -->
+  <header>
+    <a href="/" class="logo">📱 FreeMenu.in</a>
+    <a href="owner.html" class="nav-btn">Partner Login / Signup</a>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Transform Your Restaurant Menu Into a Smart QR Experience</h1>
+    <p>Zero print costs, instant real-time price updates, and effortless digital ordering for your customers.</p>
+
+    <!-- Quick Search Restaurant Menu -->
+    <div class="search-container">
+      <input type="text" id="slug-input" placeholder="Enter Restaurant Slug (e.g. royal-spices)">
+      <button onclick="openMenu()">View Menu</button>
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section class="features">
+    <div class="feature-card">
+      <h3>🚀 Instant Digital Menu</h3>
+      <p>No app downloads required. Customers scan your QR code and browse the full menu in seconds.</p>
+    </div>
+    <div class="feature-card">
+      <h3>⚡ Real-Time Price Updates</h3>
+      <p>Change prices or hide out-of-stock items instantly from your smartphone owner portal.</p>
+    </div>
+    <div class="feature-card">
+      <h3>📲 WhatsApp Ordering</h3>
+      <p>Allow customers to directly send their order details to your phone or kitchen counter via WhatsApp.</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2026 FreeMenu.in — Smart Digital Menu SaaS Platform</p>
+  </footer>
+
+  <script>
+    function openMenu() {
+      const slug = document.getElementById('slug-input').value.trim();
+      if (!slug) return alert("Please enter a valid restaurant name or slug!");
+      window.location.href = `menu.html?slug=${encodeURIComponent(slug)}`;
+    }
+  </script>
+</body>
+</html>
