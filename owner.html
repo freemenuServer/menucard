@@ -94,7 +94,6 @@
     .btn-save { background: #dcfce7; color: #16a34a; }
     .btn-cancel { background: #f1f5f9; color: #64748b; }
 
-    /* Category Tag Chips */
     .cat-chips-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
     .cat-tag {
       background: #f1f5f9;
@@ -141,9 +140,8 @@
   <main class="container">
     <div class="dashboard-grid">
       
-      <!-- Left Column: Settings, Category Add & Item Add Forms -->
+      <!-- Left Column: Setup & Adding -->
       <div>
-        <!-- 1. Restaurant Details -->
         <div class="card">
           <h3 class="card-title">Restaurant Details</h3>
           <div class="form-group">
@@ -165,27 +163,25 @@
           <button class="btn" onclick="saveRestaurant()">Save Restaurant Details</button>
         </div>
 
-        <!-- 2. Add Category Section (ALAG OPTION) -->
         <div class="card">
           <h3 class="card-title">Manage Categories</h3>
           <div class="form-group">
             <label>New Category Name</label>
             <div class="flex-row">
-              <input type="text" id="new-cat-name" class="form-control" placeholder="e.g. Starters, Beverages, Chinese">
+              <input type="text" id="new-cat-name" class="form-control" placeholder="e.g. Starters, Beverages">
               <button class="btn" style="width: auto; padding: 0 16px;" onclick="addCategory()">+ Add</button>
             </div>
           </div>
           <div class="cat-chips-list" id="categories-chips">
-            <span style="font-size: 12px; color: var(--text-muted);">No categories added yet.</span>
+            <span style="font-size: 12px; color: var(--text-muted);">Loading categories...</span>
           </div>
         </div>
 
-        <!-- 3. Add Item Form (DROPDOWN SELECTION) -->
         <div class="card">
           <h3 class="card-title">Add New Dish</h3>
           <div class="form-group">
             <label>Item Name</label>
-            <input type="text" id="item-name" class="form-control" placeholder="e.g. Paneer Tikka / Egg Roll">
+            <input type="text" id="item-name" class="form-control" placeholder="e.g. Egg Curry / Paneer Tikka">
           </div>
           
           <div class="flex-row">
@@ -222,7 +218,7 @@
         </div>
       </div>
 
-      <!-- Right Column: Live Items List -->
+      <!-- Right Column: All Saved Items -->
       <div>
         <div class="card">
           <div class="card-title">
@@ -231,7 +227,7 @@
           </div>
 
           <div id="items-list">
-            <p style="color: var(--text-muted); text-align: center; padding: 20px 0;">Loading items...</p>
+            <p style="color: var(--text-muted); text-align: center; padding: 20px 0;">Loading menu items...</p>
           </div>
         </div>
       </div>
@@ -273,7 +269,8 @@
         await fetchCategories(currentRestaurant.id);
         await loadMenuItems(currentRestaurant.id);
       } else {
-        document.getElementById('items-list').innerHTML = '<p style="text-align: center; color: var(--text-muted);">Save restaurant details first.</p>';
+        await fetchCategories(null);
+        await loadMenuItems(null);
       }
     }
 
@@ -302,19 +299,20 @@
       loadDashboard();
     }
 
-    // --- CATEGORY FUNCTIONS ---
     async function fetchCategories(restaurantId) {
-      const { data } = await supabaseClient.from('categories').select('*').eq('restaurant_id', restaurantId).order('name');
+      let query = supabaseClient.from('categories').select('*');
+      if (restaurantId) {
+        query = query.eq('restaurant_id', restaurantId);
+      }
+      const { data } = await query;
       categoriesList = data || [];
       
-      // Update Dropdown
       const selectEl = document.getElementById('item-category-select');
       selectEl.innerHTML = '<option value="">-- Choose Category --</option>';
       categoriesList.forEach(c => {
         selectEl.innerHTML += `<option value="${c.name}">${c.name}</option>`;
       });
 
-      // Update Tag Chips
       const chipsEl = document.getElementById('categories-chips');
       if (categoriesList.length === 0) {
         chipsEl.innerHTML = '<span style="font-size: 12px; color: var(--text-muted);">No categories added yet.</span>';
@@ -329,30 +327,29 @@
     }
 
     async function addCategory() {
-      if (!currentRestaurant) { alert("Pehle Restaurant save karein!"); return; }
       const catName = document.getElementById('new-cat-name').value.trim();
       if (!catName) return;
 
-      const { error } = await supabaseClient.from('categories').insert([{ restaurant_id: currentRestaurant.id, name: catName }]);
+      const payload = { name: catName };
+      if (currentRestaurant) payload.restaurant_id = currentRestaurant.id;
+
+      const { error } = await supabaseClient.from('categories').insert([payload]);
       if (error) {
         alert("Category save error: " + error.message);
       } else {
         document.getElementById('new-cat-name').value = '';
-        fetchCategories(currentRestaurant.id);
+        fetchCategories(currentRestaurant ? currentRestaurant.id : null);
       }
     }
 
     async function deleteCategory(id) {
       if (confirm("Delete this category?")) {
         await supabaseClient.from('categories').delete().eq('id', id);
-        fetchCategories(currentRestaurant.id);
+        fetchCategories(currentRestaurant ? currentRestaurant.id : null);
       }
     }
 
-    // --- ITEM FUNCTIONS ---
     async function addMenuItem() {
-      if (!currentRestaurant) { alert("Save restaurant first!"); return; }
-
       const name = document.getElementById('item-name').value.trim();
       const price = parseFloat(document.getElementById('item-price').value);
       const category = document.getElementById('item-category-select').value;
@@ -363,7 +360,6 @@
       if (!name || isNaN(price)) { alert("Valid Name & Price zaroori hain!"); return; }
 
       const newItem = {
-        restaurant_id: currentRestaurant.id,
         name,
         price,
         category: category || 'General',
@@ -373,6 +369,10 @@
         description
       };
 
+      if (currentRestaurant) {
+        newItem.restaurant_id = currentRestaurant.id;
+      }
+
       const { error } = await supabaseClient.from('menu_items').insert([newItem]);
       if (error) {
         alert("Failed to add item: " + error.message);
@@ -381,12 +381,20 @@
         document.getElementById('item-price').value = '';
         document.getElementById('item-img').value = '';
         document.getElementById('item-desc').value = '';
-        loadMenuItems(currentRestaurant.id);
+        loadMenuItems(currentRestaurant ? currentRestaurant.id : null);
       }
     }
 
     async function loadMenuItems(restaurantId) {
-      const { data: items } = await supabaseClient.from('menu_items').select('*').eq('restaurant_id', restaurantId).order('created_at', { ascending: false });
+      let query = supabaseClient.from('menu_items').select('*');
+      if (restaurantId) {
+        query = query.eq('restaurant_id', restaurantId);
+      }
+      
+      const { data: items, error } = await query;
+      if (error) {
+        console.error("Fetch items error:", error);
+      }
       menuItems = items || [];
       renderItemList();
     }
@@ -396,7 +404,7 @@
       document.getElementById('items-count').innerText = `${menuItems.length} items`;
 
       if (menuItems.length === 0) {
-        listContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 20px 0;">No items added yet.</p>';
+        listContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 20px 0;">No items found on dashboard.</p>';
         return;
       }
 
@@ -411,8 +419,6 @@
 
         return `
           <div class="item-card">
-            
-            <!-- View Mode -->
             <div class="item-view-mode" id="view-${item.id}">
               <div style="flex: 1;">
                 <div class="item-header-inline">
@@ -430,7 +436,6 @@
               </div>
             </div>
 
-            <!-- Inline Edit Mode (Popup ke bina same place par) -->
             <div class="item-edit-mode" id="edit-${item.id}" style="display: none;">
               <div class="inline-inputs-row">
                 <input type="text" id="edit-name-${item.id}" class="form-control" value="${item.name}" placeholder="Name" style="flex: 2;">
@@ -455,7 +460,6 @@
                 <button class="btn-action btn-save" onclick="saveInlineEdit('${item.id}')">Save Changes</button>
               </div>
             </div>
-
           </div>
         `;
       }).join('');
@@ -491,13 +495,13 @@
 
       const { error } = await supabaseClient.from('menu_items').update(updatedData).eq('id', id);
       if (error) alert("Error updating: " + error.message);
-      else loadMenuItems(currentRestaurant.id);
+      else loadMenuItems(currentRestaurant ? currentRestaurant.id : null);
     }
 
     async function deleteItem(id) {
       if (confirm("Delete this item?")) {
         await supabaseClient.from('menu_items').delete().eq('id', id);
-        loadMenuItems(currentRestaurant.id);
+        loadMenuItems(currentRestaurant ? currentRestaurant.id : null);
       }
     }
 
