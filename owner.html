@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Owner Menu Dashboard</title>
+  <title>Owner Dashboard - Digital Menu</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <style>
@@ -19,9 +19,31 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg-color); color: var(--text-main); padding: 20px 12px 60px; }
+    body { background: var(--bg-color); color: var(--text-main); padding-bottom: 60px; }
 
-    .dashboard-container { max-width: 768px; margin: 0 auto; }
+    /* Top Navigation with Logout */
+    .nav-bar {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .nav-title { font-size: 18px; font-weight: 800; color: var(--text-main); }
+    .logout-btn {
+      background: #fee2e2;
+      color: var(--danger);
+      border: 1px solid #fca5a5;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .dashboard-container { max-width: 768px; margin: 0 auto; padding: 0 12px; }
 
     .header-card, .form-card, .menu-card {
       background: var(--card-bg);
@@ -32,12 +54,12 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
 
-    h2 { font-size: 18px; font-weight: 700; margin-bottom: 14px; color: var(--text-main); }
+    h2 { font-size: 17px; font-weight: 700; margin-bottom: 14px; color: var(--text-main); }
 
     .form-group { margin-bottom: 14px; }
     label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
     
-    input[type="text"], input[type="number"], input[type="file"], select {
+    input[type="text"], input[type="number"], select {
       width: 100%;
       padding: 10px 12px;
       border: 1px solid var(--border);
@@ -48,11 +70,40 @@
     }
     input:focus, select:focus { border-color: var(--primary); }
 
+    /* Side-by-Side Logo URL & Upload Input */
+    .logo-upload-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .file-select-btn {
+      display: inline-block;
+      padding: 10px 12px;
+      background: #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .upload-action-btn {
+      padding: 10px 14px;
+      background: #3b82f6;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .upload-action-btn:disabled { background: #94a3b8; }
+
+    .logo-preview-img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border); margin-top: 8px; display: none; }
+
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-
-    .logo-preview-box { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
-    .logo-preview-img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border); display: none; }
 
     .radio-group { display: flex; gap: 16px; margin-top: 6px; }
     .radio-label { display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
@@ -87,30 +138,37 @@
 </head>
 <body>
 
+  <!-- Top Navbar with Logout -->
+  <header class="nav-bar">
+    <div class="nav-title">🏪 Owner Dashboard</div>
+    <button class="logout-btn" onclick="handleLogout()">Logout</button>
+  </header>
+
   <div class="dashboard-container">
     
     <!-- Restaurant Settings Card -->
     <div class="header-card">
-      <h2>⚙️ Restaurant Profile</h2>
+      <h2>⚙️ Restaurant Profile Details</h2>
       <div class="form-group">
         <label>Restaurant Name</label>
         <input type="text" id="setting-name" placeholder="Enter Restaurant Name">
       </div>
       
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Phone Number</label>
-          <input type="text" id="setting-phone" placeholder="Phone Number">
-        </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="text" id="setting-phone" placeholder="Phone Number">
+      </div>
 
-        <div class="form-group">
-          <label>Upload Logo (Select File from Computer)</label>
-          <input type="file" id="setting-logo-file" accept="image/*">
-          <div class="logo-preview-box">
-            <img id="logo-preview" class="logo-preview-img" alt="Logo Preview">
-            <input type="hidden" id="setting-logo-url">
-          </div>
+      <!-- Logo Input + Offline File Upload Side-by-Side -->
+      <div class="form-group">
+        <label>Logo Image URL (Or Select Computer File & Upload)</label>
+        <div class="logo-upload-row">
+          <input type="text" id="setting-logo" placeholder="https://image-link.com/logo.jpg">
+          <input type="file" id="logo-file-input" accept="image/*" style="display: none;" onchange="updateFileLabel()">
+          <button type="button" class="file-select-btn" onclick="document.getElementById('logo-file-input').click()">Choose File</button>
+          <button type="button" class="upload-action-btn" id="upload-btn" onclick="uploadLogoFromComputer()">Upload</button>
         </div>
+        <img id="logo-preview" class="logo-preview-img" alt="Logo Preview">
       </div>
 
       <button class="btn" id="save-profile-btn" onclick="saveRestaurantDetails()">Save Profile Details</button>
@@ -182,14 +240,21 @@
     let currentRestaurantId = null;
 
     async function initDashboard() {
+      // Check active user session
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      
       const urlParams = new URLSearchParams(window.location.search);
-      const slug = urlParams.get('r') || 'default';
+      const slug = urlParams.get('r');
 
-      const { data: restaurants } = await supabaseClient
-        .from('restaurants')
-        .select('*')
-        .eq('slug', slug.toLowerCase())
-        .limit(1);
+      let restQuery = supabaseClient.from('restaurants').select('*');
+      
+      if (slug) {
+        restQuery = restQuery.eq('slug', slug.toLowerCase());
+      } else if (session && session.user) {
+        restQuery = restQuery.eq('user_id', session.user.id);
+      }
+
+      const { data: restaurants } = await restQuery.limit(1);
 
       if (restaurants && restaurants.length > 0) {
         const rest = restaurants[0];
@@ -198,7 +263,7 @@
         document.getElementById('setting-phone').value = rest.phone || '';
         
         if (rest.logo_url) {
-          document.getElementById('setting-logo-url').value = rest.logo_url;
+          document.getElementById('setting-logo').value = rest.logo_url;
           const img = document.getElementById('logo-preview');
           img.src = rest.logo_url;
           img.style.display = 'block';
@@ -206,8 +271,58 @@
 
         loadMenuItems();
       } else {
-        document.getElementById('owner-menu-list').innerText = "Restaurant profile not found for this slug.";
+        document.getElementById('owner-menu-list').innerText = "Restaurant profile not found.";
       }
+    }
+
+    function updateFileLabel() {
+      const fileInput = document.getElementById('logo-file-input');
+      const btn = document.querySelector('.file-select-btn');
+      if (fileInput.files.length > 0) {
+        btn.innerText = fileInput.files[0].name.substring(0, 10) + "...";
+      }
+    }
+
+    // Direct Upload Action for Side Button
+    async function uploadLogoFromComputer() {
+      const fileInput = document.getElementById('logo-file-input');
+      const uploadBtn = document.getElementById('upload-btn');
+
+      if (fileInput.files.length === 0) {
+        return alert("Pehle computer se file select kijiye!");
+      }
+
+      uploadBtn.innerText = "Uploading...";
+      uploadBtn.disabled = true;
+
+      const file = fileInput.files[0];
+      const fileExt = file.name.split('.').pop();
+      const fileName = `logo_${currentRestaurantId || Date.now()}_${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabaseClient.storage
+        .from('restaurant-logos')
+        .upload(fileName, file, { upsert: true });
+
+      uploadBtn.innerText = "Upload";
+      uploadBtn.disabled = false;
+
+      if (uploadError) {
+        alert("Upload failed: Ensure 'restaurant-logos' bucket is created as Public in Supabase!");
+        return;
+      }
+
+      const { data: publicUrlData } = supabaseClient.storage
+        .from('restaurant-logos')
+        .getPublicUrl(fileName);
+
+      const uploadedUrl = publicUrlData.publicUrl;
+      document.getElementById('setting-logo').value = uploadedUrl;
+      
+      const img = document.getElementById('logo-preview');
+      img.src = uploadedUrl;
+      img.style.display = 'block';
+
+      alert("Logo successfully uploaded!");
     }
 
     async function saveRestaurantDetails() {
@@ -215,59 +330,17 @@
 
       const name = document.getElementById('setting-name').value;
       const phone = document.getElementById('setting-phone').value;
-      const fileInput = document.getElementById('setting-logo-file');
-      const btn = document.getElementById('save-profile-btn');
-
-      let logo_url = document.getElementById('setting-logo-url').value;
-
-      // Handle Computer File Upload to Supabase Storage
-      if (fileInput.files.length > 0) {
-        btn.innerText = "Uploading Logo...";
-        btn.disabled = true;
-
-        const file = fileInput.files[0];
-        const fileExt = file.name.split('.').pop();
-        const fileName = `logo_${currentRestaurantId}_${Date.now()}.${fileExt}`;
-        const filePath = `${fileName}`;
-
-        const { error: uploadError } = await supabaseClient.storage
-          .from('restaurant-logos')
-          .upload(filePath, file, { upsert: true });
-
-        if (uploadError) {
-          alert("Logo upload failed: Make sure 'restaurant-logos' bucket is created in Supabase Storage!");
-          btn.innerText = "Save Profile Details";
-          btn.disabled = false;
-          return;
-        }
-
-        const { data: publicUrlData } = supabaseClient.storage
-          .from('restaurant-logos')
-          .getPublicUrl(filePath);
-
-        logo_url = publicUrlData.publicUrl;
-      }
-
-      btn.innerText = "Saving...";
+      const logo_url = document.getElementById('setting-logo').value;
 
       const { error } = await supabaseClient
         .from('restaurants')
         .update({ name, phone, logo_url })
         .eq('id', currentRestaurantId);
 
-      btn.innerText = "Save Profile Details";
-      btn.disabled = false;
-
       if (error) {
         alert('Error saving profile');
       } else {
-        alert('Profile and Logo updated successfully!');
-        if (logo_url) {
-          document.getElementById('setting-logo-url').value = logo_url;
-          const img = document.getElementById('logo-preview');
-          img.src = logo_url;
-          img.style.display = 'block';
-        }
+        alert('Profile saved successfully!');
       }
     }
 
@@ -346,6 +419,11 @@
       if (!confirm('Are you sure you want to delete this item?')) return;
       await supabaseClient.from('menu_items').delete().eq('id', id);
       loadMenuItems();
+    }
+
+    async function handleLogout() {
+      await supabaseClient.auth.signOut();
+      window.location.href = 'login.html';
     }
 
     window.addEventListener('load', initDashboard);
