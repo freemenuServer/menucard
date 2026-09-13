@@ -45,7 +45,7 @@
       gap: 24px;
     }
     @media (min-width: 850px) {
-      .dashboard-grid { grid-template-columns: 360px 1fr; }
+      .dashboard-grid { grid-template-columns: 380px 1fr; }
     }
 
     .card {
@@ -71,8 +71,8 @@
     }
     .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.15); }
     
-    .flex-row { display: flex; gap: 10px; }
-    .flex-row .form-group { flex: 1; }
+    .flex-row { display: flex; gap: 8px; }
+    .flex-row .form-group { flex: 1; margin-bottom: 0; }
 
     .btn {
       width: 100%;
@@ -107,7 +107,6 @@
     }
     .cat-tag-del { color: #dc2626; cursor: pointer; font-size: 14px; font-weight: bold; }
 
-    /* Category Section Layout */
     .category-group-block {
       margin-bottom: 24px;
       background: #f8fafc;
@@ -147,7 +146,17 @@
     .item-view-mode { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
     .item-header-inline { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
     .item-name { font-weight: 700; font-size: 15px; }
-    .item-price { font-weight: 800; color: #16a34a; font-size: 15px; background: #f0fdf4; padding: 2px 8px; border-radius: 6px; }
+
+    .price-pills-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+    .price-pill {
+      font-size: 12px;
+      font-weight: 700;
+      background: #f0fdf4;
+      color: #16a34a;
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid #bbf7d0;
+    }
 
     .item-edit-mode { display: flex; flex-direction: column; gap: 10px; }
     .inline-inputs-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -169,8 +178,9 @@
   <main class="container">
     <div class="dashboard-grid">
       
-      <!-- Left Column: Settings, Category Add & Item Add Forms -->
+      <!-- Left Column: Forms -->
       <div>
+        <!-- Restaurant Details -->
         <div class="card">
           <h3 class="card-title">Restaurant Details</h3>
           <div class="form-group">
@@ -192,12 +202,13 @@
           <button class="btn" onclick="saveRestaurant()">Save Restaurant Details</button>
         </div>
 
+        <!-- Categories -->
         <div class="card">
           <h3 class="card-title">Manage Categories</h3>
           <div class="form-group">
             <label>New Category Name</label>
             <div class="flex-row">
-              <input type="text" id="new-cat-name" class="form-control" placeholder="e.g. Main Course, Fry, Starters">
+              <input type="text" id="new-cat-name" class="form-control" placeholder="e.g. Main Course, Fry">
               <button class="btn" style="width: auto; padding: 0 16px;" onclick="addCategory()">+ Add</button>
             </div>
           </div>
@@ -206,17 +217,20 @@
           </div>
         </div>
 
+        <!-- Item Add Form with Multi Pricing -->
         <div class="card">
           <h3 class="card-title">Add New Dish</h3>
           <div class="form-group">
             <label>Item Name</label>
-            <input type="text" id="item-name" class="form-control" placeholder="e.g. Chicken Fry / Dal Makhani">
+            <input type="text" id="item-name" class="form-control" placeholder="e.g. Chicken Korma / Dal Makhani">
           </div>
-          
-          <div class="flex-row">
+
+          <div class="flex-row" style="margin-bottom: 12px;">
             <div class="form-group">
-              <label>Price (₹)</label>
-              <input type="number" id="item-price" class="form-control" placeholder="180">
+              <label>Select Category</label>
+              <select id="item-category-select" class="form-control">
+                <option value="">-- Choose --</option>
+              </select>
             </div>
             <div class="form-group">
               <label>Food Type</label>
@@ -228,26 +242,34 @@
             </div>
           </div>
 
+          <!-- Price Inputs Section -->
           <div class="form-group">
-            <label>Select Category</label>
-            <select id="item-category-select" class="form-control">
-              <option value="">-- Choose Category --</option>
-            </select>
+            <label style="color: var(--primary);">Pricing Options (₹)</label>
+            <div class="form-group" style="margin-bottom: 8px;">
+              <input type="number" id="item-price" class="form-control" placeholder="Fixed / Single Price (e.g. 150)">
+            </div>
+            <div class="flex-row">
+              <div class="form-group">
+                <input type="number" id="item-price-quarter" class="form-control" placeholder="Qtr (1/4)">
+              </div>
+              <div class="form-group">
+                <input type="number" id="item-price-half" class="form-control" placeholder="Half (1/2)">
+              </div>
+              <div class="form-group">
+                <input type="number" id="item-price-full" class="form-control" placeholder="Full (1)">
+              </div>
+            </div>
           </div>
 
           <div class="form-group">
-            <label>Image URL (Optional)</label>
-            <input type="text" id="item-img" class="form-control" placeholder="https://example.com/dish.jpg">
-          </div>
-          <div class="form-group">
             <label>Short Description</label>
-            <textarea id="item-desc" class="form-control" rows="2" placeholder="Brief details..."></textarea>
+            <textarea id="item-desc" class="form-control" rows="2" placeholder="Brief dish description..."></textarea>
           </div>
           <button class="btn" onclick="addMenuItem()">+ Add Item to Menu</button>
         </div>
       </div>
 
-      <!-- Right Column: Category-wise Menu Display -->
+      <!-- Right Column: Category-wise Menu -->
       <div>
         <div class="card">
           <div class="card-title">
@@ -309,10 +331,7 @@
       const logo_url = document.getElementById('rest-logo').value.trim();
       const phone = document.getElementById('rest-phone').value.trim();
 
-      if (!name || !slug) {
-        alert("Please enter Name and Slug!");
-        return;
-      }
+      if (!name || !slug) { alert("Name and Slug required!"); return; }
 
       const payload = { name, slug, logo_url, phone };
 
@@ -330,9 +349,8 @@
 
     async function fetchCategories(restaurantId) {
       let query = supabaseClient.from('categories').select('*');
-      if (restaurantId) {
-        query = query.eq('restaurant_id', restaurantId);
-      }
+      if (restaurantId) query = query.eq('restaurant_id', restaurantId);
+
       const { data } = await query;
       categoriesList = data || [];
       
@@ -364,7 +382,7 @@
 
       const { error } = await supabaseClient.from('categories').insert([payload]);
       if (error) {
-        alert("Category save error: " + error.message);
+        alert("Category error: " + error.message);
       } else {
         document.getElementById('new-cat-name').value = '';
         fetchCategories(currentRestaurant ? currentRestaurant.id : null);
@@ -380,27 +398,34 @@
 
     async function addMenuItem() {
       const name = document.getElementById('item-name').value.trim();
-      const price = parseFloat(document.getElementById('item-price').value);
+      const price = parseFloat(document.getElementById('item-price').value) || null;
+      const price_quarter = parseFloat(document.getElementById('item-price-quarter').value) || null;
+      const price_half = parseFloat(document.getElementById('item-price-half').value) || null;
+      const price_full = parseFloat(document.getElementById('item-price-full').value) || null;
+
       const category = document.getElementById('item-category-select').value;
       const itemType = document.getElementById('item-type').value;
-      const image_url = document.getElementById('item-img').value.trim();
       const description = document.getElementById('item-desc').value.trim();
 
-      if (!name || isNaN(price)) { alert("Valid Name & Price zaroori hain!"); return; }
+      if (!name) { alert("Please enter dish name!"); return; }
+      if (!price && !price_quarter && !price_half && !price_full) {
+        alert("At least ek price enter karein (Single Price, Half, Quarter ya Full)!");
+        return;
+      }
 
       const newItem = {
         name,
         price,
+        price_quarter,
+        price_half,
+        price_full,
         category: category || 'General',
         item_type: itemType,
         is_veg: itemType === 'veg',
-        image_url,
         description
       };
 
-      if (currentRestaurant) {
-        newItem.restaurant_id = currentRestaurant.id;
-      }
+      if (currentRestaurant) newItem.restaurant_id = currentRestaurant.id;
 
       const { error } = await supabaseClient.from('menu_items').insert([newItem]);
       if (error) {
@@ -408,7 +433,9 @@
       } else {
         document.getElementById('item-name').value = '';
         document.getElementById('item-price').value = '';
-        document.getElementById('item-img').value = '';
+        document.getElementById('item-price-quarter').value = '';
+        document.getElementById('item-price-half').value = '';
+        document.getElementById('item-price-full').value = '';
         document.getElementById('item-desc').value = '';
         loadMenuItems(currentRestaurant ? currentRestaurant.id : null);
       }
@@ -416,14 +443,9 @@
 
     async function loadMenuItems(restaurantId) {
       let query = supabaseClient.from('menu_items').select('*');
-      if (restaurantId) {
-        query = query.eq('restaurant_id', restaurantId);
-      }
+      if (restaurantId) query = query.eq('restaurant_id', restaurantId);
       
-      const { data: items, error } = await query;
-      if (error) {
-        console.error("Fetch items error:", error);
-      }
+      const { data: items } = await query;
       menuItems = items || [];
       renderGroupedItemList();
     }
@@ -437,19 +459,14 @@
         return;
       }
 
-      // 1. Group items by Category
       const grouped = {};
       menuItems.forEach(item => {
         const catName = item.category ? item.category.trim() : 'General / Other Items';
-        if (!grouped[catName]) {
-          grouped[catName] = [];
-        }
+        if (!grouped[catName]) grouped[catName] = [];
         grouped[catName].push(item);
       });
 
-      // 2. Build Category Sections HTML
       let groupedHtml = '';
-
       for (const [catName, items] of Object.entries(grouped)) {
         groupedHtml += `
           <div class="category-group-block">
@@ -474,6 +491,12 @@
         `<option value="${c.name}" ${item.category === c.name ? 'selected' : ''}>${c.name}</option>`
       ).join('');
 
+      let priceDisplayHtml = '';
+      if (item.price) priceDisplayHtml += `<span class="price-pill">₹${item.price}</span>`;
+      if (item.price_quarter) priceDisplayHtml += `<span class="price-pill">Qtr: ₹${item.price_quarter}</span>`;
+      if (item.price_half) priceDisplayHtml += `<span class="price-pill">Half: ₹${item.price_half}</span>`;
+      if (item.price_full) priceDisplayHtml += `<span class="price-pill">Full: ₹${item.price_full}</span>`;
+
       return `
         <div class="item-card">
           <div class="item-view-mode" id="view-${item.id}">
@@ -483,24 +506,31 @@
                 <span class="item-name">${item.name}</span>
               </div>
               <div style="font-size: 13px; color: var(--text-muted);">${item.description || ''}</div>
+              <div class="price-pills-row">${priceDisplayHtml}</div>
             </div>
 
             <div style="display: flex; align-items: center; gap: 8px;">
-              <span class="item-price">₹${item.price}</span>
               <button class="btn-action btn-edit" onclick="enableInlineEdit('${item.id}')">Edit</button>
               <button class="btn-action btn-delete" onclick="deleteItem('${item.id}')">Delete</button>
             </div>
           </div>
 
+          <!-- Edit Mode -->
           <div class="item-edit-mode" id="edit-${item.id}" style="display: none;">
             <div class="inline-inputs-row">
               <input type="text" id="edit-name-${item.id}" class="form-control" value="${item.name}" placeholder="Name" style="flex: 2;">
-              <input type="number" id="edit-price-${item.id}" class="form-control" value="${item.price}" placeholder="Price" style="flex: 1;">
               <select id="edit-type-${item.id}" class="form-control" style="flex: 1;">
                 <option value="veg" ${item.item_type === 'veg' ? 'selected' : ''}>🟢 Veg</option>
                 <option value="nonveg" ${item.item_type === 'nonveg' ? 'selected' : ''}>🔴 Non-Veg</option>
                 <option value="egg" ${item.item_type === 'egg' ? 'selected' : ''}>🟡 Egg</option>
               </select>
+            </div>
+
+            <div class="inline-inputs-row">
+              <input type="number" id="edit-price-${item.id}" class="form-control" value="${item.price || ''}" placeholder="Single ₹" style="flex: 1;">
+              <input type="number" id="edit-qtr-${item.id}" class="form-control" value="${item.price_quarter || ''}" placeholder="Qtr ₹" style="flex: 1;">
+              <input type="number" id="edit-half-${item.id}" class="form-control" value="${item.price_half || ''}" placeholder="Half ₹" style="flex: 1;">
+              <input type="number" id="edit-full-${item.id}" class="form-control" value="${item.price_full || ''}" placeholder="Full ₹" style="flex: 1;">
             </div>
 
             <div class="inline-inputs-row">
@@ -532,16 +562,22 @@
 
     async function saveInlineEdit(id) {
       const newName = document.getElementById(`edit-name-${id}`).value.trim();
-      const newPrice = parseFloat(document.getElementById(`edit-price-${id}`).value);
+      const newPrice = parseFloat(document.getElementById(`edit-price-${id}`).value) || null;
+      const newQtr = parseFloat(document.getElementById(`edit-qtr-${id}`).value) || null;
+      const newHalf = parseFloat(document.getElementById(`edit-half-${id}`).value) || null;
+      const newFull = parseFloat(document.getElementById(`edit-full-${id}`).value) || null;
       const newType = document.getElementById(`edit-type-${id}`).value;
       const newCat = document.getElementById(`edit-cat-${id}`).value;
       const newDesc = document.getElementById(`edit-desc-${id}`).value.trim();
 
-      if (!newName || isNaN(newPrice)) { alert("Name and Price required!"); return; }
+      if (!newName) { alert("Name is required!"); return; }
 
       const updatedData = {
         name: newName,
         price: newPrice,
+        price_quarter: newQtr,
+        price_half: newHalf,
+        price_full: newFull,
         item_type: newType,
         is_veg: newType === 'veg',
         category: newCat,
