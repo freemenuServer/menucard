@@ -3,600 +3,352 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Owner Dashboard - FreeMenu.in</title>
+  <title>Owner Menu Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <style>
     :root {
-      --primary: #ff4757;
-      --primary-hover: #ff6b81;
-      --bg: #f8fafc;
+      --primary: #10b981;
+      --primary-dark: #047857;
+      --bg-color: #f8fafc;
       --card-bg: #ffffff;
-      --text-dark: #0f172a;
+      --text-main: #0f172a;
       --text-muted: #64748b;
-      --veg-color: #16a34a;
-      --nonveg-color: #dc2626;
-      --egg-color: #d97706;
-      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+      --border: #e2e8f0;
+      --danger: #ef4444;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg); color: var(--text-dark); min-height: 100vh; padding-bottom: 60px; }
+    body { background: var(--bg-color); color: var(--text-main); padding: 20px 12px 60px; }
 
-    .navbar {
-      background: #ffffff;
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #e2e8f0;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .logo { font-size: 22px; font-weight: 800; color: var(--primary); text-decoration: none; }
-    .logo span { color: var(--text-dark); }
-    .nav-btn { background: #f1f5f9; color: var(--text-dark); padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 700; }
+    .dashboard-container { max-width: 768px; margin: 0 auto; }
 
-    .container { max-width: 1050px; margin: 24px auto; padding: 0 16px; }
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 24px;
-    }
-    @media (min-width: 850px) {
-      .dashboard-grid { grid-template-columns: 380px 1fr; }
-    }
-
-    .card {
+    .header-card, .form-card, .menu-card {
       background: var(--card-bg);
-      border-radius: 16px;
-      padding: 24px;
-      border: 1px solid #e2e8f0;
-      box-shadow: var(--shadow);
-      margin-bottom: 24px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
     }
-    .card-title { font-size: 18px; font-weight: 800; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+
+    h2 { font-size: 18px; font-weight: 700; margin-bottom: 14px; color: var(--text-main); }
 
     .form-group { margin-bottom: 14px; }
-    .form-group label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: var(--text-dark); }
-    .form-control {
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+    
+    input[type="text"], input[type="number"], input[type="file"], select {
       width: 100%;
       padding: 10px 12px;
-      font-size: 14px;
-      border: 1px solid #cbd5e1;
+      border: 1px solid var(--border);
       border-radius: 8px;
+      font-size: 14px;
       outline: none;
-      transition: all 0.2s;
+      background: #fff;
     }
-    .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.15); }
-    
-    .flex-row { display: flex; gap: 8px; }
-    .flex-row .form-group { flex: 1; margin-bottom: 0; }
+    input:focus, select:focus { border-color: var(--primary); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+    .logo-preview-box { display: flex; align-items: center; gap: 12px; margin-top: 6px; }
+    .logo-preview-img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border); display: none; }
+
+    .radio-group { display: flex; gap: 16px; margin-top: 6px; }
+    .radio-label { display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
 
     .btn {
       width: 100%;
       background: var(--primary);
       color: white;
-      padding: 12px;
       border: none;
-      border-radius: 10px;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 700;
       font-size: 14px;
-      font-weight: 700;
       cursor: pointer;
-      transition: background 0.2s;
+      margin-top: 10px;
     }
-    .btn:hover { background: var(--primary-hover); }
+    .btn:active { background: var(--primary-dark); }
+    .btn-danger { background: #fee2e2; color: var(--danger); border: 1px solid #fca5a5; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; }
 
-    .btn-action { padding: 6px 12px; border-radius: 8px; font-size: 12px; border: none; cursor: pointer; font-weight: 700; }
-    .btn-edit { background: #e0f2fe; color: #0284c7; }
-    .btn-delete { background: #fee2e2; color: #dc2626; }
-    .btn-save { background: #dcfce7; color: #16a34a; }
-    .btn-cancel { background: #f1f5f9; color: #64748b; }
-
-    .cat-chips-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-    .cat-tag {
-      background: #f1f5f9;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .cat-tag-del { color: #dc2626; cursor: pointer; font-size: 14px; font-weight: bold; }
-
-    .category-group-block {
-      margin-bottom: 24px;
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 16px;
-    }
-    .category-group-header {
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--primary);
-      margin-bottom: 12px;
-      padding-bottom: 6px;
-      border-bottom: 2px solid #e2e8f0;
+    .item-list-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
     }
-    .category-item-count {
-      font-size: 12px;
-      color: var(--text-muted);
-      background: #ffffff;
-      padding: 2px 8px;
-      border-radius: 10px;
-      border: 1px solid #cbd5e1;
-    }
-
-    .item-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 10px;
-    }
-    .item-card:last-child { margin-bottom: 0; }
-    
-    .item-view-mode { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-    .item-header-inline { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-    .item-name { font-weight: 700; font-size: 15px; }
-
-    .price-pills-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
-    .price-pill {
-      font-size: 12px;
-      font-weight: 700;
-      background: #f0fdf4;
-      color: #16a34a;
-      padding: 3px 8px;
-      border-radius: 6px;
-      border: 1px solid #bbf7d0;
-    }
-
-    .item-edit-mode { display: flex; flex-direction: column; gap: 10px; }
-    .inline-inputs-row { display: flex; gap: 8px; flex-wrap: wrap; }
-    .inline-inputs-row input, .inline-inputs-row select { font-size: 13px; padding: 8px; }
-
-    .badge-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-    .badge-veg { background: var(--veg-color); }
-    .badge-nonveg { background: var(--nonveg-color); }
-    .badge-egg { background: var(--egg-color); }
+    .item-list-row:last-child { border-bottom: none; }
+    .item-info { flex: 1; }
+    .item-name-tag { font-weight: 700; font-size: 15px; }
+    .item-sub-tag { font-size: 12px; color: var(--text-muted); }
   </style>
 </head>
 <body>
 
-  <nav class="navbar">
-    <a href="#" class="logo">FreeMenu<span>.in</span></a>
-    <a href="#" id="preview-link" target="_blank" class="nav-btn">View Live Menu ↗</a>
-  </nav>
-
-  <main class="container">
-    <div class="dashboard-grid">
+  <div class="dashboard-container">
+    
+    <!-- Restaurant Settings Card -->
+    <div class="header-card">
+      <h2>⚙️ Restaurant Profile</h2>
+      <div class="form-group">
+        <label>Restaurant Name</label>
+        <input type="text" id="setting-name" placeholder="Enter Restaurant Name">
+      </div>
       
-      <!-- Left Column: Forms -->
-      <div>
-        <!-- Restaurant Details -->
-        <div class="card">
-          <h3 class="card-title">Restaurant Details</h3>
-          <div class="form-group">
-            <label>Restaurant Name</label>
-            <input type="text" id="rest-name" class="form-control" placeholder="e.g. Royal Spice Restaurant">
-          </div>
-          <div class="form-group">
-            <label>Menu Slug Code (URL)</label>
-            <input type="text" id="rest-slug" class="form-control" placeholder="e.g. royalspice">
-          </div>
-          <div class="form-group">
-            <label>Logo Image URL</label>
-            <input type="text" id="rest-logo" class="form-control" placeholder="https://example.com/logo.png">
-          </div>
-          <div class="form-group">
-            <label>Phone Number</label>
-            <input type="text" id="rest-phone" class="form-control" placeholder="+91 9876543210">
-          </div>
-          <button class="btn" onclick="saveRestaurant()">Save Restaurant Details</button>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="text" id="setting-phone" placeholder="Phone Number">
         </div>
 
-        <!-- Categories -->
-        <div class="card">
-          <h3 class="card-title">Manage Categories</h3>
-          <div class="form-group">
-            <label>New Category Name</label>
-            <div class="flex-row">
-              <input type="text" id="new-cat-name" class="form-control" placeholder="e.g. Main Course, Fry">
-              <button class="btn" style="width: auto; padding: 0 16px;" onclick="addCategory()">+ Add</button>
-            </div>
-          </div>
-          <div class="cat-chips-list" id="categories-chips">
-            <span style="font-size: 12px; color: var(--text-muted);">Loading categories...</span>
-          </div>
-        </div>
-
-        <!-- Item Add Form with Multi Pricing -->
-        <div class="card">
-          <h3 class="card-title">Add New Dish</h3>
-          <div class="form-group">
-            <label>Item Name</label>
-            <input type="text" id="item-name" class="form-control" placeholder="e.g. Chicken Korma / Dal Makhani">
-          </div>
-
-          <div class="flex-row" style="margin-bottom: 12px;">
-            <div class="form-group">
-              <label>Select Category</label>
-              <select id="item-category-select" class="form-control">
-                <option value="">-- Choose --</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Food Type</label>
-              <select id="item-type" class="form-control">
-                <option value="veg">🟢 Veg</option>
-                <option value="nonveg">🔴 Non-Veg</option>
-                <option value="egg">🟡 Egg</option>
-              </select>
-            </div>
-          </div>
-
-          <!-- Price Inputs Section -->
-          <div class="form-group">
-            <label style="color: var(--primary);">Pricing Options (₹)</label>
-            <div class="form-group" style="margin-bottom: 8px;">
-              <input type="number" id="item-price" class="form-control" placeholder="Fixed / Single Price (e.g. 150)">
-            </div>
-            <div class="flex-row">
-              <div class="form-group">
-                <input type="number" id="item-price-quarter" class="form-control" placeholder="Qtr (1/4)">
-              </div>
-              <div class="form-group">
-                <input type="number" id="item-price-half" class="form-control" placeholder="Half (1/2)">
-              </div>
-              <div class="form-group">
-                <input type="number" id="item-price-full" class="form-control" placeholder="Full (1)">
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Short Description</label>
-            <textarea id="item-desc" class="form-control" rows="2" placeholder="Brief dish description..."></textarea>
-          </div>
-          <button class="btn" onclick="addMenuItem()">+ Add Item to Menu</button>
-        </div>
-      </div>
-
-      <!-- Right Column: Category-wise Menu -->
-      <div>
-        <div class="card">
-          <div class="card-title">
-            <span>Current Menu Items</span>
-            <span id="items-count" style="font-size: 13px; color: var(--text-muted);">0 items</span>
-          </div>
-
-          <div id="items-list">
-            <p style="color: var(--text-muted); text-align: center; padding: 20px 0;">Loading menu items...</p>
+        <div class="form-group">
+          <label>Upload Logo (Select File from Computer)</label>
+          <input type="file" id="setting-logo-file" accept="image/*">
+          <div class="logo-preview-box">
+            <img id="logo-preview" class="logo-preview-img" alt="Logo Preview">
+            <input type="hidden" id="setting-logo-url">
           </div>
         </div>
       </div>
 
+      <button class="btn" id="save-profile-btn" onclick="saveRestaurantDetails()">Save Profile Details</button>
     </div>
-  </main>
+
+    <!-- Add Item Form Card -->
+    <div class="form-card">
+      <h2>➕ Add New Menu Item</h2>
+      
+      <div class="form-group">
+        <label>Item Name</label>
+        <input type="text" id="item-name" placeholder="e.g. Paneer Butter Masala">
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Category</label>
+          <input type="text" id="item-category" placeholder="e.g. Main Course, Starters">
+        </div>
+        <div class="form-group">
+          <label>Food Type</label>
+          <div class="radio-group">
+            <label class="radio-label"><input type="radio" name="item_type" value="veg" checked> 🟢 Veg</label>
+            <label class="radio-label"><input type="radio" name="item_type" value="nonveg"> 🔴 Non-Veg</label>
+            <label class="radio-label"><input type="radio" name="item_type" value="egg"> 🟡 Egg</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Description (Optional)</label>
+        <input type="text" id="item-desc" placeholder="Short description of ingredients or taste">
+      </div>
+
+      <div class="form-group">
+        <label>Single Price (If no portion system)</label>
+        <input type="number" id="price-single" placeholder="₹ Price">
+      </div>
+
+      <label>Portion Pricing (Optional)</label>
+      <div class="grid-3 form-group">
+        <div>
+          <input type="number" id="price-qtr" placeholder="Qtr ₹">
+        </div>
+        <div>
+          <input type="number" id="price-half" placeholder="Half ₹">
+        </div>
+        <div>
+          <input type="number" id="price-full" placeholder="Full ₹">
+        </div>
+      </div>
+
+      <button class="btn" onclick="addNewMenuItem()">Add Item To Menu</button>
+    </div>
+
+    <!-- Menu Live List Card -->
+    <div class="menu-card">
+      <h2>📋 Current Menu Items</h2>
+      <div id="owner-menu-list">Loading Menu...</div>
+    </div>
+
+  </div>
 
   <script>
-    let supabaseClient = null;
-    let currentRestaurant = null;
-    let categoriesList = [];
-    let menuItems = [];
+    const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    function initSupabase() {
-      const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
-      const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
-      if (window.supabase && typeof window.supabase.createClient === 'function') {
-        return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      }
-      return null;
-    }
+    let currentRestaurantId = null;
 
-    async function loadDashboard() {
-      supabaseClient = initSupabase();
-      if (!supabaseClient) return;
+    async function initDashboard() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const slug = urlParams.get('r') || 'default';
 
-      const { data: restaurants } = await supabaseClient.from('restaurants').select('*').limit(1);
+      const { data: restaurants } = await supabaseClient
+        .from('restaurants')
+        .select('*')
+        .eq('slug', slug.toLowerCase())
+        .limit(1);
+
       if (restaurants && restaurants.length > 0) {
-        currentRestaurant = restaurants[0];
-        document.getElementById('rest-name').value = currentRestaurant.name || '';
-        document.getElementById('rest-slug').value = currentRestaurant.slug || '';
-        document.getElementById('rest-logo').value = currentRestaurant.logo_url || '';
-        document.getElementById('rest-phone').value = currentRestaurant.phone || '';
+        const rest = restaurants[0];
+        currentRestaurantId = rest.id;
+        document.getElementById('setting-name').value = rest.name || '';
+        document.getElementById('setting-phone').value = rest.phone || '';
         
-        if (currentRestaurant.slug) {
-          document.getElementById('preview-link').href = `menu.html?r=${currentRestaurant.slug}`;
+        if (rest.logo_url) {
+          document.getElementById('setting-logo-url').value = rest.logo_url;
+          const img = document.getElementById('logo-preview');
+          img.src = rest.logo_url;
+          img.style.display = 'block';
         }
-        
-        await fetchCategories(currentRestaurant.id);
-        await loadMenuItems(currentRestaurant.id);
+
+        loadMenuItems();
       } else {
-        await fetchCategories(null);
-        await loadMenuItems(null);
+        document.getElementById('owner-menu-list').innerText = "Restaurant profile not found for this slug.";
       }
     }
 
-    async function saveRestaurant() {
-      const name = document.getElementById('rest-name').value.trim();
-      const slug = document.getElementById('rest-slug').value.trim().toLowerCase();
-      const logo_url = document.getElementById('rest-logo').value.trim();
-      const phone = document.getElementById('rest-phone').value.trim();
+    async function saveRestaurantDetails() {
+      if (!currentRestaurantId) return alert('No Restaurant Loaded');
 
-      if (!name || !slug) { alert("Name and Slug required!"); return; }
+      const name = document.getElementById('setting-name').value;
+      const phone = document.getElementById('setting-phone').value;
+      const fileInput = document.getElementById('setting-logo-file');
+      const btn = document.getElementById('save-profile-btn');
 
-      const payload = { name, slug, logo_url, phone };
+      let logo_url = document.getElementById('setting-logo-url').value;
 
-      if (currentRestaurant) {
-        await supabaseClient.from('restaurants').update(payload).eq('id', currentRestaurant.id);
-      } else {
-        const { data, error } = await supabaseClient.from('restaurants').insert([payload]).select().single();
-        if (error) { alert("Error: " + error.message); return; }
-        currentRestaurant = data;
+      // Handle Computer File Upload to Supabase Storage
+      if (fileInput.files.length > 0) {
+        btn.innerText = "Uploading Logo...";
+        btn.disabled = true;
+
+        const file = fileInput.files[0];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `logo_${currentRestaurantId}_${Date.now()}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError } = await supabaseClient.storage
+          .from('restaurant-logos')
+          .upload(filePath, file, { upsert: true });
+
+        if (uploadError) {
+          alert("Logo upload failed: Make sure 'restaurant-logos' bucket is created in Supabase Storage!");
+          btn.innerText = "Save Profile Details";
+          btn.disabled = false;
+          return;
+        }
+
+        const { data: publicUrlData } = supabaseClient.storage
+          .from('restaurant-logos')
+          .getPublicUrl(filePath);
+
+        logo_url = publicUrlData.publicUrl;
       }
 
-      alert("Restaurant Saved!");
-      loadDashboard();
-    }
+      btn.innerText = "Saving...";
 
-    async function fetchCategories(restaurantId) {
-      let query = supabaseClient.from('categories').select('*');
-      if (restaurantId) query = query.eq('restaurant_id', restaurantId);
+      const { error } = await supabaseClient
+        .from('restaurants')
+        .update({ name, phone, logo_url })
+        .eq('id', currentRestaurantId);
 
-      const { data } = await query;
-      categoriesList = data || [];
-      
-      const selectEl = document.getElementById('item-category-select');
-      selectEl.innerHTML = '<option value="">-- Choose Category --</option>';
-      categoriesList.forEach(c => {
-        selectEl.innerHTML += `<option value="${c.name}">${c.name}</option>`;
-      });
+      btn.innerText = "Save Profile Details";
+      btn.disabled = false;
 
-      const chipsEl = document.getElementById('categories-chips');
-      if (categoriesList.length === 0) {
-        chipsEl.innerHTML = '<span style="font-size: 12px; color: var(--text-muted);">No categories added yet.</span>';
-        return;
-      }
-      chipsEl.innerHTML = categoriesList.map(c => `
-        <span class="cat-tag">
-          ${c.name}
-          <span class="cat-tag-del" onclick="deleteCategory('${c.id}')">&times;</span>
-        </span>
-      `).join('');
-    }
-
-    async function addCategory() {
-      const catName = document.getElementById('new-cat-name').value.trim();
-      if (!catName) return;
-
-      const payload = { name: catName };
-      if (currentRestaurant) payload.restaurant_id = currentRestaurant.id;
-
-      const { error } = await supabaseClient.from('categories').insert([payload]);
       if (error) {
-        alert("Category error: " + error.message);
+        alert('Error saving profile');
       } else {
-        document.getElementById('new-cat-name').value = '';
-        fetchCategories(currentRestaurant ? currentRestaurant.id : null);
+        alert('Profile and Logo updated successfully!');
+        if (logo_url) {
+          document.getElementById('setting-logo-url').value = logo_url;
+          const img = document.getElementById('logo-preview');
+          img.src = logo_url;
+          img.style.display = 'block';
+        }
       }
     }
 
-    async function deleteCategory(id) {
-      if (confirm("Delete this category?")) {
-        await supabaseClient.from('categories').delete().eq('id', id);
-        fetchCategories(currentRestaurant ? currentRestaurant.id : null);
-      }
-    }
+    async function addNewMenuItem() {
+      if (!currentRestaurantId) return alert('No Restaurant Selected');
 
-    async function addMenuItem() {
       const name = document.getElementById('item-name').value.trim();
-      const price = parseFloat(document.getElementById('item-price').value) || null;
-      const price_quarter = parseFloat(document.getElementById('item-price-quarter').value) || null;
-      const price_half = parseFloat(document.getElementById('item-price-half').value) || null;
-      const price_full = parseFloat(document.getElementById('item-price-full').value) || null;
-
-      const category = document.getElementById('item-category-select').value;
-      const itemType = document.getElementById('item-type').value;
+      const category = document.getElementById('item-category').value.trim() || 'General';
       const description = document.getElementById('item-desc').value.trim();
+      const item_type = document.querySelector('input[name="item_type"]:checked').value;
 
-      if (!name) { alert("Please enter dish name!"); return; }
-      if (!price && !price_quarter && !price_half && !price_full) {
-        alert("At least ek price enter karein (Single Price, Half, Quarter ya Full)!");
-        return;
-      }
+      const price = parseFloat(document.getElementById('price-single').value) || null;
+      const price_quarter = parseFloat(document.getElementById('price-qtr').value) || null;
+      const price_half = parseFloat(document.getElementById('price-half').value) || null;
+      const price_full = parseFloat(document.getElementById('price-full').value) || null;
 
-      const newItem = {
-        name,
-        price,
-        price_quarter,
-        price_half,
-        price_full,
-        category: category || 'General',
-        item_type: itemType,
-        is_veg: itemType === 'veg',
-        description
-      };
+      if (!name) return alert('Please enter Item Name');
 
-      if (currentRestaurant) newItem.restaurant_id = currentRestaurant.id;
+      const { error } = await supabaseClient
+        .from('menu_items')
+        .insert([{
+          restaurant_id: currentRestaurantId,
+          name,
+          category,
+          description,
+          item_type,
+          is_veg: item_type === 'veg',
+          price,
+          price_quarter,
+          price_half,
+          price_full
+        }]);
 
-      const { error } = await supabaseClient.from('menu_items').insert([newItem]);
       if (error) {
-        alert("Failed to add item: " + error.message);
+        alert('Failed to add item');
       } else {
+        alert('Item Added Successfully!');
         document.getElementById('item-name').value = '';
-        document.getElementById('item-price').value = '';
-        document.getElementById('item-price-quarter').value = '';
-        document.getElementById('item-price-half').value = '';
-        document.getElementById('item-price-full').value = '';
         document.getElementById('item-desc').value = '';
-        loadMenuItems(currentRestaurant ? currentRestaurant.id : null);
+        document.getElementById('price-single').value = '';
+        document.getElementById('price-qtr').value = '';
+        document.getElementById('price-half').value = '';
+        document.getElementById('price-full').value = '';
+        loadMenuItems();
       }
     }
 
-    async function loadMenuItems(restaurantId) {
-      let query = supabaseClient.from('menu_items').select('*');
-      if (restaurantId) query = query.eq('restaurant_id', restaurantId);
-      
-      const { data: items } = await query;
-      menuItems = items || [];
-      renderGroupedItemList();
-    }
+    async function loadMenuItems() {
+      const container = document.getElementById('owner-menu-list');
+      const { data: items } = await supabaseClient
+        .from('menu_items')
+        .select('*')
+        .eq('restaurant_id', currentRestaurantId)
+        .order('id', { ascending: false });
 
-    function renderGroupedItemList() {
-      const listContainer = document.getElementById('items-list');
-      document.getElementById('items-count').innerText = `${menuItems.length} items`;
-
-      if (menuItems.length === 0) {
-        listContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 20px 0;">No items found on dashboard.</p>';
+      if (!items || items.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-muted);">No menu items added yet.</p>';
         return;
       }
 
-      const grouped = {};
-      menuItems.forEach(item => {
-        const catName = item.category ? item.category.trim() : 'General / Other Items';
-        if (!grouped[catName]) grouped[catName] = [];
-        grouped[catName].push(item);
-      });
-
-      let groupedHtml = '';
-      for (const [catName, items] of Object.entries(grouped)) {
-        groupedHtml += `
-          <div class="category-group-block">
-            <div class="category-group-header">
-              <span>📂 ${catName}</span>
-              <span class="category-item-count">${items.length} items</span>
+      container.innerHTML = items.map(item => {
+        let priceStr = item.price ? `₹${item.price}` : `Q: ₹${item.price_quarter||'-'} | H: ₹${item.price_half||'-'} | F: ₹${item.price_full||'-'}`;
+        return `
+          <div class="item-list-row">
+            <div class="item-info">
+              <div class="item-name-tag">${item.name} <small>(${item.item_type.toUpperCase()})</small></div>
+              <div class="item-sub-tag">Category: ${item.category} | ${priceStr}</div>
             </div>
-            ${items.map(item => renderItemCard(item)).join('')}
+            <button class="btn-danger" onclick="deleteMenuItem(${item.id})">Delete</button>
           </div>
         `;
-      }
-
-      listContainer.innerHTML = groupedHtml;
+      }).join('');
     }
 
-    function renderItemCard(item) {
-      let typeClass = 'badge-veg';
-      if (item.item_type === 'egg') typeClass = 'badge-egg';
-      else if (item.item_type === 'nonveg' || item.is_veg === false) typeClass = 'badge-nonveg';
-
-      const catOptionsHtml = categoriesList.map(c => 
-        `<option value="${c.name}" ${item.category === c.name ? 'selected' : ''}>${c.name}</option>`
-      ).join('');
-
-      let priceDisplayHtml = '';
-      if (item.price) priceDisplayHtml += `<span class="price-pill">₹${item.price}</span>`;
-      if (item.price_quarter) priceDisplayHtml += `<span class="price-pill">Qtr: ₹${item.price_quarter}</span>`;
-      if (item.price_half) priceDisplayHtml += `<span class="price-pill">Half: ₹${item.price_half}</span>`;
-      if (item.price_full) priceDisplayHtml += `<span class="price-pill">Full: ₹${item.price_full}</span>`;
-
-      return `
-        <div class="item-card">
-          <div class="item-view-mode" id="view-${item.id}">
-            <div style="flex: 1;">
-              <div class="item-header-inline">
-                <span class="badge-dot ${typeClass}"></span>
-                <span class="item-name">${item.name}</span>
-              </div>
-              <div style="font-size: 13px; color: var(--text-muted);">${item.description || ''}</div>
-              <div class="price-pills-row">${priceDisplayHtml}</div>
-            </div>
-
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <button class="btn-action btn-edit" onclick="enableInlineEdit('${item.id}')">Edit</button>
-              <button class="btn-action btn-delete" onclick="deleteItem('${item.id}')">Delete</button>
-            </div>
-          </div>
-
-          <!-- Edit Mode -->
-          <div class="item-edit-mode" id="edit-${item.id}" style="display: none;">
-            <div class="inline-inputs-row">
-              <input type="text" id="edit-name-${item.id}" class="form-control" value="${item.name}" placeholder="Name" style="flex: 2;">
-              <select id="edit-type-${item.id}" class="form-control" style="flex: 1;">
-                <option value="veg" ${item.item_type === 'veg' ? 'selected' : ''}>🟢 Veg</option>
-                <option value="nonveg" ${item.item_type === 'nonveg' ? 'selected' : ''}>🔴 Non-Veg</option>
-                <option value="egg" ${item.item_type === 'egg' ? 'selected' : ''}>🟡 Egg</option>
-              </select>
-            </div>
-
-            <div class="inline-inputs-row">
-              <input type="number" id="edit-price-${item.id}" class="form-control" value="${item.price || ''}" placeholder="Single ₹" style="flex: 1;">
-              <input type="number" id="edit-qtr-${item.id}" class="form-control" value="${item.price_quarter || ''}" placeholder="Qtr ₹" style="flex: 1;">
-              <input type="number" id="edit-half-${item.id}" class="form-control" value="${item.price_half || ''}" placeholder="Half ₹" style="flex: 1;">
-              <input type="number" id="edit-full-${item.id}" class="form-control" value="${item.price_full || ''}" placeholder="Full ₹" style="flex: 1;">
-            </div>
-
-            <div class="inline-inputs-row">
-              <select id="edit-cat-${item.id}" class="form-control" style="flex: 1;">
-                <option value="">-- Select Category --</option>
-                ${catOptionsHtml}
-              </select>
-              <input type="text" id="edit-desc-${item.id}" class="form-control" value="${item.description || ''}" placeholder="Description" style="flex: 2;">
-            </div>
-
-            <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px;">
-              <button class="btn-action btn-cancel" onclick="cancelInlineEdit('${item.id}')">Cancel</button>
-              <button class="btn-action btn-save" onclick="saveInlineEdit('${item.id}')">Save Changes</button>
-            </div>
-          </div>
-        </div>
-      `;
+    async function deleteMenuItem(id) {
+      if (!confirm('Are you sure you want to delete this item?')) return;
+      await supabaseClient.from('menu_items').delete().eq('id', id);
+      loadMenuItems();
     }
 
-    function enableInlineEdit(id) {
-      document.getElementById(`view-${id}`).style.display = 'none';
-      document.getElementById(`edit-${id}`).style.display = 'flex';
-    }
-
-    function cancelInlineEdit(id) {
-      document.getElementById(`edit-${id}`).style.display = 'none';
-      document.getElementById(`view-${id}`).style.display = 'flex';
-    }
-
-    async function saveInlineEdit(id) {
-      const newName = document.getElementById(`edit-name-${id}`).value.trim();
-      const newPrice = parseFloat(document.getElementById(`edit-price-${id}`).value) || null;
-      const newQtr = parseFloat(document.getElementById(`edit-qtr-${id}`).value) || null;
-      const newHalf = parseFloat(document.getElementById(`edit-half-${id}`).value) || null;
-      const newFull = parseFloat(document.getElementById(`edit-full-${id}`).value) || null;
-      const newType = document.getElementById(`edit-type-${id}`).value;
-      const newCat = document.getElementById(`edit-cat-${id}`).value;
-      const newDesc = document.getElementById(`edit-desc-${id}`).value.trim();
-
-      if (!newName) { alert("Name is required!"); return; }
-
-      const updatedData = {
-        name: newName,
-        price: newPrice,
-        price_quarter: newQtr,
-        price_half: newHalf,
-        price_full: newFull,
-        item_type: newType,
-        is_veg: newType === 'veg',
-        category: newCat,
-        description: newDesc
-      };
-
-      const { error } = await supabaseClient.from('menu_items').update(updatedData).eq('id', id);
-      if (error) alert("Error updating: " + error.message);
-      else loadMenuItems(currentRestaurant ? currentRestaurant.id : null);
-    }
-
-    async function deleteItem(id) {
-      if (confirm("Delete this item?")) {
-        await supabaseClient.from('menu_items').delete().eq('id', id);
-        loadMenuItems(currentRestaurant ? currentRestaurant.id : null);
-      }
-    }
-
-    window.addEventListener('load', loadDashboard);
+    window.addEventListener('load', initDashboard);
   </script>
 </body>
 </html>
