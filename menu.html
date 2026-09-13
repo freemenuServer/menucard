@@ -55,17 +55,17 @@
     }
     .category-title { font-size: 17px; font-weight: 800; color: var(--primary); }
 
-    /* Right side portion titles aligned above prices */
+    /* Header portion titles */
     .portion-labels-header {
       display: flex;
-      gap: 12px;
+      gap: 8px;
       font-size: 12px;
       font-weight: 800;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    .portion-col { width: 52px; text-align: center; }
+    .portion-col { width: 54px; text-align: center; }
 
     /* Item Row Layout */
     .item-row {
@@ -82,30 +82,28 @@
     .item-name { font-size: 15px; font-weight: 700; color: var(--text-main); }
     .item-desc { font-size: 12px; color: var(--text-muted); line-height: 1.3; }
 
-    /* Price Columns for Portion Items */
-    .price-columns-group { display: flex; gap: 12px; align-items: center; }
-    .price-val {
-      width: 52px;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 800;
-      color: #15803d;
-    }
-    .price-val.empty { color: #cbd5e1; font-weight: 400; font-size: 12px; }
+    /* Consistent Green Price Badges */
+    .price-columns-group { display: flex; gap: 8px; align-items: center; }
 
-    /* Highlighted Badge for Single Price Items */
-    .price-single {
-      display: inline-block;
+    .price-pill-badge {
+      width: 54px;
+      text-align: center;
       background: #ecfdf5;
       color: #047857;
       border: 1px solid #a7f3d0;
-      padding: 5px 12px;
+      padding: 5px 0;
       border-radius: 8px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 800;
-      min-width: 65px;
-      text-align: center;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    .price-pill-badge.empty {
+      background: transparent;
+      border: 1px solid transparent;
+      color: #cbd5e1;
+      font-weight: 400;
+      box-shadow: none;
     }
 
     .badge-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
@@ -125,7 +123,7 @@
 
   <!-- Menu Section Container -->
   <main class="menu-container" id="menu-sections">
-    <!-- Categories & Items dynamic html yahan render hoga -->
+    <!-- Categories & Items Dynamic Output -->
   </main>
 
   <script>
@@ -134,7 +132,7 @@
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     async function loadPublicMenu() {
-      // 1. URL Parameter se Restaurant Slug fetch karein (?r=slugname)
+      // 1. Fetch Restaurant Slug from URL (?r=slugname)
       const urlParams = new URLSearchParams(window.location.search);
       const slug = urlParams.get('r');
 
@@ -159,7 +157,7 @@
         logoImg.style.display = 'inline-block';
       }
 
-      // 2. Load Items for this Restaurant
+      // 2. Fetch Items for this Restaurant
       const { data: items } = await supabaseClient
         .from('menu_items')
         .select('*')
@@ -186,7 +184,7 @@
       let html = '';
 
       for (const [catName, catItems] of Object.entries(grouped)) {
-        // Check if any item in this category has portion pricing (Qtr, Half, or Full)
+        // Check if category has any portion-priced items
         const hasPortions = catItems.some(i => i.price_quarter || i.price_half || i.price_full);
 
         html += `
@@ -201,7 +199,7 @@
                 </div>
               ` : `
                 <div class="portion-labels-header">
-                  <span class="portion-col" style="width:70px;">Price</span>
+                  <span class="portion-col" style="width:65px;">Price</span>
                 </div>
               `}
             </div>
@@ -222,21 +220,26 @@
 
       let pricesHtml = '';
 
-      // Agar category mein Portions hain AUR iss specific item ke paas portion values hain
-      if (hasPortions && (item.price_quarter || item.price_half || item.price_full)) {
+      if (hasPortions) {
+        // Portion prices formatting
+        const qtr = item.price_quarter ? `₹${item.price_quarter}` : '-';
+        const half = item.price_half ? `₹${item.price_half}` : '-';
+        const fullVal = item.price_full || item.price;
+        const full = fullVal ? `₹${fullVal}` : '-';
+
         pricesHtml = `
           <div class="price-columns-group">
-            <span class="price-val ${!item.price_quarter ? 'empty' : ''}">${item.price_quarter ? '₹' + item.price_quarter : '-'}</span>
-            <span class="price-val ${!item.price_half ? 'empty' : ''}">${item.price_half ? '₹' + item.price_half : '-'}</span>
-            <span class="price-val ${!item.price_full ? 'empty' : ''}">${item.price_full ? '₹' + item.price_full : '-'}</span>
+            <span class="price-pill-badge ${!item.price_quarter ? 'empty' : ''}">${qtr}</span>
+            <span class="price-pill-badge ${!item.price_half ? 'empty' : ''}">${half}</span>
+            <span class="price-pill-badge ${!fullVal ? 'empty' : ''}">${full}</span>
           </div>
         `;
       } else {
-        // Agar single price item hai, toh Highlight Badge container me show hoga
+        // Single Price formatting
         const singlePrice = item.price || item.price_full || item.price_half || item.price_quarter || 0;
         pricesHtml = `
           <div class="price-columns-group">
-            <span class="price-single">₹${singlePrice}</span>
+            <span class="price-pill-badge" style="width: 65px;">₹${singlePrice}</span>
           </div>
         `;
       }
