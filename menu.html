@@ -3,544 +3,243 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digital Menu - FreeMenu.in</title>
-
-  <!-- Supabase JS CDN -->
+  <title>Digital Menu Card</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <style>
-    :root { 
-      --primary: #ff4757; 
-      --primary-dark: #e03244;
-      --bg: #f8fafc; 
-      --card-bg: #ffffff; 
-      --text-dark: #0f172a; 
-      --text-muted: #64748b; 
-      --veg-color: #16a34a;
-      --nonveg-color: #dc2626;
-      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+    :root {
+      --primary: #ff4757;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --veg: #16a34a;
+      --nonveg: #dc2626;
+      --egg: #d97706;
     }
-    
+
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg); color: var(--text-dark); padding-bottom: 60px; }
+    body { background: var(--bg-color); color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
 
-    /* Hero Banner - Responsive */
-    .hero-banner {
-      background: linear-gradient(135deg, #1e293b, #0f172a);
-      color: white;
-      padding: 40px 20px 24px;
-      border-bottom-left-radius: 24px;
-      border-bottom-right-radius: 24px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-    .hero-content {
-      max-width: 900px;
-      margin: 0 auto;
-    }
-    .hero-header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .rest-logo {
-      width: 72px;
-      height: 72px;
-      border-radius: 50%;
-      border: 3px solid #ffffff;
-      object-fit: cover;
+    .header-card {
       background: #ffffff;
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      font-weight: 800;
-      flex-shrink: 0;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-    .rest-meta { flex: 1; }
-    .rest-name { font-size: 26px; font-weight: 800; line-height: 1.2; margin-bottom: 6px; }
-    .rest-sub { font-size: 13px; color: #cbd5e1; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .badge-tag { background: rgba(255,255,255,0.15); padding: 3px 8px; border-radius: 6px; font-size: 11px; }
-
-    /* Action Buttons */
-    .action-bar {
-      display: flex;
-      justify-content: flex-start;
-      gap: 12px;
-      margin-top: 20px;
-      padding-top: 16px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-      flex-wrap: wrap;
-    }
-    .action-btn {
-      color: white;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255,255,255,0.1);
-      padding: 8px 16px;
-      border-radius: 20px;
-      transition: background 0.2s;
-    }
-    .action-btn:hover { background: rgba(255,255,255,0.2); }
-
-    /* Responsive Main Layout Container */
-    .container { 
-      max-width: 900px; 
-      margin: 0 auto; 
-      padding: 20px 16px; 
-    }
-
-    /* Filter Switcher */
-    .filter-bar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .filter-btn {
-      padding: 8px 16px;
-      border-radius: 20px;
-      border: 1px solid #cbd5e1;
-      background: white;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-dark);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s;
-    }
-    .filter-btn.active {
-      background: var(--text-dark);
-      color: white;
-      border-color: var(--text-dark);
-    }
-    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-    .dot-veg { background: var(--veg-color); }
-    .dot-nonveg { background: var(--nonveg-color); }
-
-    /* Sticky Categories Navigation Bar */
-    .category-scroll {
-      position: sticky;
-      top: 0;
-      background: rgba(248, 250, 252, 0.95);
-      backdrop-filter: blur(8px);
-      z-index: 90;
-      padding: 12px 0;
-      margin-bottom: 24px;
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      scrollbar-width: none;
+      padding: 24px 16px;
+      text-align: center;
       border-bottom: 1px solid #e2e8f0;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
-    .category-scroll::-webkit-scrollbar { display: none; }
-    .cat-chip {
-      white-space: nowrap;
-      padding: 8px 18px;
-      border-radius: 20px;
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-    .cat-chip:hover, .cat-chip.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
-    }
+    .restaurant-logo { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 2px solid var(--primary); }
+    .restaurant-name { font-size: 22px; font-weight: 800; color: var(--text-main); }
+    .restaurant-phone { font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 600; }
 
-    /* Category Section */
-    .category-section { margin-bottom: 36px; scroll-margin-top: 70px; }
-    .category-title { 
-      font-size: 20px; 
-      font-weight: 800; 
-      color: var(--text-dark); 
-      margin-bottom: 16px; 
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px solid #e2e8f0;
-      padding-bottom: 8px;
-    }
-    .category-count { font-size: 12px; color: var(--text-muted); font-weight: 600; background: #e2e8f0; padding: 2px 10px; border-radius: 12px; }
+    .menu-container { max-width: 720px; margin: 20px auto; padding: 0 12px; }
 
-    /* Responsive Grid for Desktop & Mobile */
-    .items-grid {
-      display: grid;
-      grid-template-columns: 1fr; /* Mobile View */
-      gap: 16px;
-    }
-    @media (min-width: 768px) {
-      .items-grid {
-        grid-template-columns: repeat(2, 1fr); /* PC / Desktop View */
-      }
-    }
-
-    /* Item Card UI */
-    .menu-card {
+    /* Category Table Layout */
+    .category-card {
       background: var(--card-bg);
-      border-radius: 16px;
-      padding: 18px;
-      display: flex;
-      justify-content: space-between;
-      gap: 14px;
-      border: 1px solid #f1f5f9;
-      box-shadow: var(--shadow);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border-radius: 14px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 20px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
-    .menu-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px -4px rgba(0, 0, 0, 0.08);
-    }
-    .item-main { flex: 1; }
 
-    /* Header Line: Name (Left) + Price (Right) */
-    .item-header {
+    /* Category Header with Portion Labels */
+    .category-header {
+      background: #fff5f5;
+      padding: 12px 16px;
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
+      border-bottom: 2px solid #ffe3e3;
+    }
+    .category-title { font-size: 17px; font-weight: 800; color: var(--primary); }
+
+    /* Right side portion titles aligned above prices */
+    .portion-labels-header {
+      display: flex;
       gap: 12px;
-      margin-bottom: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .item-title-group {
+    .portion-col { width: 52px; text-align: center; }
+
+    /* Item Row Layout */
+    .item-row {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
+      padding: 14px 16px;
+      border-bottom: 1px dashed #f1f5f9;
     }
-    .item-name { 
-      font-size: 16px; 
-      font-weight: 700; 
-      color: var(--text-dark); 
-      line-height: 1.3;
-    }
-    
-    /* Price aligned right in front of the name */
-    .item-price { 
-      font-size: 16px; 
-      font-weight: 800; 
-      color: #16a34a; 
-      background: #f0fdf4;
-      padding: 4px 10px;
-      border-radius: 8px;
-      white-space: nowrap;
-    }
+    .item-row:last-child { border-bottom: none; }
 
-    .item-type-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 14px;
-      height: 14px;
-      border: 1px solid #cbd5e1;
-      padding: 2px;
-      flex-shrink: 0;
-    }
-    .item-type-badge .inner-dot { width: 8px; height: 8px; border-radius: 50%; }
-    .item-type-badge.veg { border-color: var(--veg-color); }
-    .item-type-badge.veg .inner-dot { background: var(--veg-color); }
-    .item-type-badge.nonveg { border-color: var(--nonveg-color); }
-    .item-type-badge.nonveg .inner-dot { background: var(--nonveg-color); }
+    .item-details { flex: 1; padding-right: 12px; }
+    .item-title-flex { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+    .item-name { font-size: 15px; font-weight: 700; color: var(--text-main); }
+    .item-desc { font-size: 12px; color: var(--text-muted); line-height: 1.3; }
 
-    .item-desc { 
-      font-size: 13px; 
-      color: var(--text-muted); 
-      line-height: 1.4; 
-      margin-top: 6px;
-      display: -webkit-box; 
-      -webkit-line-clamp: 2; 
-      -webkit-box-orient: vertical; 
-      overflow: hidden; 
+    /* Price Columns */
+    .price-columns-group { display: flex; gap: 12px; align-items: center; }
+    .price-val {
+      width: 52px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: #15803d;
     }
+    .price-val.empty { color: #cbd5e1; font-weight: 400; font-size: 12px; }
 
-    .item-img {
-      width: 85px;
-      height: 85px;
-      border-radius: 12px;
-      object-fit: cover;
-      flex-shrink: 0;
-      background: #f1f5f9;
-    }
-
-    /* Loading and Status UI */
-    .status-container { text-align: center; padding: 80px 20px; }
-    .spinner {
-      width: 42px; height: 42px;
-      border: 4px solid #e2e8f0;
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s ease-in-out infinite;
-      margin: 0 auto 18px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    footer { text-align: center; margin-top: 50px; font-size: 13px; color: var(--text-muted); font-weight: 500; }
-    footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
+    .badge-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+    .badge-veg { background: var(--veg); }
+    .badge-nonveg { background: var(--nonveg); }
+    .badge-egg { background: var(--egg); }
   </style>
 </head>
 <body>
 
-  <!-- Loading State -->
-  <div id="loading-state" class="status-container">
-    <div class="spinner"></div>
-    <div style="font-weight: 700; font-size: 18px;">Welcome!</div>
-    <div style="font-size: 13px; color: var(--text-muted);">Fetching menu...</div>
-  </div>
+  <!-- Header -->
+  <header class="header-card">
+    <img id="rest-logo" class="restaurant-logo" src="https://via.placeholder.com/70" style="display: none;">
+    <h1 id="rest-name" class="restaurant-name">Loading Menu...</h1>
+    <p id="rest-phone" class="restaurant-phone"></p>
+  </header>
 
-  <!-- Error State -->
-  <div id="error-state" class="status-container" style="display: none;">
-    <div style="font-size: 20px; font-weight: 800; color: #dc2626;" id="error-title">Restaurant Not Found</div>
-    <div style="font-size: 14px; color: var(--text-muted); margin-top: 6px;" id="error-sub">Please scan a valid menu QR code.</div>
-  </div>
-
-  <!-- Main View -->
-  <div id="menu-view" style="display: none;">
-    
-    <!-- Hero Header -->
-    <header class="hero-banner">
-      <div class="hero-content">
-        <div class="hero-header">
-          <div id="rest-logo-box" class="rest-logo">R</div>
-          <div class="rest-meta">
-            <h1 class="rest-name" id="restaurant-name">Restaurant Name</h1>
-            <div class="rest-sub">
-              <span>⭐ 4.8 (500+ Ratings)</span> &bull; 
-              <span class="badge-tag">Open Now</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="action-bar">
-          <a href="#" id="call-btn" class="action-btn">📞 Call Us</a>
-          <a href="#" id="maps-btn" class="action-btn" target="_blank">📍 Directions</a>
-          <a href="#" id="share-btn" class="action-btn" onclick="shareMenu(event)">🔗 Share Menu</a>
-        </div>
-      </div>
-    </header>
-
-    <main class="container">
-
-      <!-- Filter Buttons -->
-      <div class="filter-bar">
-        <button class="filter-btn active" onclick="applyFilter('all', this)">All Items</button>
-        <button class="filter-btn" onclick="applyFilter('veg', this)"><span class="dot dot-veg"></span> Veg</button>
-        <button class="filter-btn" onclick="applyFilter('nonveg', this)"><span class="dot dot-nonveg"></span> Non-Veg</button>
-      </div>
-
-      <!-- Sticky Category Scroll -->
-      <div class="category-scroll" id="category-chips"></div>
-
-      <!-- Dynamic Menu View -->
-      <div id="menu-container"></div>
-    </main>
-
-    <footer>
-      Powered by <a href="/">FreeMenu.in</a> &bull; Contactless Digital Menu
-    </footer>
-  </div>
+  <!-- Menu Section -->
+  <main class="menu-container" id="menu-sections">
+    <!-- Categories & Items Dynamic Output -->
+  </main>
 
   <script>
-    let supabaseClient = null;
-    let allMenuItems = [];
-    let groupedMenu = {};
+    const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    function initSupabase() {
-      const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co"; 
-      const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE"; 
-      if (window.supabase && typeof window.supabase.createClient === 'function') {
-        return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      }
-      return null;
-    }
-
-    function getSlugFromUrl() {
+    async function loadPublicMenu() {
+      // 1. Get Restaurant Slug from URL (?r=slugname)
       const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get('r') || urlParams.get('restaurant');
+      const slug = urlParams.get('r');
+
+      let restQuery = supabaseClient.from('restaurants').select('*');
+      if (slug) {
+        restQuery = restQuery.eq('slug', slug.toLowerCase());
+      }
+      
+      const { data: restaurants } = await restQuery.limit(1);
+
+      if (!restaurants || restaurants.length === 0) {
+        document.getElementById('rest-name').innerText = "Restaurant Not Found";
+        return;
+      }
+
+      const rest = restaurants[0];
+      document.getElementById('rest-name').innerText = rest.name || 'Menu';
+      if (rest.phone) document.getElementById('rest-phone').innerText = `📞 Call: ${rest.phone}`;
+      if (rest.logo_url) {
+        const logoImg = document.getElementById('rest-logo');
+        logoImg.src = rest.logo_url;
+        logoImg.style.display = 'inline-block';
+      }
+
+      // 2. Load Items
+      const { data: items } = await supabaseClient
+        .from('menu_items')
+        .select('*')
+        .eq('restaurant_id', rest.id);
+
+      renderCategorizedMenu(items || []);
     }
 
-    async function loadMenu() {
-      supabaseClient = initSupabase();
-
-      if (!supabaseClient) {
-        showError("Script Error", "Supabase library loading failed.");
+    function renderCategorizedMenu(items) {
+      const container = document.getElementById('menu-sections');
+      if (items.length === 0) {
+        container.innerHTML = '<p style="text-align:center; padding: 40px; color: #64748b;">No items added to the menu yet.</p>';
         return;
       }
 
-      const slug = getSlugFromUrl();
-      if (!slug) {
-        showError("Invalid Link", "No restaurant specified in link.");
-        return;
-      }
-
-      try {
-        const { data: restaurant, error: restError } = await supabaseClient
-          .from('restaurants')
-          .select('*')
-          .eq('slug', slug)
-          .maybeSingle();
-
-        if (restError || !restaurant) {
-          showError("Restaurant Not Found", `No restaurant found for '${slug}'`);
-          return;
-        }
-
-        document.getElementById('restaurant-name').innerText = restaurant.name || slug.toUpperCase();
-        document.title = `${restaurant.name || slug} - Digital Menu`;
-
-        // Logo Logic
-        const logoBox = document.getElementById('rest-logo-box');
-        const firstLetter = (restaurant.name || slug).charAt(0).toUpperCase();
-        if (restaurant.logo_url) {
-          logoBox.innerHTML = `<img src="${restaurant.logo_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.outerHTML='${firstLetter}'"/>`;
-        } else {
-          logoBox.innerText = firstLetter;
-        }
-
-        // Phone & Address Logic
-        if (restaurant.phone) document.getElementById('call-btn').href = `tel:${restaurant.phone}`;
-        if (restaurant.address) document.getElementById('maps-btn').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.name + ' ' + restaurant.address)}`;
-
-        // Fetch Menu Items
-        const { data: items, error: itemsError } = await supabaseClient
-          .from('menu_items')
-          .select('*')
-          .eq('restaurant_id', restaurant.id);
-
-        allMenuItems = items || [];
-        groupAndRenderMenu(allMenuItems);
-
-      } catch (err) {
-        showError("Connection Error", "Please check your internet connection.");
-      }
-    }
-
-    function groupAndRenderMenu(items) {
-      if (!items || items.length === 0) {
-        document.getElementById('loading-state').style.display = 'none';
-        document.getElementById('menu-view').style.display = 'block';
-        document.getElementById('menu-container').innerHTML = `
-          <div class="status-container" style="padding: 40px 0;">
-            <div style="color: var(--text-muted);">No items found in this section.</div>
-          </div>
-        `;
-        return;
-      }
-
-      groupedMenu = {};
+      // Group items by category
+      const grouped = {};
       items.forEach(item => {
-        const cat = item.category || 'Specialities';
-        if (!groupedMenu[cat]) groupedMenu[cat] = [];
-        groupedMenu[cat].push(item);
+        const cat = item.category ? item.category.trim() : 'General';
+        if (!grouped[cat]) grouped[cat] = [];
+        grouped[cat].push(item);
       });
 
-      renderUI();
-    }
+      let html = '';
 
-    function renderUI() {
-      const container = document.getElementById('menu-container');
-      const chipsContainer = document.getElementById('category-chips');
-      
-      container.innerHTML = '';
-      chipsContainer.innerHTML = '';
+      for (const [catName, catItems] of Object.entries(grouped)) {
+        // Check if any item in this category has portion pricing
+        const hasPortions = catItems.some(i => i.price_quarter || i.price_half || i.price_full);
 
-      for (const category in groupedMenu) {
-        const catId = category.toLowerCase().replace(/[^a-z0-9]/g, '-');
-
-        // Sticky Chips
-        chipsContainer.innerHTML += `
-          <a href="#cat-${catId}" class="cat-chip">${category}</a>
-        `;
-
-        // Category Wrapper
-        const catSection = document.createElement('div');
-        catSection.className = 'category-section';
-        catSection.id = `cat-${catId}`;
-
-        const categoryHeader = `
-          <div class="category-title">
-            <span>${category}</span>
-            <span class="category-count">${groupedMenu[category].length} items</span>
+        html += `
+          <div class="category-card">
+            <div class="category-header">
+              <span class="category-title">📂 ${catName}</span>
+              ${hasPortions ? `
+                <div class="portion-labels-header">
+                  <span class="portion-col">Qtr</span>
+                  <span class="portion-col">Half</span>
+                  <span class="portion-col">Full</span>
+                </div>
+              ` : `
+                <div class="portion-labels-header">
+                  <span class="portion-col" style="width:70px;">Price</span>
+                </div>
+              `}
+            </div>
+            <div>
+              ${catItems.map(item => renderItemRow(item, hasPortions)).join('')}
+            </div>
           </div>
         `;
-
-        const itemsHtml = groupedMenu[category].map(item => {
-          const isVeg = item.is_veg !== false;
-          const badgeClass = isVeg ? 'veg' : 'nonveg';
-          const imgHtml = item.image_url ? `<img src="${item.image_url}" class="item-img" alt="${item.name}">` : '';
-
-          return `
-            <div class="menu-card">
-              <div class="item-main">
-                <div class="item-header">
-                  <div class="item-title-group">
-                    <div class="item-type-badge ${badgeClass}"><div class="inner-dot"></div></div>
-                    <span class="item-name">${item.name}</span>
-                  </div>
-                  <span class="item-price">₹${item.price}</span>
-                </div>
-                ${item.description ? `<div class="item-desc">${item.description}</div>` : ''}
-              </div>
-              ${imgHtml}
-            </div>
-          `;
-        }).join('');
-
-        catSection.innerHTML = categoryHeader + `<div class="items-grid">${itemsHtml}</div>`;
-        container.appendChild(catSection);
       }
 
-      document.getElementById('loading-state').style.display = 'none';
-      document.getElementById('menu-view').style.display = 'block';
+      container.innerHTML = html;
     }
 
-    function applyFilter(type, btnElement) {
-      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-      btnElement.classList.add('active');
+    function renderItemRow(item, hasPortions) {
+      let typeClass = 'badge-veg';
+      if (item.item_type === 'egg') typeClass = 'badge-egg';
+      else if (item.item_type === 'nonveg' || item.is_veg === false) typeClass = 'badge-nonveg';
 
-      if (type === 'all') {
-        groupAndRenderMenu(allMenuItems);
-      } else if (type === 'veg') {
-        const filtered = allMenuItems.filter(item => item.is_veg !== false);
-        groupAndRenderMenu(filtered);
-      } else if (type === 'nonveg') {
-        const filtered = allMenuItems.filter(item => item.is_veg === false);
-        groupAndRenderMenu(filtered);
-      }
-    }
+      let pricesHtml = '';
 
-    function shareMenu(e) {
-      e.preventDefault();
-      if (navigator.share) {
-        navigator.share({
-          title: document.title,
-          url: window.location.href
-        });
+      if (hasPortions) {
+        // If portion headers exist in category
+        pricesHtml = `
+          <div class="price-columns-group">
+            <span class="price-val ${!item.price_quarter ? 'empty' : ''}">${item.price_quarter ? '₹' + item.price_quarter : '-'}</span>
+            <span class="price-val ${!item.price_half ? 'empty' : ''}">${item.price_half ? '₹' + item.price_half : '-'}</span>
+            <span class="price-val ${!item.price_full ? 'empty' : ''}">${item.price_full ? '₹' + item.price_full : (item.price ? '₹' + item.price : '-')}</span>
+          </div>
+        `;
       } else {
-        navigator.clipboard.writeText(window.location.href);
-        alert("Link copied to clipboard!");
+        // Single Price Item Output
+        pricesHtml = `
+          <div class="price-columns-group">
+            <span class="price-val" style="width:70px;">₹${item.price || 0}</span>
+          </div>
+        `;
       }
+
+      return `
+        <div class="item-row">
+          <div class="item-details">
+            <div class="item-title-flex">
+              <span class="badge-dot ${typeClass}"></span>
+              <span class="item-name">${item.name}</span>
+            </div>
+            ${item.description ? `<div class="item-desc">${item.description}</div>` : ''}
+          </div>
+          ${pricesHtml}
+        </div>
+      `;
     }
 
-    function showError(title, message) {
-      document.getElementById('loading-state').style.display = 'none';
-      const errEl = document.getElementById('error-state');
-      if (title) document.getElementById('error-title').innerText = title;
-      if (message) document.getElementById('error-sub').innerText = message;
-      errEl.style.display = 'block';
-    }
-
-    window.addEventListener('load', loadMenu);
+    window.addEventListener('load', loadPublicMenu);
   </script>
 </body>
 </html>
