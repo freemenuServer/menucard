@@ -3,231 +3,81 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Owner Dashboard - Digital Menu</title>
+  <title>Owner Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <style>
     :root {
       --primary: #10b981;
-      --primary-dark: #047857;
       --bg-color: #f8fafc;
       --card-bg: #ffffff;
       --text-main: #0f172a;
-      --text-muted: #64748b;
       --border: #e2e8f0;
       --danger: #ef4444;
     }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg-color); color: var(--text-main); padding-bottom: 60px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, sans-serif; }
+    body { background: var(--bg-color); color: var(--text-main); padding-bottom: 40px; }
 
     .nav-bar {
-      background: #ffffff;
-      border-bottom: 1px solid var(--border);
-      padding: 12px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
+      background: #fff; border-bottom: 1px solid var(--border);
+      padding: 12px 20px; display: flex; justify-content: space-between; align-items: center;
     }
-    .nav-title { font-size: 18px; font-weight: 800; color: var(--text-main); }
-    .logout-btn {
-      background: #fee2e2;
-      color: var(--danger);
-      border: 1px solid #fca5a5;
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-weight: 700;
-      font-size: 13px;
-      cursor: pointer;
-    }
+    .logout-btn { background: #fee2e2; color: var(--danger); border: 1px solid #fca5a5; padding: 6px 12px; border-radius: 6px; font-weight: 700; cursor: pointer; }
 
-    .dashboard-container { max-width: 768px; margin: 0 auto; padding: 0 12px; }
-
-    .header-card, .form-card, .menu-card {
-      background: var(--card-bg);
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-    }
-
-    h2 { font-size: 17px; font-weight: 700; margin-bottom: 14px; color: var(--text-main); }
-
-    .form-group { margin-bottom: 14px; }
-    label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+    .container { max-width: 600px; margin: 20px auto; padding: 0 12px; }
+    .card { background: #fff; border-radius: 10px; border: 1px solid var(--border); padding: 20px; margin-bottom: 20px; }
     
-    input[type="text"], input[type="number"], select {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 14px;
-      outline: none;
-      background: #fff;
-    }
-    input:focus, select:focus { border-color: var(--primary); }
+    .form-group { margin-bottom: 12px; }
+    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #475569; }
+    input[type="text"] { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; }
 
-    .logo-upload-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .file-select-btn {
-      display: inline-block;
-      padding: 10px 12px;
-      background: #f1f5f9;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .upload-action-btn {
-      padding: 10px 14px;
-      background: #3b82f6;
-      color: #ffffff;
-      border: none;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .upload-action-btn:disabled { background: #94a3b8; }
+    /* File Upload Controls */
+    .upload-row { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
+    .file-btn { background: #e2e8f0; border: 1px solid #cbd5e1; padding: 10px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .upload-btn { background: #3b82f6; color: white; border: none; padding: 10px 14px; border-radius: 6px; font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
+    .upload-btn:disabled { background: #94a3b8; }
+    .preview-img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; margin-top: 8px; display: none; border: 1px solid var(--border); }
 
-    .logo-preview-img { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; border: 1px solid var(--border); margin-top: 8px; display: none; }
-
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-
-    .radio-group { display: flex; gap: 16px; margin-top: 6px; }
-    .radio-label { display: flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
-
-    .btn {
-      width: 100%;
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 14px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    .btn:active { background: var(--primary-dark); }
-    .btn-danger { background: #fee2e2; color: var(--danger); border: 1px solid #fca5a5; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; }
-
-    .item-list-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .item-list-row:last-child { border-bottom: none; }
-    .item-info { flex: 1; }
-    .item-name-tag { font-weight: 700; font-size: 15px; }
-    .item-sub-tag { font-size: 12px; color: var(--text-muted); }
+    .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 6px; font-weight: 700; cursor: pointer; margin-top: 10px; }
   </style>
 </head>
 <body>
 
-  <!-- Top Navbar with Logout -->
-  <header class="nav-bar">
-    <div class="nav-title">🏪 Owner Dashboard</div>
+  <div class="nav-bar">
+    <div style="font-weight:700;">🏪 Restaurant Owner Dashboard</div>
     <button class="logout-btn" onclick="handleLogout()">Logout</button>
-  </header>
+  </div>
 
-  <div class="dashboard-container">
-    
-    <!-- Restaurant Profile Form Card -->
-    <div class="header-card">
-      <h2>⚙️ Restaurant Profile Details</h2>
+  <div class="container">
+    <div class="card">
+      <h2>⚙️ Profile & Logo Setup</h2>
+      <br>
+      
       <div class="form-group">
         <label>Restaurant Name</label>
-        <input type="text" id="setting-name" placeholder="Enter Restaurant Name">
+        <input type="text" id="setting-name" placeholder="Restaurant Name">
       </div>
-      
+
       <div class="form-group">
         <label>Phone Number</label>
         <input type="text" id="setting-phone" placeholder="Phone Number">
       </div>
 
-      <!-- Side-by-Side Logo URL & Upload Option -->
+      <!-- Photo Upload Setup -->
       <div class="form-group">
-        <label>Logo Image URL (Or Select File & Click Upload)</label>
-        <div class="logo-upload-row">
-          <input type="text" id="setting-logo" placeholder="https://image-link.com/logo.jpg">
-          <input type="file" id="logo-file-input" accept="image/*" style="display: none;" onchange="updateFileLabel()">
-          <button type="button" class="file-select-btn" onclick="document.getElementById('logo-file-input').click()">Choose File</button>
-          <button type="button" class="upload-action-btn" id="upload-btn" onclick="uploadLogoFromComputer()">Upload</button>
+        <label>Logo Image URL (Or Upload Photo from PC)</label>
+        <input type="text" id="setting-logo" placeholder="https://image-link.com/logo.jpg">
+        
+        <div class="upload-row">
+          <input type="file" id="logo-file" accept="image/*" style="display:none;" onchange="showFileName()">
+          <button type="button" class="file-btn" onclick="document.getElementById('logo-file').click()">Select Photo</button>
+          <button type="button" class="upload-btn" id="upload-action-btn" onclick="uploadLogo()">Upload Photo</button>
         </div>
-        <img id="logo-preview" class="logo-preview-img" alt="Logo Preview">
+        <img id="logo-preview" class="preview-img" alt="Logo Preview">
       </div>
 
-      <button class="btn" id="save-profile-btn" onclick="saveRestaurantDetails()">Save Profile Details</button>
+      <button class="btn-main" onclick="saveProfile()">Save Profile Details</button>
     </div>
-
-    <!-- Add Item Form Card -->
-    <div class="form-card">
-      <h2>➕ Add New Menu Item</h2>
-      
-      <div class="form-group">
-        <label>Item Name</label>
-        <input type="text" id="item-name" placeholder="e.g. Paneer Butter Masala">
-      </div>
-
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Category</label>
-          <input type="text" id="item-category" placeholder="e.g. Main Course, Starters">
-        </div>
-        <div class="form-group">
-          <label>Food Type</label>
-          <div class="radio-group">
-            <label class="radio-label"><input type="radio" name="item_type" value="veg" checked> 🟢 Veg</label>
-            <label class="radio-label"><input type="radio" name="item_type" value="nonveg"> 🔴 Non-Veg</label>
-            <label class="radio-label"><input type="radio" name="item_type" value="egg"> 🟡 Egg</label>
-          </div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>Description (Optional)</label>
-        <input type="text" id="item-desc" placeholder="Short description of ingredients or taste">
-      </div>
-
-      <div class="form-group">
-        <label>Single Price (If no portion system)</label>
-        <input type="number" id="price-single" placeholder="₹ Price">
-      </div>
-
-      <label>Portion Pricing (Optional)</label>
-      <div class="grid-3 form-group">
-        <div>
-          <input type="number" id="price-qtr" placeholder="Qtr ₹">
-        </div>
-        <div>
-          <input type="number" id="price-half" placeholder="Half ₹">
-        </div>
-        <div>
-          <input type="number" id="price-full" placeholder="Full ₹">
-        </div>
-      </div>
-
-      <button class="btn" onclick="addNewMenuItem()">Add Item To Menu</button>
-    </div>
-
-    <!-- Current Menu List Card -->
-    <div class="menu-card">
-      <h2>📋 Current Menu Items</h2>
-      <div id="owner-menu-list">Loading Menu...</div>
-    </div>
-
   </div>
 
   <script>
@@ -235,99 +85,83 @@
     const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let currentRestaurantId = null;
+    let restaurantId = null;
 
-    async function initDashboard() {
+    async function loadData() {
       const { data: { session } } = await supabaseClient.auth.getSession();
       const urlParams = new URLSearchParams(window.location.search);
       const slug = urlParams.get('r');
 
-      let restQuery = supabaseClient.from('restaurants').select('*');
-      
+      let query = supabaseClient.from('restaurants').select('*');
       if (slug) {
-        restQuery = restQuery.eq('slug', slug.toLowerCase());
+        query = query.eq('slug', slug);
       } else if (session && session.user) {
-        restQuery = restQuery.eq('user_id', session.user.id);
+        query = query.eq('owner_id', session.user.id);
       }
 
-      const { data: restaurants } = await restQuery.limit(1);
-
-      if (restaurants && restaurants.length > 0) {
-        const rest = restaurants[0];
-        currentRestaurantId = rest.id;
+      const { data } = await query.limit(1);
+      if (data && data.length > 0) {
+        const rest = data[0];
+        restaurantId = rest.id;
         document.getElementById('setting-name').value = rest.name || '';
         document.getElementById('setting-phone').value = rest.phone || '';
-        
         if (rest.logo_url) {
           document.getElementById('setting-logo').value = rest.logo_url;
           const img = document.getElementById('logo-preview');
           img.src = rest.logo_url;
           img.style.display = 'block';
         }
-
-        loadMenuItems();
-      } else {
-        document.getElementById('owner-menu-list').innerText = "Restaurant profile not found.";
       }
     }
 
-    function updateFileLabel() {
-      const fileInput = document.getElementById('logo-file-input');
-      const btn = document.querySelector('.file-select-btn');
-      if (fileInput.files.length > 0) {
-        btn.innerText = fileInput.files[0].name.substring(0, 10) + "...";
+    function showFileName() {
+      const file = document.getElementById('logo-file').files[0];
+      if (file) {
+        document.querySelector('.file-btn').innerText = file.name.substring(0, 10) + "...";
       }
     }
 
-    // Dynamic 400 Safe Image Upload Function
-    async function uploadLogoFromComputer() {
-      const fileInput = document.getElementById('logo-file-input');
-      const uploadBtn = document.getElementById('upload-btn');
+    async function uploadLogo() {
+      const fileInput = document.getElementById('logo-file');
+      const btn = document.getElementById('upload-action-btn');
 
       if (fileInput.files.length === 0) {
-        return alert("Pehle computer se image select kijiye!");
+        return alert("Pehle computer se photo select karein!");
       }
 
-      uploadBtn.innerText = "Uploading...";
-      uploadBtn.disabled = true;
+      btn.innerText = "Uploading...";
+      btn.disabled = true;
 
       const file = fileInput.files[0];
-      const fileExt = file.name.split('.').pop().toLowerCase().replace(/[^a-z0-9]/g, '');
-      const fileName = `logo_${currentRestaurantId || 'rest'}_${Date.now()}.${fileExt}`;
+      const ext = file.name.split('.').pop();
+      const fileName = `logo_${restaurantId || Date.now()}.${ext}`;
 
-      const { data, error: uploadError } = await supabaseClient.storage
+      const { data, error } = await supabaseClient.storage
         .from('restaurant-logos')
-        .upload(fileName, file, { 
-          cacheControl: '3600',
-          upsert: true,
-          contentType: file.type
-        });
+        .upload(fileName, file, { upsert: true });
 
-      uploadBtn.innerText = "Upload";
-      uploadBtn.disabled = false;
+      btn.innerText = "Upload Photo";
+      btn.disabled = false;
 
-      if (uploadError) {
-        console.error("Upload Detailed Error:", uploadError);
-        alert("Upload Failed: " + uploadError.message);
+      if (error) {
+        alert("Upload error: " + error.message);
         return;
       }
 
-      const { data: publicUrlData } = supabaseClient.storage
+      const { data: publicData } = supabaseClient.storage
         .from('restaurant-logos')
         .getPublicUrl(fileName);
 
-      const uploadedUrl = publicUrlData.publicUrl;
-      document.getElementById('setting-logo').value = uploadedUrl;
-      
+      document.getElementById('setting-logo').value = publicData.publicUrl;
       const img = document.getElementById('logo-preview');
-      img.src = uploadedUrl;
+      img.src = publicData.publicUrl;
       img.style.display = 'block';
 
-      alert("Logo image successfully uploaded!");
+      alert("Photo Upload Ho Gayi!");
     }
 
-    async function saveRestaurantDetails() {
-      if (!currentRestaurantId) return alert('No Restaurant Loaded');
+    async function saveProfile() {
+      if (!restaurantId) return alert('No Restaurant Found');
 
       const name = document.getElementById('setting-name').value;
       const phone = document.getElementById('setting-phone').value;
@@ -336,90 +170,10 @@
       const { error } = await supabaseClient
         .from('restaurants')
         .update({ name, phone, logo_url })
-        .eq('id', currentRestaurantId);
+        .eq('id', restaurantId);
 
-      if (error) {
-        alert('Error saving profile: ' + error.message);
-      } else {
-        alert('Profile saved successfully!');
-      }
-    }
-
-    async function addNewMenuItem() {
-      if (!currentRestaurantId) return alert('No Restaurant Selected');
-
-      const name = document.getElementById('item-name').value.trim();
-      const category = document.getElementById('item-category').value.trim() || 'General';
-      const description = document.getElementById('item-desc').value.trim();
-      const item_type = document.querySelector('input[name="item_type"]:checked').value;
-
-      const price = parseFloat(document.getElementById('price-single').value) || null;
-      const price_quarter = parseFloat(document.getElementById('price-qtr').value) || null;
-      const price_half = parseFloat(document.getElementById('price-half').value) || null;
-      const price_full = parseFloat(document.getElementById('price-full').value) || null;
-
-      if (!name) return alert('Please enter Item Name');
-
-      const { error } = await supabaseClient
-        .from('menu_items')
-        .insert([{
-          restaurant_id: currentRestaurantId,
-          name,
-          category,
-          description,
-          item_type,
-          is_veg: item_type === 'veg',
-          price,
-          price_quarter,
-          price_half,
-          price_full
-        }]);
-
-      if (error) {
-        alert('Failed to add item');
-      } else {
-        alert('Item Added Successfully!');
-        document.getElementById('item-name').value = '';
-        document.getElementById('item-desc').value = '';
-        document.getElementById('price-single').value = '';
-        document.getElementById('price-qtr').value = '';
-        document.getElementById('price-half').value = '';
-        document.getElementById('price-full').value = '';
-        loadMenuItems();
-      }
-    }
-
-    async function loadMenuItems() {
-      const container = document.getElementById('owner-menu-list');
-      const { data: items } = await supabaseClient
-        .from('menu_items')
-        .select('*')
-        .eq('restaurant_id', currentRestaurantId)
-        .order('id', { ascending: false });
-
-      if (!items || items.length === 0) {
-        container.innerHTML = '<p style="color:var(--text-muted);">No menu items added yet.</p>';
-        return;
-      }
-
-      container.innerHTML = items.map(item => {
-        let priceStr = item.price ? `₹${item.price}` : `Q: ₹${item.price_quarter||'-'} | H: ₹${item.price_half||'-'} | F: ₹${item.price_full||'-'}`;
-        return `
-          <div class="item-list-row">
-            <div class="item-info">
-              <div class="item-name-tag">${item.name} <small>(${item.item_type.toUpperCase()})</small></div>
-              <div class="item-sub-tag">Category: ${item.category} | ${priceStr}</div>
-            </div>
-            <button class="btn-danger" onclick="deleteMenuItem(${item.id})">Delete</button>
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function deleteMenuItem(id) {
-      if (!confirm('Are you sure you want to delete this item?')) return;
-      await supabaseClient.from('menu_items').delete().eq('id', id);
-      loadMenuItems();
+      if (error) alert("Save Error: " + error.message);
+      else alert("Profile Updated Successfully!");
     }
 
     async function handleLogout() {
@@ -427,7 +181,7 @@
       window.location.href = 'login.html';
     }
 
-    window.addEventListener('load', initDashboard);
+    window.onload = loadData;
   </script>
 </body>
 </html>
