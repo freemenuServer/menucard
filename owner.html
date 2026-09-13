@@ -107,18 +107,47 @@
     }
     .cat-tag-del { color: #dc2626; cursor: pointer; font-size: 14px; font-weight: bold; }
 
+    /* Category Section Layout */
+    .category-group-block {
+      margin-bottom: 24px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .category-group-header {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .category-item-count {
+      font-size: 12px;
+      color: var(--text-muted);
+      background: #ffffff;
+      padding: 2px 8px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+    }
+
     .item-card {
       background: #ffffff;
       border: 1px solid #e2e8f0;
       border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
+      padding: 14px;
+      margin-bottom: 10px;
     }
+    .item-card:last-child { margin-bottom: 0; }
+    
     .item-view-mode { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
     .item-header-inline { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-    .item-name { font-weight: 700; font-size: 16px; }
-    .item-price { font-weight: 800; color: #16a34a; font-size: 16px; background: #f0fdf4; padding: 2px 8px; border-radius: 6px; }
-    .item-cat { font-size: 11px; color: var(--text-muted); background: #f1f5f9; padding: 2px 8px; border-radius: 6px; font-weight: 600; }
+    .item-name { font-weight: 700; font-size: 15px; }
+    .item-price { font-weight: 800; color: #16a34a; font-size: 15px; background: #f0fdf4; padding: 2px 8px; border-radius: 6px; }
 
     .item-edit-mode { display: flex; flex-direction: column; gap: 10px; }
     .inline-inputs-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -140,7 +169,7 @@
   <main class="container">
     <div class="dashboard-grid">
       
-      <!-- Left Column: Setup & Adding -->
+      <!-- Left Column: Settings, Category Add & Item Add Forms -->
       <div>
         <div class="card">
           <h3 class="card-title">Restaurant Details</h3>
@@ -168,7 +197,7 @@
           <div class="form-group">
             <label>New Category Name</label>
             <div class="flex-row">
-              <input type="text" id="new-cat-name" class="form-control" placeholder="e.g. Starters, Beverages">
+              <input type="text" id="new-cat-name" class="form-control" placeholder="e.g. Main Course, Fry, Starters">
               <button class="btn" style="width: auto; padding: 0 16px;" onclick="addCategory()">+ Add</button>
             </div>
           </div>
@@ -181,7 +210,7 @@
           <h3 class="card-title">Add New Dish</h3>
           <div class="form-group">
             <label>Item Name</label>
-            <input type="text" id="item-name" class="form-control" placeholder="e.g. Egg Curry / Paneer Tikka">
+            <input type="text" id="item-name" class="form-control" placeholder="e.g. Chicken Fry / Dal Makhani">
           </div>
           
           <div class="flex-row">
@@ -218,7 +247,7 @@
         </div>
       </div>
 
-      <!-- Right Column: All Saved Items -->
+      <!-- Right Column: Category-wise Menu Display -->
       <div>
         <div class="card">
           <div class="card-title">
@@ -396,10 +425,10 @@
         console.error("Fetch items error:", error);
       }
       menuItems = items || [];
-      renderItemList();
+      renderGroupedItemList();
     }
 
-    function renderItemList() {
+    function renderGroupedItemList() {
       const listContainer = document.getElementById('items-list');
       document.getElementById('items-count').innerText = `${menuItems.length} items`;
 
@@ -408,61 +437,87 @@
         return;
       }
 
-      listContainer.innerHTML = menuItems.map(item => {
-        let typeClass = 'badge-veg';
-        if (item.item_type === 'egg') typeClass = 'badge-egg';
-        else if (item.item_type === 'nonveg' || item.is_veg === false) typeClass = 'badge-nonveg';
+      // 1. Group items by Category
+      const grouped = {};
+      menuItems.forEach(item => {
+        const catName = item.category ? item.category.trim() : 'General / Other Items';
+        if (!grouped[catName]) {
+          grouped[catName] = [];
+        }
+        grouped[catName].push(item);
+      });
 
-        const catOptionsHtml = categoriesList.map(c => 
-          `<option value="${c.name}" ${item.category === c.name ? 'selected' : ''}>${c.name}</option>`
-        ).join('');
+      // 2. Build Category Sections HTML
+      let groupedHtml = '';
 
-        return `
-          <div class="item-card">
-            <div class="item-view-mode" id="view-${item.id}">
-              <div style="flex: 1;">
-                <div class="item-header-inline">
-                  <span class="badge-dot ${typeClass}"></span>
-                  <span class="item-name">${item.name}</span>
-                  <span class="item-cat">${item.category || 'General'}</span>
-                </div>
-                <div style="font-size: 13px; color: var(--text-muted);">${item.description || ''}</div>
-              </div>
-
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span class="item-price">₹${item.price}</span>
-                <button class="btn-action btn-edit" onclick="enableInlineEdit('${item.id}')">Edit</button>
-                <button class="btn-action btn-delete" onclick="deleteItem('${item.id}')">Delete</button>
-              </div>
+      for (const [catName, items] of Object.entries(grouped)) {
+        groupedHtml += `
+          <div class="category-group-block">
+            <div class="category-group-header">
+              <span>📂 ${catName}</span>
+              <span class="category-item-count">${items.length} items</span>
             </div>
-
-            <div class="item-edit-mode" id="edit-${item.id}" style="display: none;">
-              <div class="inline-inputs-row">
-                <input type="text" id="edit-name-${item.id}" class="form-control" value="${item.name}" placeholder="Name" style="flex: 2;">
-                <input type="number" id="edit-price-${item.id}" class="form-control" value="${item.price}" placeholder="Price" style="flex: 1;">
-                <select id="edit-type-${item.id}" class="form-control" style="flex: 1;">
-                  <option value="veg" ${item.item_type === 'veg' ? 'selected' : ''}>🟢 Veg</option>
-                  <option value="nonveg" ${item.item_type === 'nonveg' ? 'selected' : ''}>🔴 Non-Veg</option>
-                  <option value="egg" ${item.item_type === 'egg' ? 'selected' : ''}>🟡 Egg</option>
-                </select>
-              </div>
-
-              <div class="inline-inputs-row">
-                <select id="edit-cat-${item.id}" class="form-control" style="flex: 1;">
-                  <option value="">-- Select Category --</option>
-                  ${catOptionsHtml}
-                </select>
-                <input type="text" id="edit-desc-${item.id}" class="form-control" value="${item.description || ''}" placeholder="Description" style="flex: 2;">
-              </div>
-
-              <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px;">
-                <button class="btn-action btn-cancel" onclick="cancelInlineEdit('${item.id}')">Cancel</button>
-                <button class="btn-action btn-save" onclick="saveInlineEdit('${item.id}')">Save Changes</button>
-              </div>
-            </div>
+            ${items.map(item => renderItemCard(item)).join('')}
           </div>
         `;
-      }).join('');
+      }
+
+      listContainer.innerHTML = groupedHtml;
+    }
+
+    function renderItemCard(item) {
+      let typeClass = 'badge-veg';
+      if (item.item_type === 'egg') typeClass = 'badge-egg';
+      else if (item.item_type === 'nonveg' || item.is_veg === false) typeClass = 'badge-nonveg';
+
+      const catOptionsHtml = categoriesList.map(c => 
+        `<option value="${c.name}" ${item.category === c.name ? 'selected' : ''}>${c.name}</option>`
+      ).join('');
+
+      return `
+        <div class="item-card">
+          <div class="item-view-mode" id="view-${item.id}">
+            <div style="flex: 1;">
+              <div class="item-header-inline">
+                <span class="badge-dot ${typeClass}"></span>
+                <span class="item-name">${item.name}</span>
+              </div>
+              <div style="font-size: 13px; color: var(--text-muted);">${item.description || ''}</div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="item-price">₹${item.price}</span>
+              <button class="btn-action btn-edit" onclick="enableInlineEdit('${item.id}')">Edit</button>
+              <button class="btn-action btn-delete" onclick="deleteItem('${item.id}')">Delete</button>
+            </div>
+          </div>
+
+          <div class="item-edit-mode" id="edit-${item.id}" style="display: none;">
+            <div class="inline-inputs-row">
+              <input type="text" id="edit-name-${item.id}" class="form-control" value="${item.name}" placeholder="Name" style="flex: 2;">
+              <input type="number" id="edit-price-${item.id}" class="form-control" value="${item.price}" placeholder="Price" style="flex: 1;">
+              <select id="edit-type-${item.id}" class="form-control" style="flex: 1;">
+                <option value="veg" ${item.item_type === 'veg' ? 'selected' : ''}>🟢 Veg</option>
+                <option value="nonveg" ${item.item_type === 'nonveg' ? 'selected' : ''}>🔴 Non-Veg</option>
+                <option value="egg" ${item.item_type === 'egg' ? 'selected' : ''}>🟡 Egg</option>
+              </select>
+            </div>
+
+            <div class="inline-inputs-row">
+              <select id="edit-cat-${item.id}" class="form-control" style="flex: 1;">
+                <option value="">-- Select Category --</option>
+                ${catOptionsHtml}
+              </select>
+              <input type="text" id="edit-desc-${item.id}" class="form-control" value="${item.description || ''}" placeholder="Description" style="flex: 2;">
+            </div>
+
+            <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px;">
+              <button class="btn-action btn-cancel" onclick="cancelInlineEdit('${item.id}')">Cancel</button>
+              <button class="btn-action btn-save" onclick="saveInlineEdit('${item.id}')">Save Changes</button>
+            </div>
+          </div>
+        </div>
+      `;
     }
 
     function enableInlineEdit(id) {
