@@ -119,19 +119,32 @@
       margin-top: 10px;
     }
     .btn:active { background: var(--primary-dark); }
-    .btn-danger { background: #fee2e2; color: var(--danger); border: 1px solid #fca5a5; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    .btn-edit { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; margin-right: 6px; }
+    .btn-save { background: #dcfce7; color: #166534; border: 1px solid #86efac; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; margin-right: 6px; }
+    .btn-cancel { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; margin-right: 6px; }
+    .btn-danger { background: #fee2e2; color: var(--danger); border: 1px solid #fca5a5; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; }
 
     .item-list-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       padding: 12px 0;
       border-bottom: 1px solid var(--border);
     }
     .item-list-row:last-child { border-bottom: none; }
+    .item-view-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
     .item-info { flex: 1; }
     .item-name-tag { font-weight: 700; font-size: 15px; }
     .item-sub-tag { font-size: 12px; color: var(--text-muted); }
+
+    .inline-edit-box {
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      padding: 14px;
+      border-radius: 8px;
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
@@ -236,6 +249,7 @@
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let currentRestaurantId = null;
+    let cachedMenuItems = [];
 
     async function initDashboard() {
       const { data: { session } } = await supabaseClient.auth.getSession();
@@ -279,7 +293,6 @@
       }
     }
 
-    // Photo Upload Function
     async function uploadLogoFromComputer() {
       const fileInput = document.getElementById('logo-file-input');
       const uploadBtn = document.getElementById('upload-btn');
@@ -399,21 +412,118 @@
 
       if (!items || items.length === 0) {
         container.innerHTML = '<p style="color:var(--text-muted);">No menu items added yet.</p>';
+        cachedMenuItems = [];
         return;
       }
+
+      cachedMenuItems = items;
 
       container.innerHTML = items.map(item => {
         let priceStr = item.price ? `₹${item.price}` : `Q: ₹${item.price_quarter||'-'} | H: ₹${item.price_half||'-'} | F: ₹${item.price_full||'-'}`;
         return `
-          <div class="item-list-row">
-            <div class="item-info">
-              <div class="item-name-tag">${item.name} <small>(${item.item_type.toUpperCase()})</small></div>
-              <div class="item-sub-tag">Category: ${item.category} | ${priceStr}</div>
+          <div class="item-list-row" id="item-row-${item.id}">
+            <div class="item-view-container">
+              <div class="item-info">
+                <div class="item-name-tag">${item.name} <small>(${item.item_type ? item.item_type.toUpperCase() : 'VEG'})</small></div>
+                <div class="item-sub-tag">Category: ${item.category} | ${priceStr}</div>
+              </div>
+              <div>
+                <button class="btn-edit" onclick="enableInlineEdit(${item.id})">Edit</button>
+                <button class="btn-danger" onclick="deleteMenuItem(${item.id})">Delete</button>
+              </div>
             </div>
-            <button class="btn-danger" onclick="deleteMenuItem(${item.id})">Delete</button>
           </div>
         `;
       }).join('');
+    }
+
+    function enableInlineEdit(itemId) {
+      const item = cachedMenuItems.find(i => i.id === itemId);
+      if (!item) return;
+
+      const rowContainer = document.getElementById(`item-row-${itemId}`);
+      const currentType = item.item_type || 'veg';
+
+      rowContainer.innerHTML = `
+        <div class="inline-edit-box">
+          <div class="form-group">
+            <label>Item Name</label>
+            <input type="text" id="inline-name-${item.id}" value="${item.name || ''}">
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Category</label>
+              <input type="text" id="inline-category-${item.id}" value="${item.category || ''}">
+            </div>
+            <div class="form-group">
+              <label>Type</label>
+              <select id="inline-type-${item.id}">
+                <option value="veg" ${currentType === 'veg' ? 'selected' : ''}>🟢 Veg</option>
+                <option value="nonveg" ${currentType === 'nonveg' ? 'selected' : ''}>🔴 Non-Veg</option>
+                <option value="egg" ${currentType === 'egg' ? 'selected' : ''}>🟡 Egg</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Description</label>
+            <input type="text" id="inline-desc-${item.id}" value="${item.description || ''}">
+          </div>
+
+          <div class="form-group">
+            <label>Single Price</label>
+            <input type="number" id="inline-price-${item.id}" value="${item.price || ''}">
+          </div>
+
+          <label>Portion Prices (Q / H / F)</label>
+          <div class="grid-3 form-group">
+            <input type="number" id="inline-qtr-${item.id}" placeholder="Qtr ₹" value="${item.price_quarter || ''}">
+            <input type="number" id="inline-half-${item.id}" placeholder="Half ₹" value="${item.price_half || ''}">
+            <input type="number" id="inline-full-${item.id}" placeholder="Full ₹" value="${item.price_full || ''}">
+          </div>
+
+          <div style="text-align: right; margin-top: 10px;">
+            <button class="btn-save" onclick="saveInlineEdit(${item.id})">Save</button>
+            <button class="btn-cancel" onclick="loadMenuItems()">Cancel</button>
+          </div>
+        </div>
+      `;
+    }
+
+    async function saveInlineEdit(itemId) {
+      const name = document.getElementById(`inline-name-${itemId}`).value.trim();
+      const category = document.getElementById(`inline-category-${itemId}`).value.trim() || 'General';
+      const description = document.getElementById(`inline-desc-${itemId}`).value.trim();
+      const item_type = document.getElementById(`inline-type-${itemId}`).value;
+
+      const price = parseFloat(document.getElementById(`inline-price-${itemId}`).value) || null;
+      const price_quarter = parseFloat(document.getElementById(`inline-qtr-${itemId}`).value) || null;
+      const price_half = parseFloat(document.getElementById(`inline-half-${itemId}`).value) || null;
+      const price_full = parseFloat(document.getElementById(`inline-full-${itemId}`).value) || null;
+
+      if (!name) return alert('Please enter Item Name');
+
+      const { error } = await supabaseClient
+        .from('menu_items')
+        .update({
+          name,
+          category,
+          description,
+          item_type,
+          is_veg: item_type === 'veg',
+          price,
+          price_quarter,
+          price_half,
+          price_full
+        })
+        .eq('id', itemId);
+
+      if (error) {
+        alert('Failed to update item: ' + error.message);
+      } else {
+        loadMenuItems();
+      }
     }
 
     async function deleteMenuItem(id) {
