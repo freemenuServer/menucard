@@ -408,12 +408,13 @@
         document.getElementById('price-qtr').value = '';
         document.getElementById('price-half').value = '';
         document.getElementById('price-full').value = '';
-        loadMenuItems();
+        await loadMenuItems();
       }
     }
 
     async function loadMenuItems() {
       const container = document.getElementById('owner-menu-list');
+      
       const { data: items, error } = await supabaseClient
         .from('menu_items')
         .select('*')
@@ -452,7 +453,7 @@
       }).join('');
     }
 
-    // Global Click Listener for dynamically loaded edit & delete buttons
+    // Global Click Listener for edit, delete, save and cancel buttons
     document.getElementById('owner-menu-list').addEventListener('click', function(e) {
       const target = e.target;
       if (!target || !target.dataset) return;
@@ -465,7 +466,7 @@
       } else if (action === 'delete' && itemId) {
         deleteMenuItem(itemId);
       } else if (action === 'save' && itemId) {
-        saveInlineEdit(itemId);
+        saveInlineEdit(itemId, target);
       } else if (action === 'cancel') {
         loadMenuItems();
       }
@@ -527,45 +528,68 @@
       `;
     }
 
-    async function saveInlineEdit(itemId) {
-      const name = document.getElementById(`inline-name-${itemId}`).value.trim();
-      const category = document.getElementById(`inline-category-${itemId}`).value.trim() || 'General';
-      const description = document.getElementById(`inline-desc-${itemId}`).value.trim();
-      const item_type = document.getElementById(`inline-type-${itemId}`).value;
+    async function saveInlineEdit(itemId, saveBtnElement) {
+      const nameEl = document.getElementById(`inline-name-${itemId}`);
+      const catEl = document.getElementById(`inline-category-${itemId}`);
+      const descEl = document.getElementById(`inline-desc-${itemId}`);
+      const typeEl = document.getElementById(`inline-type-${itemId}`);
+      const priceEl = document.getElementById(`inline-price-${itemId}`);
+      const qtrEl = document.getElementById(`inline-qtr-${itemId}`);
+      const halfEl = document.getElementById(`inline-half-${itemId}`);
+      const fullEl = document.getElementById(`inline-full-${itemId}`);
 
-      const price = parseFloat(document.getElementById(`inline-price-${itemId}`).value) || null;
-      const price_quarter = parseFloat(document.getElementById(`inline-qtr-${itemId}`).value) || null;
-      const price_half = parseFloat(document.getElementById(`inline-half-${itemId}`).value) || null;
-      const price_full = parseFloat(document.getElementById(`inline-full-${itemId}`).value) || null;
+      const name = nameEl.value.trim();
+      const category = catEl.value.trim() || 'General';
+      const description = descEl.value.trim();
+      const item_type = typeEl.value;
+
+      const price = priceEl.value !== '' ? parseFloat(priceEl.value) : null;
+      const price_quarter = qtrEl.value !== '' ? parseFloat(qtrEl.value) : null;
+      const price_half = halfEl.value !== '' ? parseFloat(halfEl.value) : null;
+      const price_full = fullEl.value !== '' ? parseFloat(fullEl.value) : null;
 
       if (!name) return alert('Please enter Item Name');
 
-      const { error } = await supabaseClient
+      if (saveBtnElement) {
+        saveBtnElement.innerText = "Saving...";
+        saveBtnElement.disabled = true;
+      }
+
+      const { data, error } = await supabaseClient
         .from('menu_items')
         .update({
-          name,
-          category,
-          description,
-          item_type,
+          name: name,
+          category: category,
+          description: description,
+          item_type: item_type,
           is_veg: item_type === 'veg',
-          price,
-          price_quarter,
-          price_half,
-          price_full
+          price: price,
+          price_quarter: price_quarter,
+          price_half: price_half,
+          price_full: price_full
         })
-        .eq('id', itemId);
+        .eq('id', itemId)
+        .select();
 
       if (error) {
         alert('Failed to update item: ' + error.message);
+        if (saveBtnElement) {
+          saveBtnElement.innerText = "Save";
+          saveBtnElement.disabled = false;
+        }
       } else {
-        loadMenuItems();
+        await loadMenuItems();
       }
     }
 
     async function deleteMenuItem(id) {
       if (!confirm('Are you sure you want to delete this item?')) return;
-      await supabaseClient.from('menu_items').delete().eq('id', id);
-      loadMenuItems();
+      const { error } = await supabaseClient.from('menu_items').delete().eq('id', id);
+      if (error) {
+        alert('Failed to delete item: ' + error.message);
+      } else {
+        await loadMenuItems();
+      }
     }
 
     async function handleLogout() {
