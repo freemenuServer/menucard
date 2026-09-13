@@ -119,10 +119,10 @@
       margin-top: 10px;
     }
     .btn:active { background: var(--primary-dark); }
-    .btn-edit { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; margin-right: 6px; }
-    .btn-save { background: #dcfce7; color: #166534; border: 1px solid #86efac; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; margin-right: 6px; }
-    .btn-cancel { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; margin-right: 6px; }
-    .btn-danger { background: #fee2e2; color: var(--danger); border: 1px solid #fca5a5; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; }
+    .btn-edit { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; margin-right: 6px; }
+    .btn-save { background: #dcfce7; color: #166534; border: 1px solid #86efac; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; margin-right: 6px; }
+    .btn-cancel { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; margin-right: 6px; }
+    .btn-danger { background: #fee2e2; color: var(--danger); border: 1px solid #fca5a5; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; }
 
     .item-list-row {
       padding: 12px 0;
@@ -251,7 +251,6 @@
     let currentRestaurantId = null;
     let cachedMenuItems = [];
 
-    // Helper for escaping HTML special characters to prevent JS/HTML breakages inside input fields
     function escapeHtml(str) {
       if (!str) return '';
       return String(str)
@@ -444,8 +443,8 @@
                 <div class="item-sub-tag">Category: ${escapeHtml(item.category)} | ${priceStr}</div>
               </div>
               <div>
-                <button class="btn-edit" type="button" onclick="enableInlineEdit(${item.id})">Edit</button>
-                <button class="btn-danger" type="button" onclick="deleteMenuItem(${item.id})">Delete</button>
+                <button class="btn-edit" type="button" data-id="${item.id}" data-action="edit">Edit</button>
+                <button class="btn-danger" type="button" data-id="${item.id}" data-action="delete">Delete</button>
               </div>
             </div>
           </div>
@@ -453,13 +452,28 @@
       }).join('');
     }
 
-    function enableInlineEdit(itemId) {
-      // Find item cast correctly by matching strictly with String or Number ID comparison
-      const item = cachedMenuItems.find(i => String(i.id) === String(itemId));
-      if (!item) {
-        alert('Item not found in memory.');
-        return;
+    // Global Click Listener for dynamically loaded edit & delete buttons
+    document.getElementById('owner-menu-list').addEventListener('click', function(e) {
+      const target = e.target;
+      if (!target || !target.dataset) return;
+
+      const action = target.dataset.action;
+      const itemId = target.dataset.id;
+
+      if (action === 'edit' && itemId) {
+        enableInlineEdit(itemId);
+      } else if (action === 'delete' && itemId) {
+        deleteMenuItem(itemId);
+      } else if (action === 'save' && itemId) {
+        saveInlineEdit(itemId);
+      } else if (action === 'cancel') {
+        loadMenuItems();
       }
+    });
+
+    function enableInlineEdit(itemId) {
+      const item = cachedMenuItems.find(i => String(i.id) === String(itemId));
+      if (!item) return;
 
       const rowContainer = document.getElementById(`item-row-${itemId}`);
       if (!rowContainer) return;
@@ -506,8 +520,8 @@
           </div>
 
           <div style="text-align: right; margin-top: 10px;">
-            <button class="btn-save" type="button" onclick="saveInlineEdit(${item.id})">Save</button>
-            <button class="btn-cancel" type="button" onclick="loadMenuItems()">Cancel</button>
+            <button class="btn-save" type="button" data-id="${item.id}" data-action="save">Save</button>
+            <button class="btn-cancel" type="button" data-action="cancel">Cancel</button>
           </div>
         </div>
       `;
@@ -558,16 +572,6 @@
       await supabaseClient.auth.signOut();
       window.location.href = 'login.html';
     }
-
-    // Attach global functions to window scope explicitly
-    window.enableInlineEdit = enableInlineEdit;
-    window.saveInlineEdit = saveInlineEdit;
-    window.deleteMenuItem = deleteMenuItem;
-    window.handleLogout = handleLogout;
-    window.saveRestaurantDetails = saveRestaurantDetails;
-    window.addNewMenuItem = addNewMenuItem;
-    window.uploadLogoFromComputer = uploadLogoFromComputer;
-    window.updateFileLabel = updateFileLabel;
 
     window.addEventListener('load', initDashboard);
   </script>
