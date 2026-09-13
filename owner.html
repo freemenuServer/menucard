@@ -21,7 +21,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background: var(--bg-color); color: var(--text-main); padding-bottom: 60px; }
 
-    /* Top Navigation with Logout */
     .nav-bar {
       background: #ffffff;
       border-bottom: 1px solid var(--border);
@@ -70,7 +69,6 @@
     }
     input:focus, select:focus { border-color: var(--primary); }
 
-    /* Side-by-Side Logo URL & Upload Input */
     .logo-upload-row {
       display: flex;
       gap: 8px;
@@ -146,7 +144,7 @@
 
   <div class="dashboard-container">
     
-    <!-- Restaurant Settings Card -->
+    <!-- Restaurant Profile Form Card -->
     <div class="header-card">
       <h2>⚙️ Restaurant Profile Details</h2>
       <div class="form-group">
@@ -159,9 +157,9 @@
         <input type="text" id="setting-phone" placeholder="Phone Number">
       </div>
 
-      <!-- Logo Input + Offline File Upload Side-by-Side -->
+      <!-- Side-by-Side Logo URL & Upload Option -->
       <div class="form-group">
-        <label>Logo Image URL (Or Select Computer File & Upload)</label>
+        <label>Logo Image URL (Or Select File & Click Upload)</label>
         <div class="logo-upload-row">
           <input type="text" id="setting-logo" placeholder="https://image-link.com/logo.jpg">
           <input type="file" id="logo-file-input" accept="image/*" style="display: none;" onchange="updateFileLabel()">
@@ -224,7 +222,7 @@
       <button class="btn" onclick="addNewMenuItem()">Add Item To Menu</button>
     </div>
 
-    <!-- Menu Live List Card -->
+    <!-- Current Menu List Card -->
     <div class="menu-card">
       <h2>📋 Current Menu Items</h2>
       <div id="owner-menu-list">Loading Menu...</div>
@@ -240,9 +238,7 @@
     let currentRestaurantId = null;
 
     async function initDashboard() {
-      // Check active user session
       const { data: { session } } = await supabaseClient.auth.getSession();
-      
       const urlParams = new URLSearchParams(window.location.search);
       const slug = urlParams.get('r');
 
@@ -283,31 +279,36 @@
       }
     }
 
-    // Direct Upload Action for Side Button
+    // Dynamic 400 Safe Image Upload Function
     async function uploadLogoFromComputer() {
       const fileInput = document.getElementById('logo-file-input');
       const uploadBtn = document.getElementById('upload-btn');
 
       if (fileInput.files.length === 0) {
-        return alert("Pehle computer se file select kijiye!");
+        return alert("Pehle computer se image select kijiye!");
       }
 
       uploadBtn.innerText = "Uploading...";
       uploadBtn.disabled = true;
 
       const file = fileInput.files[0];
-      const fileExt = file.name.split('.').pop();
-      const fileName = `logo_${currentRestaurantId || Date.now()}_${Date.now()}.${fileExt}`;
+      const fileExt = file.name.split('.').pop().toLowerCase().replace(/[^a-z0-9]/g, '');
+      const fileName = `logo_${currentRestaurantId || 'rest'}_${Date.now()}.${fileExt}`;
 
-      const { error: uploadError } = await supabaseClient.storage
+      const { data, error: uploadError } = await supabaseClient.storage
         .from('restaurant-logos')
-        .upload(fileName, file, { upsert: true });
+        .upload(fileName, file, { 
+          cacheControl: '3600',
+          upsert: true,
+          contentType: file.type
+        });
 
       uploadBtn.innerText = "Upload";
       uploadBtn.disabled = false;
 
       if (uploadError) {
-        alert("Upload failed: Ensure 'restaurant-logos' bucket is created as Public in Supabase!");
+        console.error("Upload Detailed Error:", uploadError);
+        alert("Upload Failed: " + uploadError.message);
         return;
       }
 
@@ -322,7 +323,7 @@
       img.src = uploadedUrl;
       img.style.display = 'block';
 
-      alert("Logo successfully uploaded!");
+      alert("Logo image successfully uploaded!");
     }
 
     async function saveRestaurantDetails() {
@@ -338,7 +339,7 @@
         .eq('id', currentRestaurantId);
 
       if (error) {
-        alert('Error saving profile');
+        alert('Error saving profile: ' + error.message);
       } else {
         alert('Profile saved successfully!');
       }
