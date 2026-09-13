@@ -241,7 +241,7 @@
       supabaseClient = initSupabase();
       if (!supabaseClient) return;
 
-      const { data: restaurants } = await supabaseClient.from('restaurants').select('*').limit(1);
+      const { data: restaurants, error } = await supabaseClient.from('restaurants').select('*').limit(1);
       if (restaurants && restaurants.length > 0) {
         currentRestaurant = restaurants[0];
         document.getElementById('rest-name').value = currentRestaurant.name || '';
@@ -275,7 +275,11 @@
       if (currentRestaurant) {
         await supabaseClient.from('restaurants').update(payload).eq('id', currentRestaurant.id);
       } else {
-        const { data } = await supabaseClient.from('restaurants').insert([payload]).select().single();
+        const { data, error } = await supabaseClient.from('restaurants').insert([payload]).select().single();
+        if (error) {
+          alert("Error saving restaurant: " + error.message);
+          return;
+        }
         currentRestaurant = data;
       }
 
@@ -307,14 +311,16 @@
         price,
         category,
         item_type: itemType, // veg / nonveg / egg
-        is_veg: itemType === 'veg', // Backward compatibility flag
+        is_veg: itemType === 'veg',
         image_url,
         description
       };
 
-      const { error } = await supabaseClient.from('menu_items').insert([newItem]);
+      const { data, error } = await supabaseClient.from('menu_items').insert([newItem]);
+      
       if (error) {
-        alert("Failed to add item.");
+        console.error("Supabase Error:", error);
+        alert("Failed to add item: " + error.message);
       } else {
         document.getElementById('item-name').value = '';
         document.getElementById('item-price').value = '';
@@ -325,8 +331,11 @@
     }
 
     async function loadMenuItems(restaurantId) {
-      const { data: items } = await supabaseClient.from('menu_items').select('*').eq('restaurant_id', restaurantId).order('created_at', { ascending: false });
+      const { data: items, error } = await supabaseClient.from('menu_items').select('*').eq('restaurant_id', restaurantId).order('created_at', { ascending: false });
       
+      if (error) {
+        console.error("Load Error:", error);
+      }
       menuItems = items || [];
       renderItemList();
     }
@@ -341,7 +350,6 @@
       }
 
       listContainer.innerHTML = menuItems.map(item => {
-        // Handle Veg / Non-Veg / Egg badge color
         let typeClass = 'badge-veg';
         if (item.item_type === 'egg') typeClass = 'badge-egg';
         else if (item.item_type === 'nonveg' || item.is_veg === false) typeClass = 'badge-nonveg';
@@ -367,7 +375,7 @@
               </div>
             </div>
 
-            <!-- Inline Edit Mode (Popup ke bina same jagah edit) -->
+            <!-- Inline Edit Mode (Bina Popup ke Same Place Par Edit) -->
             <div class="item-edit-mode" id="edit-${item.id}" style="display: none;">
               <div class="inline-inputs-row">
                 <input type="text" id="edit-name-${item.id}" class="form-control" value="${item.name}" placeholder="Name" style="flex: 2;">
@@ -429,7 +437,7 @@
       const { error } = await supabaseClient.from('menu_items').update(updatedData).eq('id', id);
 
       if (error) {
-        alert("Failed to update item.");
+        alert("Failed to update item: " + error.message);
       } else {
         loadMenuItems(currentRestaurant.id);
       }
