@@ -5,81 +5,224 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Digital Menu - FreeMenu.in</title>
 
-  <!-- Correct Supabase UMD Bundle -->
+  <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <style>
     :root { 
       --primary: #ff4757; 
+      --primary-dark: #e03244;
       --bg: #f8fafc; 
       --card-bg: #ffffff; 
       --text-dark: #0f172a; 
       --text-muted: #64748b; 
+      --veg-color: #16a34a;
+      --nonveg-color: #dc2626;
+      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: var(--bg); color: var(--text-dark); padding-bottom: 40px; }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text-dark); padding-bottom: 60px; }
 
-    /* Header */
-    .restaurant-header {
-      background: white;
-      padding: 24px 20px;
-      text-align: center;
-      border-bottom: 1px solid #e2e8f0;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+    /* Restaurant Hero Banner */
+    .hero-banner {
+      position: relative;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: white;
+      padding: 40px 20px 24px;
+      border-bottom-left-radius: 24px;
+      border-bottom-right-radius: 24px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
-    .restaurant-title { font-size: 24px; font-weight: 800; color: var(--text-dark); margin-bottom: 4px; }
-    .restaurant-tagline { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .hero-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .rest-logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 3px solid #ffffff;
+      object-fit: cover;
+      background: #ffffff;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 800;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .rest-meta { flex: 1; }
+    .rest-name { font-size: 24px; font-weight: 800; line-height: 1.2; margin-bottom: 4px; }
+    .rest-sub { font-size: 13px; color: #cbd5e1; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .badge-tag { background: rgba(255,255,255,0.15); padding: 3px 8px; border-radius: 6px; font-size: 11px; }
+
+    /* Quick Action Buttons (Call, Map, Share) */
+    .action-bar {
+      display: flex;
+      justify-content: space-around;
+      max-width: 600px;
+      margin: 16px auto 0;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .action-btn {
+      color: white;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.1);
+      padding: 8px 14px;
+      border-radius: 20px;
+      transition: background 0.2s;
+    }
+    .action-btn:hover { background: rgba(255,255,255,0.2); }
 
     .container { max-width: 600px; margin: 0 auto; padding: 16px; }
 
-    /* Categories & Cards */
-    .category-section { margin-bottom: 24px; }
+    /* Veg / Non-Veg Filter Switcher */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 16px 0;
+    }
+    .filter-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid #cbd5e1;
+      background: white;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-dark);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .filter-btn.active {
+      background: var(--text-dark);
+      color: white;
+      border-color: var(--text-dark);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .dot-veg { background: var(--veg-color); }
+    .dot-nonveg { background: var(--nonveg-color); }
+
+    /* Sticky Categories Navigation */
+    .category-scroll {
+      position: sticky;
+      top: 0;
+      background: rgba(248, 250, 252, 0.95);
+      backdrop-filter: blur(8px);
+      z-index: 90;
+      padding: 10px 0;
+      margin: 0 -16px 16px -16px;
+      padding-left: 16px;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .category-scroll::-webkit-scrollbar { display: none; }
+    .cat-chip {
+      white-space: nowrap;
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .cat-chip.active, .cat-chip:hover {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* Category Section */
+    .category-section { margin-bottom: 28px; scroll-margin-top: 60px; }
     .category-title { 
       font-size: 18px; 
-      font-weight: 700; 
-      color: var(--primary); 
-      margin-bottom: 12px; 
-      padding-bottom: 6px; 
-      border-bottom: 2px solid #ffe1e4;
+      font-weight: 800; 
+      color: var(--text-dark); 
+      margin-bottom: 14px; 
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .category-count { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+    .category-count { font-size: 12px; color: var(--text-muted); font-weight: 600; }
 
+    /* Menu Card Item UI */
     .menu-card {
       background: var(--card-bg);
-      border-radius: 12px;
+      border-radius: 16px;
       padding: 16px;
       margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      gap: 12px;
+      border: 1px solid #f1f5f9;
+      box-shadow: var(--shadow);
     }
-    .item-info { flex: 1; padding-right: 12px; }
-    .item-name { font-size: 16px; font-weight: 600; color: var(--text-dark); margin-bottom: 4px; }
-    .item-price { font-size: 16px; font-weight: 700; color: #16a34a; white-space: nowrap; }
+    .item-left { flex: 1; }
+    .item-type-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
+      border: 1px solid #cbd5e1;
+      padding: 2px;
+      margin-bottom: 6px;
+    }
+    .item-type-badge .inner-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .item-type-badge.veg { border-color: var(--veg-color); }
+    .item-type-badge.veg .inner-dot { background: var(--veg-color); }
+    .item-type-badge.nonveg { border-color: var(--nonveg-color); }
+    .item-type-badge.nonveg .inner-dot { background: var(--nonveg-color); }
+
+    .item-name { font-size: 16px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px; }
+    .item-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .item-price { font-size: 16px; font-weight: 800; color: var(--text-dark); }
+
+    .item-img {
+      width: 90px;
+      height: 90px;
+      border-radius: 12px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #f1f5f9;
+    }
 
     /* Statuses */
-    .status-container { text-align: center; padding: 60px 20px; }
-    .status-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-    .status-sub { font-size: 14px; color: var(--text-muted); }
+    .status-container { text-align: center; padding: 80px 20px; }
     .spinner {
-      width: 40px; height: 40px;
-      border: 4px solid #cbd5e1;
+      width: 42px; height: 42px;
+      border: 4px solid #e2e8f0;
       border-top-color: var(--primary);
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin: 0 auto 16px;
+      animation: spin 0.8s ease-in-out infinite;
+      margin: 0 auto 18px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .footer-brand { text-align: center; margin-top: 40px; font-size: 12px; color: var(--text-muted); }
-    .footer-brand a { color: var(--primary); text-decoration: none; font-weight: 600; }
+    footer { text-align: center; margin-top: 40px; font-size: 12px; color: var(--text-muted); font-weight: 500; }
+    footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
   </style>
 </head>
 <body>
@@ -87,49 +230,75 @@
   <!-- Loading State -->
   <div id="loading-state" class="status-container">
     <div class="spinner"></div>
-    <div class="status-title">Loading Menu...</div>
-    <div class="status-sub">Fetching menu items</div>
+    <div style="font-weight: 700; font-size: 18px;">Welcome!</div>
+    <div style="font-size: 13px; color: var(--text-muted);">Preparing restaurant menu...</div>
   </div>
 
   <!-- Error / Not Found State -->
   <div id="error-state" class="status-container" style="display: none;">
-    <div class="status-title" style="color: #dc2626;" id="error-title">Restaurant Not Found</div>
-    <div class="status-sub" id="error-sub">The menu link you scanned might be invalid or deleted.</div>
+    <div style="font-size: 20px; font-weight: 800; color: #dc2626;" id="error-title">Restaurant Not Found</div>
+    <div style="font-size: 14px; color: var(--text-muted); margin-top: 6px;" id="error-sub">Please scan a valid restaurant QR code.</div>
   </div>
 
-  <!-- Main Menu View -->
+  <!-- Main Restaurant View -->
   <div id="menu-view" style="display: none;">
-    <header class="restaurant-header">
-      <h1 class="restaurant-title" id="restaurant-name">Restaurant Name</h1>
-      <div class="restaurant-tagline">Digital Menu</div>
+    
+    <!-- Hero Header -->
+    <header class="hero-banner">
+      <div class="hero-header">
+        <div id="rest-logo-box" class="rest-logo">R</div>
+        <div class="rest-meta">
+          <h1 class="rest-name" id="restaurant-name">Restaurant Name</h1>
+          <div class="rest-sub">
+            <span>⭐ 4.8 (500+ Reviews)</span> &bull; 
+            <span class="badge-tag">Open Now</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-bar">
+        <a href="#" id="call-btn" class="action-btn">📞 Call Us</a>
+        <a href="#" id="maps-btn" class="action-btn" target="_blank">📍 Directions</a>
+        <a href="#" id="share-btn" class="action-btn" onclick="shareMenu(event)">🔗 Share</a>
+      </div>
     </header>
 
-    <main class="container" id="menu-container">
-      <!-- Items Dynamically Inserted Here -->
+    <main class="container">
+
+      <!-- Filter Toggle Buttons -->
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="applyFilter('all', this)">All Items</button>
+        <button class="filter-btn" onclick="applyFilter('veg', this)"><span class="dot dot-veg"></span> Pure Veg</button>
+        <button class="filter-btn" onclick="applyFilter('nonveg', this)"><span class="dot dot-nonveg"></span> Non-Veg</button>
+      </div>
+
+      <!-- Sticky Category Chips -->
+      <div class="category-scroll" id="category-chips"></div>
+
+      <!-- Dynamic Menu Container -->
+      <div id="menu-container"></div>
     </main>
 
-    <footer class="footer-brand">
-      Powered by <a href="/">FreeMenu.in</a>
+    <footer>
+      Powered by <a href="/">FreeMenu.in</a> &bull; Digital Dining Experience
     </footer>
   </div>
 
   <script>
     let supabaseClient = null;
+    let allMenuItems = [];
+    let groupedMenu = {};
 
-    // Helper: Safely initialize Supabase client
     function initSupabase() {
       const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co"; 
       const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE"; 
-
       if (window.supabase && typeof window.supabase.createClient === 'function') {
         return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      } else if (typeof createClient === 'function') {
-        return createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
       }
       return null;
     }
 
-    // Helper: Extract query parameter 'r' or 'restaurant'
     function getSlugFromUrl() {
       const urlParams = new URLSearchParams(window.location.search);
       return urlParams.get('r') || urlParams.get('restaurant');
@@ -139,19 +308,18 @@
       supabaseClient = initSupabase();
 
       if (!supabaseClient) {
-        showError("Script Error", "Supabase library could not be loaded. Please refresh the page.");
+        showError("Script Error", "Supabase library could not be loaded.");
         return;
       }
 
       const slug = getSlugFromUrl();
-
       if (!slug) {
-        showError("Invalid Link", "No restaurant code specified in URL (e.g. ?r=urbanpunjab)");
+        showError("Invalid Link", "No restaurant specified in link.");
         return;
       }
 
       try {
-        // 1. Fetch Restaurant
+        // Fetch Restaurant Details
         const { data: restaurant, error: restError } = await supabaseClient
           .from('restaurants')
           .select('*')
@@ -159,67 +327,107 @@
           .maybeSingle();
 
         if (restError || !restaurant) {
-          showError("Restaurant Not Found", `No restaurant found with code '${slug}'`);
+          showError("Restaurant Not Found", `No restaurant registered as '${slug}'`);
           return;
         }
 
+        // Set UI Header Info
         document.getElementById('restaurant-name').innerText = restaurant.name || slug.toUpperCase();
-        document.title = `${restaurant.name || slug} - FreeMenu.in`;
+        document.title = `${restaurant.name || slug} - Official Menu`;
 
-        // 2. Fetch Menu Items
+        // Logo Handler
+        const logoBox = document.getElementById('rest-logo-box');
+        const firstLetter = (restaurant.name || slug).charAt(0).toUpperCase();
+        if (restaurant.logo_url) {
+          logoBox.innerHTML = `<img src="${restaurant.logo_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.outerHTML='${firstLetter}'"/>`;
+        } else {
+          logoBox.innerText = firstLetter;
+        }
+
+        // Action Buttons Setup
+        if (restaurant.phone) document.getElementById('call-btn').href = `tel:${restaurant.phone}`;
+        if (restaurant.address) document.getElementById('maps-btn').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.name + ' ' + restaurant.address)}`;
+
+        // Fetch Items
         const { data: items, error: itemsError } = await supabaseClient
           .from('menu_items')
           .select('*')
           .eq('restaurant_id', restaurant.id);
 
-        if (itemsError || !items || items.length === 0) {
-          document.getElementById('loading-state').style.display = 'none';
-          document.getElementById('menu-view').style.display = 'block';
-          document.getElementById('menu-container').innerHTML = `
-            <div class="status-container" style="padding: 40px 0;">
-              <div class="status-sub">No menu items added yet.</div>
-            </div>
-          `;
-          return;
-        }
+        allMenuItems = items || [];
+        groupAndRenderMenu(allMenuItems);
 
-        // 3. Group Items by Category
-        const groupedItems = {};
-        items.forEach(item => {
-          const cat = item.category || 'General';
-          if (!groupedItems[cat]) groupedItems[cat] = [];
-          groupedItems[cat].push(item);
-        });
-
-        renderMenuUI(groupedItems);
       } catch (err) {
-        showError("Connection Error", "Unable to connect to database. Please check your internet or Supabase URL.");
+        showError("Connection Error", "Check your internet connection.");
       }
     }
 
-    function renderMenuUI(groupedItems) {
-      const container = document.getElementById('menu-container');
-      container.innerHTML = '';
+    function groupAndRenderMenu(items) {
+      if (!items || items.length === 0) {
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('menu-view').style.display = 'block';
+        document.getElementById('menu-container').innerHTML = `
+          <div class="status-container" style="padding: 40px 0;">
+            <div style="color: var(--text-muted);">No items available in this category.</div>
+          </div>
+        `;
+        return;
+      }
 
-      for (const category in groupedItems) {
+      groupedMenu = {};
+      items.forEach(item => {
+        const cat = item.category || 'Specialities';
+        if (!groupedMenu[cat]) groupedMenu[cat] = [];
+        groupedMenu[cat].push(item);
+      });
+
+      renderUI();
+    }
+
+    function renderUI() {
+      const container = document.getElementById('menu-container');
+      const chipsContainer = document.getElementById('category-chips');
+      
+      container.innerHTML = '';
+      chipsContainer.innerHTML = '';
+
+      for (const category in groupedMenu) {
+        const catId = category.toLowerCase().replace(/[^a-z0-0]/g, '-');
+
+        // Render Category Sticky Chip
+        chipsContainer.innerHTML += `
+          <a href="#cat-${catId}" class="cat-chip">${category}</a>
+        `;
+
+        // Render Category Section
         const catSection = document.createElement('div');
         catSection.className = 'category-section';
+        catSection.id = `cat-${catId}`;
 
         const categoryHeader = `
           <div class="category-title">
             <span>${category}</span>
-            <span class="category-count">${groupedItems[category].length} items</span>
+            <span class="category-count">${groupedMenu[category].length} items</span>
           </div>
         `;
 
-        const itemsHtml = groupedItems[category].map(item => `
-          <div class="menu-card">
-            <div class="item-info">
-              <div class="item-name">${item.name}</div>
+        const itemsHtml = groupedMenu[category].map(item => {
+          const isVeg = item.is_veg !== false; // Default to veg if not specified
+          const badgeClass = isVeg ? 'veg' : 'nonveg';
+          const imgHtml = item.image_url ? `<img src="${item.image_url}" class="item-img" alt="${item.name}">` : '';
+
+          return `
+            <div class="menu-card">
+              <div class="item-left">
+                <div class="item-type-badge ${badgeClass}"><div class="inner-dot"></div></div>
+                <div class="item-name">${item.name}</div>
+                ${item.description ? `<div class="item-desc">${item.description}</div>` : ''}
+                <div class="item-price">₹${item.price}</div>
+              </div>
+              ${imgHtml}
             </div>
-            <div class="item-price">₹${item.price}</div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
 
         catSection.innerHTML = categoryHeader + itemsHtml;
         container.appendChild(catSection);
@@ -227,6 +435,34 @@
 
       document.getElementById('loading-state').style.display = 'none';
       document.getElementById('menu-view').style.display = 'block';
+    }
+
+    function applyFilter(type, btnElement) {
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      btnElement.classList.add('active');
+
+      if (type === 'all') {
+        groupAndRenderMenu(allMenuItems);
+      } else if (type === 'veg') {
+        const filtered = allMenuItems.filter(item => item.is_veg !== false);
+        groupAndRenderMenu(filtered);
+      } else if (type === 'nonveg') {
+        const filtered = allMenuItems.filter(item => item.is_veg === false);
+        groupAndRenderMenu(filtered);
+      }
+    }
+
+    function shareMenu(e) {
+      e.preventDefault();
+      if (navigator.share) {
+        navigator.share({
+          title: document.title,
+          url: window.location.href
+        });
+      } else {
+        navigator.clipboard.writeText(window.location.href);
+        alert("Menu link copied to clipboard!");
+      }
     }
 
     function showError(title, message) {
@@ -237,7 +473,6 @@
       errEl.style.display = 'block';
     }
 
-    // Run on full page load
     window.addEventListener('load', loadMenu);
   </script>
 </body>
