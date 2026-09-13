@@ -251,6 +251,17 @@
     let currentRestaurantId = null;
     let cachedMenuItems = [];
 
+    // Helper for escaping HTML special characters to prevent JS/HTML breakages inside input fields
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
     async function initDashboard() {
       const { data: { session } } = await supabaseClient.auth.getSession();
       const urlParams = new URLSearchParams(window.location.search);
@@ -404,11 +415,16 @@
 
     async function loadMenuItems() {
       const container = document.getElementById('owner-menu-list');
-      const { data: items } = await supabaseClient
+      const { data: items, error } = await supabaseClient
         .from('menu_items')
         .select('*')
         .eq('restaurant_id', currentRestaurantId)
         .order('id', { ascending: false });
+
+      if (error) {
+        container.innerHTML = `<p style="color:var(--danger);">Error loading menu: ${error.message}</p>`;
+        return;
+      }
 
       if (!items || items.length === 0) {
         container.innerHTML = '<p style="color:var(--text-muted);">No menu items added yet.</p>';
@@ -424,12 +440,12 @@
           <div class="item-list-row" id="item-row-${item.id}">
             <div class="item-view-container">
               <div class="item-info">
-                <div class="item-name-tag">${item.name} <small>(${item.item_type ? item.item_type.toUpperCase() : 'VEG'})</small></div>
-                <div class="item-sub-tag">Category: ${item.category} | ${priceStr}</div>
+                <div class="item-name-tag">${escapeHtml(item.name)} <small>(${item.item_type ? item.item_type.toUpperCase() : 'VEG'})</small></div>
+                <div class="item-sub-tag">Category: ${escapeHtml(item.category)} | ${priceStr}</div>
               </div>
               <div>
-                <button class="btn-edit" onclick="enableInlineEdit(${item.id})">Edit</button>
-                <button class="btn-danger" onclick="deleteMenuItem(${item.id})">Delete</button>
+                <button class="btn-edit" type="button" onclick="enableInlineEdit(${item.id})">Edit</button>
+                <button class="btn-danger" type="button" onclick="deleteMenuItem(${item.id})">Delete</button>
               </div>
             </div>
           </div>
@@ -438,23 +454,29 @@
     }
 
     function enableInlineEdit(itemId) {
-      const item = cachedMenuItems.find(i => i.id === itemId);
-      if (!item) return;
+      // Find item cast correctly by matching strictly with String or Number ID comparison
+      const item = cachedMenuItems.find(i => String(i.id) === String(itemId));
+      if (!item) {
+        alert('Item not found in memory.');
+        return;
+      }
 
       const rowContainer = document.getElementById(`item-row-${itemId}`);
+      if (!rowContainer) return;
+
       const currentType = item.item_type || 'veg';
 
       rowContainer.innerHTML = `
         <div class="inline-edit-box">
           <div class="form-group">
             <label>Item Name</label>
-            <input type="text" id="inline-name-${item.id}" value="${item.name || ''}">
+            <input type="text" id="inline-name-${item.id}" value="${escapeHtml(item.name)}">
           </div>
 
           <div class="grid-2">
             <div class="form-group">
               <label>Category</label>
-              <input type="text" id="inline-category-${item.id}" value="${item.category || ''}">
+              <input type="text" id="inline-category-${item.id}" value="${escapeHtml(item.category)}">
             </div>
             <div class="form-group">
               <label>Type</label>
@@ -468,24 +490,24 @@
 
           <div class="form-group">
             <label>Description</label>
-            <input type="text" id="inline-desc-${item.id}" value="${item.description || ''}">
+            <input type="text" id="inline-desc-${item.id}" value="${escapeHtml(item.description)}">
           </div>
 
           <div class="form-group">
             <label>Single Price</label>
-            <input type="number" id="inline-price-${item.id}" value="${item.price || ''}">
+            <input type="number" id="inline-price-${item.id}" value="${item.price !== null && item.price !== undefined ? item.price : ''}">
           </div>
 
           <label>Portion Prices (Q / H / F)</label>
           <div class="grid-3 form-group">
-            <input type="number" id="inline-qtr-${item.id}" placeholder="Qtr ₹" value="${item.price_quarter || ''}">
-            <input type="number" id="inline-half-${item.id}" placeholder="Half ₹" value="${item.price_half || ''}">
-            <input type="number" id="inline-full-${item.id}" placeholder="Full ₹" value="${item.price_full || ''}">
+            <input type="number" id="inline-qtr-${item.id}" placeholder="Qtr ₹" value="${item.price_quarter !== null && item.price_quarter !== undefined ? item.price_quarter : ''}">
+            <input type="number" id="inline-half-${item.id}" placeholder="Half ₹" value="${item.price_half !== null && item.price_half !== undefined ? item.price_half : ''}">
+            <input type="number" id="inline-full-${item.id}" placeholder="Full ₹" value="${item.price_full !== null && item.price_full !== undefined ? item.price_full : ''}">
           </div>
 
           <div style="text-align: right; margin-top: 10px;">
-            <button class="btn-save" onclick="saveInlineEdit(${item.id})">Save</button>
-            <button class="btn-cancel" onclick="loadMenuItems()">Cancel</button>
+            <button class="btn-save" type="button" onclick="saveInlineEdit(${item.id})">Save</button>
+            <button class="btn-cancel" type="button" onclick="loadMenuItems()">Cancel</button>
           </div>
         </div>
       `;
@@ -536,6 +558,16 @@
       await supabaseClient.auth.signOut();
       window.location.href = 'login.html';
     }
+
+    // Attach global functions to window scope explicitly
+    window.enableInlineEdit = enableInlineEdit;
+    window.saveInlineEdit = saveInlineEdit;
+    window.deleteMenuItem = deleteMenuItem;
+    window.handleLogout = handleLogout;
+    window.saveRestaurantDetails = saveRestaurantDetails;
+    window.addNewMenuItem = addNewMenuItem;
+    window.uploadLogoFromComputer = uploadLogoFromComputer;
+    window.updateFileLabel = updateFileLabel;
 
     window.addEventListener('load', initDashboard);
   </script>
