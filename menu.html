@@ -8,8 +8,9 @@
 
   <style>
     :root {
-      --primary: #2563eb;
-      --bg-color: #f1f5f9;
+      --primary: #10b981;
+      --primary-dark: #047857;
+      --bg-color: #f8fafc;
       --card-bg: #ffffff;
       --text-main: #0f172a;
       --text-muted: #64748b;
@@ -19,44 +20,138 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif; }
-    body { background: var(--bg-color); color: var(--text-main); min-height: 100vh; padding-bottom: 40px; }
+    body { background: var(--bg-color); color: var(--text-main); min-height: 100vh; padding-bottom: 50px; }
 
-    /* Header Container */
-    .header-card {
+    /* Sticky Top Header */
+    .top-navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
       background: #ffffff;
-      padding: 24px 16px;
-      text-align: center;
       border-bottom: 1px solid #e2e8f0;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
     }
-    .restaurant-logo { width: 72px; height: 72px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; border: 2px solid var(--primary); }
-    .restaurant-name { font-size: 22px; font-weight: 800; color: var(--text-main); letter-spacing: -0.3px; }
-    .restaurant-phone { font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 600; }
 
-    .menu-container { max-width: 720px; margin: 24px auto; padding: 0 12px; }
+    .header-content {
+      max-width: 768px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
 
-    /* Category Card Layout */
+    /* Left: Logo */
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .logo-wrapper { position: relative; flex-shrink: 0; }
+    .restaurant-logo { 
+      width: 48px; 
+      height: 48px; 
+      border-radius: 12px; 
+      object-fit: cover; 
+      border: 1px solid #e2e8f0; 
+    }
+    .status-indicator {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 12px;
+      height: 12px;
+      background: #22c55e;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+    }
+
+    /* Center: Name & Sub-text */
+    .header-center { flex: 1; min-width: 0; }
+    .restaurant-name { 
+      font-size: 17px; 
+      font-weight: 800; 
+      color: var(--text-main); 
+      white-space: nowrap; 
+      overflow: hidden; 
+      text-overflow: ellipsis; 
+      line-height: 1.2;
+    }
+    .restaurant-subtitle { 
+      font-size: 12px; 
+      color: var(--text-muted); 
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Right: Call Button */
+    .header-right { flex-shrink: 0; }
+    .call-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ecfdf5;
+      color: var(--primary-dark);
+      border: 1px solid #a7f3d0;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .call-btn:active { transform: scale(0.96); }
+
+    /* Main Container */
+    .menu-container { max-width: 768px; margin: 16px auto; padding: 0 12px; }
+
+    /* Category Navigation Bar */
+    .category-scroll-bar {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      scrollbar-width: none;
+    }
+    .category-scroll-bar::-webkit-scrollbar { display: none; }
+
+    .cat-chip {
+      white-space: nowrap;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .cat-chip.active {
+      background: var(--text-main);
+      color: #ffffff;
+      border-color: var(--text-main);
+    }
+
+    /* Category Cards Layout */
     .category-card {
       background: var(--card-bg);
-      border-radius: 12px;
+      border-radius: 14px;
       border: 1px solid #e2e8f0;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
     }
 
-    /* Category Header */
     .category-header {
       background: #f8fafc;
-      padding: 14px 16px;
+      padding: 12px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #e2e8f0;
     }
-    .category-title { font-size: 16px; font-weight: 700; color: #1e293b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .category-title { font-size: 15px; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    /* Right Side Portion Columns Header */
     .portion-labels-header {
       display: flex;
       gap: 8px;
@@ -64,7 +159,6 @@
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
     }
     .portion-col { width: 54px; text-align: center; }
 
@@ -80,10 +174,10 @@
 
     .item-details { flex: 1; padding-right: 12px; }
     .item-title-flex { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
-    .item-name { font-size: 15px; font-weight: 600; color: var(--text-main); }
-    .item-desc { font-size: 12px; color: var(--text-muted); line-height: 1.3; }
+    .item-name { font-size: 15px; font-weight: 700; color: var(--text-main); }
+    .item-desc { font-size: 12px; color: var(--text-muted); line-height: 1.3; margin-top: 2px; }
 
-    /* Clean Uniform Price Badges */
+    /* Green Badge Prices */
     .price-columns-group { display: flex; gap: 8px; align-items: center; }
 
     .price-pill-badge {
@@ -93,9 +187,9 @@
       color: #047857;
       border: 1px solid #a7f3d0;
       padding: 5px 0;
-      border-radius: 6px;
+      border-radius: 8px;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
       box-shadow: 0 1px 2px rgba(0,0,0,0.02);
     }
 
@@ -107,24 +201,102 @@
       box-shadow: none;
     }
 
-    /* Type Indicators */
-    .badge-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
-    .badge-veg { background: var(--veg); }
-    .badge-nonveg { background: var(--nonveg); }
-    .badge-egg { background: var(--egg); }
+    /* Veg / Non-Veg Icons */
+    .veg-symbol {
+      width: 14px;
+      height: 14px;
+      border: 1.5px solid var(--veg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .veg-symbol::after {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--veg);
+      border-radius: 50%;
+    }
+
+    .nonveg-symbol {
+      width: 14px;
+      height: 14px;
+      border: 1.5px solid var(--nonveg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .nonveg-symbol::after {
+      content: '';
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-bottom: 7px solid var(--nonveg);
+    }
+
+    .egg-symbol {
+      width: 14px;
+      height: 14px;
+      border: 1.5px solid var(--egg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .egg-symbol::after {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--egg);
+      border-radius: 50%;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Website Top Header -->
-  <header class="header-card">
-    <img id="rest-logo" class="restaurant-logo" src="https://via.placeholder.com/72" style="display: none;" alt="Logo">
-    <h1 id="rest-name" class="restaurant-name">Loading Menu...</h1>
-    <p id="rest-phone" class="restaurant-phone"></p>
-  </header>
+  <!-- Top Fixed Navbar Header -->
+  <nav class="top-navbar">
+    <div class="header-content">
+      <!-- Left: Logo -->
+      <div class="header-left">
+        <div class="logo-wrapper">
+          <img id="rest-logo" class="restaurant-logo" src="https://via.placeholder.com/48" alt="Logo">
+          <span class="status-indicator"></span>
+        </div>
+      </div>
 
-  <!-- Menu App Container -->
-  <main class="menu-container" id="menu-sections"></main>
+      <!-- Center: Restaurant Name & Info -->
+      <div class="header-center">
+        <h1 id="rest-name" class="restaurant-name">Loading Restaurant...</h1>
+        <div class="restaurant-subtitle">
+          <span>🍽️ Fresh & Authentic Food Menu</span>
+        </div>
+      </div>
+
+      <!-- Right: Direct Call Button -->
+      <div class="header-right">
+        <a id="rest-call-btn" href="#" class="call-btn" style="display: none;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+          Call
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Container -->
+  <main class="menu-container">
+    <!-- Quick Filter Category Bar -->
+    <div class="category-scroll-bar" id="category-chips"></div>
+
+    <!-- Menu Items List -->
+    <div id="menu-sections"></div>
+  </main>
 
   <script>
     const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
@@ -149,11 +321,17 @@
 
       const rest = restaurants[0];
       document.getElementById('rest-name').innerText = rest.name || 'Menu';
-      if (rest.phone) document.getElementById('rest-phone').innerText = `📞 Call: ${rest.phone}`;
+      
+      // Update Call Button Link
+      if (rest.phone) {
+        const callBtn = document.getElementById('rest-call-btn');
+        callBtn.href = `tel:${rest.phone}`;
+        callBtn.style.display = 'inline-flex';
+      }
+
+      // Update Logo
       if (rest.logo_url) {
-        const logoImg = document.getElementById('rest-logo');
-        logoImg.src = rest.logo_url;
-        logoImg.style.display = 'inline-block';
+        document.getElementById('rest-logo').src = rest.logo_url;
       }
 
       const { data: items } = await supabaseClient
@@ -166,6 +344,8 @@
 
     function renderCategorizedMenu(items) {
       const container = document.getElementById('menu-sections');
+      const chipsContainer = document.getElementById('category-chips');
+
       if (items.length === 0) {
         container.innerHTML = '<p style="text-align:center; padding: 40px; color: #64748b;">No items added to the menu yet.</p>';
         return;
@@ -178,13 +358,20 @@
         grouped[cat].push(item);
       });
 
-      let html = '';
+      // Render Category Filter Chips
+      let chipsHtml = `<span class="cat-chip active">All Menu</span>`;
+      Object.keys(grouped).forEach(cat => {
+        chipsHtml += `<span class="cat-chip">${cat}</span>`;
+      });
+      chipsContainer.innerHTML = chipsHtml;
 
+      // Render Categories & Items
+      let html = '';
       for (const [catName, catItems] of Object.entries(grouped)) {
         const hasPortions = catItems.some(i => i.price_quarter || i.price_half || i.price_full);
 
         html += `
-          <div class="category-card">
+          <div class="category-card" id="cat-${catName.replace(/\s+/g, '-')}">
             <div class="category-header">
               <span class="category-title">${catName}</span>
               ${hasPortions ? `
@@ -210,12 +397,15 @@
     }
 
     function renderItemRow(item, hasPortions) {
-      let typeClass = 'badge-veg';
-      if (item.item_type === 'egg') typeClass = 'badge-egg';
-      else if (item.item_type === 'nonveg' || item.is_veg === false) typeClass = 'badge-nonveg';
+      // Food Type Symbol
+      let symbolHtml = '<span class="veg-symbol"></span>';
+      if (item.item_type === 'egg') {
+        symbolHtml = '<span class="egg-symbol"></span>';
+      } else if (item.item_type === 'nonveg' || item.is_veg === false) {
+        symbolHtml = '<span class="nonveg-symbol"></span>';
+      }
 
       let pricesHtml = '';
-
       if (hasPortions) {
         const qtr = item.price_quarter ? `₹${item.price_quarter}` : '-';
         const half = item.price_half ? `₹${item.price_half}` : '-';
@@ -242,7 +432,7 @@
         <div class="item-row">
           <div class="item-details">
             <div class="item-title-flex">
-              <span class="badge-dot ${typeClass}"></span>
+              ${symbolHtml}
               <span class="item-name">${item.name}</span>
             </div>
             ${item.description ? `<div class="item-desc">${item.description}</div>` : ''}
