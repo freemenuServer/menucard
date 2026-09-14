@@ -403,10 +403,85 @@ $("mobileMenu").onclick=()=>$("sidebar").classList.toggle("open");
 
 function showOwnerLogin(){
   $("loader").classList.add("hidden");
+  $("ownerLogin").classList.remove("show");
+  const c=$("ownerAuthChoice");
+  if(c) c.style.display="flex";
+}
+function showLoginForm(){
+  $("ownerAuthChoice").style.display="none";
+  $("signupModal").classList.remove("show");
   $("ownerLogin").classList.add("show");
+  setTimeout(()=>$("loginEmail").focus(),80);
 }
 function hideOwnerLogin(){
   $("ownerLogin").classList.remove("show");
+}
+function showSignupForm(){
+  $("ownerAuthChoice").style.display="none";
+  $("ownerLogin").classList.remove("show");
+  $("signupModal").classList.add("show");
+  setTimeout(()=>$("signupName").focus(),80);
+}
+function hideSignupForm(){
+  $("signupModal").classList.remove("show");
+}
+async function ownerSignup(){
+  const name=$("signupName").value.trim();
+  const email=$("signupEmail").value.trim();
+  const phone=$("signupPhone").value.trim();
+  const password=$("signupPassword").value;
+  const confirm=$("signupConfirm").value;
+  const restaurant=$("signupRestaurant").value.trim();
+  const address=$("signupAddress").value.trim();
+  const slug=$("signupSlug").value.trim().toLowerCase().replace(/[^a-z0-9-]+/g,"-").replace(/^-+|-+$/g,"");
+  const err=$("signupError"), btn=$("signupSubmit");
+  if(!name||!email||!phone||!password||!restaurant||!address||!slug){
+    err.textContent="Please fill all required fields.";
+    err.classList.remove("hidden"); return;
+  }
+  if(password.length<6){
+    err.textContent="Password must be at least 6 characters.";
+    err.classList.remove("hidden"); return;
+  }
+  if(password!==confirm){
+    err.textContent="Passwords do not match.";
+    err.classList.remove("hidden"); return;
+  }
+  err.classList.add("hidden"); btn.disabled=true;
+  btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Creating account...';
+  try{
+    const {data,error}=await supabaseClient.auth.signUp({
+      email,password,
+      options:{data:{full_name:name,phone}}
+    });
+    if(error) throw error;
+    const newSession=data.session;
+    if(!newSession){
+      err.textContent="Account created. Please verify your email, then login to complete your restaurant setup.";
+      err.classList.remove("hidden");
+      btn.disabled=false;
+      btn.innerHTML='<i class="fa-solid fa-user-plus"></i> Create Owner Account';
+      return;
+    }
+    const uid=newSession.user.id;
+    const {data:existing}=await supabaseClient.from("restaurants").select("id").eq("slug",slug).maybeSingle();
+    if(existing?.id){
+      throw new Error("This menu slug is already taken. Please choose another.");
+    }
+    const {error:restErr}=await supabaseClient.from("restaurants").insert({
+      owner_id:uid,name:restaurant,slug,phone,address,
+      status:"pending",plan:"free",subscription_status:"inactive"
+    });
+    if(restErr) throw restErr;
+    hideSignupForm();
+    $("loader").classList.remove("hidden");
+    await init();
+  }catch(e){
+    err.textContent=e.message||"Unable to create account.";
+    err.classList.remove("hidden");
+    btn.disabled=false;
+    btn.innerHTML='<i class="fa-solid fa-user-plus"></i> Create Owner Account';
+  }
 }
 async function ownerLogin(){
   const email=$("loginEmail").value.trim();
@@ -743,19 +818,38 @@ window.addEventListener("load",init);
   <div class="owner-auth-card">
     <div class="owner-auth-logo">FM</div>
     <h1>Restaurant Owner Portal</h1>
-    <p>Manage your restaurant menu with FreeMenu</p>
+    <p>Choose how you want to continue</p>
     <div class="owner-auth-actions">
       <button type="button" class="owner-auth-btn owner-auth-login" id="chooseOwnerLogin">
-        <span>🔐</span>
-        <strong>Login</strong>
-        <small>Already have an owner account</small>
+        <span>🔐</span><strong>Login</strong><small>Already have an owner account</small>
       </button>
       <button type="button" class="owner-auth-btn owner-auth-signup" id="chooseOwnerSignup">
-        <span>📝</span>
-        <strong>Sign Up</strong>
-        <small>Register your restaurant</small>
+        <span>📝</span><strong>Sign Up</strong><small>New restaurant? Create an account</small>
       </button>
     </div>
+  </div>
+</div>
+
+<!-- Separate Sign Up Form -->
+<div id="signupModal" class="owner-signup-modal">
+  <div class="signup-card">
+    <button type="button" class="signup-close" id="signupBack">← Back</button>
+    <div class="signup-logo">FM</div>
+    <h1>Create Restaurant Account</h1>
+    <p class="signup-sub">Register your owner account and restaurant</p>
+    <div id="signupError" class="loginError hidden"></div>
+    <div class="signup-grid">
+      <div class="formGroup"><label>Full Name *</label><input class="input" id="signupName" type="text" placeholder="Your name" autocomplete="name"></div>
+      <div class="formGroup"><label>Mobile Number *</label><input class="input" id="signupPhone" type="tel" placeholder="9876543210" autocomplete="tel"></div>
+      <div class="formGroup full"><label>Email Address *</label><input class="input" id="signupEmail" type="email" placeholder="owner@example.com" autocomplete="email"></div>
+      <div class="formGroup"><label>Password *</label><input class="input" id="signupPassword" type="password" placeholder="Minimum 6 characters" autocomplete="new-password"></div>
+      <div class="formGroup"><label>Confirm Password *</label><input class="input" id="signupConfirm" type="password" placeholder="Re-enter password" autocomplete="new-password"></div>
+      <div class="formGroup full"><label>Restaurant Name *</label><input class="input" id="signupRestaurant" type="text" placeholder="Your restaurant name"></div>
+      <div class="formGroup full"><label>Restaurant Address *</label><input class="input" id="signupAddress" type="text" placeholder="Complete restaurant address"></div>
+      <div class="formGroup full"><label>Menu Slug *</label><input class="input" id="signupSlug" type="text" placeholder="e.g. royal-tandoor"><small class="slug-help">Your menu link will use this name.</small></div>
+    </div>
+    <button class="loginSubmit" id="signupSubmit"><i class="fa-solid fa-user-plus"></i> Create Owner Account</button>
+    <div class="loginHint">After signup, your restaurant profile will be created automatically.</div>
   </div>
 </div>
 
@@ -763,8 +857,8 @@ window.addEventListener("load",init);
 .owner-auth-choice{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px}
 .owner-auth-backdrop{position:absolute;inset:0;background:rgba(8,12,20,.78);backdrop-filter:blur(8px)}
 .owner-auth-card{position:relative;width:min(460px,100%);background:#fff;border-radius:24px;padding:34px 28px;box-shadow:0 25px 80px rgba(0,0,0,.3);text-align:center}
-.owner-auth-logo{width:64px;height:64px;border-radius:18px;margin:0 auto 16px;display:grid;place-items:center;background:linear-gradient(135deg,#111827,#374151);color:#fff;font-size:22px;font-weight:800}
-.owner-auth-card h1{margin:0;font-size:26px;color:#111827}
+.owner-auth-logo,.signup-logo{width:64px;height:64px;border-radius:18px;margin:0 auto 16px;display:grid;place-items:center;background:linear-gradient(135deg,#111827,#374151);color:#fff;font-size:22px;font-weight:800}
+.owner-auth-card h1,.signup-card h1{margin:0;font-size:26px;color:#111827}
 .owner-auth-card p{margin:8px 0 25px;color:#6b7280}
 .owner-auth-actions{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .owner-auth-btn{border:1px solid #e5e7eb;background:#f9fafb;border-radius:17px;padding:19px 14px;cursor:pointer;text-align:left;transition:.18s}
@@ -772,56 +866,29 @@ window.addEventListener("load",init);
 .owner-auth-btn span{font-size:24px;display:block;margin-bottom:9px}
 .owner-auth-btn strong{display:block;font-size:17px;color:#111827}
 .owner-auth-btn small{display:block;margin-top:5px;color:#6b7280;line-height:1.35}
-.owner-auth-login{background:#f8fafc}
-.owner-auth-signup{background:#fffaf3}
-@media(max-width:520px){.owner-auth-actions{grid-template-columns:1fr}.owner-auth-card{padding:28px 20px}}
+.owner-auth-login{background:#f8fafc}.owner-auth-signup{background:#fffaf3}
+.owner-signup-modal{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(8,12,20,.78);backdrop-filter:blur(8px);overflow:auto}
+.owner-signup-modal.show{display:flex}
+.signup-card{position:relative;width:min(680px,100%);max-height:94vh;overflow:auto;background:#fff;border-radius:24px;padding:30px;box-shadow:0 25px 80px rgba(0,0,0,.3)}
+.signup-card .signup-logo{margin:0 auto 10px;width:52px;height:52px;font-size:18px}
+.signup-card h1{text-align:center;font-size:25px}
+.signup-sub{text-align:center;color:#6b7280;margin:5px 0 20px;font-size:13px}
+.signup-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.signup-grid .full{grid-column:1/-1}
+.slug-help{display:block;color:#7b8494;font-size:10px;margin-top:5px}
+.signup-close{border:0;background:#f3f4f6;color:#374151;border-radius:9px;padding:8px 11px;cursor:pointer;margin-bottom:8px}
+@media(max-width:600px){.owner-auth-actions,.signup-grid{grid-template-columns:1fr}.signup-grid .full{grid-column:auto}.signup-card{padding:22px}}
 </style>
 <script>
 (function(){
-  const choice = document.getElementById('ownerAuthChoice');
-  const loginBtn = document.getElementById('chooseOwnerLogin');
-  const signupBtn = document.getElementById('chooseOwnerSignup');
-
-  function showChoice(){
-    if(choice) choice.style.display='flex';
-  }
-  function hideChoice(){
-    if(choice) choice.style.display='none';
-  }
-
-  // Existing page auth forms are reused; we only add the first decision screen.
-  loginBtn && loginBtn.addEventListener('click', function(){
-    hideChoice();
-    const email = document.querySelector('input[type="email"]');
-    if(email) email.focus();
-  });
-
-  signupBtn && signupBtn.addEventListener('click', function(){
-    hideChoice();
-    // Existing page signup/create-profile UI, if present.
-    const signup = document.getElementById('signupForm') ||
-                   document.querySelector('[data-auth="signup"]');
-    if(signup){ signup.style.display='block'; }
-    // If the current page has no separate signup form, expose the create-profile
-    // flow already used by the fixed dashboard.
-    const create = document.getElementById('createRestaurant') ||
-                   document.querySelector('[data-create-restaurant]');
-    if(create){ create.style.display='block'; }
-    const first = document.querySelector('input[type="text"]');
-    if(first) first.focus();
-  });
-
-  // Called by the existing auth initialization when the visitor is not logged in.
-  window.showOwnerAuthChoice = showChoice;
-  window.hideOwnerAuthChoice = hideChoice;
-
-  // If the existing script exposes an auth error state, don't interfere.
-  // Show the choice after DOM is ready; authenticated sessions are handled by
-  // the page's existing Supabase session logic.
-  document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(function(){
-      if(window.__ownerAuthenticated !== true) showChoice();
-    }, 250);
+  const choice=document.getElementById('ownerAuthChoice');
+  document.getElementById('chooseOwnerLogin').onclick=()=>showLoginForm();
+  document.getElementById('chooseOwnerSignup').onclick=()=>showSignupForm();
+  document.getElementById('signupBack').onclick=()=>{hideSignupForm();showOwnerLogin();};
+  document.getElementById('signupSubmit').onclick=ownerSignup;
+  document.getElementById('signupConfirm').addEventListener('keydown',e=>{if(e.key==='Enter')ownerSignup();});
+  document.getElementById('signupSlug').addEventListener('input',e=>{
+    e.target.value=e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-+|-+$/g,'');
   });
 })();
 </script>
