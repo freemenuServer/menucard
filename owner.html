@@ -736,5 +736,104 @@ supabaseClient.auth.onAuthStateChange((event, newSession)=>{
 });
 window.addEventListener("load",init);
 </script>
+
+<!-- FreeMenu Owner Auth Choice -->
+<div id="ownerAuthChoice" class="owner-auth-choice" style="display:none;">
+  <div class="owner-auth-backdrop"></div>
+  <div class="owner-auth-card">
+    <div class="owner-auth-logo">FM</div>
+    <h1>Restaurant Owner Portal</h1>
+    <p>Manage your restaurant menu with FreeMenu</p>
+    <div class="owner-auth-actions">
+      <button type="button" class="owner-auth-btn owner-auth-login" id="chooseOwnerLogin">
+        <span>🔐</span>
+        <strong>Login</strong>
+        <small>Already have an owner account</small>
+      </button>
+      <button type="button" class="owner-auth-btn owner-auth-signup" id="chooseOwnerSignup">
+        <span>📝</span>
+        <strong>Sign Up</strong>
+        <small>Register your restaurant</small>
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+.owner-auth-choice{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px}
+.owner-auth-backdrop{position:absolute;inset:0;background:rgba(8,12,20,.78);backdrop-filter:blur(8px)}
+.owner-auth-card{position:relative;width:min(460px,100%);background:#fff;border-radius:24px;padding:34px 28px;box-shadow:0 25px 80px rgba(0,0,0,.3);text-align:center}
+.owner-auth-logo{width:64px;height:64px;border-radius:18px;margin:0 auto 16px;display:grid;place-items:center;background:linear-gradient(135deg,#111827,#374151);color:#fff;font-size:22px;font-weight:800}
+.owner-auth-card h1{margin:0;font-size:26px;color:#111827}
+.owner-auth-card p{margin:8px 0 25px;color:#6b7280}
+.owner-auth-actions{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.owner-auth-btn{border:1px solid #e5e7eb;background:#f9fafb;border-radius:17px;padding:19px 14px;cursor:pointer;text-align:left;transition:.18s}
+.owner-auth-btn:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(0,0,0,.08);border-color:#cbd5e1}
+.owner-auth-btn span{font-size:24px;display:block;margin-bottom:9px}
+.owner-auth-btn strong{display:block;font-size:17px;color:#111827}
+.owner-auth-btn small{display:block;margin-top:5px;color:#6b7280;line-height:1.35}
+.owner-auth-login{background:#f8fafc}
+.owner-auth-signup{background:#fffaf3}
+@media(max-width:520px){.owner-auth-actions{grid-template-columns:1fr}.owner-auth-card{padding:28px 20px}}
+</style>
+<script>
+(function(){
+  const choice = document.getElementById('ownerAuthChoice');
+  const loginBtn = document.getElementById('chooseOwnerLogin');
+  const signupBtn = document.getElementById('chooseOwnerSignup');
+
+  function showChoice(){
+    if(choice) choice.style.display='flex';
+  }
+  function hideChoice(){
+    if(choice) choice.style.display='none';
+  }
+
+  // Existing page auth forms are reused; we only add the first decision screen.
+  loginBtn && loginBtn.addEventListener('click', function(){
+    hideChoice();
+    const email = document.querySelector('input[type="email"]');
+    if(email) email.focus();
+  });
+
+  signupBtn && signupBtn.addEventListener('click', function(){
+    hideChoice();
+    // Existing page signup/create-profile UI, if present.
+    const signup = document.getElementById('signupForm') ||
+                   document.querySelector('[data-auth="signup"]');
+    if(signup){ signup.style.display='block'; }
+    // If the current page has no separate signup form, expose the create-profile
+    // flow already used by the fixed dashboard.
+    const create = document.getElementById('createRestaurant') ||
+                   document.querySelector('[data-create-restaurant]');
+    if(create){ create.style.display='block'; }
+    const first = document.querySelector('input[type="text"]');
+    if(first) first.focus();
+  });
+
+  // Called by the existing auth initialization when the visitor is not logged in.
+  window.showOwnerAuthChoice = showChoice;
+  window.hideOwnerAuthChoice = hideChoice;
+
+  // If the existing script exposes an auth error state, don't interfere.
+  // Show the choice after DOM is ready; authenticated sessions are handled by
+  // the page's existing Supabase session logic.
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){
+      if(window.__ownerAuthenticated !== true) showChoice();
+    }, 250);
+  });
+})();
+</script>
+
 </body>
 </html>
+<script>
+window.addEventListener('load',function(){
+  try{
+    if(window.__ownerAuthenticated === false || !document.querySelector('.sidebar, #dashboard, [data-dashboard]')){
+      if(typeof window.showOwnerAuthChoice==='function') window.showOwnerAuthChoice();
+    }
+  }catch(e){}
+});
+</script>
