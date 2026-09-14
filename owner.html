@@ -448,18 +448,103 @@ async function init(){
   $("avatar").textContent=initials($("ownerName").textContent);
 
   const urlSlug=new URLSearchParams(location.search).get("r");
-  let q=supabaseClient.from("restaurants").select("*");
-  if(urlSlug) q=q.eq("slug",urlSlug.toLowerCase());
-  else q=q.eq("owner_id",session.user.id);
-  const {data,error}=await q.limit(1);
+
+  // Owner Panel must work from Index -> owner.html even when the owner's
+  // restaurant row has not been linked yet. First try owner_id, then offer
+  // a one-time profile creation instead of showing "Restaurant not found".
+  let data=null,error=null;
+
+  if(urlSlug){
+    const res=await supabaseClient.from("restaurants").select("*").eq("slug",urlSlug.toLowerCase()).limit(1);
+    data=res.data; error=res.error;
+  }else{
+    const res=await supabaseClient.from("restaurants").select("*").eq("owner_id",session.user.id).limit(1);
+    data=res.data; error=res.error;
+  }
+
   if(error) return fail(error.message);
-  if(!data?.length) return fail("Restaurant profile not found for this owner.");
-  currentRestaurant=data[0];currentRestaurantId=currentRestaurant.id;
+
+  if(!data?.length){
+    if(urlSlug){
+      return fail("Restaurant profile not found for this owner. Open Owner Panel from the main Index page, or use the restaurant's owner account.");
+    }
+    return showCreateRestaurant();
+  }
+
+  currentRestaurant=data[0];
+  currentRestaurantId=currentRestaurant.id;
   fillProfile();
   await loadItems();
   $("loader").classList.add("hidden");
   showSection(location.hash.slice(1)||"dashboard");
 }
+function showCreateRestaurant(){
+  $("loader").innerHTML=`<div style="max-width:460px;margin:auto;background:#fff;border:1px solid var(--border);border-radius:16px;padding:25px;box-shadow:var(--shadow);text-align:left">
+    <div style="text-align:center"><i class="fa-solid fa-store" style="font-size:38px;color:var(--primary)"></i>
+    <h3 style="margin:10px 0 5px">Create Restaurant Profile</h3>
+    <p class="muted" style="font-size:12px">This owner account is valid, but it is not linked to a restaurant yet.</p></div>
+    <div class="formGroup"><label>Restaurant Name *</label><input class="input" id="newRestName" placeholder="My Restaurant"></div>
+    <div class="formGroup"><label>Phone</label><input class="input" id="newRestPhone" placeholder="9876543210"></div>
+    <div class="formGroup"><label>Address</label><textarea class="textarea" id="newRestAddress" placeholder="Restaurant address"></textarea></div>
+    <div class="formGroup"><label>Menu Slug *</label><input class="input" id="newRestSlug" placeholder="my-restaurant"></div>
+    <button class="btn primary" id="createRestBtn" style="width:100%"><i class="fa-solid fa-plus"></i> Create & Open Owner Panel</button>
+    <p class="muted" style="font-size:10px;margin:10px 0 0">The restaurant will be linked to your logged-in Supabase account automatically.</p>
+  </div>`;
+  $("createRestBtn").onclick=createRestaurantProfile;
+}
+
+async function createRestaurantProfile(){
+  const name=$("newRestName").value.trim();
+  const phone=$("newRestPhone").value.trim();
+  const address=$("newRestAddress").value.trim();
+  let slug=$("newRestSlug").value.trim().toLowerCase()
+    .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+  if(!name)return toast("Restaurant name is required");
+  if(!slug)return toast("Menu slug is required");
+
+  $("createRestBtn").disabled=true;
+  $("createRestBtn").textContent="Creating...";
+
+  // Check slug first so we don't create duplicate public menu URLs.
+  const {data:existing,error:slugError}=await supabaseClient
+    .from("restaurants").select("id").eq("slug",slug).limit(1);
+
+  if(slugError){
+    $("createRestBtn").disabled=false;
+    $("createRestBtn").innerHTML='<i class="fa-solid fa-plus"></i> Create & Open Owner Panel';
+    return toast("Slug check failed: "+slugError.message);
+  }
+  if(existing?.length){
+    $("createRestBtn").disabled=false;
+    $("createRestBtn").innerHTML='<i class="fa-solid fa-plus"></i> Create & Open Owner Panel';
+    return toast("This menu slug is already in use.");
+  }
+
+  const {data,error}=await supabaseClient.from("restaurants").insert([{
+    owner_id:session.user.id,
+    name,slug,phone,address,
+    status:"pending",
+    plan:"free",
+    subscription_status:"inactive"
+  }]).select("*").single();
+
+  $("createRestBtn").disabled=false;
+  $("createRestBtn").innerHTML='<i class="fa-solid fa-plus"></i> Create & Open Owner Panel';
+
+  if(error){
+    toast("Restaurant creation failed: "+error.message);
+    return;
+  }
+
+  currentRestaurant=data;
+  currentRestaurantId=data.id;
+  fillProfile();
+  await loadItems();
+  $("loader").classList.add("hidden");
+  toast("Restaurant profile created");
+  showSection("dashboard");
+}
+
 function fail(msg){
   $("loader").innerHTML=`<div style="text-align:center;padding:25px"><i class="fa-solid fa-circle-exclamation" style="font-size:38px;color:#c33"></i><h3>Unable to open Owner Panel</h3><p>${esc(msg)}</p><button class="btn" onclick="location.reload()">Retry</button></div>`;
 }
