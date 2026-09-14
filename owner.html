@@ -812,95 +812,201 @@ supabaseClient.auth.onAuthStateChange((event, newSession)=>{
 window.addEventListener("load",init);
 </script>
 
-<!-- FreeMenu Owner Auth Choice -->
+<!-- FreeMenu Owner Authentication -->
 <div id="ownerAuthChoice" class="owner-auth-choice" style="display:none;">
   <div class="owner-auth-backdrop"></div>
-  <div class="owner-auth-card">
+
+  <!-- Choice -->
+  <div class="owner-auth-card" id="ownerAuthHome">
     <div class="owner-auth-logo">FM</div>
     <h1>Restaurant Owner Portal</h1>
-    <p>Choose how you want to continue</p>
+    <p>Choose an option to continue</p>
     <div class="owner-auth-actions">
-      <button type="button" class="owner-auth-btn owner-auth-login" id="chooseOwnerLogin">
-        <span>🔐</span><strong>Login</strong><small>Already have an owner account</small>
+      <button type="button" class="owner-auth-btn" id="chooseOwnerLogin">
+        <span>🔐</span><strong>Login</strong>
+        <small>Already have an account?</small>
       </button>
-      <button type="button" class="owner-auth-btn owner-auth-signup" id="chooseOwnerSignup">
-        <span>📝</span><strong>Sign Up</strong><small>New restaurant? Create an account</small>
+      <button type="button" class="owner-auth-btn" id="chooseOwnerSignup">
+        <span>📝</span><strong>Sign Up</strong>
+        <small>Create a new restaurant account</small>
       </button>
     </div>
   </div>
-</div>
 
-<!-- Separate Sign Up Form -->
-<div id="signupModal" class="owner-signup-modal">
-  <div class="signup-card">
-    <button type="button" class="signup-close" id="signupBack">← Back</button>
-    <div class="signup-logo">FM</div>
-    <h1>Create Restaurant Account</h1>
-    <p class="signup-sub">Register your owner account and restaurant</p>
-    <div id="signupError" class="loginError hidden"></div>
-    <div class="signup-grid">
-      <div class="formGroup"><label>Full Name *</label><input class="input" id="signupName" type="text" placeholder="Your name" autocomplete="name"></div>
-      <div class="formGroup"><label>Mobile Number *</label><input class="input" id="signupPhone" type="tel" placeholder="9876543210" autocomplete="tel"></div>
-      <div class="formGroup full"><label>Email Address *</label><input class="input" id="signupEmail" type="email" placeholder="owner@example.com" autocomplete="email"></div>
-      <div class="formGroup"><label>Password *</label><input class="input" id="signupPassword" type="password" placeholder="Minimum 6 characters" autocomplete="new-password"></div>
-      <div class="formGroup"><label>Confirm Password *</label><input class="input" id="signupConfirm" type="password" placeholder="Re-enter password" autocomplete="new-password"></div>
-      <div class="formGroup full"><label>Restaurant Name *</label><input class="input" id="signupRestaurant" type="text" placeholder="Your restaurant name"></div>
-      <div class="formGroup full"><label>Restaurant Address *</label><input class="input" id="signupAddress" type="text" placeholder="Complete restaurant address"></div>
-      <div class="formGroup full"><label>Menu Slug *</label><input class="input" id="signupSlug" type="text" placeholder="e.g. royal-tandoor"><small class="slug-help">Your menu link will use this name.</small></div>
-    </div>
-    <button class="loginSubmit" id="signupSubmit"><i class="fa-solid fa-user-plus"></i> Create Owner Account</button>
-    <div class="loginHint">After signup, your restaurant profile will be created automatically.</div>
+  <!-- Login -->
+  <div class="owner-auth-card owner-auth-form-card" id="ownerLoginBox" style="display:none;">
+    <button type="button" class="owner-auth-back" id="backFromLogin">← Back</button>
+    <div class="owner-auth-logo">FM</div>
+    <h1>Owner Login</h1>
+    <p>Login to manage your restaurant</p>
+    <form id="ownerSeparateLoginForm">
+      <label>Email</label>
+      <input id="ownerLoginEmail" type="email" autocomplete="email" required placeholder="Enter your email">
+      <label>Password</label>
+      <input id="ownerLoginPassword" type="password" autocomplete="current-password" required placeholder="Enter your password">
+      <div id="ownerLoginError" class="owner-auth-error"></div>
+      <button class="owner-primary-btn" type="submit">🔐 Login to Owner Panel</button>
+    </form>
+    <button type="button" class="owner-switch" id="switchToSignup">New here? Sign Up</button>
+  </div>
+
+  <!-- Sign Up -->
+  <div class="owner-auth-card owner-auth-form-card" id="ownerSignupBox" style="display:none;">
+    <button type="button" class="owner-auth-back" id="backFromSignup">← Back</button>
+    <div class="owner-auth-logo">FM</div>
+    <h1>Create Owner Account</h1>
+    <p>Register your restaurant on FreeMenu</p>
+    <form id="ownerSeparateSignupForm">
+      <label>Full Name</label>
+      <input id="ownerSignupName" type="text" required placeholder="Your full name">
+      <label>Mobile</label>
+      <input id="ownerSignupPhone" type="tel" required placeholder="10-digit mobile number">
+      <label>Email</label>
+      <input id="ownerSignupEmail" type="email" autocomplete="email" required placeholder="Your email">
+      <label>Password</label>
+      <input id="ownerSignupPassword" type="password" autocomplete="new-password" minlength="6" required placeholder="Minimum 6 characters">
+      <label>Confirm Password</label>
+      <input id="ownerSignupConfirm" type="password" autocomplete="new-password" minlength="6" required placeholder="Repeat password">
+      <label>Restaurant Name</label>
+      <input id="ownerSignupRestaurant" type="text" required placeholder="Restaurant name">
+      <label>Restaurant Address</label>
+      <textarea id="ownerSignupAddress" required placeholder="Restaurant address"></textarea>
+      <label>Menu Slug</label>
+      <input id="ownerSignupSlug" type="text" required placeholder="e.g. my-restaurant">
+      <div id="ownerSignupError" class="owner-auth-error"></div>
+      <button class="owner-primary-btn" type="submit">📝 Create Owner Account</button>
+    </form>
+    <button type="button" class="owner-switch" id="switchToLogin">Already have an account? Login</button>
   </div>
 </div>
 
 <style>
-.owner-auth-choice{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px}
-.owner-auth-backdrop{position:absolute;inset:0;background:rgba(8,12,20,.78);backdrop-filter:blur(8px)}
-.owner-auth-card{position:relative;width:min(460px,100%);background:#fff;border-radius:24px;padding:34px 28px;box-shadow:0 25px 80px rgba(0,0,0,.3);text-align:center}
-.owner-auth-logo,.signup-logo{width:64px;height:64px;border-radius:18px;margin:0 auto 16px;display:grid;place-items:center;background:linear-gradient(135deg,#111827,#374151);color:#fff;font-size:22px;font-weight:800}
-.owner-auth-card h1,.signup-card h1{margin:0;font-size:26px;color:#111827}
-.owner-auth-card p{margin:8px 0 25px;color:#6b7280}
+.owner-auth-choice{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;padding:20px}
+.owner-auth-backdrop{position:absolute;inset:0;background:rgba(8,12,20,.82);backdrop-filter:blur(8px)}
+.owner-auth-card{position:relative;width:min(470px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:24px;padding:30px 28px;box-shadow:0 25px 80px rgba(0,0,0,.35);text-align:center}
+.owner-auth-logo{width:62px;height:62px;border-radius:17px;margin:0 auto 14px;display:grid;place-items:center;background:linear-gradient(135deg,#111827,#374151);color:#fff;font-size:21px;font-weight:800}
+.owner-auth-card h1{margin:0;font-size:25px;color:#111827}
+.owner-auth-card p{margin:7px 0 22px;color:#6b7280}
 .owner-auth-actions{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.owner-auth-btn{border:1px solid #e5e7eb;background:#f9fafb;border-radius:17px;padding:19px 14px;cursor:pointer;text-align:left;transition:.18s}
-.owner-auth-btn:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(0,0,0,.08);border-color:#cbd5e1}
-.owner-auth-btn span{font-size:24px;display:block;margin-bottom:9px}
+.owner-auth-btn{border:1px solid #e5e7eb;background:#f9fafb;border-radius:17px;padding:19px 14px;cursor:pointer;text-align:left}
+.owner-auth-btn:hover{box-shadow:0 10px 25px rgba(0,0,0,.1);transform:translateY(-1px)}
+.owner-auth-btn span{display:block;font-size:24px;margin-bottom:8px}
 .owner-auth-btn strong{display:block;font-size:17px;color:#111827}
-.owner-auth-btn small{display:block;margin-top:5px;color:#6b7280;line-height:1.35}
-.owner-auth-login{background:#f8fafc}.owner-auth-signup{background:#fffaf3}
-.owner-signup-modal{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(8,12,20,.78);backdrop-filter:blur(8px);overflow:auto}
-.owner-signup-modal.show{display:flex}
-.signup-card{position:relative;width:min(680px,100%);max-height:94vh;overflow:auto;background:#fff;border-radius:24px;padding:30px;box-shadow:0 25px 80px rgba(0,0,0,.3)}
-.signup-card .signup-logo{margin:0 auto 10px;width:52px;height:52px;font-size:18px}
-.signup-card h1{text-align:center;font-size:25px}
-.signup-sub{text-align:center;color:#6b7280;margin:5px 0 20px;font-size:13px}
-.signup-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.signup-grid .full{grid-column:1/-1}
-.slug-help{display:block;color:#7b8494;font-size:10px;margin-top:5px}
-.signup-close{border:0;background:#f3f4f6;color:#374151;border-radius:9px;padding:8px 11px;cursor:pointer;margin-bottom:8px}
-@media(max-width:600px){.owner-auth-actions,.signup-grid{grid-template-columns:1fr}.signup-grid .full{grid-column:auto}.signup-card{padding:22px}}
+.owner-auth-btn small{display:block;margin-top:5px;color:#6b7280}
+.owner-auth-form-card{text-align:left}
+.owner-auth-form-card .owner-auth-logo{margin-left:auto;margin-right:auto}
+.owner-auth-form-card h1,.owner-auth-form-card p{text-align:center}
+.owner-auth-form-card label{display:block;margin:11px 0 5px;font-size:13px;font-weight:700;color:#374151}
+.owner-auth-form-card input,.owner-auth-form-card textarea{box-sizing:border-box;width:100%;border:1px solid #d1d5db;border-radius:10px;padding:11px 12px;font:inherit;outline:none}
+.owner-auth-form-card input:focus,.owner-auth-form-card textarea:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
+.owner-auth-form-card textarea{min-height:75px;resize:vertical}
+.owner-primary-btn{width:100%;margin-top:17px;border:0;border-radius:11px;padding:13px;background:#111827;color:#fff;font-weight:700;cursor:pointer}
+.owner-auth-back{border:0;background:none;color:#4b5563;font-weight:700;cursor:pointer;padding:0 0 12px}
+.owner-switch{display:block;margin:15px auto 0;border:0;background:none;color:#4f46e5;font-weight:700;cursor:pointer}
+.owner-auth-error{color:#b91c1c;font-size:13px;margin-top:10px;min-height:18px}
+@media(max-width:520px){.owner-auth-actions{grid-template-columns:1fr}.owner-auth-card{padding:25px 19px}}
 </style>
+
 <script>
 (function(){
-  const choice=document.getElementById('ownerAuthChoice');
-  document.getElementById('chooseOwnerLogin').onclick=()=>showLoginForm();
-  document.getElementById('chooseOwnerSignup').onclick=()=>showSignupForm();
-  document.getElementById('signupBack').onclick=()=>{hideSignupForm();showOwnerLogin();};
-  document.getElementById('signupSubmit').onclick=ownerSignup;
-  document.getElementById('signupConfirm').addEventListener('keydown',e=>{if(e.key==='Enter')ownerSignup();});
-  document.getElementById('signupSlug').addEventListener('input',e=>{
-    e.target.value=e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-+|-+$/g,'');
+  const choice = document.getElementById('ownerAuthChoice');
+  const home = document.getElementById('ownerAuthHome');
+  const login = document.getElementById('ownerLoginBox');
+  const signup = document.getElementById('ownerSignupBox');
+
+  function showHome(){choice.style.display='flex';home.style.display='block';login.style.display='none';signup.style.display='none';}
+  function showLogin(){choice.style.display='flex';home.style.display='none';login.style.display='block';signup.style.display='none';}
+  function showSignup(){choice.style.display='flex';home.style.display='none';login.style.display='none';signup.style.display='block';}
+  function closeAuth(){choice.style.display='none';}
+
+  document.getElementById('chooseOwnerLogin').onclick=showLogin;
+  document.getElementById('chooseOwnerSignup').onclick=showSignup;
+  document.getElementById('backFromLogin').onclick=showHome;
+  document.getElementById('backFromSignup').onclick=showHome;
+  document.getElementById('switchToSignup').onclick=showSignup;
+  document.getElementById('switchToLogin').onclick=showLogin;
+
+  async function getSupabaseClient(){
+    if(window.supabaseClient) return window.supabaseClient;
+    if(window.supabase && typeof window.supabase.createClient==='function'){
+      window.supabaseClient=window.supabase.createClient(
+        "https://pfsrpowopbrevocwsuii.supabase.co",
+        "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE"
+      );
+      return window.supabaseClient;
+    }
+    return null;
+  }
+
+  document.getElementById('ownerSeparateLoginForm').addEventListener('submit',async function(e){
+    e.preventDefault();
+    const err=document.getElementById('ownerLoginError'); err.textContent='';
+    const sb=await getSupabaseClient();
+    if(!sb){err.textContent='Supabase connection not available.';return;}
+    const {error}=await sb.auth.signInWithPassword({
+      email:document.getElementById('ownerLoginEmail').value.trim(),
+      password:document.getElementById('ownerLoginPassword').value
+    });
+    if(error){err.textContent=error.message;return;}
+    closeAuth();
+    location.reload();
+  });
+
+  document.getElementById('ownerSeparateSignupForm').addEventListener('submit',async function(e){
+    e.preventDefault();
+    const err=document.getElementById('ownerSignupError'); err.textContent='';
+    const password=document.getElementById('ownerSignupPassword').value;
+    const confirm=document.getElementById('ownerSignupConfirm').value;
+    if(password!==confirm){err.textContent='Passwords do not match.';return;}
+    const sb=await getSupabaseClient();
+    if(!sb){err.textContent='Supabase connection not available.';return;}
+
+    const name=document.getElementById('ownerSignupName').value.trim();
+    const phone=document.getElementById('ownerSignupPhone').value.trim();
+    const email=document.getElementById('ownerSignupEmail').value.trim();
+    const restaurant=document.getElementById('ownerSignupRestaurant').value.trim();
+    const address=document.getElementById('ownerSignupAddress').value.trim();
+    const slug=document.getElementById('ownerSignupSlug').value.trim().toLowerCase()
+      .replace(/[^a-z0-9-]+/g,'-').replace(/^-+|-+$/g,'');
+
+    const {data,error}=await sb.auth.signUp({
+      email,password,
+      options:{data:{full_name:name,phone:phone,role:'owner'}}
+    });
+    if(error){err.textContent=error.message;return;}
+
+    // If email confirmation is disabled, session is immediately available.
+    // If enabled, the restaurant insert will happen after the user logs in.
+    if(data.user && data.session){
+      const {data:existing,error:checkErr}=await sb.from('restaurants').select('id').eq('slug',slug).maybeSingle();
+      if(checkErr){err.textContent=checkErr.message;return;}
+      if(existing){err.textContent='This Menu Slug is already in use.';return;}
+      const {error:restaurantErr}=await sb.from('restaurants').insert({
+        owner_id:data.user.id,name:restaurant,slug,phone,address,
+        status:'pending',plan:'free',subscription_status:'inactive'
+      });
+      if(restaurantErr){err.textContent=restaurantErr.message;return;}
+      closeAuth(); location.reload();
+    }else{
+      err.style.color='#166534';
+      err.textContent='Account created. Please verify your email, then use Login.';
+      setTimeout(showLogin,1400);
+    }
+  });
+
+  window.showOwnerAuthChoice=showHome;
+  window.hideOwnerAuthChoice=closeAuth;
+
+  // Existing dashboard auth code can set this flag if it knows the session state.
+  document.addEventListener('DOMContentLoaded',function(){
+    setTimeout(function(){
+      if(window.__ownerAuthenticated !== true){
+        showHome();
+      }
+    },300);
   });
 })();
 </script>
 
 </body>
 </html>
-<script>
-window.addEventListener('load',function(){
-  try{
-    if(window.__ownerAuthenticated === false || !document.querySelector('.sidebar, #dashboard, [data-dashboard]')){
-      if(typeof window.showOwnerAuthChoice==='function') window.showOwnerAuthChoice();
-    }
-  }catch(e){}
-});
-</script>
