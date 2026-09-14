@@ -1,998 +1,602 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#7b1e16" />
-  <title>Digital Menu</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#5b1116">
+<title>Restaurant Menu</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
-  <style>
-    :root {
-      --primary: #7b1e16;
-      --primary-dark: #5a140f;
-      --primary-soft: #fff4e8;
-      --accent: #c8943e;
-      --bg: #f5eee5;
-      --surface: #fffaf2;
-      --surface-2: #f7eee4;
-      --text: #4a281a;
-      --muted: #7d6558;
-      --border: #d9c39a;
-      --veg: #16a34a;
-      --nonveg: #dc2626;
-      --egg: #d97706;
-      --danger: #dc2626;
-      --radius: 18px;
-      --shadow: 0 10px 30px rgba(15, 23, 42, .06);
-      --font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
+<!-- Fonts / Icons -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: var(--font-family);
-      background: var(--bg);
-      color: var(--text);
-      padding-bottom: calc(24px + env(safe-area-inset-bottom));
-    }
+<style>
+:root{
+  --primary:#641219;
+  --primary-2:#8b2029;
+  --accent:#d8ad62;
+  --cream:#fffaf1;
+  --cream-2:#f7efdf;
+  --surface:#fffdf8;
+  --text:#241719;
+  --muted:#76676a;
+  --line:#eadfcd;
+  --success:#18864b;
+  --danger:#c73838;
+  --shadow:0 12px 35px rgba(60,28,20,.10);
+  --radius:18px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--text);font-family:"DM Sans",sans-serif}
+button,input{font:inherit}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+.hidden{display:none!important}
 
-    button, input { font: inherit; }
-    button { -webkit-tap-highlight-color: transparent; }
-    img { display: block; max-width: 100%; }
+/* Loader */
+#pageLoader{position:fixed;inset:0;background:var(--cream);z-index:9999;display:grid;place-items:center}
+.loaderBox{text-align:center;color:var(--primary)}
+.spinner{width:46px;height:46px;border:4px solid #eadcc5;border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:auto}
+.loaderBox p{font-weight:700;margin:14px 0 0}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-    .app-shell {
-      width: min(100%, 820px);
-      margin: 0 auto;
-    }
+/* Hero */
+.hero{min-height:480px;position:relative;overflow:hidden;background:#351012;color:#fff}
+.heroBg{position:absolute;inset:0;background:
+ linear-gradient(90deg,rgba(19,8,7,.90) 0%,rgba(19,8,7,.68) 38%,rgba(19,8,7,.20) 72%,rgba(19,8,7,.48)),
+ linear-gradient(180deg,rgba(0,0,0,.15),rgba(0,0,0,.45)),
+ url("") center/cover no-repeat;
+ transform:scale(1.01)}
+.heroInner{position:relative;max-width:1180px;margin:auto;min-height:480px;padding:20px 24px 54px;display:flex;flex-direction:column}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.brand{display:flex;align-items:center;gap:12px;min-width:210px}
+.brandLogo{width:58px;height:58px;border-radius:50%;object-fit:cover;border:2px solid var(--accent);background:#fff}
+.brandFallback{width:58px;height:58px;border-radius:50%;border:2px solid var(--accent);display:grid;place-items:center;background:rgba(255,255,255,.08);font-size:24px}
+.brandName{font-family:"Cormorant Garamond",serif;font-size:28px;font-weight:700;line-height:.9}
+.brandTag{font-size:9px;letter-spacing:2px;text-transform:uppercase;opacity:.85;margin-top:6px}
+.navLinks{display:flex;gap:28px;align-items:center}
+.navLinks a{font-size:14px;font-weight:600;padding:10px 0;border-bottom:2px solid transparent}
+.navLinks a:hover,.navLinks a.active{color:#f5cc7c;border-bottom-color:#f5cc7c}
+.phoneBtn{background:#fff;color:#201618;border-radius:28px;padding:11px 17px;font-weight:800;white-space:nowrap}
+.heroContent{margin-top:auto;max-width:650px;padding-top:80px}
+.script{font-family:"Great Vibes",cursive;font-size:42px;color:#f2c66e;line-height:1}
+.hero h1{font-family:"Cormorant Garamond",serif;font-size:70px;line-height:.88;margin:8px 0 12px}
+.heroSubtitle{font-size:14px;letter-spacing:3px;font-weight:800;text-transform:uppercase}
+.heroFeatures{display:flex;gap:18px;flex-wrap:wrap;margin-top:24px;font-size:13px}
+.heroFeatures span{display:flex;align-items:center;gap:7px}
+.heroFeatures i{color:#f3c56a}
+.heroQuote{font-family:"Great Vibes",cursive;font-size:31px;transform:rotate(-4deg);margin-top:28px;color:#fff}
 
-    /* HERO */
-    .hero {
-      position: relative;
-      min-height: 190px;
-      background:
-        linear-gradient(135deg, color-mix(in srgb, var(--primary) 94%, black 6%), var(--primary-dark));
-      overflow: hidden;
-      color: #fff;
-    }
+/* Info strip */
+.infoStrip{background:#fff;box-shadow:0 2px 15px rgba(0,0,0,.08);position:relative;z-index:2}
+.infoInner{max-width:1180px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 20px}
+.infoGroup{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.infoItem{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;padding-right:16px;border-right:1px solid #ded6cb}
+.infoItem:last-child{border-right:0}
+.openBadge{background:#19884e;color:white;border-radius:18px;padding:6px 12px}
+.closedBadge{background:#b93838;color:#fff;border-radius:18px;padding:6px 12px}
+.serviceList{display:flex;gap:20px;font-size:13px;font-weight:600}
+.serviceList span{display:flex;gap:7px;align-items:center}
 
-    .hero::before,
-    .hero::after {
-      content: "";
-      position: absolute;
-      border-radius: 999px;
-      background: rgba(255,255,255,.08);
-      pointer-events: none;
-    }
-    .hero::before { width: 190px; height: 190px; right: -70px; top: -65px; }
-    .hero::after { width: 120px; height: 120px; left: -40px; bottom: -55px; }
+/* Main */
+main{max-width:1180px;margin:auto;padding:26px 18px 55px}
+.searchWrap{max-width:600px;margin:0 auto 20px;position:relative}
+.searchWrap i{position:absolute;left:20px;top:50%;transform:translateY(-50%);font-size:18px;color:#7a6c6d}
+#search{width:100%;height:52px;border:1px solid #e3d9ca;background:#fff;border-radius:28px;padding:0 48px;font-size:14px;outline:none;box-shadow:0 5px 18px rgba(64,31,20,.06)}
+#search:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(216,173,98,.14)}
+.clearSearch{position:absolute;right:17px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#8d7f7f;cursor:pointer}
 
-    .hero-cover {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: .22;
-    }
+.categories{display:flex;gap:10px;overflow:auto;padding:3px 2px 17px;scrollbar-width:none;position:sticky;top:0;z-index:20;background:linear-gradient(var(--cream) 80%,transparent)}
+.categories::-webkit-scrollbar{display:none}
+.catBtn{border:1px solid var(--line);background:#fffaf2;min-width:91px;padding:10px 13px;border-radius:15px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;color:#4e3b3d;transition:.2s}
+.catBtn i{font-size:18px;color:var(--primary)}
+.catBtn small{font-size:11px;font-weight:700;white-space:nowrap}
+.catBtn.active{background:var(--primary);border-color:var(--primary);color:#fff;box-shadow:0 8px 20px rgba(100,18,25,.18)}
+.catBtn.active i{color:#f2c56b}
 
-    .hero-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.44));
-    }
+/* Menu grid */
+.menuGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.menuSection{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);scroll-margin-top:75px}
+.sectionHead{background:linear-gradient(135deg,var(--primary),#3d0b10);color:#fff;padding:13px 15px;display:flex;align-items:center;gap:10px}
+.sectionIcon{width:35px;height:35px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.12);color:#f4c66c;flex:0 0 auto}
+.sectionTitle{font-family:"Cormorant Garamond",serif;font-size:23px;font-weight:700;letter-spacing:.3px;flex:1}
+.portionHeads{display:grid;grid-template-columns:repeat(3,58px);gap:3px;text-align:center;color:#f5d17e;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+.portionHeads.one{grid-template-columns:68px}
+.menuRows{padding:0 14px}
+.menuRow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:12px 2px;border-bottom:1px dashed #e8dccb;align-items:center}
+.menuRow:last-child{border-bottom:0}
+.itemMain{min-width:0}
+.itemTitle{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:700;line-height:1.25}
+.itemName{overflow-wrap:anywhere}
+.itemDesc{font-size:11px;color:var(--muted);line-height:1.35;margin-top:4px}
+.itemTags{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.tag{font-size:9px;font-weight:800;padding:3px 6px;border-radius:8px;background:#f8e7ca;color:#7a4c13}
+.tag.best{background:#fae0a0;color:#7a4b00}
+.tag.hot{background:#ffe1de;color:#a52d24}
+.foodDot{width:14px;height:14px;border:1.5px solid #18a354;border-radius:3px;position:relative;flex:0 0 auto}
+.foodDot:after{content:"";width:6px;height:6px;background:#18a354;border-radius:50%;position:absolute;left:2.5px;top:2.5px}
+.foodDot.nv{border-color:#c83434}.foodDot.nv:after{background:#c83434;border-radius:0;clip-path:polygon(50% 0,100% 100%,0 100%)}
+.foodDot.egg{border-color:#d98c18}.foodDot.egg:after{background:#d98c18}
+.prices{display:grid;grid-template-columns:repeat(3,58px);gap:3px;align-items:center}
+.prices.one{grid-template-columns:68px}
+.price{min-width:0;text-align:center;font-size:13px;font-weight:800;color:var(--primary)}
+.price.empty{color:#b9acad;font-weight:500}
+.price small{font-size:9px;color:var(--muted);font-weight:700}
 
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      min-height: 190px;
-      display: flex;
-      align-items: flex-end;
-      gap: 14px;
-      padding: 22px 16px 18px;
-    }
+/* No results */
+.emptyState{grid-column:1/-1;text-align:center;padding:55px 20px;background:#fff;border:1px dashed var(--line);border-radius:18px;color:var(--muted)}
+.emptyState i{font-size:35px;color:#cbb9a0;margin-bottom:12px}
+.emptyState h3{margin:0;color:var(--text)}
 
-    .logo-wrap {
-      width: 68px;
-      height: 68px;
-      border-radius: 18px;
-      flex: 0 0 auto;
-      background: rgba(255,255,255,.96);
-      border: 3px solid rgba(255,255,255,.65);
-      box-shadow: 0 8px 24px rgba(0,0,0,.2);
-      overflow: hidden;
-      display: grid;
-      place-items: center;
-      color: var(--primary);
-    }
+/* About / gallery / contact */
+.infoGrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}
+.infoCard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow)}
+.infoCard h2{font-family:"Cormorant Garamond",serif;font-size:30px;color:var(--primary);margin:0 0 8px}
+.infoCard p{font-size:13px;line-height:1.7;color:var(--muted);margin:0}
+.hoursRow{display:flex;justify-content:space-between;border-bottom:1px dashed var(--line);padding:8px 0;font-size:13px}
+.hoursRow:last-child{border:0}
+.actionRow{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}
+.action{padding:10px 14px;border-radius:11px;background:var(--cream-2);font-size:12px;font-weight:800}
+.action.primary{background:var(--primary);color:#fff}
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:18px}
+.gallery img{height:150px;width:100%;object-fit:cover;border-radius:13px}
 
-    .logo-wrap img { width: 100%; height: 100%; object-fit: cover; }
-    .logo-fallback svg { width: 30px; height: 30px; }
+/* CTA/footer */
+.cta{margin-top:24px;background:linear-gradient(135deg,#4a0d12,#7e1b25);color:#fff;border-radius:18px;padding:22px 25px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.cta h2{font-family:"Cormorant Garamond",serif;font-size:31px;margin:0}
+.cta p{margin:4px 0 0;font-size:12px;opacity:.9}
+.cta a{background:#f2c56b;color:#321416;border-radius:11px;padding:11px 15px;font-size:12px;font-weight:900;white-space:nowrap}
+footer{background:#2a1214;color:#eee;padding:32px 18px}
+.footerInner{max-width:1180px;margin:auto;display:flex;justify-content:space-between;gap:30px;align-items:center}
+.footerBrand{font-family:"Cormorant Garamond",serif;font-size:30px;font-weight:700}
+.footerTag{font-size:9px;letter-spacing:2px;color:#d7bf91}
+.footerLinks{display:flex;gap:17px;font-size:12px}
+.socials{display:flex;gap:9px}
+.socials a{width:35px;height:35px;border:1px solid #675052;border-radius:50%;display:grid;place-items:center}
 
-    .hero-info { min-width: 0; flex: 1; }
-    .restaurant-name {
-      margin: 0;
-      font-size: clamp(22px, 5vw, 30px);
-      line-height: 1.1;
-      font-weight: 850;
-      letter-spacing: -.5px;
-      text-shadow: 0 2px 10px rgba(0,0,0,.2);
-    }
+/* Mobile */
+@media(max-width:820px){
+ .hero,.heroInner{min-height:450px}.hero h1{font-size:54px}.navLinks{display:none}.phoneBtn{font-size:12px}
+ .heroContent{padding-top:60px}.script{font-size:35px}
+ .infoInner{align-items:flex-start;flex-direction:column}.serviceList{gap:13px;flex-wrap:wrap}
+ .menuGrid{grid-template-columns:1fr}.infoGrid{grid-template-columns:1fr}.gallery{grid-template-columns:repeat(2,1fr)}
+ .gallery img{height:135px}.cta{flex-direction:column;align-items:flex-start}
+ .footerInner{flex-direction:column;align-items:flex-start}
+}
+@media(max-width:520px){
+ main{padding:18px 10px 45px}.heroInner{padding-left:16px;padding-right:16px}.hero h1{font-size:47px}
+ .brandName{font-size:24px}.brandLogo,.brandFallback{width:50px;height:50px}
+ .phoneBtn{padding:9px 11px}.phoneBtn span{display:none}
+ .heroFeatures{gap:10px;font-size:11px}.heroQuote{font-size:27px}
+ .infoInner{padding:11px 12px}.infoItem{padding-right:9px;font-size:11px}.serviceList{font-size:11px}
+ .categories{margin-left:-2px;margin-right:-2px}.catBtn{min-width:78px;padding:9px 9px}
+ .sectionTitle{font-size:21px}.portionHeads,.prices{grid-template-columns:repeat(3,51px)}.portionHeads.one,.prices.one{grid-template-columns:60px}
+ .menuRows{padding:0 10px}.menuRow{padding:11px 1px}.itemTitle{font-size:13px}.itemDesc{font-size:10px}.price{font-size:12px}
+}
 
-    .restaurant-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px 10px;
-      margin-top: 8px;
-      font-size: 12.5px;
-      color: rgba(255,255,255,.9);
-    }
-
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 9px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.16);
-      backdrop-filter: blur(8px);
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; }
-    .status-badge.closed .status-dot { background: #f87171; }
-
-    .hero-action {
-      flex: 0 0 auto;
-      width: 42px;
-      height: 42px;
-      border: 1px solid rgba(255,255,255,.32);
-      border-radius: 14px;
-      background: rgba(255,255,255,.16);
-      color: #fff;
-      display: none;
-      place-items: center;
-      text-decoration: none;
-      backdrop-filter: blur(10px);
-    }
-
-    /* STICKY CONTROL AREA */
-    .sticky-panel {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: color-mix(in srgb, var(--bg) 90%, transparent);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
-      padding: 10px 12px 8px;
-    }
-
-    .search-wrap {
-      position: relative;
-      display: flex;
-      align-items: center;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      box-shadow: 0 4px 16px rgba(15,23,42,.04);
-      overflow: hidden;
-    }
-
-    .search-icon {
-      width: 42px;
-      height: 42px;
-      display: grid;
-      place-items: center;
-      color: var(--muted);
-      flex: 0 0 auto;
-    }
-
-    #menu-search {
-      width: 100%;
-      height: 44px;
-      border: 0;
-      outline: 0;
-      background: transparent;
-      color: var(--text);
-      padding: 0 12px 0 0;
-      font-size: 14px;
-    }
-    #menu-search::placeholder { color: #9ca3af; }
-
-    .category-scroll {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-top: 9px;
-      scrollbar-width: none;
-      overscroll-behavior-inline: contain;
-    }
-    .category-scroll::-webkit-scrollbar { display: none; }
-
-    .cat-chip {
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--muted);
-      min-height: 34px;
-      padding: 7px 13px;
-      border-radius: 999px;
-      white-space: nowrap;
-      font-size: 12.5px;
-      font-weight: 750;
-      cursor: pointer;
-      transition: .18s ease;
-    }
-    .cat-chip.active {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: #fff;
-      box-shadow: 0 5px 14px color-mix(in srgb, var(--primary) 22%, transparent);
-    }
-
-    /* CONTENT */
-    .menu-wrap { padding: 14px 12px 30px; }
-
-    .summary-line {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin: 2px 2px 12px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .category-section {
-      scroll-margin-top: 110px;
-      margin-bottom: 20px;
-    }
-
-    .category-heading {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin: 0 2px 9px;
-    }
-
-    .category-title {
-      margin: 0;
-      font-size: 18px;
-      line-height: 1.2;
-      font-weight: 850;
-      letter-spacing: -.2px;
-    }
-    .item-count {
-      color: var(--muted);
-      font-size: 11.5px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .items-list {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-    }
-
-    .menu-item {
-      position: relative;
-      display: flex;
-      gap: 13px;
-      padding: 14px;
-      border-bottom: 1px solid var(--border);
-      transition: background .2s ease;
-    }
-    .menu-item:last-child { border-bottom: 0; }
-    .menu-item:active { background: var(--surface-2); }
-    .menu-item.unavailable { opacity: .58; }
-
-    .item-content { flex: 1; min-width: 0; }
-    .item-main-row { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
-    .item-info { flex: 1; min-width: 0; }
-    .item-topline { display: flex; align-items: flex-start; gap: 7px; }
-
-    /* Menu-style right-aligned portion columns */
-    .item-price-area {
-      flex: 0 0 158px;
-      width: 158px;
-      align-self: flex-start;
-      margin-left: auto;
-    }
-    .price-header {
-      display: grid;
-      grid-template-columns: repeat(3, 45px);
-      gap: 5px;
-      justify-content: end;
-      margin-bottom: 5px;
-      color: var(--text);
-      font-size: 10px;
-      line-height: 1;
-      font-weight: 850;
-      text-transform: uppercase;
-      letter-spacing: .45px;
-      text-align: center;
-    }
-    .price-header.single { grid-template-columns: 58px; }
-    .portion-prices {
-      display: grid;
-      grid-template-columns: repeat(3, 45px);
-      gap: 5px;
-      justify-content: end;
-      align-items: center;
-    }
-    .portion-price {
-      width: 45px;
-      min-width: 45px;
-      padding: 2px 0;
-      text-align: center;
-      border: 0;
-      background: transparent;
-      border-radius: 0;
-      color: var(--primary);
-      font-weight: 850;
-    }
-    .portion-price.empty {
-      background: transparent;
-      border: 0;
-      color: #cbbdaf;
-    }
-    .portion-price .label { display: none; }
-    .portion-price .amount {
-      margin-top: 0;
-      font-size: 13px;
-      line-height: 1.25;
-      white-space: nowrap;
-    }
-    .single-price-area { display: flex; justify-content: flex-end; }
-    .single-price {
-      margin-top: 0;
-      width: 58px;
-      padding: 2px 0;
-      border: 0;
-      background: transparent;
-      border-radius: 0;
-      color: var(--primary);
-      font-size: 13px;
-      font-weight: 850;
-      text-align: center;
-      white-space: nowrap;
-    }
-
-    .food-symbol {
-      width: 15px;
-      height: 15px;
-      margin-top: 2px;
-      border-radius: 3px;
-      display: grid;
-      place-items: center;
-      flex: 0 0 auto;
-    }
-    .food-symbol::after { content: ""; width: 7px; height: 7px; border-radius: 50%; }
-    .food-symbol.veg { border: 1.6px solid var(--veg); }
-    .food-symbol.veg::after { background: var(--veg); }
-    .food-symbol.nonveg { border: 1.6px solid var(--nonveg); }
-    .food-symbol.nonveg::after { background: var(--nonveg); border-radius: 1px; transform: rotate(45deg); width: 6px; height: 6px; }
-    .food-symbol.egg { border: 1.6px solid var(--egg); }
-    .food-symbol.egg::after { background: var(--egg); }
-
-    .item-name {
-      margin: 0;
-      font-size: 15.5px;
-      line-height: 1.25;
-      font-weight: 790;
-      color: var(--text);
-    }
-
-    .item-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin-top: 7px;
-    }
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      min-height: 20px;
-      padding: 3px 7px;
-      border-radius: 999px;
-      font-size: 10px;
-      line-height: 1;
-      font-weight: 800;
-      background: var(--primary-soft);
-      color: var(--primary-dark);
-    }
-    .tag.out { background: #fef2f2; color: #b91c1c; }
-    .tag.hot { background: #fff7ed; color: #c2410c; }
-
-    .item-desc {
-      margin: 7px 0 0;
-      color: var(--muted);
-      font-size: 12.5px;
-      line-height: 1.45;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .item-image-wrap {
-      position: relative;
-      width: 92px;
-      height: 92px;
-      flex: 0 0 92px;
-      border-radius: 14px;
-      overflow: hidden;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-    }
-    .item-image { width: 100%; height: 100%; object-fit: cover; }
-    .img-placeholder {
-      width: 100%; height: 100%;
-      display: grid; place-items: center;
-      color: #9ca3af;
-      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    }
-    .img-placeholder svg { width: 26px; height: 26px; }
-
-    /* Warm printed-menu card styling */
-    .category-section { margin-bottom: 18px; }
-    .category-heading {
-      margin: 0;
-      padding: 11px 14px;
-      background: var(--primary);
-      border-radius: 15px 15px 0 0;
-      color: #fffaf2;
-    }
-    .category-title {
-      color: #fffaf2;
-      font-size: 17px;
-      text-transform: uppercase;
-      letter-spacing: .35px;
-    }
-    .item-count { color: rgba(255,250,242,.78); }
-    .items-list {
-      border: 1px solid var(--border);
-      border-top: 0;
-      border-radius: 0 0 15px 15px;
-      background: var(--surface);
-      box-shadow: 0 4px 12px rgba(90,20,15,.07);
-    }
-    .menu-item {
-      padding: 11px 13px;
-      border-bottom: 1px dashed #e2cda9;
-      background: var(--surface);
-    }
-    .menu-item:last-child { border-bottom: 0; }
-    .item-name { color: #6b174b; font-size: 14.5px; }
-    .item-desc { color: #8a7668; }
-    .price-header { color: #5a321e; }
-    .summary-line { color: var(--muted); }
-
-    @media (max-width: 560px) {
-      .menu-item { padding: 10px 10px; gap: 8px; }
-      .item-main-row { gap: 6px; }
-      .item-price-area { flex-basis: 151px; width: 151px; }
-      .price-header, .portion-prices { grid-template-columns: repeat(3, 43px); gap: 4px; }
-      .portion-price { width: 43px; min-width: 43px; }
-      .price-header.single { grid-template-columns: 55px; }
-      .single-price { width: 55px; }
-      .item-name { font-size: 14px; }
-      .portion-price .amount, .single-price { font-size: 12px; }
-    }
-
-    /* STATES */
-    .state-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 34px 20px;
-      text-align: center;
-      box-shadow: var(--shadow);
-      color: var(--muted);
-    }
-    .state-card strong { display: block; color: var(--text); font-size: 17px; margin-bottom: 5px; }
-
-    .skeleton {
-      overflow: hidden;
-      position: relative;
-      background: #e9edf2;
-      border-radius: 10px;
-    }
-    .skeleton::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      transform: translateX(-100%);
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.65), transparent);
-      animation: shimmer 1.25s infinite;
-    }
-    @keyframes shimmer { 100% { transform: translateX(100%); } }
-
-    .loading-list {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-    .loading-row { display: flex; gap: 12px; padding: 14px; border-bottom: 1px solid var(--border); }
-    .loading-row:last-child { border-bottom: 0; }
-    .sk-line { height: 12px; margin-bottom: 8px; }
-    .sk-title { width: 58%; height: 15px; }
-    .sk-text { width: 85%; }
-    .sk-price { width: 35%; }
-    .sk-img { width: 90px; height: 90px; flex: 0 0 90px; }
-
-    .footer-note {
-      text-align: center;
-      color: #9ca3af;
-      font-size: 11px;
-      padding: 8px 16px 0;
-    }
-
-    @media (min-width: 640px) {
-      body { padding-top: 18px; }
-      .app-shell {
-        border-radius: 24px;
-        overflow: hidden;
-        box-shadow: 0 20px 60px rgba(15,23,42,.08);
-      }
-      .hero, .hero-content { min-height: 220px; }
-      .hero-content { padding: 28px 24px 22px; }
-      .sticky-panel { padding-inline: 18px; }
-      .menu-wrap { padding-inline: 18px; }
-      .menu-item { padding: 16px; }
-      .item-image-wrap { width: 110px; height: 100px; flex-basis: 110px; }
-    }
-  </style>
+/* Toast */
+#toast{position:fixed;left:50%;bottom:20px;transform:translate(-50%,20px);background:#241719;color:#fff;padding:11px 15px;border-radius:12px;font-size:12px;font-weight:700;opacity:0;pointer-events:none;transition:.25s;z-index:999}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
 </head>
+
 <body>
-  <div class="app-shell">
+<div id="pageLoader"><div class="loaderBox"><div class="spinner"></div><p>Loading menu...</p></div></div>
 
-    <header class="hero" id="hero">
-      <img id="rest-cover" class="hero-cover" alt="" style="display:none;" />
-      <div class="hero-overlay"></div>
-
-      <div class="hero-content">
-        <div class="logo-wrap" id="logo-container">
-          <div class="logo-fallback" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/>
-            </svg>
-          </div>
-        </div>
-
-        <div class="hero-info">
-          <h1 id="rest-name" class="restaurant-name">Loading Menu...</h1>
-          <div class="restaurant-meta">
-            <span id="rest-status" class="status-badge">
-              <span class="status-dot"></span>
-              <span>Open</span>
-            </span>
-            <span id="rest-address" style="display:none;"></span>
-          </div>
-        </div>
-
-        <a id="rest-call-btn" class="hero-action" href="#" aria-label="Call restaurant">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24c1.12.37 2.33.57 3.57.57A1 1 0 0121 16.5V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1.02l-2.2 2.2z"/>
-          </svg>
-        </a>
+<header class="hero" id="home">
+  <div class="heroBg" id="heroBg"></div>
+  <div class="heroInner">
+    <nav class="nav">
+      <a href="#home" class="brand">
+        <div id="brandLogo"></div>
+        <div><div class="brandName" id="brandName">Restaurant</div><div class="brandTag">Good Food • Happy Mood</div></div>
+      </a>
+      <div class="navLinks">
+        <a href="#menu" class="active">Menu</a>
+        <a href="#gallery" id="galleryNav">Gallery</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
       </div>
-    </header>
+      <a href="#" id="heroPhone" class="phoneBtn"><i class="fa-solid fa-phone"></i> <span>Call Restaurant</span></a>
+    </nav>
 
-    <section class="sticky-panel">
-      <div class="search-wrap">
-        <div class="search-icon" aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="7"></circle>
-            <path d="m20 20-3.5-3.5"></path>
-          </svg>
-        </div>
-        <input id="menu-search" type="search" placeholder="Search food or category..." autocomplete="off" />
+    <div class="heroContent">
+      <div class="script">Welcome to</div>
+      <h1 id="heroName">Our Restaurant</h1>
+      <div class="heroSubtitle" id="heroSubtitle">The Taste You'll Love</div>
+      <div class="heroFeatures">
+        <span><i class="fa-solid fa-leaf"></i> Pure Veg & Non-Veg</span>
+        <span><i class="fa-solid fa-hat-chef"></i> Hygienic Food</span>
+        <span><i class="fa-solid fa-heart"></i> Great Taste</span>
       </div>
-      <div class="category-scroll" id="category-chips"></div>
-    </section>
+      <div class="heroQuote">Good Food<br><span style="margin-left:55px">Good Mood</span></div>
+    </div>
+  </div>
+</header>
 
-    <main class="menu-wrap">
-      <div id="summary-line" class="summary-line" style="display:none;"></div>
-      <div id="menu-sections"></div>
-      <div class="footer-note">Digital menu • Prices may be subject to change</div>
-    </main>
+<section class="infoStrip">
+  <div class="infoInner">
+    <div class="infoGroup">
+      <span id="openStatus" class="openBadge"><i class="fa-solid fa-circle" style="font-size:7px"></i> Open Now</span>
+      <span class="infoItem"><i class="fa-regular fa-clock"></i><span id="hoursText">11:00 AM - 11:00 PM</span></span>
+      <span class="infoItem" id="addressWrap"><i class="fa-solid fa-location-dot"></i><span id="addressText">Restaurant Address</span></span>
+    </div>
+    <div class="serviceList">
+      <span id="dineIn"><i class="fa-solid fa-utensils"></i> Dine In</span>
+      <span id="takeaway"><i class="fa-solid fa-bag-shopping"></i> Takeaway</span>
+      <span id="delivery"><i class="fa-solid fa-motorcycle"></i> Home Delivery</span>
+    </div>
+  </div>
+</section>
+
+<main id="menu">
+  <div class="searchWrap">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input id="search" type="search" placeholder="Search for dishes (e.g. Biryani, Paneer, Soup...)">
+    <button class="clearSearch hidden" id="clearSearch" aria-label="Clear search"><i class="fa-solid fa-xmark"></i></button>
   </div>
 
-  <script>
-    /* =========================================================
-       SUPABASE CONFIG
-       Keep RLS enabled in Supabase. An anon/public key is safe to
-       expose only when your database policies are configured correctly.
-    ========================================================== */
-    const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <div class="categories" id="categories"></div>
+  <div class="menuGrid" id="menuGrid"></div>
 
-    let restaurant = null;
-    let allItems = [];
-    let currentCategory = "all";
-    let searchText = "";
+  <section class="infoGrid" id="aboutSection">
+    <article class="infoCard" id="about">
+      <h2>About Us</h2>
+      <p id="aboutText">Fresh ingredients, delicious food and a warm dining experience.</p>
+      <div class="actionRow">
+        <a id="mapBtn" class="action primary" href="#" target="_blank"><i class="fa-solid fa-location-dot"></i> Get Directions</a>
+        <a id="whatsappBtn" class="action" href="#" target="_blank"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+      </div>
+    </article>
+    <article class="infoCard" id="contact">
+      <h2>Visit Us</h2>
+      <div id="hoursList"></div>
+      <div class="actionRow">
+        <a id="callBtn" class="action primary" href="#"><i class="fa-solid fa-phone"></i> Call Now</a>
+        <a id="emailBtn" class="action hidden" href="#"><i class="fa-regular fa-envelope"></i> Email</a>
+      </div>
+    </article>
+  </section>
 
-    const $ = (id) => document.getElementById(id);
+  <section id="gallery" class="infoCard" style="margin-top:18px">
+    <h2>Gallery</h2>
+    <div class="gallery" id="galleryGrid"></div>
+  </section>
 
-    function escapeHTML(value = "") {
-      return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
+  <div class="cta">
+    <div><h2>Hungry?</h2><p>Call now for takeaway, table booking or home delivery.</p></div>
+    <a id="ctaPhone" href="#"><i class="fa-solid fa-phone"></i> Call Restaurant</a>
+  </div>
+</main>
 
-    function safeUrl(value) {
-      if (!value) return "";
-      try {
-        const url = new URL(value, window.location.origin);
-        if (["http:", "https:"].includes(url.protocol)) return url.href;
-      } catch (_) {}
-      return "";
-    }
+<footer>
+  <div class="footerInner">
+    <div>
+      <div class="footerBrand" id="footerName">Restaurant</div>
+      <div class="footerTag">GOOD FOOD • HAPPY MOOD</div>
+    </div>
+    <div class="footerLinks"><a href="#menu">Menu</a><a href="#gallery">Gallery</a><a href="#about">About</a><a href="#contact">Contact</a></div>
+    <div class="socials" id="socials"></div>
+  </div>
+</footer>
 
-    function cssColor(value, fallback) {
-      if (!value) return fallback;
-      const test = document.createElement("span");
-      test.style.color = "";
-      test.style.color = value;
-      return test.style.color ? value : fallback;
-    }
+<div id="toast"></div>
 
-    function applyRestaurantTheme(rest) {
-      const root = document.documentElement.style;
+<script>
+/* ==========================================================
+   SUPABASE CONFIG — SAME PROJECT FROM YOUR EXISTING MENU
+   ========================================================== */
+const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      // These fields are OPTIONAL. If your table does not have them,
-      // the fallback colors below will be used automatically.
-      const primary = cssColor(rest.primary_color || rest.theme_primary, "#0f766e");
-      const primaryDark = cssColor(rest.primary_dark || rest.theme_primary_dark, "#115e59");
-      const bg = cssColor(rest.background_color || rest.theme_background, "#f6f7f9");
-      const surface = cssColor(rest.card_color || rest.theme_card, "#ffffff");
-      const text = cssColor(rest.text_color || rest.theme_text, "#111827");
+/* URL: /menu.html?r=restaurant-slug */
+const params = new URLSearchParams(location.search);
+const slug = (params.get("r") || "").trim().toLowerCase();
 
-      root.setProperty("--primary", primary);
-      root.setProperty("--primary-dark", primaryDark);
-      root.setProperty("--bg", bg);
-      root.setProperty("--surface", surface);
-      root.setProperty("--text", text);
+let restaurant = null;
+let allItems = [];
+let grouped = {};
+let activeCategory = "All Menu";
 
-      const radius = Number(rest.card_radius || rest.theme_radius);
-      if (Number.isFinite(radius) && radius >= 0 && radius <= 40) {
-        root.setProperty("--radius", `${radius}px`);
-      }
+/* ---------- Safe helpers ---------- */
+function esc(value){
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[c]));
+}
+function val(obj,...keys){
+  for(const k of keys){
+    if(obj && obj[k] !== undefined && obj[k] !== null && String(obj[k]).trim() !== "") return obj[k];
+  }
+  return "";
+}
+function money(v){ return v !== "" && v !== null && v !== undefined ? "₹"+esc(v) : "—"; }
+function showToast(msg){
+  const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(showToast.t); showToast.t=setTimeout(()=>t.classList.remove("show"),2200);
+}
 
-      const metaTheme = document.querySelector('meta[name="theme-color"]');
-      if (metaTheme) metaTheme.setAttribute("content", primary);
-    }
+/* ---------- Theme ---------- */
+function applyTheme(r){
+  const root=document.documentElement;
+  const theme = r.theme || {};
+  const get=(...keys)=>val(r,...keys) || val(theme,...keys);
+  const primary=get("primary_color","primaryColor") || "#641219";
+  const primary2=get("primary_dark","primaryDark","secondary_color","secondaryColor") || "#8b2029";
+  const bg=get("background_color","backgroundColor") || "#fffaf1";
+  const card=get("card_color","cardColor") || "#fffdf8";
+  const text=get("text_color","textColor") || "#241719";
+  const accent=get("accent_color","accentColor") || "#d8ad62";
+  document.documentElement.style.setProperty("--primary",primary);
+  document.documentElement.style.setProperty("--primary-2",primary2);
+  document.documentElement.style.setProperty("--cream",bg);
+  document.documentElement.style.setProperty("--surface",card);
+  document.documentElement.style.setProperty("--text",text);
+  document.documentElement.style.setProperty("--accent",accent);
+  if(r.card_radius) document.documentElement.style.setProperty("--radius", r.card_radius+"px");
+}
 
-    function showLoading() {
-      $("menu-sections").innerHTML = `
-        <div class="loading-list" aria-label="Loading menu">
-          ${[1,2,3,4].map(() => `
-            <div class="loading-row">
-              <div style="flex:1; padding-top:4px;">
-                <div class="skeleton sk-title sk-line"></div>
-                <div class="skeleton sk-text sk-line"></div>
-                <div class="skeleton sk-price sk-line"></div>
-              </div>
-              <div class="skeleton sk-img"></div>
-            </div>
-          `).join("")}
-        </div>
-      `;
-    }
+/* ---------- Restaurant ---------- */
+function getLogo(r){
+  const logo=val(r,"logo_url","logo","logoUrl");
+  if(logo) return `<img class="brandLogo" src="${esc(logo)}" alt="${esc(r.name||"Restaurant")} logo" onerror="this.style.display='none'">`;
+  return `<div class="brandFallback"><i class="fa-solid fa-utensils"></i></div>`;
+}
+function setRestaurantUI(r){
+  const name=val(r,"name","restaurant_name","title") || "Restaurant";
+  const phone=val(r,"phone","phone_number","mobile");
+  const address=val(r,"address","full_address","location");
+  const about=val(r,"description","about","about_text","bio") || "Fresh ingredients, delicious food and a warm dining experience.";
+  const cover=val(r,"cover_url","cover_image","banner_url","banner_image","hero_image","coverImage");
 
-    function showState(title, message) {
-      $("menu-sections").innerHTML = `
-        <div class="state-card">
-          <strong>${escapeHTML(title)}</strong>
-          <span>${escapeHTML(message)}</span>
-        </div>
-      `;
-    }
+  applyTheme(r);
+  document.title = name + " — Digital Menu";
+  document.getElementById("brandName").textContent=name;
+  document.getElementById("heroName").textContent=name;
+  document.getElementById("footerName").textContent=name;
+  document.getElementById("brandLogo").innerHTML=getLogo(r);
+  document.getElementById("aboutText").textContent=about;
+  if(cover) document.getElementById("heroBg").style.backgroundImage =
+    `linear-gradient(90deg,rgba(19,8,7,.90) 0%,rgba(19,8,7,.68) 38%,rgba(19,8,7,.20) 72%,rgba(19,8,7,.48)),linear-gradient(180deg,rgba(0,0,0,.15),rgba(0,0,0,.45)),url("${String(cover).replace(/"/g,'\\"')}")`;
 
-    function logoFallback() {
-      return `
-        <div class="logo-fallback" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/>
-          </svg>
-        </div>
-      `;
-    }
+  if(phone){
+    const tel="tel:"+String(phone).replace(/[^\d+]/g,"");
+    ["heroPhone","callBtn","ctaPhone"].forEach(id=>document.getElementById(id).href=tel);
+    const waPhone=String(phone).replace(/\D/g,"");
+    document.getElementById("whatsappBtn").href="https://wa.me/"+waPhone;
+  }else{
+    document.getElementById("heroPhone").classList.add("hidden");
+    document.getElementById("callBtn").classList.add("hidden");
+    document.getElementById("ctaPhone").classList.add("hidden");
+    document.getElementById("whatsappBtn").classList.add("hidden");
+  }
 
-    function itemImageHTML(item) {
-      const imageUrl = safeUrl(item.image_url || item.photo_url || item.image);
-      if (!imageUrl) return "";
+  document.getElementById("addressText").textContent=address || "Restaurant Address";
+  if(!address) document.getElementById("addressWrap").classList.add("hidden");
+  if(address) document.getElementById("mapBtn").href="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(address);
 
-      return `
-        <div class="item-image-wrap">
-          <img class="item-image" src="${escapeHTML(imageUrl)}" alt="${escapeHTML(item.name || "Menu item")}" loading="lazy"
-               onerror="this.parentElement.innerHTML='<div class=&quot;img-placeholder&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot;><path d=&quot;M4 5h16v14H4z&quot;/><path d=&quot;m4 15 4-4 4 4 3-3 5 5&quot;/><circle cx=&quot;15&quot; cy=&quot;9&quot; r=&quot;1.5&quot;/></svg></div>'" />
-        </div>
-      `;
-    }
+  const email=val(r,"email","email_address");
+  if(email){document.getElementById("emailBtn").href="mailto:"+email;document.getElementById("emailBtn").classList.remove("hidden")}
 
-    function getItemType(item) {
-      if (String(item.item_type || "").toLowerCase() === "egg") return "egg";
-      if (String(item.item_type || "").toLowerCase() === "nonveg" || item.is_veg === false) return "nonveg";
-      return "veg";
-    }
+  const hours=val(r,"opening_hours","hours","timings","business_hours");
+  if(hours) document.getElementById("hoursText").textContent=typeof hours==="string"?hours:"See hours below";
+  renderHours(hours);
+  renderSocials(r);
+  setServices(r);
+}
+function setServices(r){
+  const serviceMap=[
+    ["dineIn","dine_in","dineIn","dine_in_available"],
+    ["takeaway","takeaway","take_away","takeaway_available"],
+    ["delivery","delivery","home_delivery","delivery_available"]
+  ];
+  serviceMap.forEach(([id,...keys])=>{
+    const raw=val(r,...keys);
+    if(raw!=="" && (raw===false || raw==="false" || raw===0 || raw==="0")) document.getElementById(id).classList.add("hidden");
+  });
+}
+function renderHours(raw){
+  const el=document.getElementById("hoursList");
+  if(!raw){el.innerHTML='<div class="hoursRow"><span>Restaurant Hours</span><strong>11:00 AM - 11:00 PM</strong></div>';return}
+  if(typeof raw==="object"){
+    el.innerHTML=Object.entries(raw).map(([d,h])=>`<div class="hoursRow"><span>${esc(d)}</span><strong>${esc(h)}</strong></div>`).join("");
+  }else{
+    el.innerHTML=`<div class="hoursRow"><span>Opening Hours</span><strong>${esc(raw)}</strong></div>`;
+  }
+}
+function renderSocials(r){
+  const socials=[
+    ["instagram","instagram_url","fa-brands fa-instagram"],
+    ["facebook","facebook_url","fa-brands fa-facebook-f"],
+    ["youtube","youtube_url","fa-brands fa-youtube"],
+    ["website","website_url","fa-solid fa-globe"]
+  ];
+  document.getElementById("socials").innerHTML=socials.map(([name,key,icon])=>{
+    const u=val(r,key,name+"_url",name);
+    return u?`<a href="${esc(u)}" target="_blank" rel="noopener" aria-label="${name}"><i class="${icon}"></i></a>`:"";
+  }).join("");
+}
 
-    function isUnavailable(item) {
-      return item.is_available === false || item.available === false || item.status === "unavailable" || item.status === "out_of_stock";
-    }
-
-    function renderPrice(item) {
-      const qtr = item.price_quarter;
-      const half = item.price_half;
-      const full = item.price_full || item.price;
-      const hasPortions = qtr || half || item.price_full;
-
-      if (hasPortions) {
-        const portions = [
-          ["Qtr", qtr],
-          ["Half", half],
-          ["Full", full]
-        ];
-
-        return `
-          <div class="price-header" aria-hidden="true">
-            <span>Qtr</span><span>Half</span><span>Full</span>
-          </div>
-          <div class="portion-prices">
-            ${portions.map(([label, value]) => `
-              <div class="portion-price ${value === null || value === undefined || value === "" ? "empty" : ""}">
-                <span class="amount">${value !== null && value !== undefined && value !== "" ? `₹${escapeHTML(value)}` : "—"}</span>
-              </div>
-            `).join("")}
-          </div>
-        `;
-      }
-
-      const single = item.price ?? item.price_full ?? item.price_half ?? item.price_quarter;
-      return single !== null && single !== undefined && single !== ""
-        ? `<div class="price-header single" aria-hidden="true"><span>Price</span></div><div class="single-price-area"><div class="single-price">₹${escapeHTML(single)}</div></div>`
-        : "";
-    }
-
-    function renderTags(item) {
-      const tags = [];
-      if (item.is_bestseller === true || item.bestseller === true) tags.push(`<span class="tag hot">★ Bestseller</span>`);
-      if (item.is_recommended === true || item.recommended === true) tags.push(`<span class="tag">Recommended</span>`);
-      if (item.is_spicy === true || item.spicy === true) tags.push(`<span class="tag hot">🌶 Spicy</span>`);
-      if (isUnavailable(item)) tags.push(`<span class="tag out">Unavailable</span>`);
-      return tags.length ? `<div class="item-tags">${tags.join("")}</div>` : "";
-    }
-
-    function renderItem(item) {
-      const type = getItemType(item);
-      const unavailable = isUnavailable(item);
-
-      return `
-        <article class="menu-item ${unavailable ? "unavailable" : ""}" data-name="${escapeHTML((item.name || "").toLowerCase())}">
-          <div class="item-content">
-            <div class="item-main-row">
-              <div class="item-info">
-                <div class="item-topline">
-                  <span class="food-symbol ${type}" aria-label="${type}"></span>
-                  <h3 class="item-name">${escapeHTML(item.name || "Unnamed item")}</h3>
-                </div>
-                ${renderTags(item)}
-                ${item.description ? `<p class="item-desc">${escapeHTML(item.description)}</p>` : ""}
-              </div>
-              <div class="item-price-area">
-                ${renderPrice(item)}
-              </div>
-            </div>
-          </div>
-          ${itemImageHTML(item)}
-        </article>
-      `;
-    }
-
-    function categoryKey(category) {
-      return String(category || "General").trim() || "General";
-    }
-
-    function sectionId(name) {
-      return `cat-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "general"}`;
-    }
-
-    function getCategories(items) {
-      const categories = [];
-      const seen = new Set();
-      items.forEach(item => {
-        const category = categoryKey(item.category);
-        if (!seen.has(category)) {
-          seen.add(category);
-          categories.push(category);
-        }
-      });
-      return categories;
-    }
-
-    function renderCategoryChips() {
-      const categories = getCategories(allItems);
-      $("category-chips").innerHTML = [
-        `<button class="cat-chip ${currentCategory === "all" ? "active" : ""}" data-category="all">All Menu</button>`,
-        ...categories.map(category => `
-          <button class="cat-chip ${currentCategory === category ? "active" : ""}" data-category="${escapeHTML(category)}">
-            ${escapeHTML(category)}
-          </button>
-        `)
-      ].join("");
-    }
-
-    function getFilteredItems() {
-      const q = searchText.trim().toLowerCase();
-      return allItems.filter(item => {
-        const category = categoryKey(item.category);
-        const categoryMatch = currentCategory === "all" || category === currentCategory;
-        const haystack = `${item.name || ""} ${item.description || ""} ${category}`.toLowerCase();
-        const searchMatch = !q || haystack.includes(q);
-        return categoryMatch && searchMatch;
-      });
-    }
-
-    function renderMenu() {
-      const filtered = getFilteredItems();
-      const grouped = {};
-
-      filtered.forEach(item => {
-        const category = categoryKey(item.category);
-        if (!grouped[category]) grouped[category] = [];
-        grouped[category].push(item);
-      });
-
-      $("summary-line").style.display = "flex";
-      $("summary-line").innerHTML = `
-        <span>${filtered.length} item${filtered.length === 1 ? "" : "s"}</span>
-        ${searchText ? `<span>Search: “${escapeHTML(searchText)}”</span>` : ""}
-      `;
-
-      if (!filtered.length) {
-        showState("Nothing found", "Try another search or category.");
-        return;
-      }
-
-      $("menu-sections").innerHTML = Object.entries(grouped).map(([category, items]) => `
-        <section class="category-section" id="${sectionId(category)}" data-category="${escapeHTML(category)}">
-          <div class="category-heading">
-            <h2 class="category-title">${escapeHTML(category)}</h2>
-            <span class="item-count">${items.length} item${items.length === 1 ? "" : "s"}</span>
-          </div>
-          <div class="items-list">
-            ${items.map(renderItem).join("")}
-          </div>
-        </section>
-      `).join("");
-    }
-
-    function renderRestaurant(rest) {
-      restaurant = rest;
-      applyRestaurantTheme(rest);
-
-      $("rest-name").textContent = rest.name || "Menu";
-      document.title = `${rest.name || "Restaurant"} • Menu`;
-
-      const logoUrl = safeUrl(rest.logo_url);
-      $("logo-container").innerHTML = logoUrl
-        ? `<img src="${escapeHTML(logoUrl)}" alt="${escapeHTML(rest.name || "Restaurant")} logo" onerror="this.parentElement.innerHTML=logoFallback()" />`
-        : logoFallback();
-
-      const coverUrl = safeUrl(rest.cover_url || rest.banner_url || rest.cover_image);
-      if (coverUrl) {
-        $("rest-cover").src = coverUrl;
-        $("rest-cover").style.display = "block";
-      }
-
-      if (rest.phone) {
-        const phone = String(rest.phone).replace(/[^+\d]/g, "");
-        $("rest-call-btn").href = `tel:${phone}`;
-        $("rest-call-btn").style.display = "grid";
-      }
-
-      const address = rest.address || rest.location || rest.city;
-      if (address) {
-        $("rest-address").textContent = `• ${address}`;
-        $("rest-address").style.display = "inline";
-      }
-
-      const isOpen = rest.is_open !== false && rest.status !== "closed" && rest.is_active !== false;
-      const statusEl = $("rest-status");
-      statusEl.classList.toggle("closed", !isOpen);
-      statusEl.querySelector("span:last-child").textContent = isOpen ? "Open" : "Closed";
-    }
-
-    async function loadPublicMenu() {
-      showLoading();
-
-      try {
-        const params = new URLSearchParams(window.location.search);
-        const slug = (params.get("r") || "").trim().toLowerCase();
-
-        let query = supabaseClient.from("restaurants").select("*");
-        if (slug) query = query.eq("slug", slug);
-
-        const { data: restaurants, error: restError } = await query.limit(1);
-        if (restError) throw restError;
-
-        if (!restaurants || !restaurants.length) {
-          $("rest-name").textContent = "Restaurant Not Found";
-          $("category-chips").innerHTML = "";
-          $("summary-line").style.display = "none";
-          showState("Restaurant not found", "Please check the menu link and try again.");
-          return;
-        }
-
-        const rest = restaurants[0];
-        renderRestaurant(rest);
-
-        const { data: items, error: itemsError } = await supabaseClient
-          .from("menu_items")
-          .select("*")
-          .eq("restaurant_id", rest.id);
-
-        if (itemsError) throw itemsError;
-
-        allItems = Array.isArray(items) ? items : [];
-
-        // Optional sorting if you later add sort_order fields.
-        allItems.sort((a, b) => {
-          const aOrder = Number(a.sort_order ?? a.position ?? 999999);
-          const bOrder = Number(b.sort_order ?? b.position ?? 999999);
-          return aOrder - bOrder;
-        });
-
-        if (!allItems.length) {
-          $("category-chips").innerHTML = "";
-          $("summary-line").style.display = "none";
-          showState("Menu is being prepared", "No menu items have been added yet.");
-          return;
-        }
-
-        renderCategoryChips();
-        renderMenu();
-      } catch (error) {
-        console.error("Menu load error:", error);
-        $("rest-name").textContent = "Menu Unavailable";
-        $("category-chips").innerHTML = "";
-        $("summary-line").style.display = "none";
-        showState("Unable to load menu", "Please refresh the page or try again shortly.");
-      }
-    }
-
-    $("menu-search").addEventListener("input", (event) => {
-      searchText = event.target.value || "";
-      renderMenu();
+/* ---------- Menu ---------- */
+function categoryIcon(cat){
+  const s=cat.toLowerCase();
+  if(/soup/.test(s)) return "fa-bowl-food";
+  if(/starter|snack/.test(s)) return "fa-cheese";
+  if(/tandoori|kebab|chaap|grill/.test(s)) return "fa-fire-flame-curved";
+  if(/chinese|noodle|manchurian/.test(s)) return "fa-bowl-rice";
+  if(/main|curry|paneer/.test(s)) return "fa-cloche";
+  if(/rice|biryani/.test(s)) return "fa-bowl-rice";
+  if(/bread|roti|naan/.test(s)) return "fa-pizza-slice";
+  if(/dessert|sweet|ice/.test(s)) return "fa-cake-candles";
+  if(/drink|beverage|shake/.test(s)) return "fa-glass-water";
+  return "fa-utensils";
+}
+function typeIcon(item){
+  const type=String(val(item,"item_type","type")).toLowerCase();
+  if(type==="egg") return "egg";
+  if(type==="nonveg" || item.is_veg===false) return "nv";
+  return "veg";
+}
+function hasPortions(items){
+  return items.some(i => val(i,"price_quarter","quarter_price","price_qtr")!=="" ||
+                         val(i,"price_half","half_price")!=="" ||
+                         val(i,"price_full","full_price")!=="");
+}
+function priceValues(item, portions){
+  if(!portions){
+    const p=val(item,"price","price_full","price_half","price_quarter","amount");
+    return [`<span class="price">${p!==""?money(p):"—"}</span>`];
+  }
+  const q=val(item,"price_quarter","quarter_price","price_qtr");
+  const h=val(item,"price_half","half_price");
+  const f=val(item,"price_full","full_price","price");
+  return [q,h,f].map(p=>`<span class="price ${p===""?"empty":""}">${money(p)}</span>`);
+}
+function renderCategories(){
+  const cats=Object.keys(grouped);
+  const el=document.getElementById("categories");
+  const all=[`<button class="catBtn active" data-cat="All Menu"><i class="fa-solid fa-utensils"></i><small>All</small></button>`];
+  cats.forEach(c=>all.push(`<button class="catBtn" data-cat="${esc(c)}"><i class="fa-solid ${categoryIcon(c)}"></i><small>${esc(c)}</small></button>`));
+  el.innerHTML=all.join("");
+  el.querySelectorAll(".catBtn").forEach(btn=>btn.addEventListener("click",()=>{
+    activeCategory=btn.dataset.cat;
+    el.querySelectorAll(".catBtn").forEach(x=>x.classList.remove("active"));
+    btn.classList.add("active");
+    if(activeCategory!=="All Menu"){
+      const target=document.getElementById("cat-"+CSS.escape(activeCategory));
+      if(target) target.scrollIntoView({behavior:"smooth",block:"start"});
+    }else window.scrollTo({top:document.getElementById("menu").offsetTop-10,behavior:"smooth"});
+  }));
+}
+function renderMenu(){
+  const grid=document.getElementById("menuGrid");
+  const query=document.getElementById("search").value.trim().toLowerCase();
+  const cats=Object.keys(grouped);
+  let html="";
+  cats.forEach(cat=>{
+    if(activeCategory!=="All Menu" && activeCategory!==cat) return;
+    let items=grouped[cat].filter(i=>{
+      if(!query) return true;
+      return [i.name,i.description,i.category,i.item_type].filter(Boolean).join(" ").toLowerCase().includes(query);
     });
+    if(!items.length) return;
+    const portions=hasPortions(items);
+    html+=`<section class="menuSection" id="cat-${esc(cat).replace(/[^a-zA-Z0-9_-]/g,"-")}">
+      <div class="sectionHead">
+        <div class="sectionIcon"><i class="fa-solid ${categoryIcon(cat)}"></i></div>
+        <div class="sectionTitle">${esc(cat)}</div>
+        <div class="portionHeads ${portions?"":"one"}">${portions
+          ? "<span>Qtr</span><span>Half</span><span>Full</span>"
+          : "<span>Price</span>"}</div>
+      </div>
+      <div class="menuRows">
+        ${items.map(i=>renderItem(i,portions)).join("")}
+      </div>
+    </section>`;
+  });
+  if(!html) html=`<div class="emptyState"><i class="fa-solid fa-utensils"></i><h3>No dishes found</h3><p>Try another dish name or category.</p></div>`;
+  grid.innerHTML=html;
+}
+function renderItem(item,portions){
+  const name=val(item,"name","item_name")||"Unnamed Item";
+  const desc=val(item,"description","item_description");
+  const img=val(item,"image_url","image","photo_url","imageUrl");
+  const tags=[];
+  if(item.is_bestseller===true || item.bestseller===true) tags.push('<span class="tag best">Bestseller</span>');
+  if(item.is_recommended===true || item.recommended===true) tags.push('<span class="tag">Recommended</span>');
+  if(item.is_spicy===true || item.spicy===true) tags.push('<span class="tag hot">Spicy</span>');
+  const available = item.is_available===false || item.available===false || item.status==="inactive" || item.status==="out_of_stock";
+  if(available) tags.push('<span class="tag hot">Unavailable</span>');
+  const photo=img?`<div style="margin:0 0 8px;border-radius:10px;overflow:hidden;max-width:120px"><img src="${esc(img)}" alt="${esc(name)}" style="width:100%;height:72px;object-fit:cover" loading="lazy"></div>`:"";
+  return `<div class="menuRow" style="${available?"opacity:.48":""}">
+    <div class="itemMain">
+      ${photo}
+      <div class="itemTitle"><span class="foodDot ${typeIcon(item)}"></span><span class="itemName">${esc(name)}</span></div>
+      ${desc?`<div class="itemDesc">${esc(desc)}</div>`:""}
+      ${tags.length?`<div class="itemTags">${tags.join("")}</div>`:""}
+    </div>
+    <div class="prices ${portions?"":"one"}">${priceValues(item,portions).join("")}</div>
+  </div>`;
+}
 
-    $("category-chips").addEventListener("click", (event) => {
-      const btn = event.target.closest(".cat-chip");
-      if (!btn) return;
+/* ---------- Gallery ---------- */
+function renderGallery(r,items){
+  const candidates=[];
+  const galleryRaw=val(r,"gallery","gallery_images","gallery_urls");
+  if(Array.isArray(galleryRaw)) candidates.push(...galleryRaw);
+  items.map(i=>val(i,"image_url","image","photo_url")).filter(Boolean).slice(0,8).forEach(x=>candidates.push(x));
+  const unique=[...new Set(candidates)].slice(0,8);
+  const el=document.getElementById("galleryGrid");
+  if(!unique.length){
+    el.innerHTML='<p style="color:var(--muted);font-size:13px">Restaurant photos will appear here.</p>';
+    return;
+  }
+  el.innerHTML=unique.map(u=>`<img src="${esc(u)}" alt="Restaurant photo" loading="lazy">`).join("");
+}
 
-      currentCategory = btn.dataset.category || "all";
-      renderCategoryChips();
-      renderMenu();
+/* ---------- Open status ---------- */
+function updateOpenStatus(){
+  const el=document.getElementById("openStatus");
+  const raw=val(restaurant,"is_open","open_now","status");
+  if(raw!=="" && (raw===false || raw==="false" || raw==="closed")){
+    el.className="closedBadge";el.innerHTML='<i class="fa-solid fa-circle" style="font-size:7px"></i> Closed';
+  }
+}
 
-      window.scrollTo({
-        top: document.querySelector(".sticky-panel").offsetTop,
-        behavior: "smooth"
-      });
+/* ---------- Load ---------- */
+async function loadPublicMenu(){
+  try{
+    if(!slug){
+      throw new Error("Restaurant slug missing. Open this page with ?r=restaurant-slug");
+    }
+    const {data:restaurants,error:restError}=await supabaseClient.from("restaurants").select("*").eq("slug",slug).limit(1);
+    if(restError) throw restError;
+    if(!restaurants?.length) throw new Error("Restaurant not found.");
+    restaurant=restaurants[0];
+    setRestaurantUI(restaurant);
+    updateOpenStatus();
+
+    const {data:items,error:itemError}=await supabaseClient.from("menu_items").select("*").eq("restaurant_id",restaurant.id);
+    if(itemError) throw itemError;
+    allItems=items||[];
+    grouped={};
+    allItems.forEach(item=>{
+      const cat=String(val(item,"category","category_name")||"General").trim();
+      if(!grouped[cat]) grouped[cat]=[];
+      grouped[cat].push(item);
     });
+    renderCategories();
+    renderMenu();
+    renderGallery(restaurant,allItems);
+    document.getElementById("pageLoader").classList.add("hidden");
+  }catch(err){
+    console.error(err);
+    document.getElementById("pageLoader").classList.add("hidden");
+    document.getElementById("menuGrid").innerHTML=`<div class="emptyState"><i class="fa-solid fa-circle-exclamation"></i><h3>Menu unavailable</h3><p>${esc(err.message||"Unable to load this restaurant menu.")}</p></div>`;
+    showToast("Unable to load menu");
+  }
+}
 
-    window.addEventListener("load", loadPublicMenu);
-  </script>
+/* ---------- Search ---------- */
+document.getElementById("search").addEventListener("input",()=>{
+  const q=document.getElementById("search").value;
+  document.getElementById("clearSearch").classList.toggle("hidden",!q);
+  renderMenu();
+});
+document.getElementById("clearSearch").addEventListener("click",()=>{
+  document.getElementById("search").value="";
+  document.getElementById("clearSearch").classList.add("hidden");
+  renderMenu();
+});
+
+window.addEventListener("load",loadPublicMenu);
+</script>
 </body>
 </html>
