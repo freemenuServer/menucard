@@ -812,6 +812,47 @@ supabaseClient.auth.onAuthStateChange((event, newSession)=>{
 window.addEventListener("load",init);
 </script>
 
+
+<script>
+/* Owner auth bootstrap: resolve Supabase session before showing the auth gate. */
+(function(){
+  const URL="https://pfsrpowopbrevocwsuii.supabase.co";
+  const KEY="sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+  window.__ownerAuthReady = false;
+
+  async function bootstrapOwnerAuth(){
+    try{
+      let sb=window.supabaseClient;
+      if(!sb && window.supabase && typeof window.supabase.createClient==="function"){
+        sb=window.supabase.createClient(URL,KEY);
+        window.supabaseClient=sb;
+      }
+      if(!sb) return;
+
+      const {data}=await sb.auth.getSession();
+      if(data && data.session){
+        window.__ownerAuthenticated=true;
+        // Hide the gate immediately for a valid existing session.
+        const gate=document.getElementById("ownerAuthChoice");
+        if(gate) gate.style.display="none";
+      }else{
+        window.__ownerAuthenticated=false;
+      }
+    }catch(e){
+      console.error("Auth bootstrap:",e);
+    }finally{
+      window.__ownerAuthReady=true;
+    }
+  }
+
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",bootstrapOwnerAuth,{once:true});
+  }else{
+    bootstrapOwnerAuth();
+  }
+})();
+</script>
+
 <!-- FreeMenu Owner Authentication -->
 <div id="ownerAuthChoice" class="owner-auth-choice" style="display:none;">
   <div class="owner-auth-backdrop"></div>
@@ -949,6 +990,30 @@ window.addEventListener("load",init);
     });
     if(error){err.textContent=error.message;return;}
     closeAuth();
+    window.__ownerAuthenticated = true;
+
+    // Let the original dashboard code initialize/load the restaurant.
+    // Different versions of this page expose different init function names,
+    // so support the common ones and finally reload as a fallback.
+    try{
+      if(typeof window.initOwnerDashboard === 'function'){
+        await window.initOwnerDashboard();
+        return;
+      }
+      if(typeof window.loadDashboard === 'function'){
+        await window.loadDashboard();
+        return;
+      }
+      if(typeof window.loadOwnerDashboard === 'function'){
+        await window.loadOwnerDashboard();
+        return;
+      }
+    }catch(initErr){
+      console.error('Owner dashboard init error:', initErr);
+    }
+
+    // Supabase session is persisted; reload once with an authenticated flag.
+    // The auth gate checks this flag and will not show the Login/Sign Up screen.
     location.reload();
   });
 
@@ -999,11 +1064,20 @@ window.addEventListener("load",init);
 
   // Existing dashboard auth code can set this flag if it knows the session state.
   document.addEventListener('DOMContentLoaded',function(){
-    setTimeout(function(){
-      if(window.__ownerAuthenticated !== true){
-        showHome();
+    let tries=0;
+    const waitForAuth=()=>{
+      tries++;
+      if(window.__ownerAuthenticated===true){
+        closeAuth();
+        return;
       }
-    },300);
+      if(window.__ownerAuthReady===true || tries>=30){
+        showHome();
+        return;
+      }
+      setTimeout(waitForAuth,100);
+    };
+    waitForAuth();
   });
 })();
 </script>
