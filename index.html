@@ -1084,17 +1084,3 @@ window.addEventListener("load",init);
 
 </body>
 </html>
-
-<script>
-(function(){
- function openRequestedAuth(){
-  const mode=new URLSearchParams(location.search).get('auth');
-  if(mode!=='login' && mode!=='signup') return;
-  const choice=document.getElementById('ownerAuthChoice');
-  if(choice) choice.style.display='none';
-  if(mode==='login' && typeof window.showLoginForm==='function') window.showLoginForm();
-  if(mode==='signup' && typeof window.showSignupForm==='function') window.showSignupForm();
- }
- window.addEventListener('load',()=>setTimeout(openRequestedAuth,800));
-})();
-</script>
