@@ -3,23 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0f766e" />
+  <meta name="theme-color" content="#7b1e16" />
   <title>Digital Menu</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <style>
     :root {
-      --primary: #0f766e;
-      --primary-dark: #115e59;
-      --primary-soft: #ecfdf5;
-      --accent: #f59e0b;
-      --bg: #f6f7f9;
-      --surface: #ffffff;
-      --surface-2: #f8fafc;
-      --text: #111827;
-      --muted: #6b7280;
-      --border: #e5e7eb;
+      --primary: #7b1e16;
+      --primary-dark: #5a140f;
+      --primary-soft: #fff4e8;
+      --accent: #c8943e;
+      --bg: #f5eee5;
+      --surface: #fffaf2;
+      --surface-2: #f7eee4;
+      --text: #4a281a;
+      --muted: #7d6558;
+      --border: #d9c39a;
       --veg: #16a34a;
       --nonveg: #dc2626;
       --egg: #d97706;
@@ -297,62 +297,67 @@
     .item-info { flex: 1; min-width: 0; }
     .item-topline { display: flex; align-items: flex-start; gap: 7px; }
 
-    /* Right-aligned portion/price columns */
+    /* Menu-style right-aligned portion columns */
     .item-price-area {
-      flex: 0 0 174px;
-      width: 174px;
+      flex: 0 0 158px;
+      width: 158px;
       align-self: flex-start;
+      margin-left: auto;
     }
     .price-header {
       display: grid;
-      grid-template-columns: repeat(3, 54px);
-      gap: 4px;
+      grid-template-columns: repeat(3, 45px);
+      gap: 5px;
       justify-content: end;
       margin-bottom: 5px;
-      color: var(--muted);
-      font-size: 9px;
+      color: var(--text);
+      font-size: 10px;
       line-height: 1;
       font-weight: 850;
       text-transform: uppercase;
-      letter-spacing: .35px;
+      letter-spacing: .45px;
       text-align: center;
     }
-    .price-header.single { grid-template-columns: 70px; }
+    .price-header.single { grid-template-columns: 58px; }
     .portion-prices {
       display: grid;
-      grid-template-columns: repeat(3, 54px);
-      gap: 4px;
+      grid-template-columns: repeat(3, 45px);
+      gap: 5px;
       justify-content: end;
-      margin-top: 0;
+      align-items: center;
     }
     .portion-price {
-      width: 54px;
-      min-width: 54px;
-      padding: 6px 3px;
+      width: 45px;
+      min-width: 45px;
+      padding: 2px 0;
       text-align: center;
-      border: 1px solid color-mix(in srgb, var(--primary) 22%, var(--border));
-      background: var(--primary-soft);
-      border-radius: 9px;
+      border: 0;
+      background: transparent;
+      border-radius: 0;
+      color: var(--primary);
+      font-weight: 850;
     }
     .portion-price.empty {
       background: transparent;
-      border-color: transparent;
+      border: 0;
+      color: #cbbdaf;
     }
     .portion-price .label { display: none; }
     .portion-price .amount {
       margin-top: 0;
-      font-size: 12px;
+      font-size: 13px;
+      line-height: 1.25;
       white-space: nowrap;
     }
     .single-price-area { display: flex; justify-content: flex-end; }
     .single-price {
       margin-top: 0;
-      width: 70px;
-      padding: 7px 5px;
-      border: 1px solid color-mix(in srgb, var(--primary) 22%, var(--border));
-      background: var(--primary-soft);
-      border-radius: 9px;
-      color: var(--primary-dark);
+      width: 58px;
+      padding: 2px 0;
+      border: 0;
+      background: transparent;
+      border-radius: 0;
+      color: var(--primary);
       font-size: 13px;
       font-weight: 850;
       text-align: center;
@@ -434,6 +439,52 @@
       background: linear-gradient(135deg, #f8fafc, #f1f5f9);
     }
     .img-placeholder svg { width: 26px; height: 26px; }
+
+    /* Warm printed-menu card styling */
+    .category-section { margin-bottom: 18px; }
+    .category-heading {
+      margin: 0;
+      padding: 11px 14px;
+      background: var(--primary);
+      border-radius: 15px 15px 0 0;
+      color: #fffaf2;
+    }
+    .category-title {
+      color: #fffaf2;
+      font-size: 17px;
+      text-transform: uppercase;
+      letter-spacing: .35px;
+    }
+    .item-count { color: rgba(255,250,242,.78); }
+    .items-list {
+      border: 1px solid var(--border);
+      border-top: 0;
+      border-radius: 0 0 15px 15px;
+      background: var(--surface);
+      box-shadow: 0 4px 12px rgba(90,20,15,.07);
+    }
+    .menu-item {
+      padding: 11px 13px;
+      border-bottom: 1px dashed #e2cda9;
+      background: var(--surface);
+    }
+    .menu-item:last-child { border-bottom: 0; }
+    .item-name { color: #6b174b; font-size: 14.5px; }
+    .item-desc { color: #8a7668; }
+    .price-header { color: #5a321e; }
+    .summary-line { color: var(--muted); }
+
+    @media (max-width: 560px) {
+      .menu-item { padding: 10px 10px; gap: 8px; }
+      .item-main-row { gap: 6px; }
+      .item-price-area { flex-basis: 151px; width: 151px; }
+      .price-header, .portion-prices { grid-template-columns: repeat(3, 43px); gap: 4px; }
+      .portion-price { width: 43px; min-width: 43px; }
+      .price-header.single { grid-template-columns: 55px; }
+      .single-price { width: 55px; }
+      .item-name { font-size: 14px; }
+      .portion-price .amount, .single-price { font-size: 12px; }
+    }
 
     /* STATES */
     .state-card {
