@@ -65,9 +65,41 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
  .sidebar{transform:translateX(-100%);transition:.25s;width:250px}.sidebar.open{transform:none}.content{margin-left:0}.topbar{height:66px;padding:0 12px}.mobileMenu{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--border);background:#fff;border-radius:8px}.topActions .openToggle{display:none}.profile .profileName{display:none}.container{padding:15px 11px 35px}.grid4{grid-template-columns:1fr 1fr;gap:9px}.stat{padding:13px;min-height:94px}.statValue{font-size:20px}.threeCol,.categoryCards{grid-template-columns:1fr}.profileBox{grid-template-columns:1fr;text-align:center}.bigLogo{margin:auto}.mediaCover{height:150px}.menuTable{min-width:700px}.menuTableWrap{overflow:auto}.quickGrid{grid-template-columns:1fr}.heroHideMobile{display:none}}
 @media(max-width:430px){.grid4{grid-template-columns:1fr 1fr}.statLabel{font-size:9px}.statValue{font-size:18px}.restTitle{font-size:14px}.restAddress{font-size:9px}}
 </style>
-</head>
+
+<style id="ownerLoginStyles">
+#ownerLogin{position:fixed;inset:0;background:linear-gradient(135deg,#0d1624,#18263b);z-index:10000;display:none;align-items:center;justify-content:center;padding:18px}
+#ownerLogin.show{display:flex}
+.loginCard{width:min(430px,100%);background:#fff;border-radius:18px;padding:30px;box-shadow:0 25px 70px rgba(0,0,0,.28)}
+.loginLogo{width:66px;height:66px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(135deg,#8f1831,#c52345);color:#fff;font-size:27px}
+.loginCard h1{font-family:"Cormorant Garamond",serif;text-align:center;font-size:34px;margin:0;color:#151c2a}
+.loginCard .sub{text-align:center;color:#718096;font-size:12px;margin:4px 0 22px}
+.loginError{background:#fff0f0;color:#b4232e;border:1px solid #ffd0d0;border-radius:8px;padding:9px 10px;font-size:11px;margin-bottom:12px}
+.loginSubmit{width:100%;border:0;background:linear-gradient(90deg,#8f1831,#c52345);color:#fff;border-radius:9px;padding:12px;font-weight:800;cursor:pointer}
+.loginSubmit:disabled{opacity:.6}
+.loginHint{text-align:center;font-size:10px;color:#8a93a3;margin-top:13px;line-height:1.5}
+</style></head>
 
 <body>
+
+<div id="ownerLogin">
+  <div class="loginCard">
+    <div class="loginLogo"><i class="fa-solid fa-utensils"></i></div>
+    <h1>Owner Login</h1>
+    <div class="sub">Restaurant Owner Panel</div>
+    <div id="loginError" class="loginError hidden"></div>
+    <div class="formGroup">
+      <label>Email Address</label>
+      <input class="input" id="loginEmail" type="email" autocomplete="email" placeholder="owner@example.com">
+    </div>
+    <div class="formGroup">
+      <label>Password</label>
+      <input class="input" id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter your password">
+    </div>
+    <button class="loginSubmit" id="loginSubmit"><i class="fa-solid fa-right-to-bracket"></i> Login to Owner Panel</button>
+    <div class="loginHint">Only authenticated restaurant owners can access this dashboard.</div>
+  </div>
+</div>
+
 <div id="loader"><div class="loader-card"><div class="spinner"></div><p style="font-weight:800">Loading Owner Panel...</p></div></div>
 
 <aside class="sidebar" id="sidebar">
@@ -336,6 +368,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
 <script>
 /* ============================================================
+   OWNER PAGE AUTH — NO SEPARATE login.html REQUIRED
+   If the user is logged out, this same page shows Owner Login.
+   ============================================================
    SUPABASE CONFIG — TAKEN FROM YOUR SUPPLIED OWNER CODE
    ============================================================ */
 const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
@@ -365,12 +400,47 @@ document.querySelectorAll(".navItem").forEach(a=>a.addEventListener("click",e=>{
 window.addEventListener("hashchange",()=>showSection(location.hash.slice(1)||"dashboard"));
 $("mobileMenu").onclick=()=>$("sidebar").classList.toggle("open");
 
+
+function showOwnerLogin(){
+  $("loader").classList.add("hidden");
+  $("ownerLogin").classList.add("show");
+}
+function hideOwnerLogin(){
+  $("ownerLogin").classList.remove("show");
+}
+async function ownerLogin(){
+  const email=$("loginEmail").value.trim();
+  const password=$("loginPassword").value;
+  const err=$("loginError");
+  if(!email || !password){
+    err.textContent="Please enter email and password.";
+    err.classList.remove("hidden");
+    return;
+  }
+  err.classList.add("hidden");
+  $("loginSubmit").disabled=true;
+  $("loginSubmit").innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Signing in...';
+  const {error}=await supabaseClient.auth.signInWithPassword({email,password});
+  if(error){
+    err.textContent=error.message;
+    err.classList.remove("hidden");
+    $("loginSubmit").disabled=false;
+    $("loginSubmit").innerHTML='<i class="fa-solid fa-right-to-bracket"></i> Login to Owner Panel';
+    return;
+  }
+  hideOwnerLogin();
+  $("loader").classList.remove("hidden");
+  await init();
+}
+$("loginSubmit").onclick=ownerLogin;
+$("loginPassword").addEventListener("keydown",e=>{if(e.key==="Enter")ownerLogin()});
+
 /* ---------- Init/Auth ---------- */
 async function init(){
   const result=await supabaseClient.auth.getSession();
   session=result.data.session;
   if(!session?.user){
-    location.href="login.html";
+    showOwnerLogin();
     return;
   }
   $("accountEmail").value=session.user.email||"";
@@ -564,7 +634,7 @@ $("saveMedia").onclick=async()=>{
 };
 
 /* ---------- Logout ---------- */
-async function logout(){await supabaseClient.auth.signOut();location.href="login.html"}
+async function logout(){await supabaseClient.auth.signOut();showOwnerLogin()}
 $("logoutBtn").onclick=logout;$("logout2").onclick=logout;
 
 /* ---------- Modal close ---------- */
@@ -573,6 +643,12 @@ document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if
 
 /* ---------- Misc ---------- */
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{showSection(b.dataset.go==="restaurantEdit"?"restaurant":b.dataset.go==="galleryEdit"?"gallery":"dashboard")});
+supabaseClient.auth.onAuthStateChange((event, newSession)=>{
+  if(event==="SIGNED_OUT"){
+    currentRestaurant=null; currentRestaurantId=null; items=[];
+    showOwnerLogin();
+  }
+});
 window.addEventListener("load",init);
 </script>
 </body>
