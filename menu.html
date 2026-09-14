@@ -1,490 +1,911 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Digital Menu Card</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f766e" />
+  <title>Digital Menu</title>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
   <style>
     :root {
-      --primary: #10b981;
-      --primary-dark: #047857;
-      --bg-color: #f8fafc;
-      --card-bg: #ffffff;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
+      --primary: #0f766e;
+      --primary-dark: #115e59;
+      --primary-soft: #ecfdf5;
+      --accent: #f59e0b;
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --surface-2: #f8fafc;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
       --veg: #16a34a;
       --nonveg: #dc2626;
       --egg: #d97706;
+      --danger: #dc2626;
+      --radius: 18px;
+      --shadow: 0 10px 30px rgba(15, 23, 42, .06);
+      --font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif; }
-    body { background: var(--bg-color); color: var(--text-main); min-height: 100vh; padding-bottom: 50px; }
-
-    /* Sticky Top Header */
-    .top-navbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: #ffffff;
-      border-bottom: 1px solid #e2e8f0;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-family);
+      background: var(--bg);
+      color: var(--text);
+      padding-bottom: calc(24px + env(safe-area-inset-bottom));
     }
 
-    .header-content {
-      max-width: 768px;
+    button, input { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+    img { display: block; max-width: 100%; }
+
+    .app-shell {
+      width: min(100%, 820px);
       margin: 0 auto;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
     }
 
-    /* Left: Logo Container */
-    .header-left { display: flex; align-items: center; gap: 12px; }
-    .logo-wrapper { position: relative; flex-shrink: 0; }
-    
-    .restaurant-logo { 
-      width: 48px; 
-      height: 48px; 
-      border-radius: 12px; 
-      object-fit: cover; 
-      border: 1px solid #e2e8f0; 
-      background: #f1f5f9;
-      display: block;
+    /* HERO */
+    .hero {
+      position: relative;
+      min-height: 190px;
+      background:
+        linear-gradient(135deg, color-mix(in srgb, var(--primary) 94%, black 6%), var(--primary-dark));
+      overflow: hidden;
+      color: #fff;
     }
 
-    /* Fallback Dummy Logo Style */
-    .dummy-logo {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: #ecfdf5;
-      border: 1px solid #a7f3d0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #047857;
-    }
-
-    .status-indicator {
+    .hero::before,
+    .hero::after {
+      content: "";
       position: absolute;
-      bottom: -2px;
-      right: -2px;
-      width: 12px;
-      height: 12px;
-      background: #22c55e;
-      border: 2px solid #ffffff;
-      border-radius: 50%;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      pointer-events: none;
+    }
+    .hero::before { width: 190px; height: 190px; right: -70px; top: -65px; }
+    .hero::after { width: 120px; height: 120px; left: -40px; bottom: -55px; }
+
+    .hero-cover {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: .22;
     }
 
-    /* Center: Name & Sub-text */
-    .header-center { flex: 1; min-width: 0; }
-    .restaurant-name { 
-      font-size: 17px; 
-      font-weight: 800; 
-      color: var(--text-main); 
-      white-space: nowrap; 
-      overflow: hidden; 
-      text-overflow: ellipsis; 
-      line-height: 1.2;
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.44));
     }
-    .restaurant-subtitle { 
-      font-size: 12px; 
-      color: var(--text-muted); 
-      margin-top: 2px;
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      min-height: 190px;
       display: flex;
-      align-items: center;
-      gap: 4px;
+      align-items: flex-end;
+      gap: 14px;
+      padding: 22px 16px 18px;
     }
 
-    /* Right: Call Button */
-    .header-right { flex-shrink: 0; }
-    .call-btn {
+    .logo-wrap {
+      width: 68px;
+      height: 68px;
+      border-radius: 18px;
+      flex: 0 0 auto;
+      background: rgba(255,255,255,.96);
+      border: 3px solid rgba(255,255,255,.65);
+      box-shadow: 0 8px 24px rgba(0,0,0,.2);
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      color: var(--primary);
+    }
+
+    .logo-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .logo-fallback svg { width: 30px; height: 30px; }
+
+    .hero-info { min-width: 0; flex: 1; }
+    .restaurant-name {
+      margin: 0;
+      font-size: clamp(22px, 5vw, 30px);
+      line-height: 1.1;
+      font-weight: 850;
+      letter-spacing: -.5px;
+      text-shadow: 0 2px 10px rgba(0,0,0,.2);
+    }
+
+    .restaurant-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      margin-top: 8px;
+      font-size: 12.5px;
+      color: rgba(255,255,255,.9);
+    }
+
+    .status-badge {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: #ecfdf5;
-      color: var(--primary-dark);
-      border: 1px solid #a7f3d0;
-      padding: 8px 14px;
-      border-radius: 20px;
-      font-size: 13px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.16);
+      backdrop-filter: blur(8px);
       font-weight: 700;
-      text-decoration: none;
-      transition: all 0.2s ease;
+      white-space: nowrap;
     }
-    .call-btn:active { transform: scale(0.96); }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; }
+    .status-badge.closed .status-dot { background: #f87171; }
 
-    /* Main Container */
-    .menu-container { max-width: 768px; margin: 16px auto; padding: 0 12px; }
+    .hero-action {
+      flex: 0 0 auto;
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(255,255,255,.32);
+      border-radius: 14px;
+      background: rgba(255,255,255,.16);
+      color: #fff;
+      display: none;
+      place-items: center;
+      text-decoration: none;
+      backdrop-filter: blur(10px);
+    }
 
-    /* Category Navigation Bar */
-    .category-scroll-bar {
+    /* STICKY CONTROL AREA */
+    .sticky-panel {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: color-mix(in srgb, var(--bg) 90%, transparent);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+      padding: 10px 12px 8px;
+    }
+
+    .search-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(15,23,42,.04);
+      overflow: hidden;
+    }
+
+    .search-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      flex: 0 0 auto;
+    }
+
+    #menu-search {
+      width: 100%;
+      height: 44px;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text);
+      padding: 0 12px 0 0;
+      font-size: 14px;
+    }
+    #menu-search::placeholder { color: #9ca3af; }
+
+    .category-scroll {
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      padding-bottom: 8px;
-      margin-bottom: 16px;
+      padding-top: 9px;
       scrollbar-width: none;
+      overscroll-behavior-inline: contain;
     }
-    .category-scroll-bar::-webkit-scrollbar { display: none; }
+    .category-scroll::-webkit-scrollbar { display: none; }
 
     .cat-chip {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      min-height: 34px;
+      padding: 7px 13px;
+      border-radius: 999px;
       white-space: nowrap;
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-muted);
+      font-size: 12.5px;
+      font-weight: 750;
       cursor: pointer;
+      transition: .18s ease;
     }
     .cat-chip.active {
-      background: var(--text-main);
-      color: #ffffff;
-      border-color: var(--text-main);
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 5px 14px color-mix(in srgb, var(--primary) 22%, transparent);
     }
 
-    /* Category Cards Layout */
-    .category-card {
-      background: var(--card-bg);
-      border-radius: 14px;
-      border: 1px solid #e2e8f0;
-      margin-bottom: 16px;
-      overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-    }
+    /* CONTENT */
+    .menu-wrap { padding: 14px 12px 30px; }
 
-    .category-header {
-      background: #f8fafc;
-      padding: 12px 16px;
+    .summary-line {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid #e2e8f0;
+      gap: 12px;
+      margin: 2px 2px 12px;
+      color: var(--muted);
+      font-size: 12px;
     }
-    .category-title { font-size: 15px; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    .portion-labels-header {
+    .category-section {
+      scroll-margin-top: 110px;
+      margin-bottom: 20px;
+    }
+
+    .category-heading {
       display: flex;
-      gap: 8px;
-      font-size: 11px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0 2px 9px;
+    }
+
+    .category-title {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+      font-weight: 850;
+      letter-spacing: -.2px;
+    }
+    .item-count {
+      color: var(--muted);
+      font-size: 11.5px;
       font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
+      white-space: nowrap;
     }
-    .portion-col { width: 54px; text-align: center; }
 
-    /* Item Row Layout */
-    .item-row {
+    .items-list {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .menu-item {
+      position: relative;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 14px 16px;
-      border-bottom: 1px solid #f1f5f9;
+      gap: 13px;
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+      transition: background .2s ease;
     }
-    .item-row:last-child { border-bottom: none; }
+    .menu-item:last-child { border-bottom: 0; }
+    .menu-item:active { background: var(--surface-2); }
+    .menu-item.unavailable { opacity: .58; }
 
-    .item-details { flex: 1; padding-right: 12px; }
-    .item-title-flex { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
-    .item-name { font-size: 15px; font-weight: 700; color: var(--text-main); }
-    .item-desc { font-size: 12px; color: var(--text-muted); line-height: 1.3; margin-top: 2px; }
+    .item-content { flex: 1; min-width: 0; }
+    .item-topline { display: flex; align-items: flex-start; gap: 7px; }
 
-    /* Green Badge Prices */
-    .price-columns-group { display: flex; gap: 8px; align-items: center; }
+    .food-symbol {
+      width: 15px;
+      height: 15px;
+      margin-top: 2px;
+      border-radius: 3px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+    }
+    .food-symbol::after { content: ""; width: 7px; height: 7px; border-radius: 50%; }
+    .food-symbol.veg { border: 1.6px solid var(--veg); }
+    .food-symbol.veg::after { background: var(--veg); }
+    .food-symbol.nonveg { border: 1.6px solid var(--nonveg); }
+    .food-symbol.nonveg::after { background: var(--nonveg); border-radius: 1px; transform: rotate(45deg); width: 6px; height: 6px; }
+    .food-symbol.egg { border: 1.6px solid var(--egg); }
+    .food-symbol.egg::after { background: var(--egg); }
 
-    .price-pill-badge {
-      width: 54px;
-      text-align: center;
-      background: #ecfdf5;
-      color: #047857;
-      border: 1px solid #a7f3d0;
-      padding: 5px 0;
-      border-radius: 8px;
-      font-size: 13px;
+    .item-name {
+      margin: 0;
+      font-size: 15.5px;
+      line-height: 1.25;
+      font-weight: 790;
+      color: var(--text);
+    }
+
+    .item-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 7px;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 20px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      font-size: 10px;
+      line-height: 1;
       font-weight: 800;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+    }
+    .tag.out { background: #fef2f2; color: #b91c1c; }
+    .tag.hot { background: #fff7ed; color: #c2410c; }
+
+    .item-desc {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
-    .price-pill-badge.empty {
-      background: transparent;
-      border: 1px solid transparent;
-      color: #cbd5e1;
-      font-weight: 400;
-      box-shadow: none;
+    .single-price {
+      margin-top: 10px;
+      color: var(--primary-dark);
+      font-size: 15px;
+      font-weight: 850;
     }
 
-    /* Veg / Non-Veg Icons */
-    .veg-symbol {
-      width: 14px;
-      height: 14px;
-      border: 1.5px solid var(--veg);
+    .portion-prices {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 3px;
-      flex-shrink: 0;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
     }
-    .veg-symbol::after {
-      content: '';
-      width: 6px;
-      height: 6px;
-      background: var(--veg);
-      border-radius: 50%;
+    .portion-price {
+      border: 1px solid color-mix(in srgb, var(--primary) 22%, var(--border));
+      background: var(--primary-soft);
+      border-radius: 10px;
+      padding: 6px 8px;
+      min-width: 64px;
     }
-
-    .nonveg-symbol {
-      width: 14px;
-      height: 14px;
-      border: 1.5px solid var(--nonveg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 3px;
-      flex-shrink: 0;
+    .portion-price .label {
+      display: block;
+      color: var(--muted);
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .4px;
     }
-    .nonveg-symbol::after {
-      content: '';
-      width: 0;
-      height: 0;
-      border-left: 4px solid transparent;
-      border-right: 4px solid transparent;
-      border-bottom: 7px solid var(--nonveg);
+    .portion-price .amount {
+      display: block;
+      margin-top: 2px;
+      color: var(--primary-dark);
+      font-size: 12.5px;
+      font-weight: 850;
     }
 
-    .egg-symbol {
-      width: 14px;
-      height: 14px;
-      border: 1.5px solid var(--egg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 3px;
-      flex-shrink: 0;
+    .item-image-wrap {
+      position: relative;
+      width: 92px;
+      height: 92px;
+      flex: 0 0 92px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
     }
-    .egg-symbol::after {
-      content: '';
-      width: 6px;
-      height: 6px;
-      background: var(--egg);
-      border-radius: 50%;
+    .item-image { width: 100%; height: 100%; object-fit: cover; }
+    .img-placeholder {
+      width: 100%; height: 100%;
+      display: grid; place-items: center;
+      color: #9ca3af;
+      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    }
+    .img-placeholder svg { width: 26px; height: 26px; }
+
+    /* STATES */
+    .state-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 34px 20px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      color: var(--muted);
+    }
+    .state-card strong { display: block; color: var(--text); font-size: 17px; margin-bottom: 5px; }
+
+    .skeleton {
+      overflow: hidden;
+      position: relative;
+      background: #e9edf2;
+      border-radius: 10px;
+    }
+    .skeleton::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.65), transparent);
+      animation: shimmer 1.25s infinite;
+    }
+    @keyframes shimmer { 100% { transform: translateX(100%); } }
+
+    .loading-list {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .loading-row { display: flex; gap: 12px; padding: 14px; border-bottom: 1px solid var(--border); }
+    .loading-row:last-child { border-bottom: 0; }
+    .sk-line { height: 12px; margin-bottom: 8px; }
+    .sk-title { width: 58%; height: 15px; }
+    .sk-text { width: 85%; }
+    .sk-price { width: 35%; }
+    .sk-img { width: 90px; height: 90px; flex: 0 0 90px; }
+
+    .footer-note {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 11px;
+      padding: 8px 16px 0;
+    }
+
+    @media (min-width: 640px) {
+      body { padding-top: 18px; }
+      .app-shell {
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(15,23,42,.08);
+      }
+      .hero, .hero-content { min-height: 220px; }
+      .hero-content { padding: 28px 24px 22px; }
+      .sticky-panel { padding-inline: 18px; }
+      .menu-wrap { padding-inline: 18px; }
+      .menu-item { padding: 16px; }
+      .item-image-wrap { width: 110px; height: 100px; flex-basis: 110px; }
     }
   </style>
 </head>
 <body>
+  <div class="app-shell">
 
-  <!-- Top Fixed Navbar Header -->
-  <nav class="top-navbar">
-    <div class="header-content">
-      <!-- Left: Logo / Dummy Logo Placeholder -->
-      <div class="header-left">
-        <div class="logo-wrapper" id="logo-container">
-          <!-- Logo will be inserted via JS -->
-          <div class="dummy-logo">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>
+    <header class="hero" id="hero">
+      <img id="rest-cover" class="hero-cover" alt="" style="display:none;" />
+      <div class="hero-overlay"></div>
+
+      <div class="hero-content">
+        <div class="logo-wrap" id="logo-container">
+          <div class="logo-fallback" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/>
+            </svg>
           </div>
-          <span class="status-indicator"></span>
         </div>
-      </div>
 
-      <!-- Center: Restaurant Name & Info -->
-      <div class="header-center">
-        <h1 id="rest-name" class="restaurant-name">Loading Restaurant...</h1>
-        <div class="restaurant-subtitle">
-          <span>🍽️ Fresh & Authentic Food Menu</span>
+        <div class="hero-info">
+          <h1 id="rest-name" class="restaurant-name">Loading Menu...</h1>
+          <div class="restaurant-meta">
+            <span id="rest-status" class="status-badge">
+              <span class="status-dot"></span>
+              <span>Open</span>
+            </span>
+            <span id="rest-address" style="display:none;"></span>
+          </div>
         </div>
-      </div>
 
-      <!-- Right: Direct Call Button -->
-      <div class="header-right">
-        <a id="rest-call-btn" href="#" class="call-btn" style="display: none;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
-          Call
+        <a id="rest-call-btn" class="hero-action" href="#" aria-label="Call restaurant">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24c1.12.37 2.33.57 3.57.57A1 1 0 0121 16.5V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1.02l-2.2 2.2z"/>
+          </svg>
         </a>
       </div>
-    </div>
-  </nav>
+    </header>
 
-  <!-- Main Content Container -->
-  <main class="menu-container">
-    <!-- Quick Filter Category Bar -->
-    <div class="category-scroll-bar" id="category-chips"></div>
+    <section class="sticky-panel">
+      <div class="search-wrap">
+        <div class="search-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-3.5-3.5"></path>
+          </svg>
+        </div>
+        <input id="menu-search" type="search" placeholder="Search food or category..." autocomplete="off" />
+      </div>
+      <div class="category-scroll" id="category-chips"></div>
+    </section>
 
-    <!-- Menu Items List -->
-    <div id="menu-sections"></div>
-  </main>
+    <main class="menu-wrap">
+      <div id="summary-line" class="summary-line" style="display:none;"></div>
+      <div id="menu-sections"></div>
+      <div class="footer-note">Digital menu • Prices may be subject to change</div>
+    </main>
+  </div>
 
   <script>
+    /* =========================================================
+       SUPABASE CONFIG
+       Keep RLS enabled in Supabase. An anon/public key is safe to
+       expose only when your database policies are configured correctly.
+    ========================================================== */
     const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    async function loadPublicMenu() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const slug = urlParams.get('r');
+    let restaurant = null;
+    let allItems = [];
+    let currentCategory = "all";
+    let searchText = "";
 
-      let restQuery = supabaseClient.from('restaurants').select('*');
-      if (slug) {
-        restQuery = restQuery.eq('slug', slug.toLowerCase());
-      }
-      
-      const { data: restaurants } = await restQuery.limit(1);
+    const $ = (id) => document.getElementById(id);
 
-      if (!restaurants || restaurants.length === 0) {
-        document.getElementById('rest-name').innerText = "Restaurant Not Found";
-        return;
-      }
-
-      const rest = restaurants[0];
-      document.getElementById('rest-name').innerText = rest.name || 'Menu';
-      
-      // Update Call Button Link
-      if (rest.phone) {
-        const callBtn = document.getElementById('rest-call-btn');
-        callBtn.href = `tel:${rest.phone}`;
-        callBtn.style.display = 'inline-flex';
-      }
-
-      // Dynamic Logo or Dummy Image Fallback
-      const logoContainer = document.getElementById('logo-container');
-      if (rest.logo_url && rest.logo_url.trim() !== '') {
-        logoContainer.innerHTML = `
-          <img class="restaurant-logo" src="${rest.logo_url}" onerror="this.onerror=null; this.parentElement.innerHTML='${getDummySvg()}';" alt="Logo">
-          <span class="status-indicator"></span>
-        `;
-      } else {
-        logoContainer.innerHTML = `
-          ${getDummySvg()}
-          <span class="status-indicator"></span>
-        `;
-      }
-
-      const { data: items } = await supabaseClient
-        .from('menu_items')
-        .select('*')
-        .eq('restaurant_id', rest.id);
-
-      renderCategorizedMenu(items || []);
+    function escapeHTML(value = "") {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
 
-    function getDummySvg() {
+    function safeUrl(value) {
+      if (!value) return "";
+      try {
+        const url = new URL(value, window.location.origin);
+        if (["http:", "https:"].includes(url.protocol)) return url.href;
+      } catch (_) {}
+      return "";
+    }
+
+    function cssColor(value, fallback) {
+      if (!value) return fallback;
+      const test = document.createElement("span");
+      test.style.color = "";
+      test.style.color = value;
+      return test.style.color ? value : fallback;
+    }
+
+    function applyRestaurantTheme(rest) {
+      const root = document.documentElement.style;
+
+      // These fields are OPTIONAL. If your table does not have them,
+      // the fallback colors below will be used automatically.
+      const primary = cssColor(rest.primary_color || rest.theme_primary, "#0f766e");
+      const primaryDark = cssColor(rest.primary_dark || rest.theme_primary_dark, "#115e59");
+      const bg = cssColor(rest.background_color || rest.theme_background, "#f6f7f9");
+      const surface = cssColor(rest.card_color || rest.theme_card, "#ffffff");
+      const text = cssColor(rest.text_color || rest.theme_text, "#111827");
+
+      root.setProperty("--primary", primary);
+      root.setProperty("--primary-dark", primaryDark);
+      root.setProperty("--bg", bg);
+      root.setProperty("--surface", surface);
+      root.setProperty("--text", text);
+
+      const radius = Number(rest.card_radius || rest.theme_radius);
+      if (Number.isFinite(radius) && radius >= 0 && radius <= 40) {
+        root.setProperty("--radius", `${radius}px`);
+      }
+
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) metaTheme.setAttribute("content", primary);
+    }
+
+    function showLoading() {
+      $("menu-sections").innerHTML = `
+        <div class="loading-list" aria-label="Loading menu">
+          ${[1,2,3,4].map(() => `
+            <div class="loading-row">
+              <div style="flex:1; padding-top:4px;">
+                <div class="skeleton sk-title sk-line"></div>
+                <div class="skeleton sk-text sk-line"></div>
+                <div class="skeleton sk-price sk-line"></div>
+              </div>
+              <div class="skeleton sk-img"></div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function showState(title, message) {
+      $("menu-sections").innerHTML = `
+        <div class="state-card">
+          <strong>${escapeHTML(title)}</strong>
+          <span>${escapeHTML(message)}</span>
+        </div>
+      `;
+    }
+
+    function logoFallback() {
       return `
-        <div class="dummy-logo">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-            <line x1="6" y1="1" x2="6" y2="4"></line>
-            <line x1="10" y1="1" x2="10" y2="4"></line>
-            <line x1="14" y1="1" x2="14" y2="4"></line>
+        <div class="logo-fallback" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/>
           </svg>
         </div>
       `;
     }
 
-    function renderCategorizedMenu(items) {
-      const container = document.getElementById('menu-sections');
-      const chipsContainer = document.getElementById('category-chips');
-
-      if (items.length === 0) {
-        container.innerHTML = '<p style="text-align:center; padding: 40px; color: #64748b;">No items added to the menu yet.</p>';
-        return;
-      }
-
-      const grouped = {};
-      items.forEach(item => {
-        const cat = item.category ? item.category.trim() : 'General';
-        if (!grouped[cat]) grouped[cat] = [];
-        grouped[cat].push(item);
-      });
-
-      // Render Category Filter Chips
-      let chipsHtml = `<span class="cat-chip active">All Menu</span>`;
-      Object.keys(grouped).forEach(cat => {
-        chipsHtml += `<span class="cat-chip">${cat}</span>`;
-      });
-      chipsContainer.innerHTML = chipsHtml;
-
-      // Render Categories & Items
-      let html = '';
-      for (const [catName, catItems] of Object.entries(grouped)) {
-        const hasPortions = catItems.some(i => i.price_quarter || i.price_half || i.price_full);
-
-        html += `
-          <div class="category-card" id="cat-${catName.replace(/\s+/g, '-')}">
-            <div class="category-header">
-              <span class="category-title">${catName}</span>
-              ${hasPortions ? `
-                <div class="portion-labels-header">
-                  <span class="portion-col">Qtr</span>
-                  <span class="portion-col">Half</span>
-                  <span class="portion-col">Full</span>
-                </div>
-              ` : `
-                <div class="portion-labels-header">
-                  <span class="portion-col" style="width:65px;">Price</span>
-                </div>
-              `}
-            </div>
-            <div>
-              ${catItems.map(item => renderItemRow(item, hasPortions)).join('')}
-            </div>
-          </div>
-        `;
-      }
-
-      container.innerHTML = html;
-    }
-
-    function renderItemRow(item, hasPortions) {
-      let symbolHtml = '<span class="veg-symbol"></span>';
-      if (item.item_type === 'egg') {
-        symbolHtml = '<span class="egg-symbol"></span>';
-      } else if (item.item_type === 'nonveg' || item.is_veg === false) {
-        symbolHtml = '<span class="nonveg-symbol"></span>';
-      }
-
-      let pricesHtml = '';
-      if (hasPortions) {
-        const qtr = item.price_quarter ? `₹${item.price_quarter}` : '-';
-        const half = item.price_half ? `₹${item.price_half}` : '-';
-        const fullVal = item.price_full || item.price;
-        const full = fullVal ? `₹${fullVal}` : '-';
-
-        pricesHtml = `
-          <div class="price-columns-group">
-            <span class="price-pill-badge ${!item.price_quarter ? 'empty' : ''}">${qtr}</span>
-            <span class="price-pill-badge ${!item.price_half ? 'empty' : ''}">${half}</span>
-            <span class="price-pill-badge ${!fullVal ? 'empty' : ''}">${full}</span>
-          </div>
-        `;
-      } else {
-        const singlePrice = item.price || item.price_full || item.price_half || item.price_quarter || 0;
-        pricesHtml = `
-          <div class="price-columns-group">
-            <span class="price-pill-badge" style="width: 65px;">₹${singlePrice}</span>
-          </div>
-        `;
-      }
+    function itemImageHTML(item) {
+      const imageUrl = safeUrl(item.image_url || item.photo_url || item.image);
+      if (!imageUrl) return "";
 
       return `
-        <div class="item-row">
-          <div class="item-details">
-            <div class="item-title-flex">
-              ${symbolHtml}
-              <span class="item-name">${item.name}</span>
-            </div>
-            ${item.description ? `<div class="item-desc">${item.description}</div>` : ''}
-          </div>
-          ${pricesHtml}
+        <div class="item-image-wrap">
+          <img class="item-image" src="${escapeHTML(imageUrl)}" alt="${escapeHTML(item.name || "Menu item")}" loading="lazy"
+               onerror="this.parentElement.innerHTML='<div class=&quot;img-placeholder&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot;><path d=&quot;M4 5h16v14H4z&quot;/><path d=&quot;m4 15 4-4 4 4 3-3 5 5&quot;/><circle cx=&quot;15&quot; cy=&quot;9&quot; r=&quot;1.5&quot;/></svg></div>'" />
         </div>
       `;
     }
 
-    window.addEventListener('load', loadPublicMenu);
+    function getItemType(item) {
+      if (String(item.item_type || "").toLowerCase() === "egg") return "egg";
+      if (String(item.item_type || "").toLowerCase() === "nonveg" || item.is_veg === false) return "nonveg";
+      return "veg";
+    }
+
+    function isUnavailable(item) {
+      return item.is_available === false || item.available === false || item.status === "unavailable" || item.status === "out_of_stock";
+    }
+
+    function renderPrice(item) {
+      const qtr = item.price_quarter;
+      const half = item.price_half;
+      const full = item.price_full || item.price;
+      const hasPortions = qtr || half || item.price_full;
+
+      if (hasPortions) {
+        const portions = [
+          ["Qtr", qtr],
+          ["Half", half],
+          ["Full", full]
+        ].filter(([, value]) => value !== null && value !== undefined && value !== "");
+
+        return `
+          <div class="portion-prices">
+            ${portions.map(([label, value]) => `
+              <div class="portion-price">
+                <span class="label">${label}</span>
+                <span class="amount">₹${escapeHTML(value)}</span>
+              </div>
+            `).join("")}
+          </div>
+        `;
+      }
+
+      const single = item.price ?? item.price_full ?? item.price_half ?? item.price_quarter;
+      return single !== null && single !== undefined && single !== ""
+        ? `<div class="single-price">₹${escapeHTML(single)}</div>`
+        : "";
+    }
+
+    function renderTags(item) {
+      const tags = [];
+      if (item.is_bestseller === true || item.bestseller === true) tags.push(`<span class="tag hot">★ Bestseller</span>`);
+      if (item.is_recommended === true || item.recommended === true) tags.push(`<span class="tag">Recommended</span>`);
+      if (item.is_spicy === true || item.spicy === true) tags.push(`<span class="tag hot">🌶 Spicy</span>`);
+      if (isUnavailable(item)) tags.push(`<span class="tag out">Unavailable</span>`);
+      return tags.length ? `<div class="item-tags">${tags.join("")}</div>` : "";
+    }
+
+    function renderItem(item) {
+      const type = getItemType(item);
+      const unavailable = isUnavailable(item);
+
+      return `
+        <article class="menu-item ${unavailable ? "unavailable" : ""}" data-name="${escapeHTML((item.name || "").toLowerCase())}">
+          <div class="item-content">
+            <div class="item-topline">
+              <span class="food-symbol ${type}" aria-label="${type}"></span>
+              <h3 class="item-name">${escapeHTML(item.name || "Unnamed item")}</h3>
+            </div>
+            ${renderTags(item)}
+            ${item.description ? `<p class="item-desc">${escapeHTML(item.description)}</p>` : ""}
+            ${renderPrice(item)}
+          </div>
+          ${itemImageHTML(item)}
+        </article>
+      `;
+    }
+
+    function categoryKey(category) {
+      return String(category || "General").trim() || "General";
+    }
+
+    function sectionId(name) {
+      return `cat-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "general"}`;
+    }
+
+    function getCategories(items) {
+      const categories = [];
+      const seen = new Set();
+      items.forEach(item => {
+        const category = categoryKey(item.category);
+        if (!seen.has(category)) {
+          seen.add(category);
+          categories.push(category);
+        }
+      });
+      return categories;
+    }
+
+    function renderCategoryChips() {
+      const categories = getCategories(allItems);
+      $("category-chips").innerHTML = [
+        `<button class="cat-chip ${currentCategory === "all" ? "active" : ""}" data-category="all">All Menu</button>`,
+        ...categories.map(category => `
+          <button class="cat-chip ${currentCategory === category ? "active" : ""}" data-category="${escapeHTML(category)}">
+            ${escapeHTML(category)}
+          </button>
+        `)
+      ].join("");
+    }
+
+    function getFilteredItems() {
+      const q = searchText.trim().toLowerCase();
+      return allItems.filter(item => {
+        const category = categoryKey(item.category);
+        const categoryMatch = currentCategory === "all" || category === currentCategory;
+        const haystack = `${item.name || ""} ${item.description || ""} ${category}`.toLowerCase();
+        const searchMatch = !q || haystack.includes(q);
+        return categoryMatch && searchMatch;
+      });
+    }
+
+    function renderMenu() {
+      const filtered = getFilteredItems();
+      const grouped = {};
+
+      filtered.forEach(item => {
+        const category = categoryKey(item.category);
+        if (!grouped[category]) grouped[category] = [];
+        grouped[category].push(item);
+      });
+
+      $("summary-line").style.display = "flex";
+      $("summary-line").innerHTML = `
+        <span>${filtered.length} item${filtered.length === 1 ? "" : "s"}</span>
+        ${searchText ? `<span>Search: “${escapeHTML(searchText)}”</span>` : ""}
+      `;
+
+      if (!filtered.length) {
+        showState("Nothing found", "Try another search or category.");
+        return;
+      }
+
+      $("menu-sections").innerHTML = Object.entries(grouped).map(([category, items]) => `
+        <section class="category-section" id="${sectionId(category)}" data-category="${escapeHTML(category)}">
+          <div class="category-heading">
+            <h2 class="category-title">${escapeHTML(category)}</h2>
+            <span class="item-count">${items.length} item${items.length === 1 ? "" : "s"}</span>
+          </div>
+          <div class="items-list">
+            ${items.map(renderItem).join("")}
+          </div>
+        </section>
+      `).join("");
+    }
+
+    function renderRestaurant(rest) {
+      restaurant = rest;
+      applyRestaurantTheme(rest);
+
+      $("rest-name").textContent = rest.name || "Menu";
+      document.title = `${rest.name || "Restaurant"} • Menu`;
+
+      const logoUrl = safeUrl(rest.logo_url);
+      $("logo-container").innerHTML = logoUrl
+        ? `<img src="${escapeHTML(logoUrl)}" alt="${escapeHTML(rest.name || "Restaurant")} logo" onerror="this.parentElement.innerHTML=logoFallback()" />`
+        : logoFallback();
+
+      const coverUrl = safeUrl(rest.cover_url || rest.banner_url || rest.cover_image);
+      if (coverUrl) {
+        $("rest-cover").src = coverUrl;
+        $("rest-cover").style.display = "block";
+      }
+
+      if (rest.phone) {
+        const phone = String(rest.phone).replace(/[^+\d]/g, "");
+        $("rest-call-btn").href = `tel:${phone}`;
+        $("rest-call-btn").style.display = "grid";
+      }
+
+      const address = rest.address || rest.location || rest.city;
+      if (address) {
+        $("rest-address").textContent = `• ${address}`;
+        $("rest-address").style.display = "inline";
+      }
+
+      const isOpen = rest.is_open !== false && rest.status !== "closed" && rest.is_active !== false;
+      const statusEl = $("rest-status");
+      statusEl.classList.toggle("closed", !isOpen);
+      statusEl.querySelector("span:last-child").textContent = isOpen ? "Open" : "Closed";
+    }
+
+    async function loadPublicMenu() {
+      showLoading();
+
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const slug = (params.get("r") || "").trim().toLowerCase();
+
+        let query = supabaseClient.from("restaurants").select("*");
+        if (slug) query = query.eq("slug", slug);
+
+        const { data: restaurants, error: restError } = await query.limit(1);
+        if (restError) throw restError;
+
+        if (!restaurants || !restaurants.length) {
+          $("rest-name").textContent = "Restaurant Not Found";
+          $("category-chips").innerHTML = "";
+          $("summary-line").style.display = "none";
+          showState("Restaurant not found", "Please check the menu link and try again.");
+          return;
+        }
+
+        const rest = restaurants[0];
+        renderRestaurant(rest);
+
+        const { data: items, error: itemsError } = await supabaseClient
+          .from("menu_items")
+          .select("*")
+          .eq("restaurant_id", rest.id);
+
+        if (itemsError) throw itemsError;
+
+        allItems = Array.isArray(items) ? items : [];
+
+        // Optional sorting if you later add sort_order fields.
+        allItems.sort((a, b) => {
+          const aOrder = Number(a.sort_order ?? a.position ?? 999999);
+          const bOrder = Number(b.sort_order ?? b.position ?? 999999);
+          return aOrder - bOrder;
+        });
+
+        if (!allItems.length) {
+          $("category-chips").innerHTML = "";
+          $("summary-line").style.display = "none";
+          showState("Menu is being prepared", "No menu items have been added yet.");
+          return;
+        }
+
+        renderCategoryChips();
+        renderMenu();
+      } catch (error) {
+        console.error("Menu load error:", error);
+        $("rest-name").textContent = "Menu Unavailable";
+        $("category-chips").innerHTML = "";
+        $("summary-line").style.display = "none";
+        showState("Unable to load menu", "Please refresh the page or try again shortly.");
+      }
+    }
+
+    $("menu-search").addEventListener("input", (event) => {
+      searchText = event.target.value || "";
+      renderMenu();
+    });
+
+    $("category-chips").addEventListener("click", (event) => {
+      const btn = event.target.closest(".cat-chip");
+      if (!btn) return;
+
+      currentCategory = btn.dataset.category || "all";
+      renderCategoryChips();
+      renderMenu();
+
+      window.scrollTo({
+        top: document.querySelector(".sticky-panel").offsetTop,
+        behavior: "smooth"
+      });
+    });
+
+    window.addEventListener("load", loadPublicMenu);
   </script>
 </body>
 </html>
