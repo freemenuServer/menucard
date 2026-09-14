@@ -1,374 +1,497 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FreeMenu.in - Explore Restaurants & Digital Menus</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>FreeMenu.in — Discover Digital Restaurant Menus</title>
+<meta name="description" content="Discover restaurants and explore their digital menus on FreeMenu.in.">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-  <!-- Supabase JS CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  --red:#df182e;--red2:#f22943;--dark:#111827;--muted:#667085;
+  --cream:#fffaf3;--line:#e9e9ed;--soft:#f7f7f8;--white:#fff;
+  --shadow:0 10px 30px rgba(17,24,39,.08);--radius:14px
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:"DM Sans",sans-serif;color:var(--dark);background:#fff;line-height:1.45}
+button,input{font:inherit}
+button{cursor:pointer}
+a{text-decoration:none;color:inherit}
+.container{width:min(1240px,calc(100% - 48px));margin:auto}
+.hidden{display:none!important}
+.text-red{color:var(--red)}
+.serif{font-family:"Playfair Display",serif}
+.script{font-family:"Caveat",cursive}
 
-  <style>
-    :root {
-      --primary: #ff4757;
-      --primary-hover: #ff6b81;
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --text-dark: #0f172a;
-      --text-muted: #64748b;
-      --shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-    }
+/* Navbar */
+.navbar{height:64px;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid #eee;position:sticky;top:0;z-index:1000}
+.nav-inner{height:100%;display:flex;align-items:center;justify-content:space-between;gap:25px}
+.brand{display:flex;align-items:center;gap:8px;font-size:23px;font-weight:800;letter-spacing:-1px}
+.brand-icon{width:42px;height:42px;display:grid;place-items:center;color:var(--red);font-size:31px}
+.brand span{color:var(--red)}
+.brand small{display:block;font-size:8px;letter-spacing:.3px;color:#4b5563;font-weight:500;margin-top:-2px}
+.nav-links{display:flex;align-items:center;gap:26px;font-size:12px;font-weight:600}
+.nav-links a{padding:22px 0;position:relative}
+.nav-links a:hover,.nav-links a.active{color:var(--red)}
+.nav-links a.active:after{content:"";position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--red)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.search-top{width:40px;height:40px;border:1px solid #dfe3e8;border-radius:9px;background:#fff;color:#111827}
+.owner-btn{background:linear-gradient(90deg,var(--red),#c9152b);color:#fff;border:0;border-radius:8px;padding:11px 17px;font-size:12px;font-weight:800;box-shadow:0 5px 14px rgba(223,24,46,.2)}
+.owner-btn:hover{transform:translateY(-1px)}
+.menu-toggle{display:none;width:40px;height:40px;border:1px solid #ddd;background:#fff;border-radius:9px}
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg); color: var(--text-dark); min-height: 100vh; display: flex; flex-direction: column; }
+/* Hero */
+.hero{position:relative;min-height:340px;overflow:hidden;background:
+linear-gradient(90deg,rgba(0,0,0,.82) 0%,rgba(0,0,0,.68) 40%,rgba(0,0,0,.18) 100%),
+url("https://images.unsplash.com/photo-1563379091339-03246963d96c?auto=format&fit=crop&w=1800&q=85") center/cover}
+.hero:after{content:"";position:absolute;right:-70px;top:0;width:52%;height:100%;background:radial-gradient(circle at 45% 55%,rgba(255,184,78,.18),transparent 48%);pointer-events:none}
+.hero-inner{position:relative;z-index:2;padding:34px 0 38px;color:#fff}
+.hero-copy{max-width:670px}
+.hero h1{font-family:"Playfair Display",serif;font-size:48px;line-height:1.05;margin-bottom:12px;letter-spacing:-1px}
+.hero h1 span{color:#ff243b}
+.hero p{font-size:15px;color:#f0f0f0;max-width:580px;margin-bottom:18px}
+.search-wrap{width:min(640px,100%);height:48px;background:#fff;border-radius:28px;display:flex;align-items:center;padding:4px 5px 4px 17px;box-shadow:0 8px 25px rgba(0,0,0,.22)}
+.search-wrap i{color:#475467;font-size:18px}
+.search-wrap input{flex:1;border:0;outline:0;padding:0 13px;font-size:13px;color:#111}
+.search-wrap button{height:40px;padding:0 28px;border:0;border-radius:22px;background:var(--red);color:#fff;font-weight:800}
+.popular{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:13px;font-size:10px}
+.popular strong{margin-right:4px;font-size:10px}
+.pop-chip{border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.38);color:#fff;border-radius:14px;padding:5px 10px}
+.benefits{display:flex;gap:28px;margin-top:25px;flex-wrap:wrap}
+.benefit{display:flex;align-items:center;gap:9px;font-size:11px}
+.benefit i{width:32px;height:32px;border:1px solid rgba(255,255,255,.8);border-radius:50%;display:grid;place-items:center}
 
-    /* Glassy Navbar */
-    .navbar {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #e2e8f0;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .logo { font-size: 22px; font-weight: 800; color: var(--primary); text-decoration: none; letter-spacing: -0.5px; }
-    .logo span { color: var(--text-dark); }
-    .owner-btn {
-      background: var(--text-dark);
-      color: white;
-      padding: 10px 18px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 700;
-      transition: all 0.2s ease;
-    }
-    .owner-btn:hover { background: #334155; transform: translateY(-1px); }
+/* Categories */
+.category-bar{background:#fff;border-bottom:1px solid #f0f0f0;padding:15px 0}
+.categories{display:flex;justify-content:space-between;gap:10px;overflow:auto;padding:1px 0 4px}
+.cat{min-width:82px;border:0;background:#fff;text-align:center;color:#111;font-size:11px;padding:3px 5px;border-radius:12px}
+.cat .cat-icon{width:47px;height:47px;margin:auto auto 5px;border-radius:50%;background:#faf7f1;display:grid;place-items:center;font-size:21px}
+.cat.active .cat-icon{background:var(--red);color:#fff}
+.cat:hover .cat-icon{box-shadow:0 0 0 2px #ffd7dc}
 
-    /* Hero & Search Section */
-    .hero {
-      text-align: center;
-      padding: 48px 20px 36px;
-      background: #ffffff;
-      border-bottom: 1px solid #f1f5f9;
-    }
-    .hero-badge {
-      display: inline-block;
-      background: #fff1f2;
-      color: var(--primary);
-      font-size: 12px;
-      font-weight: 700;
-      padding: 6px 14px;
-      border-radius: 20px;
-      margin-bottom: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .hero h1 { font-size: 32px; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.5px; }
-    .hero p { font-size: 15px; color: var(--text-muted); max-width: 480px; margin: 0 auto 24px; line-height: 1.5; }
+/* Main */
+main{background:#fff}
+.section{padding:26px 0}
+.section-head{display:flex;align-items:end;justify-content:space-between;margin-bottom:14px}
+.section-head h2{font-family:"Playfair Display",serif;font-size:25px}
+.section-head p{font-size:12px;color:var(--muted);margin-top:2px}
+.view-all{font-size:12px;color:var(--red);font-weight:700}
+.restaurant-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+.restaurant-card{background:#fff;border:1px solid #e8e8ea;border-radius:10px;overflow:hidden;box-shadow:0 3px 12px rgba(0,0,0,.05);transition:.2s;display:flex;flex-direction:column}
+.restaurant-card:hover{transform:translateY(-3px);box-shadow:0 10px 25px rgba(0,0,0,.1)}
+.card-cover{height:112px;background:
+linear-gradient(135deg,rgba(17,24,39,.25),rgba(17,24,39,.05)),
+url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=80") center/cover;position:relative}
+.card-cover img.logo{position:absolute;width:76px;height:76px;border-radius:50%;object-fit:cover;left:50%;bottom:-38px;transform:translateX(-50%);border:4px solid #fff;background:#171717;box-shadow:0 5px 15px rgba(0,0,0,.2)}
+.status{position:absolute;right:7px;top:7px;background:#17a665;color:#fff;border-radius:12px;padding:4px 8px;font-size:9px;font-weight:800}
+.card-body{padding:43px 9px 9px;display:flex;flex-direction:column;flex:1}
+.card-body h3{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-body .info{font-size:9px;color:#68707e;min-height:27px;margin-top:2px}
+.location{font-size:9px;color:#596273;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.menu-link{margin-top:8px;background:var(--red);color:#fff;text-align:center;border-radius:5px;padding:7px 5px;font-size:10px;font-weight:800}
+.empty{grid-column:1/-1;padding:45px;text-align:center;color:var(--muted);border:1px dashed #ddd;border-radius:12px}
+.empty i{font-size:32px;margin-bottom:10px;color:#c7cbd1}
+.loading-grid{grid-column:1/-1;text-align:center;padding:45px;color:var(--muted)}
+.spinner{width:34px;height:34px;border:4px solid #eee;border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-    /* Search Input Styling */
-    .search-box-wrapper {
-      max-width: 460px;
-      margin: 0 auto;
-      position: relative;
-    }
-    .search-input {
-      width: 100%;
-      padding: 14px 20px 14px 46px;
-      font-size: 15px;
-      border: 2px solid #e2e8f0;
-      border-radius: 12px;
-      outline: none;
-      transition: all 0.2s ease;
-      background: #f8fafc;
-    }
-    .search-input:focus {
-      border-color: var(--primary);
-      background: #ffffff;
-      box-shadow: 0 4px 12px rgba(255, 71, 87, 0.15);
-    }
-    .search-icon {
-      position: absolute;
-      left: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 18px;
-      color: var(--text-muted);
-      pointer-events: none;
-    }
+/* Owner promo */
+.owner-promo{display:grid;grid-template-columns:1.5fr .75fr .85fr;gap:12px;margin-top:2px}
+.promo{border-radius:10px;min-height:150px;overflow:hidden;position:relative}
+.promo-main{background:linear-gradient(90deg,rgba(0,0,0,.87),rgba(0,0,0,.38)),url("https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=1000&q=85") center/cover;color:#fff;padding:23px}
+.promo-main h2{font-family:"Playfair Display",serif;font-size:25px}.promo-main p{font-size:13px;margin:3px 0 14px}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:10px}.checks i{color:#55d98f;margin-right:4px}
+.promo-btn{display:inline-block;margin-top:13px;background:var(--red);color:#fff;border-radius:6px;padding:8px 15px;font-size:10px;font-weight:800}
+.promo-demo{background:#f2f9ff;padding:18px}.promo-demo h3,.promo-love h3{font-family:"Playfair Display",serif;font-size:15px}.promo-demo p,.promo-love p{font-size:10px;color:#566174;margin:4px 0 8px}.fake-qr{width:75px;height:75px;background:repeating-conic-gradient(#111 0 25%,#fff 0 50%) 50%/12px 12px;border:7px solid #fff;box-shadow:0 2px 10px #c9d4df;margin-left:auto}
+.promo-love{background:#fff3ef;padding:18px}.promo-love .script{font-size:27px;color:var(--red);line-height:1.05}
 
-    /* Main Container */
-    .container { max-width: 900px; width: 100%; margin: 32px auto; padding: 0 16px; flex: 1; }
-    .section-header { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
-    .section-title { font-size: 20px; font-weight: 800; color: var(--text-dark); }
-    .count-badge { font-size: 13px; color: var(--text-muted); font-weight: 600; background: #e2e8f0; padding: 3px 10px; border-radius: 12px; }
+/* How it works */
+.how{text-align:center;padding:25px 0 17px}.how h2{font-family:"Playfair Display",serif;font-size:24px}.how>p{font-size:12px;color:var(--muted);margin-top:2px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-top:18px}
+.step{background:#fff;border:1px solid #f1f2f4;border-radius:9px;padding:16px 10px;box-shadow:0 2px 12px rgba(0,0,0,.025)}
+.step-icon{width:44px;height:44px;border-radius:50%;margin:auto auto 8px;background:#fff0f2;color:var(--red);display:grid;place-items:center;font-size:19px}.step h3{font-size:12px}.step p{font-size:10px;color:#667085;margin-top:3px}
 
-    /* Restaurant Grid */
-    .restaurant-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-      gap: 20px;
-    }
-    
-    .restaurant-card {
-      background: var(--card-bg);
-      border: 1px solid #f1f5f9;
-      border-radius: 16px;
-      padding: 20px;
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      box-shadow: var(--shadow);
-      transition: all 0.2s ease;
-      cursor: pointer;
-    }
-    .restaurant-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.08);
-      border-color: #cbd5e1;
-    }
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding:15px 0 25px}
+.stat{text-align:center;border-right:1px solid #e4e7ec}.stat:last-child{border-right:0}.stat i{font-size:25px;color:var(--red);margin-bottom:4px}.stat strong{display:block;font-size:20px}.stat span{font-size:10px;color:var(--muted)}
 
-    /* Round Logo Styling */
-    .card-top {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 18px;
-    }
-    .round-logo {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid #ffe1e4;
-      background: #fff1f2;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--primary);
-      text-transform: uppercase;
-    }
-    
-    .restaurant-details {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    .restaurant-name { 
-      font-size: 17px; 
-      font-weight: 800; 
-      color: var(--text-dark); 
-      white-space: nowrap; 
-      overflow: hidden; 
-      text-overflow: ellipsis; 
-      line-height: 1.3;
-    }
-    .restaurant-slug { 
-      font-size: 13px; 
-      color: var(--text-muted); 
-      font-weight: 500; 
-      margin-top: 2px;
-    }
+/* Bottom banner */
+.bottom-banner{height:105px;background:
+linear-gradient(rgba(0,0,0,.58),rgba(0,0,0,.58)),
+url("https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1800&q=80") center/cover;display:grid;place-items:center;text-align:center;color:#fff}
+.bottom-banner .script{font-size:34px;line-height:1}.bottom-banner i{color:#ff243b}
 
-    .view-menu-badge {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #f8fafc;
-      color: var(--text-dark);
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 700;
-      border: 1px solid #e2e8f0;
-      transition: all 0.2s;
-    }
-    .restaurant-card:hover .view-menu-badge {
-      background: var(--primary);
-      color: #ffffff;
-      border-color: var(--primary);
-    }
+/* Footer */
+footer{background:#fff;border-top:1px solid #eee}
+.footer-main{display:grid;grid-template-columns:1.1fr 1.2fr .8fr 1.2fr;gap:25px;padding:25px 0}
+.footer-brand p{font-size:9px;color:var(--muted);margin-top:3px}.footer-title{font-size:11px;font-weight:800;margin-bottom:8px}.footer-links{display:flex;flex-wrap:wrap;gap:9px 15px;font-size:10px;color:#4b5563}.social{display:flex;gap:8px}.social a{width:27px;height:27px;background:#20242d;color:#fff;border-radius:50%;display:grid;place-items:center;font-size:11px}.subscribe{display:flex;margin-top:6px}.subscribe input{width:100%;min-width:0;border:1px solid #ddd;padding:8px;border-radius:5px 0 0 5px;font-size:10px}.subscribe button{border:0;background:var(--red);color:#fff;padding:0 12px;border-radius:0 5px 5px 0;font-size:10px;font-weight:800}.footer-bottom{border-top:1px solid #eee;padding:11px 0;font-size:9px;color:var(--muted);display:flex;justify-content:space-between}
 
-    /* Statuses */
-    .status-box { text-align: center; padding: 60px 20px; }
-    .spinner {
-      width: 40px; height: 40px;
-      border: 4px solid #e2e8f0;
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s ease-in-out infinite;
-      margin: 0 auto 16px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+/* Search state */
+.search-state{padding:20px 0 0}.search-state strong{font-size:13px}.clear-search{border:0;background:#fff0f2;color:var(--red);border-radius:5px;padding:5px 9px;font-size:10px;margin-left:6px}
 
-    footer { text-align: center; padding: 24px; border-top: 1px solid #e2e8f0; font-size: 13px; color: var(--text-muted); background: white; }
-  </style>
+/* Mobile */
+@media(max-width:1100px){.restaurant-grid{grid-template-columns:repeat(3,1fr)}.nav-links{gap:16px}}
+@media(max-width:800px){
+ .container{width:min(100% - 28px,650px)}
+ .nav-links{display:none;position:absolute;left:12px;right:12px;top:70px;background:#fff;border:1px solid #eee;border-radius:10px;box-shadow:var(--shadow);padding:8px;flex-direction:column;gap:0}.nav-links.open{display:flex}.nav-links a{padding:11px;width:100%}.nav-links a.active:after{display:none}.menu-toggle{display:block}.search-top{display:none}.nav-right .owner-btn{padding:9px 11px;font-size:10px}
+ .hero{min-height:385px}.hero h1{font-size:38px}.hero-inner{padding-top:38px}.benefits{gap:13px}
+ .categories{justify-content:flex-start}.restaurant-grid{grid-template-columns:repeat(2,1fr);gap:10px}.card-cover{height:105px}
+ .owner-promo{grid-template-columns:1fr}.promo{min-height:145px}.promo-demo,.promo-love{min-height:125px}
+ .steps{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:1px solid #e4e7ec;padding-bottom:12px}.stat:nth-child(n+3){padding-top:12px}
+ .footer-main{grid-template-columns:1fr 1fr}.footer-bottom{flex-direction:column;gap:5px}
+}
+@media(max-width:480px){
+ .brand{font-size:19px}.brand-icon{width:35px;font-size:26px}.brand small{font-size:7px}
+ .hero h1{font-size:33px}.hero p{font-size:13px}.search-wrap{height:46px}.search-wrap button{padding:0 19px}.benefit{font-size:9px}
+ .restaurant-grid{grid-template-columns:1fr 1fr}.card-cover{height:95px}.card-cover img.logo{width:66px;height:66px;bottom:-33px}.card-body{padding-top:38px}
+ .section-head h2{font-size:21px}.footer-main{grid-template-columns:1fr}
+}
+</style>
 </head>
+
 <body>
 
-  <!-- Navbar -->
-  <nav class="navbar">
-    <a href="index.html" class="logo">FreeMenu<span>.in</span></a>
-    <a href="owner.html" class="owner-btn">Owner Portal</a>
-  </nav>
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="container nav-inner">
+    <a href="index.html" class="brand">
+      <div class="brand-icon">👨‍🍳</div>
+      <div>FreeMenu<span>.in</span><small>Every Restaurant. One Digital Menu.</small></div>
+    </a>
 
-  <!-- Hero & Search Section -->
-  <header class="hero">
-    <span class="hero-badge">Digital QR Menu</span>
-    <h1>Explore Restaurants</h1>
-    <p>Browse registered places or search by name to view digital menus.</p>
-    
-    <!-- Search Bar -->
-    <div class="search-box-wrapper">
-      <span class="search-icon">&#128065;</span>
-      <input 
-        type="text" 
-        id="search-input" 
-        class="search-input" 
-        placeholder="Search restaurant by name or code..."
-        oninput="filterRestaurants()"
-      />
-    </div>
-  </header>
-
-  <!-- Restaurants List Container -->
-  <main class="container">
-    <div class="section-header">
-      <h2 class="section-title">Registered Places</h2>
-      <span id="res-count" class="count-badge">0</span>
+    <div class="nav-links" id="navLinks">
+      <a href="#home" class="active">Home</a>
+      <a href="#restaurants">Restaurants</a>
+      <a href="#how">How It Works</a>
+      <a href="#business">For Business</a>
+      <a href="#contact">Contact</a>
     </div>
 
-    <!-- Loading -->
-    <div id="loading" class="status-box">
-      <div class="spinner"></div>
-      <p style="color: var(--text-muted); font-size: 14px;">Loading restaurants...</p>
+    <div class="nav-right">
+      <button class="search-top" id="focusSearch" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+      <button class="owner-btn" id="ownerLogin"><i class="fa-solid fa-user"></i> Owner Login</button>
+      <button class="menu-toggle" id="menuToggle"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="home">
+  <div class="container hero-inner">
+    <div class="hero-copy">
+      <h1>Discover Great Food<br><span>Anytime.</span> Anywhere</h1>
+      <p>Explore digital menus from your favourite restaurants.<br>No app. No hassle. Just Food!</p>
+
+      <form class="search-wrap" id="searchForm">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input id="searchInput" autocomplete="off" placeholder="Search restaurant, dish, cuisine or location...">
+        <button type="submit">Search</button>
+      </form>
+
+      <div class="popular">
+        <strong>Popular Searches:</strong>
+        <button class="pop-chip" data-search="Biryani">Biryani</button>
+        <button class="pop-chip" data-search="North Indian">North Indian</button>
+        <button class="pop-chip" data-search="Chinese">Chinese</button>
+        <button class="pop-chip" data-search="Lajpat Nagar">Lajpat Nagar</button>
+        <button class="pop-chip" data-search="Pizza">Pizza</button>
+        <button class="pop-chip" data-search="Burger">Burger</button>
+        <button class="pop-chip" data-search="South Indian">South Indian</button>
+      </div>
+
+      <div class="benefits">
+        <div class="benefit"><i class="fa-regular fa-circle-check"></i>100% Free<br>Digital Menus</div>
+        <div class="benefit"><i class="fa-solid fa-link"></i>Quick & Easy<br>Access</div>
+        <div class="benefit"><i class="fa-regular fa-heart"></i>Support Local<br>Restaurants</div>
+        <div class="benefit"><i class="fa-solid fa-qrcode"></i>Contactless<br>& Safe</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- CATEGORY STRIP -->
+<section class="category-bar">
+  <div class="container">
+    <div class="categories">
+      <button class="cat active" data-search=""><div class="cat-icon">🍽️</div>All</button>
+      <button class="cat" data-search="North Indian"><div class="cat-icon">🍛</div>North Indian</button>
+      <button class="cat" data-search="Chinese"><div class="cat-icon">🥡</div>Chinese</button>
+      <button class="cat" data-search="South Indian"><div class="cat-icon">🥞</div>South Indian</button>
+      <button class="cat" data-search="Italian"><div class="cat-icon">🍕</div>Italian</button>
+      <button class="cat" data-search="Mughlai"><div class="cat-icon">🍲</div>Mughlai</button>
+      <button class="cat" data-search="Fast Food"><div class="cat-icon">🍔</div>Fast Food</button>
+      <button class="cat" data-search="Desserts"><div class="cat-icon">🍰</div>Desserts</button>
+      <button class="cat" data-search="Beverages"><div class="cat-icon">🥤</div>Beverages</button>
+      <button class="cat" data-search="Street Food"><div class="cat-icon">🍜</div>Street Food</button>
+      <button class="cat" data-search="Healthy Food"><div class="cat-icon">🥗</div>Healthy Food</button>
+    </div>
+  </div>
+</section>
+
+<main>
+
+<!-- RESTAURANTS -->
+<section class="section" id="restaurants">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <h2 id="restaurantHeading">Featured Restaurants</h2>
+        <p id="restaurantSub">Explore restaurants and view their digital menus</p>
+      </div>
+      <a class="view-all" href="#restaurants" id="viewAll">View All Restaurants <i class="fa-solid fa-arrow-right"></i></a>
     </div>
 
-    <!-- Error -->
-    <div id="error-view" class="status-box" style="display: none;">
-      <p style="color: #dc2626; font-weight: 700;" id="error-msg">Failed to load restaurants.</p>
+    <div id="searchState" class="search-state hidden"></div>
+    <div class="restaurant-grid" id="restaurantGrid">
+      <div class="loading-grid"><div class="spinner"></div>Loading restaurants...</div>
+    </div>
+  </div>
+</section>
+
+<!-- OWNER CTA -->
+<section class="section" id="business" style="padding-top:0">
+  <div class="container owner-promo">
+    <div class="promo promo-main">
+      <h2>Are You a Restaurant Owner?</h2>
+      <p>Get your <b style="color:#ffcc32">FREE</b> Digital Menu today!</p>
+      <div class="checks">
+        <div><i class="fa-solid fa-circle-check"></i>Easy Setup</div>
+        <div><i class="fa-solid fa-circle-check"></i>Get More Customers</div>
+        <div><i class="fa-solid fa-circle-check"></i>Manage Menu</div>
+        <div><i class="fa-solid fa-circle-check"></i>No Technical Skills Required</div>
+      </div>
+      <button class="promo-btn" id="promoOwner">Owner Login <i class="fa-solid fa-arrow-right"></i></button>
     </div>
 
-    <!-- Restaurant Grid -->
-    <div id="restaurant-grid" class="restaurant-grid" style="display: none;"></div>
-  </main>
+    <div class="promo promo-demo">
+      <h3>Scan & See a Demo</h3>
+      <p>Scan this QR code to view a sample restaurant menu.</p>
+      <div class="fake-qr" title="Demo QR"></div>
+      <div class="script" style="color:var(--red);font-size:21px;margin-top:-5px">Try it Now!</div>
+    </div>
 
-  <footer>
-    &copy; FreeMenu.in &bull; Contactless Digital Menu
-  </footer>
+    <div class="promo promo-love">
+      <div class="script">Good Food<br>Better Connections <i class="fa-regular fa-heart"></i></div>
+      <p style="margin-top:12px">Find your next meal<br>in just a few clicks.</p>
+    </div>
+  </div>
+</section>
 
-  <script>
-    let supabaseClient = null;
-    let allRestaurants = []; // Stores fetched list for client-side filtering
+<!-- HOW -->
+<section class="how" id="how">
+  <div class="container">
+    <h2>How FreeMenu.in Works</h2>
+    <p>Get started in seconds. It's simple and free!</p>
+    <div class="steps">
+      <div class="step"><div class="step-icon"><i class="fa-solid fa-magnifying-glass"></i></div><h3>1. Search</h3><p>Find your favourite restaurant or dish</p></div>
+      <div class="step"><div class="step-icon"><i class="fa-regular fa-rectangle-list"></i></div><h3>2. Click</h3><p>Open the restaurant's digital menu</p></div>
+      <div class="step"><div class="step-icon"><i class="fa-regular fa-images"></i></div><h3>3. Explore</h3><p>Browse dishes, prices, photos and more</p></div>
+      <div class="step"><div class="step-icon"><i class="fa-solid fa-utensils"></i></div><h3>4. Enjoy</h3><p>Dine in, takeaway or order directly</p></div>
+    </div>
 
-    function initSupabase() {
-      const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
-      const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+    <div class="stats">
+      <div class="stat"><i class="fa-solid fa-store"></i><strong id="statRestaurants">0</strong><span>Restaurants</span></div>
+      <div class="stat"><i class="fa-solid fa-users"></i><strong>50,000+</strong><span>Happy Customers</span></div>
+      <div class="stat"><i class="fa-regular fa-heart"></i><strong>100%</strong><span>Free to Use</span></div>
+      <div class="stat"><i class="fa-solid fa-location-dot"></i><strong>10+</strong><span>Cities</span></div>
+    </div>
+  </div>
+</section>
 
-      if (window.supabase && typeof window.supabase.createClient === 'function') {
-        return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      }
-      return null;
-    }
+<!-- BOTTOM BANNER -->
+<div class="bottom-banner">
+  <div class="script">Good Food<br>Happier People <i class="fa-solid fa-heart"></i></div>
+</div>
 
-    async function fetchRestaurants() {
-      supabaseClient = initSupabase();
+</main>
 
-      if (!supabaseClient) {
-        showError("Script loading error. Please refresh.");
-        return;
-      }
+<!-- FOOTER -->
+<footer id="contact">
+  <div class="container footer-main">
+    <div class="footer-brand">
+      <div class="brand">👨‍🍳 <div>FreeMenu<span>.in</span><small>Every Restaurant. One Digital Menu.</small></div></div>
+    </div>
+    <div>
+      <div class="footer-title">Quick Links</div>
+      <div class="footer-links"><a href="#home">Home</a><a href="#restaurants">Restaurants</a><a href="#how">How It Works</a><a href="#business">For Business</a><a href="#contact">Contact</a></div>
+    </div>
+    <div>
+      <div class="footer-title">Follow Us</div>
+      <div class="social"><a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a><a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a><a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a><a href="#" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a></div>
+    </div>
+    <div>
+      <div class="footer-title">Subscribe</div>
+      <div style="font-size:9px;color:var(--muted)">Get updates about new restaurants</div>
+      <form class="subscribe" id="subscribeForm"><input type="email" required placeholder="Enter your email"><button>Subscribe</button></form>
+    </div>
+  </div>
+  <div class="container footer-bottom"><span>© 2026 FreeMenu.in. All rights reserved.</span><span>Good Food Brings People Together <i class="fa-solid fa-heart text-red"></i></span></div>
+</footer>
 
-      try {
-        const { data: restaurants, error } = await supabaseClient
-          .from('restaurants')
-          .select('*')
-          .order('name', { ascending: true });
+<div id="toast" style="position:fixed;right:20px;bottom:20px;background:#111827;color:#fff;border-radius:8px;padding:11px 14px;font-size:11px;font-weight:700;opacity:0;transform:translateY(10px);transition:.2s;z-index:3000"></div>
 
-        if (error) {
-          showError("Could not load restaurants.");
-          return;
-        }
+<script>
+/* ==========================================================
+   FREEMENU.IN — INDEX PAGE
+   Supabase connection taken from the supplied Index/Owner code.
+   Client-side publishable/anon keys are intended for browser use;
+   protect data with Supabase RLS policies.
+   ========================================================== */
+const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        allRestaurants = restaurants || [];
-        renderRestaurants(allRestaurants);
-      } catch (err) {
-        showError("Network error. Please try again.");
-      }
-    }
+let allRestaurants = [];
+let showingAll = false;
+let currentQuery = "";
 
-    function filterRestaurants() {
-      const query = document.getElementById('search-input').value.toLowerCase().trim();
-      const filtered = allRestaurants.filter(rest => {
-        const nameMatch = (rest.name || '').toLowerCase().includes(query);
-        const slugMatch = (rest.slug || '').toLowerCase().includes(query);
-        return nameMatch || slugMatch;
-      });
-      renderRestaurants(filtered);
-    }
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+const slugify = s => String(s||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 
-    function renderRestaurants(restaurants) {
-      const grid = document.getElementById('restaurant-grid');
-      const loading = document.getElementById('loading');
-      const countBadge = document.getElementById('res-count');
+function toast(message){
+  const t=$("toast"); t.textContent=message; t.style.opacity="1"; t.style.transform="none";
+  clearTimeout(window.__toast); window.__toast=setTimeout(()=>{t.style.opacity="0";t.style.transform="translateY(10px)"},2200);
+}
 
-      loading.style.display = 'none';
-      countBadge.innerText = restaurants.length;
+function ownerPortal(){
+  window.location.href="owner.html";
+}
 
-      if (!restaurants || restaurants.length === 0) {
-        grid.style.display = 'block';
-        grid.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 40px 0;">No matching restaurants found.</p>';
-        return;
-      }
+$("ownerLogin").onclick=ownerPortal;
+$("promoOwner").onclick=ownerPortal;
 
-      grid.innerHTML = restaurants.map(rest => {
-        const name = rest.name || 'Unnamed Restaurant';
-        const slug = rest.slug || 'menu';
-        const firstLetter = name.charAt(0).toUpperCase();
+$("menuToggle").onclick=()=> $("navLinks").classList.toggle("open");
+$("focusSearch").onclick=()=>{ $("searchInput").focus(); window.scrollTo({top:0,behavior:"smooth"}); };
 
-        const logoHtml = rest.logo_url 
-          ? `<img src="${rest.logo_url}" alt="${name}" class="round-logo" onerror="this.outerHTML='<div class=\\'round-logo\\'>${firstLetter}</div>'">`
-          : `<div class="round-logo">${firstLetter}</div>`;
+document.querySelectorAll(".nav-links a").forEach(a=>{
+  a.addEventListener("click",()=> $("navLinks").classList.remove("open"));
+});
 
-        return `
-          <a href="menu.html?r=${encodeURIComponent(slug)}" class="restaurant-card">
-            <div class="card-top">
-              ${logoHtml}
-              <div class="restaurant-details">
-                <div class="restaurant-name">${name}</div>
-                <div class="restaurant-slug">@${slug}</div>
-              </div>
-            </div>
+function getRestaurantText(r){
+  return [r.name,r.slug,r.address,r.phone].filter(Boolean).join(" ").toLowerCase();
+}
 
-            <div class="view-menu-badge">
-              <span>View Menu</span>
-              <span>&rarr;</span>
-            </div>
-          </a>
-        `;
-      }).join('');
+function applySearch(q,scroll=true){
+  currentQuery=(q||"").trim();
+  $("searchInput").value=currentQuery;
+  const lower=currentQuery.toLowerCase();
+  const filtered=!lower ? allRestaurants : allRestaurants.filter(r=>getRestaurantText(r).includes(lower));
+  showingAll=!!lower;
+  renderRestaurants(filtered);
+  if(scroll) $("restaurants").scrollIntoView({behavior:"smooth",block:"start"});
+}
 
-      grid.style.display = 'grid';
-    }
+document.getElementById("searchForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  applySearch($("searchInput").value);
+});
 
-    function showError(message) {
-      document.getElementById('loading').style.display = 'none';
-      const errBox = document.getElementById('error-view');
-      document.getElementById('error-msg').innerText = message;
-      errBox.style.display = 'block';
-    }
+document.querySelectorAll("[data-search]").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".cat").forEach(x=>x.classList.remove("active"));
+    if(btn.classList.contains("cat")) btn.classList.add("active");
+    const q=btn.dataset.search||"";
+    document.querySelectorAll(".pop-chip").forEach(x=>x.classList.toggle("selected",x.dataset.search===q));
+    applySearch(q);
+  });
+});
 
-    window.addEventListener('load', fetchRestaurants);
-  </script>
+$("viewAll").onclick=e=>{
+  e.preventDefault();
+  showingAll=true;
+  currentQuery="";
+  $("searchInput").value="";
+  document.querySelectorAll(".cat").forEach(x=>x.classList.remove("active"));
+  document.querySelector(".cat[data-search='']").classList.add("active");
+  renderRestaurants(allRestaurants);
+  $("restaurants").scrollIntoView({behavior:"smooth"});
+};
+
+function logoMarkup(r){
+  const name=esc(r.name||"Restaurant");
+  const letter=esc((r.name||"R").charAt(0).toUpperCase());
+  if(r.logo_url){
+    return `<img class="logo" src="${esc(r.logo_url)}" alt="${name}" onerror="this.outerHTML='<div class=&quot;logo&quot; style=&quot;display:grid;place-items:center;background:#191919;color:white;font-weight:800;font-size:24px&quot;>${letter}</div>">`;
+  }
+  return `<div class="logo" style="position:absolute;width:76px;height:76px;border-radius:50%;left:50%;bottom:-38px;transform:translateX(-50%);border:4px solid #fff;background:#171717;color:#fff;display:grid;place-items:center;font-weight:800;font-size:24px">${letter}</div>`;
+}
+
+function card(r){
+  const name=esc(r.name||"Unnamed Restaurant");
+  const slug=encodeURIComponent(r.slug||slugify(r.name)||"menu");
+  const address=esc(r.address||"Location not added");
+  const info=esc(r.phone ? "Digital Menu • Contact Available" : "Digital Menu • View Menu");
+  return `
+    <a class="restaurant-card" href="menu.html?r=${slug}" aria-label="View menu for ${name}">
+      <div class="card-cover">
+        <span class="status"><i class="fa-solid fa-circle" style="font-size:5px"></i> Open</span>
+        ${logoMarkup(r)}
+      </div>
+      <div class="card-body">
+        <h3>${name}</h3>
+        <div class="info">${info}</div>
+        <div class="location"><i class="fa-solid fa-location-dot"></i> ${address}</div>
+        <div class="menu-link">View Menu <i class="fa-solid fa-arrow-right"></i></div>
+      </div>
+    </a>`;
+}
+
+function renderRestaurants(list){
+  const grid=$("restaurantGrid");
+  const display=list || [];
+  $("statRestaurants").textContent=allRestaurants.length;
+  $("restaurantHeading").textContent=currentQuery ? "Search Results" : (showingAll ? "All Restaurants" : "Featured Restaurants");
+  $("restaurantSub").textContent=currentQuery ? `Restaurants matching “${currentQuery}”` : "Explore restaurants and view their digital menus";
+  $("resCount") && ($("resCount").textContent=display.length);
+
+  if(currentQuery){
+    $("searchState").classList.remove("hidden");
+    $("searchState").innerHTML=`<strong>${display.length}</strong> restaurant${display.length===1?"":"s"} found <button class="clear-search" onclick="applySearch('')">Clear Search</button>`;
+  }else $("searchState").classList.add("hidden");
+
+  if(!display.length){
+    grid.innerHTML=`<div class="empty"><i class="fa-solid fa-utensils"></i><div style="font-weight:800">No restaurants found</div><div style="font-size:11px;margin-top:3px">Try another restaurant name, code or location.</div></div>`;
+    return;
+  }
+  /* Featured = first 6, All/Search = complete result set */
+  const listToShow = (!currentQuery && !showingAll) ? display.slice(0,6) : display;
+  grid.innerHTML=listToShow.map(card).join("");
+}
+
+async function fetchRestaurants(){
+  try{
+    const {data,error}=await db.from("restaurants").select("id,name,slug,phone,address,logo_url").order("name",{ascending:true});
+    if(error) throw error;
+    allRestaurants=data||[];
+    renderRestaurants(allRestaurants);
+  }catch(err){
+    console.error(err);
+    $("restaurantGrid").innerHTML=`<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i><div style="font-weight:800">Could not load restaurants</div><div style="font-size:11px;margin-top:3px">Please refresh and try again.</div><button class="clear-search" onclick="fetchRestaurants()">Retry</button></div>`;
+  }
+}
+
+$("subscribeForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  toast("Thanks! Subscription UI is ready.");
+  e.target.reset();
+});
+
+/* Keep the owner button useful when an authenticated owner already has a session. */
+(async()=>{
+  const {data}=await db.auth.getSession();
+  if(data?.session?.user){
+    $("ownerLogin").innerHTML='<i class="fa-solid fa-gauge-high"></i> Owner Dashboard';
+  }
+})();
+
+window.addEventListener("load",fetchRestaurants);
+</script>
 </body>
 </html>
