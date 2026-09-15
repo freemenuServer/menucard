@@ -47,7 +47,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .serviceBtns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:15px}.serviceBtn{border:1px solid var(--border);background:#fff;border-radius:9px;padding:10px;font-size:11px;font-weight:700}.serviceBtn i{margin-right:5px}
 
 /* Menu */
-.menuToolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.menuToolbar .input{max-width:260px}.menuTable{width:100%;border-collapse:collapse;font-size:12px}.menuTable th{text-align:left;color:#6b7280;font-size:10px;text-transform:uppercase;padding:9px 6px;border-bottom:1px solid var(--border)}.menuTable td{padding:10px 6px;border-bottom:1px solid #eef0f3;vertical-align:middle}.menuTable tr:last-child td{border-bottom:0}.foodName{font-weight:800}.foodCat{font-size:10px;color:var(--muted);margin-top:2px}.foodType{display:inline-grid;place-items:center;width:16px;height:16px;border:1.5px solid #19a45a;border-radius:3px}.foodType.nv{border-color:#d93838}.foodType.nv:after{content:"";border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:7px solid #d93838}.foodType.veg:after{content:"";width:6px;height:6px;background:#19a45a;border-radius:50%}.foodType.egg{border-color:#d98b17}.foodType.egg:after{content:"";width:6px;height:6px;background:#d98b17;border-radius:50%}.pricesMini{white-space:nowrap;font-weight:700}.switch{width:38px;height:21px;background:#cbd5e1;border-radius:20px;padding:2px;border:0}.switch:after{content:"";display:block;width:17px;height:17px;border-radius:50%;background:#fff;transition:.2s}.switch.on{background:#17aa6b}.switch.on:after{transform:translateX(17px)}.categoryCards{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.categoryCard{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff}.catImage{height:80px;background:#eee center/cover}.catBody{padding:9px}.catName{font-weight:800;font-size:12px}.catCount{font-size:10px;color:var(--muted);margin-top:3px}
+.menuToolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.menuToolbar .input{max-width:260px}.menuTable{width:100%;border-collapse:collapse;font-size:12px}.menuTable th{text-align:left;color:#6b7280;font-size:10px;text-transform:uppercase;padding:9px 6px;border-bottom:1px solid var(--border)}.menuTable td{padding:10px 6px;border-bottom:1px solid #eef0f3;vertical-align:middle}.menuTable tr:last-child td{border-bottom:0}.foodName{font-weight:800}.foodCat{font-size:10px;color:var(--muted);margin-top:2px}.foodType{display:inline-grid;place-items:center;width:16px;height:16px;border:1.5px solid #19a45a;border-radius:3px}.foodType.nv{border-color:#d93838}.foodType.nv:after{content:"";border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:7px solid #d93838}.foodType.veg:after{content:"";width:6px;height:6px;background:#19a45a;border-radius:50%}.foodType.egg{border-color:#d98b17}.foodType.egg:after{content:"";width:6px;height:6px;background:#d98b17;border-radius:50%}.pricesMini{white-space:nowrap;font-weight:700}.switch{width:38px;height:21px;background:#cbd5e1;border-radius:20px;padding:2px;border:0}.switch:after{content:"";display:block;width:17px;height:17px;border-radius:50%;background:#fff;transition:.2s}.switch.on{background:#17aa6b}.switch.on:after{transform:translateX(17px)}.statusToggle{display:inline-flex;align-items:center;gap:7px;border:0;background:transparent;padding:0;font-size:10px;font-weight:800}.statusToggle .statusText{min-width:30px;text-align:left}.statusToggle.off .statusText{color:#b45309}.statusToggle.on .statusText{color:#087443}.categoryCards{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.categoryCard{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff}.catImage{height:80px;background:#eee center/cover}.catBody{padding:9px}.catName{font-weight:800;font-size:12px}.catCount{font-size:10px;color:var(--muted);margin-top:3px}
 
 /* Quick actions */
 .quickGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.quick{padding:14px;border-radius:10px;border:1px solid var(--border);display:flex;gap:12px;align-items:center}.quick i{font-size:20px;color:var(--green)}.quick strong{font-size:12px}.quick small{display:block;font-size:10px;color:var(--muted);margin-top:3px}
@@ -70,13 +70,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 <style id="ownerLoginStyles">
 #ownerAuth{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:18px}
 #ownerAuth.show{display:flex}
-.ownerAuthBackdrop{position:absolute;inset:0;background:linear-gradient(135deg,#0d1624,#18263b)}
-.ownerAuthCard{position:relative;width:min(460px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:20px;padding:28px;box-shadow:0 25px 70px rgba(0,0,0,.32)}
-.authBrand{width:64px;height:64px;border-radius:18px;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(135deg,#8f1831,#c52345);color:#fff;font-size:27px}
-.ownerAuthCard h1{text-align:center;font-family:"Cormorant Garamond",serif;font-size:32px;margin:0;color:#151c2a}
+.ownerAuthBackdrop{position:absolute;inset:0;background:radial-gradient(circle at 15% 15%,rgba(245,47,114,.18),transparent 30%),radial-gradient(circle at 85% 80%,rgba(181,29,59,.22),transparent 32%),linear-gradient(135deg,#080e18,#162235 55%,#241321)}
+.ownerAuthCard{position:relative;width:min(470px,100%);max-height:92vh;overflow:auto;background:rgba(255,255,255,.98);border:1px solid rgba(255,255,255,.7);border-radius:24px;padding:30px;box-shadow:0 30px 90px rgba(0,0,0,.42),0 8px 30px rgba(181,29,59,.12);backdrop-filter:blur(12px)}
+.authBrand{width:72px;height:72px;border-radius:22px;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(135deg,#8f1831,#c52345 65%,#f02e6f);color:#fff;font-size:29px;box-shadow:0 12px 28px rgba(181,29,59,.28)}
+.authKicker{text-align:center;color:#8f1831;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;font-size:10px;margin-top:2px}.ownerAuthCard h1{text-align:center;font-family:"Cormorant Garamond",serif;font-size:32px;margin:0;color:#151c2a}
 .authSub{text-align:center;color:#718096;font-size:12px;margin:4px 0 22px}
 .authChoiceGrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
-.authChoiceBtn{border:1px solid #e5e7eb;background:#fafbfc;border-radius:15px;padding:18px 14px;cursor:pointer;text-align:left;transition:.18s}
+.authChoiceBtn{border:1px solid #e5e7eb;background:#fafbfc;border-radius:15px;padding:19px 15px;cursor:pointer;text-align:left;transition:.2s;box-shadow:0 5px 16px rgba(15,23,42,.04)}
 .authChoiceBtn:hover{transform:translateY(-2px);box-shadow:0 9px 25px rgba(0,0,0,.08);border-color:#cbd5e1}
 .authChoiceBtn span{display:block;font-size:24px;margin-bottom:8px}
 .authChoiceBtn b{display:block;font-size:16px;color:#172033}
@@ -121,7 +121,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
   <!-- LOGIN FORM -->
   <div class="ownerAuthCard authFormCard" id="loginCard" style="display:none">
     <button type="button" class="authBack" id="backLoginBtn">← Back</button>
-    <div class="authBrand">🔐</div>
+    <div class="authBrand">🔐</div><div class="authKicker">FreeMenu Owner Portal</div>
     <h1>Owner Login</h1>
     <p class="authSub">Login with your existing account</p>
     <div id="loginErrorNew" class="authError" style="display:none"></div>
@@ -141,7 +141,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
   <!-- SIGN UP FORM -->
   <div class="ownerAuthCard authFormCard signupCard" id="signupCard" style="display:none">
     <button type="button" class="authBack" id="backSignupBtn">← Back</button>
-    <div class="authBrand">📝</div>
+    <div class="authBrand">📝</div><div class="authKicker">FreeMenu Partner</div>
     <h1>Create Owner Account</h1>
     <p class="authSub">Register your restaurant on FreeMenu</p>
     <div id="signupErrorNew" class="authError" style="display:none"></div>
@@ -320,7 +320,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
       <select class="select" id="fullCatFilter" style="max-width:190px"><option value="">All Categories</option></select>
       <select class="select" id="fullTypeFilter" style="max-width:150px"><option value="">All Types</option><option value="veg">Veg</option><option value="nonveg">Non-Veg</option><option value="egg">Egg</option></select>
     </div>
-    <div class="menuTableWrap"><table class="menuTable"><thead><tr><th>Item</th><th>Category</th><th>Type</th><th>Single</th><th>Qtr</th><th>Half</th><th>Full</th><th>Actions</th></tr></thead><tbody id="fullItems"></tbody></table></div>
+    <div class="menuTableWrap"><table class="menuTable"><thead><tr><th>Item</th><th>Category</th><th>Type</th><th>Single</th><th>Qtr</th><th>Half</th><th>Full</th><th>Status</th><th>Actions</th></tr></thead><tbody id="fullItems"></tbody></table></div>
   </div>
 </section>
 
@@ -491,7 +491,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 <div class="modal" id="itemModal">
  <div class="modalBox">
   <div class="modalHead"><h3 id="modalTitle">Add New Menu Item</h3><button class="close" data-close="itemModal"><i class="fa-solid fa-xmark"></i></button></div>
-  <input type="hidden" id="editId">
+  <input type="hidden" id="editId"><input type="hidden" id="mAvailable" value="true">
   <div class="threeCol">
    <div class="formGroup" style="grid-column:span 2"><label>Item Name *</label><input class="input" id="mName" placeholder="e.g. Paneer Butter Masala"></div>
    <div class="formGroup"><label>Food Type</label><select class="select" id="mType"><option value="veg">🟢 Veg</option><option value="nonveg">🔴 Non-Veg</option><option value="egg">🟡 Egg</option></select></div>
@@ -505,7 +505,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
    <input class="input" type="number" id="mHalf" placeholder="Half ₹" min="0">
    <input class="input" type="number" id="mFull" placeholder="Full ₹" min="0">
   </div>
-  <div style="margin-top:18px;display:flex;justify-content:flex-end;gap:8px"><button class="btn" data-close="itemModal">Cancel</button><button class="btn primary" id="saveItem"><i class="fa-solid fa-floppy-disk"></i> Save Item</button></div>
+  <div class="formGroup" style="margin-top:16px"><label>Menu Item Status</label><label class="statusToggle" style="font-size:11px"><button type="button" class="switch on" id="mAvailableSwitch" aria-label="Toggle item availability"></button><span class="statusText" id="mAvailableText">ON — Visible</span></label></div>
+  <div style="margin-top:18px;display:flex;justify-content:flex-end;gap:8px><button class="btn" data-close="itemModal">Cancel</button><button class="btn primary" id="saveItem"><i class="fa-solid fa-floppy-disk"></i> Save Item</button></div>
  </div>
 </div>
 
@@ -815,11 +816,11 @@ function filtered(source,search,cat,type){
 function rowActions(i){return `<div class="actions"><button class="btn blue sm editItem" data-id="${i.id}"><i class="fa-solid fa-pen"></i></button><button class="btn danger sm deleteItem" data-id="${i.id}"><i class="fa-solid fa-trash"></i></button></div>`}
 function renderDashboardTable(){
  const list=filtered(items,$("menuSearch").value,$("menuCategoryFilter").value,$("menuTypeFilter").value);
- $("dashboardItems").innerHTML=list.length?list.slice(0,8).map(i=>`<tr><td><div class="foodName">${esc(i.name)}</div><div class="foodCat">${esc(i.category||"General")}</div></td><td>${typeCell(i)}</td><td class="pricesMini">${esc(priceText(i))}</td><td><button class="switch ${i.is_available!==false?"on":""}" data-status="${i.id}"></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="5" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
+ $("dashboardItems").innerHTML=list.length?list.slice(0,8).map(i=>`<tr><td><div class="foodName">${esc(i.name)}</div><div class="foodCat">${esc(i.category||"General")}</div></td><td>${typeCell(i)}</td><td class="pricesMini">${esc(priceText(i))}</td><td><button class="statusToggle ${i.is_available!==false?"on":"off"}" data-status="${i.id}"><span class="switch ${i.is_available!==false?"on":""}"></span><span class="statusText">${i.is_available!==false?"ON":"OFF"}</span></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="5" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
 }
 function renderFullTable(){
  const list=filtered(items,$("fullSearch").value,$("fullCatFilter").value,$("fullTypeFilter").value);
- $("fullItems").innerHTML=list.length?list.map(i=>`<tr><td><div class="foodName">${esc(i.name)}</div><div class="foodCat">${esc(i.description||"")}</div></td><td>${esc(i.category||"General")}</td><td>${typeCell(i)}</td><td>${i.price??"—"}</td><td>${i.price_quarter??"—"}</td><td>${i.price_half??"—"}</td><td>${i.price_full??"—"}</td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="8" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
+ $("fullItems").innerHTML=list.length?list.map(i=>`<tr><td><div class="foodName">${esc(i.name)}</div><div class="foodCat">${esc(i.description||"")}</div></td><td>${esc(i.category||"General")}</td><td>${typeCell(i)}</td><td>${i.price??"—"}</td><td>${i.price_quarter??"—"}</td><td>${i.price_half??"—"}</td><td>${i.price_full??"—"}</td><td><button class="statusToggle ${i.is_available!==false?"on":"off"}" data-status="${i.id}"><span class="switch ${i.is_available!==false?"on":""}"></span><span class="statusText">${i.is_available!==false?"ON":"OFF"}</span></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="9" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
 }
 function renderCategories(){
  const html=categories().map(c=>{
@@ -839,12 +840,15 @@ function openItem(id=null){
  $("mName").value=i?.name||"";$("mCategory").value=i?.category||"";
  $("mDesc").value=i?.description||"";$("mType").value=i?.item_type||((i?.is_veg===false)?"nonveg":"veg");
  $("mPrice").value=i?.price??"";$("mQtr").value=i?.price_quarter??"";$("mHalf").value=i?.price_half??"";$("mFull").value=i?.price_full??"";
+ $("mAvailable").value=String(i?.is_available!==false);
+ $("mAvailableSwitch").className=`switch ${i?.is_available!==false?"on":""}`;
+ $("mAvailableText").textContent=i?.is_available!==false?"ON — Visible":"OFF — Hidden";
  $("itemModal").classList.add("show");
 }
 async function saveItem(){
  const id=$("editId").value,name=$("mName").value.trim(),category=$("mCategory").value.trim()||"General",description=$("mDesc").value.trim(),item_type=$("mType").value;
  if(!name)return toast("Item name is required");
- const payload={name,category,description,item_type,is_veg:item_type==="veg",price:cleanNum($("mPrice").value),price_quarter:cleanNum($("mQtr").value),price_half:cleanNum($("mHalf").value),price_full:cleanNum($("mFull").value)};
+ const payload={name,category,description,item_type,is_veg:item_type==="veg",price:cleanNum($("mPrice").value),price_quarter:cleanNum($("mQtr").value),price_half:cleanNum($("mHalf").value),price_full:cleanNum($("mFull").value),is_available:$("mAvailable").value!=="false"};
  $("saveItem").disabled=true;$("saveItem").textContent="Saving...";
  let res;
  if(id) res=await supabaseClient.from("menu_items").update(payload).eq("id",id).eq("restaurant_id",currentRestaurantId);
@@ -860,13 +864,18 @@ async function deleteItem(id){
 }
 async function toggleAvailability(id,btn){
  const item=items.find(i=>String(i.id)===String(id));if(!item)return;
- /* is_available is not part of the original supplied insert/update schema.
-    If the column exists, this works; if not, Supabase returns a clear error. */
- const {error}=await supabaseClient.from("menu_items").update({is_available:item.is_available===false?true:false}).eq("id",id).eq("restaurant_id",currentRestaurantId);
- if(error){toast("Availability field is not in your current menu_items table.");return}
- await loadItems();
+ const next=item.is_available===false;
+ btn.disabled=true;
+ const {error}=await supabaseClient.from("menu_items").update({is_available:next}).eq("id",id).eq("restaurant_id",currentRestaurantId);
+ btn.disabled=false;
+ if(error){toast("Could not change status. Run the menu-item ON/OFF SQL migration first.");return}
+ item.is_available=next;
+ toast(next?"Item is now ON / visible":"Item is now OFF / hidden");
+ renderAll();
 }
 document.addEventListener("click",e=>{
+ const modalStatus=e.target.closest("#mAvailableSwitch");
+ if(modalStatus){ const on=$("mAvailable").value!=="true"; $("mAvailable").value=String(on); $("mAvailableSwitch").className=`switch ${on?"on":""}`; $("mAvailableText").textContent=on?"ON — Visible":"OFF — Hidden"; return; }
  const edit=e.target.closest(".editItem"),del=e.target.closest(".deleteItem"),status=e.target.closest("[data-status]");
  if(edit)openItem(edit.dataset.id);
  if(del)deleteItem(del.dataset.id);
@@ -921,7 +930,7 @@ $("saveCategory").onclick=async()=>{
  const cat=$("newCat").value.trim();if(!cat)return toast("Enter a category name");
  if(categories().includes(cat))return toast("Category already exists");
  /* Existing schema has no category table. Create a zero-priced placeholder. */
- const {error}=await supabaseClient.from("menu_items").insert([{restaurant_id:currentRestaurantId,name:"New Item",category:cat,description:"",item_type:"veg",is_veg:true,price:null,price_quarter:null,price_half:null,price_full:null}]);
+ const {error}=await supabaseClient.from("menu_items").insert([{restaurant_id:currentRestaurantId,name:"New Item",category:cat,description:"",item_type:"veg",is_veg:true,price:null,price_quarter:null,price_half:null,price_full:null,is_available:true}]);
  if(error){toast("Could not create category: "+error.message);return}
  $("catModal").classList.remove("show");toast("Category created with a placeholder item");await loadItems();openItem(items.find(i=>i.category===cat)?.id);
 };
