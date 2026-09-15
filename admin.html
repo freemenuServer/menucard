@@ -15,6 +15,10 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
 @media(max-width:800px){.sidebar{transform:translateX(-100%);transition:.2s}.sidebar.open{transform:translateX(0)}.main{margin-left:0;width:100%}.mobile-only{display:block}.topbar{padding:0 12px}.content{padding:16px 12px}.stats{grid-template-columns:1fr 1fr}.search{display:none}.formgrid{grid-template-columns:1fr}.welcome h1{font-size:22px}.date{display:none}}
 
 /* AI Menu Scanner */
+
+.ai-ready{border-color:#12b76a!important;background:#ecfdf3!important}
+.ai-working{opacity:.65;pointer-events:none}
+
 #aiReviewTable .ai-input{width:100%;min-width:90px;padding:8px 9px;border:1px solid #d0d5dd;border-radius:8px;background:#fff;font:inherit;font-size:12px}
 #aiReviewTable .ai-textarea{min-height:50px;resize:vertical}
 #aiReviewTable td{vertical-align:top}
@@ -163,7 +167,11 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
       <input id="aiFiles" type="file" accept="image/png,image/jpeg,image/webp,image/heic,image/heif" multiple hidden>
       <button class="primary" onclick="document.getElementById('aiFiles').click()">＋ Choose Menu Images</button>
       <div id="aiFileList" style="margin-top:12px"></div>
-      <small style="display:block;color:#667085;margin-top:10px">Recommended: upload all pages of the menu. Scanner accepts up to 15 images / 20 MB total in this UI.</small>
+      <div id="aiUploadActions" style="display:none;margin-top:12px;padding:12px;border:1px solid #d0d5dd;border-radius:10px;background:#f9fafb">
+        <div style="font-size:12px;color:#475467;margin-bottom:8px"><b id="aiUploadStatus">Images ready.</b> Select the restaurant above, then scan.</div>
+        <button class="primary" id="aiScanNowBtn" type="button" onclick="runAiMenuScan()">✦ Scan Uploaded Menu Now</button>
+      </div>
+      <small style="display:block;color:#667085;margin-top:10px">Recommended: upload all pages of the menu. After both restaurant and images are selected, the scanner can start automatically. Up to 15 images / 20 MB total in this UI.</small>
     </div>
 
     <div class="card">
@@ -462,7 +470,7 @@ function renderAiFiles(){
   box.innerHTML = aiFiles.map((f,i)=>`<div class="ai-file"><span>🖼️ ${esc(f.name)} <small>(${(f.size/1024/1024).toFixed(2)} MB)</small></span><button class="iconbtn" onclick="removeAiFile(${i})">✕</button></div>`).join('');
 }
 function removeAiFile(i){aiFiles.splice(i,1);renderAiFiles();}
-$('aiFiles')?.addEventListener('change', e=>{
+$('aiFiles')?.addEventListener('change', async e=>{
   const incoming=[...e.target.files];
   const merged=[...aiFiles,...incoming];
   const unique=[];
@@ -480,7 +488,31 @@ $('aiFiles')?.addEventListener('change', e=>{
   aiFiles=unique;
   e.target.value='';
   renderAiFiles();
+  updateAiScanReady(true);
+  if(aiFiles.length && $('aiRestaurant').value && $('aiEnabled').checked){
+    await runAiMenuScan();
+  }
 });
+
+function updateAiScanReady(showMessage=false){
+  const box=$('aiUploadActions');
+  if(!box)return;
+  const ready=aiFiles.length>0;
+  box.style.display=ready?'block':'none';
+  box.classList.toggle('ai-ready', ready && !!$('aiRestaurant').value);
+  $('aiUploadStatus').textContent = !ready ? 'No images selected.'
+    : (!$('aiRestaurant').value ? 'Images ready — select a restaurant above.'
+      : 'Images ready — click Scan or the scan will start automatically.');
+}
+
+$('aiRestaurant')?.addEventListener('change', async ()=>{
+  updateAiScanReady();
+  if(aiFiles.length && $('aiRestaurant').value && $('aiEnabled').checked){
+    await runAiMenuScan();
+  }
+});
+
+
 
 function clearAiReview(){
   aiRows=[];
@@ -561,7 +593,11 @@ async function runAiMenuScan(){
   const restaurantId=$('aiRestaurant').value;
   if(!restaurantId)return aiToast('Please select a restaurant');
   if(!aiFiles.length)return aiToast('Please choose menu images');
-  const btn=$('aiScanBtn');btn.disabled=true;btn.textContent='Scanning menu...';
+  const btn=$('aiScanBtn');
+  const nowBtn=$('aiScanNowBtn');
+  if(btn){btn.disabled=true;btn.textContent='Scanning menu...';}
+  if(nowBtn){nowBtn.disabled=true;nowBtn.textContent='⏳ Scanning...';}
+  $('aiUploadStatus').textContent='AI is scanning the uploaded menu images...';
   try{
     const images=[];
     for(const f of aiFiles){
@@ -591,7 +627,9 @@ async function runAiMenuScan(){
     console.error(e);
     toast('Scan failed: '+(e.message||e));
   }finally{
-    btn.disabled=false;btn.textContent='✦ Scan Menu With AI';
+    if(btn){btn.disabled=false;btn.textContent='✦ Scan Menu With AI';}
+    if(nowBtn){nowBtn.disabled=false;nowBtn.textContent='✦ Scan Uploaded Menu Now';}
+    updateAiScanReady();
   }
 }
 
