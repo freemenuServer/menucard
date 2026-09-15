@@ -603,7 +603,7 @@ async function runAiMenuScan(){
     for(const f of aiFiles){
       images.push({mime_type:f.type || 'image/jpeg', data:await fileToBase64(f)});
     }
-    const {data,error}=await supabase.functions.invoke('scan-menu',{
+    const {data,error}=await db.functions.invoke('scan-menu',{
       body:{model:$('aiModel').value, restaurant_id:restaurantId, images}
     });
     if(error) throw new Error(error.message || 'Edge Function error');
