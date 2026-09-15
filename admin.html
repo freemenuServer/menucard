@@ -494,13 +494,35 @@ async function loadPdfJs(){
   if(window.pdfjsLib)return window.pdfjsLib;
   await new Promise((resolve,reject)=>{
     const s=document.createElement('script');
-    s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.js';
-    s.onload=resolve;s.onerror=reject;document.head.appendChild(s);
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload=resolve;
+    s.onerror=()=>reject(new Error('PDF.js could not be loaded. Check internet connection or CDN access.'));
+    document.head.appendChild(s);
   });
   if(window.pdfjsLib?.GlobalWorkerOptions){
-    window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.js';
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   }
   return window.pdfjsLib;
+}
+
+async function loadTesseract(){
+  if(window.Tesseract && typeof window.Tesseract.createWorker==='function') return window.Tesseract;
+  await new Promise((resolve,reject)=>{
+    const s=document.createElement('script');
+    s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+    s.onload=()=>{
+      const start=Date.now();
+      const wait=()=>{
+        if(window.Tesseract && typeof window.Tesseract.createWorker==='function') return resolve();
+        if(Date.now()-start>10000) return reject(new Error('Tesseract.js loaded but did not initialize. Refresh and try again.'));
+        setTimeout(wait,50);
+      };
+      wait();
+    };
+    s.onerror=()=>reject(new Error('Tesseract.js could not be loaded. Check internet connection or CDN access.'));
+    document.head.appendChild(s);
+  });
+  return window.Tesseract;
 }
 
 function normalizeText(t){
@@ -619,7 +641,7 @@ async function renderPdfPagesForOcr(pdf,fileCount){
   const pdfPages=pdf.numPages; const all=[];
   let worker=null;
   if(!$('aiOcrEnabled').checked)return all;
-  worker=await Tesseract.createWorker($('aiOcrLang').value,null,{logger:m=>{
+  const Tess=await loadTesseract(); worker=await Tess.createWorker($('aiOcrLang').value,null,{logger:m=>{
     if(m.status && m.progress!=null)$('aiUploadStatus').textContent=`OCR: ${m.status} ${Math.round(m.progress*100)}%`;
   }});
   for(let p=1;p<=pdfPages;p++){
@@ -637,7 +659,7 @@ async function renderPdfPagesForOcr(pdf,fileCount){
 }
 async function ocrImage(file){
   if(!$('aiOcrEnabled').checked) return '';
-  const worker=await Tesseract.createWorker($('aiOcrLang').value,null,{logger:m=>{
+  const Tess=await loadTesseract(); worker=await Tess.createWorker($('aiOcrLang').value,null,{logger:m=>{
     if(m.status && m.progress!=null)$('aiUploadStatus').textContent=`OCR: ${m.status} ${Math.round(m.progress*100)}%`;
   }});
   const r=await worker.recognize(file);
