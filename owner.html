@@ -66,38 +66,127 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 @media(max-width:430px){.grid4{grid-template-columns:1fr 1fr}.statLabel{font-size:9px}.statValue{font-size:18px}.restTitle{font-size:14px}.restAddress{font-size:9px}}
 </style>
 
+
 <style id="ownerLoginStyles">
-#ownerLogin{position:fixed;inset:0;background:linear-gradient(135deg,#0d1624,#18263b);z-index:10000;display:none;align-items:center;justify-content:center;padding:18px}
-#ownerLogin.show{display:flex}
-.loginCard{width:min(430px,100%);background:#fff;border-radius:18px;padding:30px;box-shadow:0 25px 70px rgba(0,0,0,.28)}
-.loginLogo{width:66px;height:66px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(135deg,#8f1831,#c52345);color:#fff;font-size:27px}
-.loginCard h1{font-family:"Cormorant Garamond",serif;text-align:center;font-size:34px;margin:0;color:#151c2a}
-.loginCard .sub{text-align:center;color:#718096;font-size:12px;margin:4px 0 22px}
-.loginError{background:#fff0f0;color:#b4232e;border:1px solid #ffd0d0;border-radius:8px;padding:9px 10px;font-size:11px;margin-bottom:12px}
-.loginSubmit{width:100%;border:0;background:linear-gradient(90deg,#8f1831,#c52345);color:#fff;border-radius:9px;padding:12px;font-weight:800;cursor:pointer}
-.loginSubmit:disabled{opacity:.6}
-.loginHint{text-align:center;font-size:10px;color:#8a93a3;margin-top:13px;line-height:1.5}
+#ownerAuth{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:18px}
+#ownerAuth.show{display:flex}
+.ownerAuthBackdrop{position:absolute;inset:0;background:linear-gradient(135deg,#0d1624,#18263b)}
+.ownerAuthCard{position:relative;width:min(460px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:20px;padding:28px;box-shadow:0 25px 70px rgba(0,0,0,.32)}
+.authBrand{width:64px;height:64px;border-radius:18px;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(135deg,#8f1831,#c52345);color:#fff;font-size:27px}
+.ownerAuthCard h1{text-align:center;font-family:"Cormorant Garamond",serif;font-size:32px;margin:0;color:#151c2a}
+.authSub{text-align:center;color:#718096;font-size:12px;margin:4px 0 22px}
+.authChoiceGrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.authChoiceBtn{border:1px solid #e5e7eb;background:#fafbfc;border-radius:15px;padding:18px 14px;cursor:pointer;text-align:left;transition:.18s}
+.authChoiceBtn:hover{transform:translateY(-2px);box-shadow:0 9px 25px rgba(0,0,0,.08);border-color:#cbd5e1}
+.authChoiceBtn span{display:block;font-size:24px;margin-bottom:8px}
+.authChoiceBtn b{display:block;font-size:16px;color:#172033}
+.authChoiceBtn small{display:block;color:#7a8495;font-size:10px;margin-top:5px;line-height:1.4}
+.authFormCard{text-align:left}
+.authFormCard .authBrand{margin-left:auto;margin-right:auto}
+.authFormCard h1,.authFormCard .authSub{text-align:center}
+.authBack,.authSwitch{border:0;background:none;color:#5b6474;font-weight:700;cursor:pointer;padding:0}
+.authBack{margin-bottom:9px}
+.authSwitch{display:block;margin:13px auto 0;color:#8f1831}
+.authError{background:#fff0f0;color:#b4232e;border:1px solid #ffd0d0;border-radius:8px;padding:9px 10px;font-size:11px;margin-bottom:12px}
+.authSuccess{background:#edfff5;color:#167647;border:1px solid #bce8cc;border-radius:8px;padding:9px 10px;font-size:11px;margin-bottom:12px}
+.slugHint{font-size:9px;color:#8a93a3;margin-top:4px}
+@media(max-width:560px){.authChoiceGrid{grid-template-columns:1fr}.ownerAuthCard{padding:22px}.twoCol{grid-template-columns:1fr}}
 </style></head>
 
 <body>
 
-<div id="ownerLogin">
-  <div class="loginCard">
-    <div class="loginLogo"><i class="fa-solid fa-utensils"></i></div>
+
+<div id="ownerAuth">
+  <div class="ownerAuthBackdrop"></div>
+
+  <!-- FIRST SCREEN: choose Login or Sign Up -->
+  <div class="ownerAuthCard" id="authChoiceCard">
+    <div class="authBrand">🍽</div>
+    <h1>Restaurant Owner</h1>
+    <p class="authSub">Manage your FreeMenu restaurant</p>
+    <div class="authChoiceGrid">
+      <button type="button" class="authChoiceBtn" id="openLoginBtn">
+        <span>🔐</span>
+        <b>Login</b>
+        <small>Already have an owner account</small>
+      </button>
+      <button type="button" class="authChoiceBtn" id="openSignupBtn">
+        <span>📝</span>
+        <b>Sign Up</b>
+        <small>Create a new restaurant account</small>
+      </button>
+    </div>
+  </div>
+
+  <!-- LOGIN FORM -->
+  <div class="ownerAuthCard authFormCard" id="loginCard" style="display:none">
+    <button type="button" class="authBack" id="backLoginBtn">← Back</button>
+    <div class="authBrand">🔐</div>
     <h1>Owner Login</h1>
-    <div class="sub">Restaurant Owner Panel</div>
-    <div id="loginError" class="loginError hidden"></div>
+    <p class="authSub">Login with your existing account</p>
+    <div id="loginErrorNew" class="authError" style="display:none"></div>
+
     <div class="formGroup">
       <label>Email Address</label>
-      <input class="input" id="loginEmail" type="email" autocomplete="email" placeholder="owner@example.com">
+      <input class="input" id="loginEmailNew" type="email" autocomplete="email" placeholder="owner@example.com">
     </div>
     <div class="formGroup">
       <label>Password</label>
-      <input class="input" id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter your password">
+      <input class="input" id="loginPasswordNew" type="password" autocomplete="current-password" placeholder="Enter your password">
     </div>
-    <button class="loginSubmit" id="loginSubmit"><i class="fa-solid fa-right-to-bracket"></i> Login to Owner Panel</button>
-    <div class="loginHint">Only authenticated restaurant owners can access this dashboard.</div>
+    <button type="button" class="loginSubmit" id="loginSubmitNew">🔐 Login to Owner Panel</button>
+    <button type="button" class="authSwitch" id="goSignupFromLogin">New here? Create an account</button>
   </div>
+
+  <!-- SIGN UP FORM -->
+  <div class="ownerAuthCard authFormCard signupCard" id="signupCard" style="display:none">
+    <button type="button" class="authBack" id="backSignupBtn">← Back</button>
+    <div class="authBrand">📝</div>
+    <h1>Create Owner Account</h1>
+    <p class="authSub">Register your restaurant on FreeMenu</p>
+    <div id="signupErrorNew" class="authError" style="display:none"></div>
+    <div id="signupSuccessNew" class="authSuccess" style="display:none"></div>
+
+    <div class="formGroup">
+      <label>Full Name</label>
+      <input class="input" id="signupName" type="text" placeholder="Your full name">
+    </div>
+    <div class="formGroup">
+      <label>Mobile Number</label>
+      <input class="input" id="signupPhone" type="tel" placeholder="10 digit mobile number">
+    </div>
+    <div class="formGroup">
+      <label>Email Address</label>
+      <input class="input" id="signupEmail" type="email" autocomplete="email" placeholder="owner@example.com">
+    </div>
+    <div class="twoCol">
+      <div class="formGroup">
+        <label>Password</label>
+        <input class="input" id="signupPassword" type="password" autocomplete="new-password" placeholder="Minimum 6 characters">
+      </div>
+      <div class="formGroup">
+        <label>Confirm Password</label>
+        <input class="input" id="signupConfirm" type="password" autocomplete="new-password" placeholder="Repeat password">
+      </div>
+    </div>
+    <div class="formGroup">
+      <label>Restaurant Name</label>
+      <input class="input" id="signupRestaurant" type="text" placeholder="Your restaurant name">
+    </div>
+    <div class="formGroup">
+      <label>Restaurant Address</label>
+      <input class="input" id="signupAddress" type="text" placeholder="Full restaurant address">
+    </div>
+    <div class="formGroup">
+      <label>Menu Slug</label>
+      <input class="input" id="signupSlug" type="text" placeholder="my-restaurant-menu">
+      <div class="slugHint">Your public menu: menu.html?r=your-slug</div>
+    </div>
+
+    <button type="button" class="loginSubmit" id="signupSubmitNew">📝 Create Restaurant Account</button>
+    <button type="button" class="authSwitch" id="goLoginFromSignup">Already have an account? Login</button>
+  </div>
+</div>
 </div>
 
 <div id="loader"><div class="loader-card"><div class="spinner"></div><p style="font-weight:800">Loading Owner Panel...</p></div></div>
@@ -401,121 +490,181 @@ window.addEventListener("hashchange",()=>showSection(location.hash.slice(1)||"da
 $("mobileMenu").onclick=()=>$("sidebar").classList.toggle("open");
 
 
+
 function showOwnerLogin(){
   $("loader").classList.add("hidden");
-  $("ownerLogin").classList.remove("show");
-  const c=$("ownerAuthChoice");
-  if(c) c.style.display="flex";
-}
-function showLoginForm(){
-  $("ownerAuthChoice").style.display="none";
-  $("signupModal").classList.remove("show");
-  $("ownerLogin").classList.add("show");
-  setTimeout(()=>$("loginEmail").focus(),80);
+  $("ownerAuth").classList.add("show");
+  $("authChoiceCard").style.display="block";
+  $("loginCard").style.display="none";
+  $("signupCard").style.display="none";
 }
 function hideOwnerLogin(){
-  $("ownerLogin").classList.remove("show");
+  $("ownerAuth").classList.remove("show");
+}
+function showLoginForm(){
+  $("ownerAuth").classList.add("show");
+  $("authChoiceCard").style.display="none";
+  $("loginCard").style.display="block";
+  $("signupCard").style.display="none";
 }
 function showSignupForm(){
-  $("ownerAuthChoice").style.display="none";
-  $("ownerLogin").classList.remove("show");
-  $("signupModal").classList.add("show");
-  setTimeout(()=>$("signupName").focus(),80);
+  $("ownerAuth").classList.add("show");
+  $("authChoiceCard").style.display="none";
+  $("loginCard").style.display="none";
+  $("signupCard").style.display="block";
 }
-function hideSignupForm(){
-  $("signupModal").classList.remove("show");
+function showAuthChoice(){
+  $("ownerAuth").classList.add("show");
+  $("authChoiceCard").style.display="block";
+  $("loginCard").style.display="none";
+  $("signupCard").style.display="none";
 }
-async function ownerSignup(){
-  const name=$("signupName").value.trim();
-  const email=$("signupEmail").value.trim();
-  const phone=$("signupPhone").value.trim();
-  const password=$("signupPassword").value;
-  const confirm=$("signupConfirm").value;
-  const restaurant=$("signupRestaurant").value.trim();
-  const address=$("signupAddress").value.trim();
-  const slug=$("signupSlug").value.trim().toLowerCase().replace(/[^a-z0-9-]+/g,"-").replace(/^-+|-+$/g,"");
-  const err=$("signupError"), btn=$("signupSubmit");
-  if(!name||!email||!phone||!password||!restaurant||!address||!slug){
-    err.textContent="Please fill all required fields.";
-    err.classList.remove("hidden"); return;
-  }
-  if(password.length<6){
-    err.textContent="Password must be at least 6 characters.";
-    err.classList.remove("hidden"); return;
-  }
-  if(password!==confirm){
-    err.textContent="Passwords do not match.";
-    err.classList.remove("hidden"); return;
-  }
-  err.classList.add("hidden"); btn.disabled=true;
-  btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Creating account...';
-  try{
-    const {data,error}=await supabaseClient.auth.signUp({
-      email,password,
-      options:{data:{full_name:name,phone}}
-    });
-    if(error) throw error;
-    const newSession=data.session;
-    if(!newSession){
-      err.textContent="Account created. Please verify your email, then login to complete your restaurant setup.";
-      err.classList.remove("hidden");
-      btn.disabled=false;
-      btn.innerHTML='<i class="fa-solid fa-user-plus"></i> Create Owner Account';
-      return;
-    }
-    const uid=newSession.user.id;
-    const {data:existing}=await supabaseClient.from("restaurants").select("id").eq("slug",slug).maybeSingle();
-    if(existing?.id){
-      throw new Error("This menu slug is already taken. Please choose another.");
-    }
-    const {error:restErr}=await supabaseClient.from("restaurants").insert({
-      owner_id:uid,name:restaurant,slug,phone,address,
-      status:"pending",plan:"free",subscription_status:"inactive"
-    });
-    if(restErr) throw restErr;
-    hideSignupForm();
-    $("loader").classList.remove("hidden");
-    await init();
-  }catch(e){
-    err.textContent=e.message||"Unable to create account.";
-    err.classList.remove("hidden");
-    btn.disabled=false;
-    btn.innerHTML='<i class="fa-solid fa-user-plus"></i> Create Owner Account';
-  }
+function setAuthMsg(id,msg,ok=false){
+  const el=$(id); el.textContent=msg; el.style.display=msg?"block":"none";
+  if(el) el.className=ok?"authSuccess":"authError";
 }
+
 async function ownerLogin(){
-  const email=$("loginEmail").value.trim();
-  const password=$("loginPassword").value;
-  const err=$("loginError");
+  const email=$("loginEmailNew").value.trim();
+  const password=$("loginPasswordNew").value;
+  setAuthMsg("loginErrorNew","");
   if(!email || !password){
-    err.textContent="Please enter email and password.";
-    err.classList.remove("hidden");
+    setAuthMsg("loginErrorNew","Please enter email and password.");
     return;
   }
-  err.classList.add("hidden");
-  $("loginSubmit").disabled=true;
-  $("loginSubmit").innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Signing in...';
+  $("loginSubmitNew").disabled=true;
+  $("loginSubmitNew").textContent="Signing in...";
   const {error}=await supabaseClient.auth.signInWithPassword({email,password});
   if(error){
-    err.textContent=error.message;
-    err.classList.remove("hidden");
-    $("loginSubmit").disabled=false;
-    $("loginSubmit").innerHTML='<i class="fa-solid fa-right-to-bracket"></i> Login to Owner Panel';
+    setAuthMsg("loginErrorNew",error.message);
+    $("loginSubmitNew").disabled=false;
+    $("loginSubmitNew").textContent="🔐 Login to Owner Panel";
     return;
   }
   hideOwnerLogin();
   $("loader").classList.remove("hidden");
   await init();
+  $("loginSubmitNew").disabled=false;
+  $("loginSubmitNew").textContent="🔐 Login to Owner Panel";
 }
-$("loginSubmit").onclick=ownerLogin;
-$("loginPassword").addEventListener("keydown",e=>{if(e.key==="Enter")ownerLogin()});
+
+async function ownerSignup(){
+  setAuthMsg("signupErrorNew","");
+  setAuthMsg("signupSuccessNew","");
+  const name=$("signupName").value.trim();
+  const phone=$("signupPhone").value.trim();
+  const email=$("signupEmail").value.trim();
+  const password=$("signupPassword").value;
+  const confirm=$("signupConfirm").value;
+  const restaurant=$("signupRestaurant").value.trim();
+  const address=$("signupAddress").value.trim();
+  const slug=$("signupSlug").value.trim().toLowerCase()
+    .replace(/[^a-z0-9-]+/g,"-").replace(/^-+|-+$/g,"");
+
+  if(!name||!phone||!email||!password||!restaurant||!address||!slug){
+    setAuthMsg("signupErrorNew","Please complete all required fields.");
+    return;
+  }
+  if(password.length<6){
+    setAuthMsg("signupErrorNew","Password must be at least 6 characters.");
+    return;
+  }
+  if(password!==confirm){
+    setAuthMsg("signupErrorNew","Passwords do not match.");
+    return;
+  }
+  if(!/^\d{10}$/.test(phone.replace(/\D/g,""))){
+    setAuthMsg("signupErrorNew","Please enter a valid 10 digit mobile number.");
+    return;
+  }
+
+  $("signupSubmitNew").disabled=true;
+  $("signupSubmitNew").textContent="Creating account...";
+
+  const {data,error}=await supabaseClient.auth.signUp({
+    email,password,
+    options:{data:{full_name:name,phone,role:"owner"}}
+  });
+  if(error){
+    setAuthMsg("signupErrorNew",error.message);
+    $("signupSubmitNew").disabled=false;
+    $("signupSubmitNew").textContent="📝 Create Restaurant Account";
+    return;
+  }
+
+  // Supabase may require email confirmation. If a session exists, create the
+  // restaurant immediately; otherwise instruct the owner to confirm and login.
+  if(data.user && data.session){
+    const {data:existing,error:checkError}=await supabaseClient
+      .from("restaurants").select("id").eq("slug",slug).maybeSingle();
+
+    if(checkError){
+      setAuthMsg("signupErrorNew",checkError.message);
+      $("signupSubmitNew").disabled=false;
+      $("signupSubmitNew").textContent="📝 Create Restaurant Account";
+      return;
+    }
+    if(existing){
+      setAuthMsg("signupErrorNew","This Menu Slug is already in use. Please choose another.");
+      $("signupSubmitNew").disabled=false;
+      $("signupSubmitNew").textContent="📝 Create Restaurant Account";
+      return;
+    }
+
+    const {data:restaurantRow,error:restaurantError}=await supabaseClient
+      .from("restaurants")
+      .insert({
+        owner_id:data.user.id,
+        name:restaurant,
+        slug,
+        phone:phone.replace(/\D/g,""),
+        address,
+        status:"pending",
+        plan:"free",
+        subscription_status:"inactive"
+      })
+      .select("*").single();
+
+    if(restaurantError){
+      setAuthMsg("signupErrorNew","Account created but restaurant setup failed: "+restaurantError.message);
+      $("signupSubmitNew").disabled=false;
+      $("signupSubmitNew").textContent="📝 Create Restaurant Account";
+      return;
+    }
+
+    currentRestaurant=restaurantRow;
+    currentRestaurantId=restaurantRow.id;
+    setAuthMsg("signupSuccessNew","Account and restaurant created. Opening Owner Dashboard...",true);
+    setTimeout(async()=>{
+      hideOwnerLogin();
+      $("loader").classList.remove("hidden");
+      await init();
+    },500);
+  }else{
+    setAuthMsg("signupSuccessNew","Account created. Please verify your email, then login to open your Owner Dashboard.",true);
+    setTimeout(showLoginForm,900);
+  }
+
+  $("signupSubmitNew").disabled=false;
+  $("signupSubmitNew").textContent="📝 Create Restaurant Account";
+}
+
+$("openLoginBtn").onclick=showLoginForm;
+$("openSignupBtn").onclick=showSignupForm;
+$("backLoginBtn").onclick=showAuthChoice;
+$("backSignupBtn").onclick=showAuthChoice;
+$("goSignupFromLogin").onclick=showSignupForm;
+$("goLoginFromSignup").onclick=showLoginForm;
+$("loginSubmitNew").onclick=ownerLogin;
+$("loginPasswordNew").addEventListener("keydown",e=>{if(e.key==="Enter")ownerLogin()});
+$("signupSubmitNew").onclick=ownerSignup;
 
 /* ---------- Init/Auth ---------- */
 async function init(){
   const result=await supabaseClient.auth.getSession();
   session=result.data.session;
   if(!session?.user){
-    showOwnerLogin();
+    showAuthChoice();
     return;
   }
   $("accountEmail").value=session.user.email||"";
@@ -523,103 +672,18 @@ async function init(){
   $("avatar").textContent=initials($("ownerName").textContent);
 
   const urlSlug=new URLSearchParams(location.search).get("r");
-
-  // Owner Panel must work from Index -> owner.html even when the owner's
-  // restaurant row has not been linked yet. First try owner_id, then offer
-  // a one-time profile creation instead of showing "Restaurant not found".
-  let data=null,error=null;
-
-  if(urlSlug){
-    const res=await supabaseClient.from("restaurants").select("*").eq("slug",urlSlug.toLowerCase()).limit(1);
-    data=res.data; error=res.error;
-  }else{
-    const res=await supabaseClient.from("restaurants").select("*").eq("owner_id",session.user.id).limit(1);
-    data=res.data; error=res.error;
-  }
-
+  let q=supabaseClient.from("restaurants").select("*");
+  if(urlSlug) q=q.eq("slug",urlSlug.toLowerCase());
+  else q=q.eq("owner_id",session.user.id);
+  const {data,error}=await q.limit(1);
   if(error) return fail(error.message);
-
-  if(!data?.length){
-    if(urlSlug){
-      return fail("Restaurant profile not found for this owner. Open Owner Panel from the main Index page, or use the restaurant's owner account.");
-    }
-    return showCreateRestaurant();
-  }
-
-  currentRestaurant=data[0];
-  currentRestaurantId=currentRestaurant.id;
+  if(!data?.length) return fail("Restaurant profile not found for this owner.");
+  currentRestaurant=data[0];currentRestaurantId=currentRestaurant.id;
   fillProfile();
   await loadItems();
   $("loader").classList.add("hidden");
   showSection(location.hash.slice(1)||"dashboard");
 }
-function showCreateRestaurant(){
-  $("loader").innerHTML=`<div style="max-width:460px;margin:auto;background:#fff;border:1px solid var(--border);border-radius:16px;padding:25px;box-shadow:var(--shadow);text-align:left">
-    <div style="text-align:center"><i class="fa-solid fa-store" style="font-size:38px;color:var(--primary)"></i>
-    <h3 style="margin:10px 0 5px">Create Restaurant Profile</h3>
-    <p class="muted" style="font-size:12px">This owner account is valid, but it is not linked to a restaurant yet.</p></div>
-    <div class="formGroup"><label>Restaurant Name *</label><input class="input" id="newRestName" placeholder="My Restaurant"></div>
-    <div class="formGroup"><label>Phone</label><input class="input" id="newRestPhone" placeholder="9876543210"></div>
-    <div class="formGroup"><label>Address</label><textarea class="textarea" id="newRestAddress" placeholder="Restaurant address"></textarea></div>
-    <div class="formGroup"><label>Menu Slug *</label><input class="input" id="newRestSlug" placeholder="my-restaurant"></div>
-    <button class="btn primary" id="createRestBtn" style="width:100%"><i class="fa-solid fa-plus"></i> Create & Open Owner Panel</button>
-    <p class="muted" style="font-size:10px;margin:10px 0 0">The restaurant will be linked to your logged-in Supabase account automatically.</p>
-  </div>`;
-  $("createRestBtn").onclick=createRestaurantProfile;
-}
-
-async function createRestaurantProfile(){
-  const name=$("newRestName").value.trim();
-  const phone=$("newRestPhone").value.trim();
-  const address=$("newRestAddress").value.trim();
-  let slug=$("newRestSlug").value.trim().toLowerCase()
-    .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
-  if(!name)return toast("Restaurant name is required");
-  if(!slug)return toast("Menu slug is required");
-
-  $("createRestBtn").disabled=true;
-  $("createRestBtn").textContent="Creating...";
-
-  // Check slug first so we don't create duplicate public menu URLs.
-  const {data:existing,error:slugError}=await supabaseClient
-    .from("restaurants").select("id").eq("slug",slug).limit(1);
-
-  if(slugError){
-    $("createRestBtn").disabled=false;
-    $("createRestBtn").innerHTML='<i class="fa-solid fa-plus"></i> Create & Open Owner Panel';
-    return toast("Slug check failed: "+slugError.message);
-  }
-  if(existing?.length){
-    $("createRestBtn").disabled=false;
-    $("createRestBtn").innerHTML='<i class="fa-solid fa-plus"></i> Create & Open Owner Panel';
-    return toast("This menu slug is already in use.");
-  }
-
-  const {data,error}=await supabaseClient.from("restaurants").insert([{
-    owner_id:session.user.id,
-    name,slug,phone,address,
-    status:"pending",
-    plan:"free",
-    subscription_status:"inactive"
-  }]).select("*").single();
-
-  $("createRestBtn").disabled=false;
-  $("createRestBtn").innerHTML='<i class="fa-solid fa-plus"></i> Create & Open Owner Panel';
-
-  if(error){
-    toast("Restaurant creation failed: "+error.message);
-    return;
-  }
-
-  currentRestaurant=data;
-  currentRestaurantId=data.id;
-  fillProfile();
-  await loadItems();
-  $("loader").classList.add("hidden");
-  toast("Restaurant profile created");
-  showSection("dashboard");
-}
-
 function fail(msg){
   $("loader").innerHTML=`<div style="text-align:center;padding:25px"><i class="fa-solid fa-circle-exclamation" style="font-size:38px;color:#c33"></i><h3>Unable to open Owner Panel</h3><p>${esc(msg)}</p><button class="btn" onclick="location.reload()">Retry</button></div>`;
 }
@@ -794,7 +858,7 @@ $("saveMedia").onclick=async()=>{
 };
 
 /* ---------- Logout ---------- */
-async function logout(){await supabaseClient.auth.signOut();showOwnerLogin()}
+async function logout(){await supabaseClient.auth.signOut();showAuthChoice()}
 $("logoutBtn").onclick=logout;$("logout2").onclick=logout;
 
 /* ---------- Modal close ---------- */
@@ -812,315 +876,20 @@ supabaseClient.auth.onAuthStateChange((event, newSession)=>{
 window.addEventListener("load",init);
 </script>
 
-
 <script>
-/* Owner auth bootstrap: resolve Supabase session before showing the auth gate. */
-(function(){
-  const URL="https://pfsrpowopbrevocwsuii.supabase.co";
-  const KEY="sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
-  window.__ownerAuthReady = false;
-
-  async function bootstrapOwnerAuth(){
-    try{
-      let sb=window.supabaseClient;
-      if(!sb && window.supabase && typeof window.supabase.createClient==="function"){
-        sb=window.supabase.createClient(URL,KEY);
-        window.supabaseClient=sb;
-      }
-      if(!sb) return;
-
-      const {data}=await sb.auth.getSession();
-      if(data && data.session){
-        window.__ownerAuthenticated=true;
-        // Hide the gate immediately for a valid existing session.
-        const gate=document.getElementById("ownerAuthChoice");
-        if(gate) gate.style.display="none";
-      }else{
-        window.__ownerAuthenticated=false;
-      }
-    }catch(e){
-      console.error("Auth bootstrap:",e);
-    }finally{
-      window.__ownerAuthReady=true;
-    }
-  }
-
-  if(document.readyState==="loading"){
-    document.addEventListener("DOMContentLoaded",bootstrapOwnerAuth,{once:true});
-  }else{
-    bootstrapOwnerAuth();
-  }
-})();
-</script>
-
-<!-- FreeMenu Owner Authentication -->
-<div id="ownerAuthChoice" class="owner-auth-choice" style="display:none;">
-  <div class="owner-auth-backdrop"></div>
-
-  <!-- Choice -->
-  <div class="owner-auth-card" id="ownerAuthHome">
-    <div class="owner-auth-logo">FM</div>
-    <h1>Restaurant Owner Portal</h1>
-    <p>Choose an option to continue</p>
-    <div class="owner-auth-actions">
-      <button type="button" class="owner-auth-btn" id="chooseOwnerLogin">
-        <span>🔐</span><strong>Login</strong>
-        <small>Already have an account?</small>
-      </button>
-      <button type="button" class="owner-auth-btn" id="chooseOwnerSignup">
-        <span>📝</span><strong>Sign Up</strong>
-        <small>Create a new restaurant account</small>
-      </button>
-    </div>
-  </div>
-
-  <!-- Login -->
-  <div class="owner-auth-card owner-auth-form-card" id="ownerLoginBox" style="display:none;">
-    <button type="button" class="owner-auth-back" id="backFromLogin">← Back</button>
-    <div class="owner-auth-logo">FM</div>
-    <h1>Owner Login</h1>
-    <p>Login to manage your restaurant</p>
-    <form id="ownerSeparateLoginForm">
-      <label>Email</label>
-      <input id="ownerLoginEmail" type="email" autocomplete="email" required placeholder="Enter your email">
-      <label>Password</label>
-      <input id="ownerLoginPassword" type="password" autocomplete="current-password" required placeholder="Enter your password">
-      <div id="ownerLoginError" class="owner-auth-error"></div>
-      <button class="owner-primary-btn" type="submit">🔐 Login to Owner Panel</button>
-    </form>
-    <button type="button" class="owner-switch" id="switchToSignup">New here? Sign Up</button>
-  </div>
-
-  <!-- Sign Up -->
-  <div class="owner-auth-card owner-auth-form-card" id="ownerSignupBox" style="display:none;">
-    <button type="button" class="owner-auth-back" id="backFromSignup">← Back</button>
-    <div class="owner-auth-logo">FM</div>
-    <h1>Create Owner Account</h1>
-    <p>Register your restaurant on FreeMenu</p>
-    <form id="ownerSeparateSignupForm">
-      <label>Full Name</label>
-      <input id="ownerSignupName" type="text" required placeholder="Your full name">
-      <label>Mobile</label>
-      <input id="ownerSignupPhone" type="tel" required placeholder="10-digit mobile number">
-      <label>Email</label>
-      <input id="ownerSignupEmail" type="email" autocomplete="email" required placeholder="Your email">
-      <label>Password</label>
-      <input id="ownerSignupPassword" type="password" autocomplete="new-password" minlength="6" required placeholder="Minimum 6 characters">
-      <label>Confirm Password</label>
-      <input id="ownerSignupConfirm" type="password" autocomplete="new-password" minlength="6" required placeholder="Repeat password">
-      <label>Restaurant Name</label>
-      <input id="ownerSignupRestaurant" type="text" required placeholder="Restaurant name">
-      <label>Restaurant Address</label>
-      <textarea id="ownerSignupAddress" required placeholder="Restaurant address"></textarea>
-      <label>Menu Slug</label>
-      <input id="ownerSignupSlug" type="text" required placeholder="e.g. my-restaurant">
-      <div id="ownerSignupError" class="owner-auth-error"></div>
-      <button class="owner-primary-btn" type="submit">📝 Create Owner Account</button>
-    </form>
-    <button type="button" class="owner-switch" id="switchToLogin">Already have an account? Login</button>
-  </div>
-</div>
-
-<style>
-.owner-auth-choice{position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;padding:20px}
-.owner-auth-backdrop{position:absolute;inset:0;background:rgba(8,12,20,.82);backdrop-filter:blur(8px)}
-.owner-auth-card{position:relative;width:min(470px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:24px;padding:30px 28px;box-shadow:0 25px 80px rgba(0,0,0,.35);text-align:center}
-.owner-auth-logo{width:62px;height:62px;border-radius:17px;margin:0 auto 14px;display:grid;place-items:center;background:linear-gradient(135deg,#111827,#374151);color:#fff;font-size:21px;font-weight:800}
-.owner-auth-card h1{margin:0;font-size:25px;color:#111827}
-.owner-auth-card p{margin:7px 0 22px;color:#6b7280}
-.owner-auth-actions{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.owner-auth-btn{border:1px solid #e5e7eb;background:#f9fafb;border-radius:17px;padding:19px 14px;cursor:pointer;text-align:left}
-.owner-auth-btn:hover{box-shadow:0 10px 25px rgba(0,0,0,.1);transform:translateY(-1px)}
-.owner-auth-btn span{display:block;font-size:24px;margin-bottom:8px}
-.owner-auth-btn strong{display:block;font-size:17px;color:#111827}
-.owner-auth-btn small{display:block;margin-top:5px;color:#6b7280}
-.owner-auth-form-card{text-align:left}
-.owner-auth-form-card .owner-auth-logo{margin-left:auto;margin-right:auto}
-.owner-auth-form-card h1,.owner-auth-form-card p{text-align:center}
-.owner-auth-form-card label{display:block;margin:11px 0 5px;font-size:13px;font-weight:700;color:#374151}
-.owner-auth-form-card input,.owner-auth-form-card textarea{box-sizing:border-box;width:100%;border:1px solid #d1d5db;border-radius:10px;padding:11px 12px;font:inherit;outline:none}
-.owner-auth-form-card input:focus,.owner-auth-form-card textarea:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.1)}
-.owner-auth-form-card textarea{min-height:75px;resize:vertical}
-.owner-primary-btn{width:100%;margin-top:17px;border:0;border-radius:11px;padding:13px;background:#111827;color:#fff;font-weight:700;cursor:pointer}
-.owner-auth-back{border:0;background:none;color:#4b5563;font-weight:700;cursor:pointer;padding:0 0 12px}
-.owner-switch{display:block;margin:15px auto 0;border:0;background:none;color:#4f46e5;font-weight:700;cursor:pointer}
-.owner-auth-error{color:#b91c1c;font-size:13px;margin-top:10px;min-height:18px}
-@media(max-width:520px){.owner-auth-actions{grid-template-columns:1fr}.owner-auth-card{padding:25px 19px}}
-</style>
-
-<script>
-(function(){
-  const choice = document.getElementById('ownerAuthChoice');
-  const home = document.getElementById('ownerAuthHome');
-  const login = document.getElementById('ownerLoginBox');
-  const signup = document.getElementById('ownerSignupBox');
-
-  function showHome(){choice.style.display='flex';home.style.display='block';login.style.display='none';signup.style.display='none';}
-  function showLogin(){choice.style.display='flex';home.style.display='none';login.style.display='block';signup.style.display='none';}
-  function showSignup(){choice.style.display='flex';home.style.display='none';login.style.display='none';signup.style.display='block';}
-  function closeAuth(){choice.style.display='none';}
-
-  document.getElementById('chooseOwnerLogin').onclick=showLogin;
-  document.getElementById('chooseOwnerSignup').onclick=showSignup;
-  document.getElementById('backFromLogin').onclick=showHome;
-  document.getElementById('backFromSignup').onclick=showHome;
-  document.getElementById('switchToSignup').onclick=showSignup;
-  document.getElementById('switchToLogin').onclick=showLogin;
-
-  async function getSupabaseClient(){
-    if(window.supabaseClient) return window.supabaseClient;
-    if(window.supabase && typeof window.supabase.createClient==='function'){
-      window.supabaseClient=window.supabase.createClient(
-        "https://pfsrpowopbrevocwsuii.supabase.co",
-        "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE"
-      );
-      return window.supabaseClient;
-    }
-    return null;
-  }
-
-  document.getElementById('ownerSeparateLoginForm').addEventListener('submit',async function(e){
-    e.preventDefault();
-    const err=document.getElementById('ownerLoginError'); err.textContent='';
-    const sb=await getSupabaseClient();
-    if(!sb){err.textContent='Supabase connection not available.';return;}
-    const {error}=await sb.auth.signInWithPassword({
-      email:document.getElementById('ownerLoginEmail').value.trim(),
-      password:document.getElementById('ownerLoginPassword').value
-    });
-    if(error){err.textContent=error.message;return;}
-    closeAuth();
-    window.__ownerAuthenticated = true;
-
-    // Let the original dashboard code initialize/load the restaurant.
-    // Different versions of this page expose different init function names,
-    // so support the common ones and finally reload as a fallback.
-    try{
-      if(typeof window.initOwnerDashboard === 'function'){
-        await window.initOwnerDashboard();
-        return;
-      }
-      if(typeof window.loadDashboard === 'function'){
-        await window.loadDashboard();
-        return;
-      }
-      if(typeof window.loadOwnerDashboard === 'function'){
-        await window.loadOwnerDashboard();
-        return;
-      }
-    }catch(initErr){
-      console.error('Owner dashboard init error:', initErr);
-    }
-
-    // Supabase session is persisted; reload once with an authenticated flag.
-    // The auth gate checks this flag and will not show the Login/Sign Up screen.
-    location.reload();
-  });
-
-  document.getElementById('ownerSeparateSignupForm').addEventListener('submit',async function(e){
-    e.preventDefault();
-    const err=document.getElementById('ownerSignupError'); err.textContent='';
-    const password=document.getElementById('ownerSignupPassword').value;
-    const confirm=document.getElementById('ownerSignupConfirm').value;
-    if(password!==confirm){err.textContent='Passwords do not match.';return;}
-    const sb=await getSupabaseClient();
-    if(!sb){err.textContent='Supabase connection not available.';return;}
-
-    const name=document.getElementById('ownerSignupName').value.trim();
-    const phone=document.getElementById('ownerSignupPhone').value.trim();
-    const email=document.getElementById('ownerSignupEmail').value.trim();
-    const restaurant=document.getElementById('ownerSignupRestaurant').value.trim();
-    const address=document.getElementById('ownerSignupAddress').value.trim();
-    const slug=document.getElementById('ownerSignupSlug').value.trim().toLowerCase()
-      .replace(/[^a-z0-9-]+/g,'-').replace(/^-+|-+$/g,'');
-
-    const {data,error}=await sb.auth.signUp({
-      email,password,
-      options:{data:{full_name:name,phone:phone,role:'owner'}}
-    });
-    if(error){err.textContent=error.message;return;}
-
-    // If email confirmation is disabled, session is immediately available.
-    // If enabled, the restaurant insert will happen after the user logs in.
-    if(data.user && data.session){
-      const {data:existing,error:checkErr}=await sb.from('restaurants').select('id').eq('slug',slug).maybeSingle();
-      if(checkErr){err.textContent=checkErr.message;return;}
-      if(existing){err.textContent='This Menu Slug is already in use.';return;}
-      const {error:restaurantErr}=await sb.from('restaurants').insert({
-        owner_id:data.user.id,name:restaurant,slug,phone,address,
-        status:'pending',plan:'free',subscription_status:'inactive'
-      });
-      if(restaurantErr){err.textContent=restaurantErr.message;return;}
-      closeAuth(); location.reload();
-    }else{
-      err.style.color='#166534';
-      err.textContent='Account created. Please verify your email, then use Login.';
-      setTimeout(showLogin,1400);
-    }
-  });
-
-  window.showOwnerAuthChoice=showHome;
-  window.hideOwnerAuthChoice=closeAuth;
-
-  // Existing dashboard auth code can set this flag if it knows the session state.
-  document.addEventListener('DOMContentLoaded',function(){
-    let tries=0;
-    const waitForAuth=()=>{
-      tries++;
-      if(window.__ownerAuthenticated===true){
-        closeAuth();
-        return;
-      }
-      if(window.__ownerAuthReady===true || tries>=30){
-        showHome();
-        return;
-      }
-      setTimeout(waitForAuth,100);
-    };
-    waitForAuth();
-  });
-})();
+/* Direct links from Index:
+   owner.html?auth=login  -> Login form
+   owner.html?auth=signup -> Sign Up form
+*/
+window.addEventListener("load",function(){
+  const mode=new URLSearchParams(location.search).get("auth");
+  if(!mode) return;
+  setTimeout(()=>{
+    if(mode==="login") showLoginForm();
+    if(mode==="signup") showSignupForm();
+  },150);
+});
 </script>
 
 </body>
 </html>
-
-
-
-<script>
-/* ==========================================================
-   FREEMENU OWNER AUTH ROUTER
-   ?auth=login  -> Login form
-   ?auth=signup -> Sign Up form
-   No auth query -> normal owner portal / choice screen
-   ========================================================== */
-(function(){
-  function routeOwnerAuth(){
-    const mode = new URLSearchParams(window.location.search).get("auth");
-    if(mode === "login"){
-      if(typeof window.showLoginForm === "function"){
-        window.showLoginForm();
-      }else if(typeof window.showOwnerLogin === "function"){
-        window.showOwnerLogin();
-        setTimeout(()=>window.showLoginForm?.(),50);
-      }
-    }else if(mode === "signup"){
-      if(typeof window.showSignupForm === "function"){
-        window.showSignupForm();
-      }else if(typeof window.showOwnerLogin === "function"){
-        window.showOwnerLogin();
-        setTimeout(()=>window.showSignupForm?.(),50);
-      }
-    }
-  }
-
-  // The original dashboard functions are declared earlier in this file.
-  // Wait until the DOM and those functions are ready.
-  document.addEventListener("DOMContentLoaded",()=>{
-    setTimeout(routeOwnerAuth,250);
-  });
-  window.addEventListener("load",()=>{
-    setTimeout(routeOwnerAuth,350);
-  });
-})();
-</script>
