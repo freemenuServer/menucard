@@ -39,7 +39,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
     <button data-page="menu"><i data-lucide="book-open"></i>Menu Management</button>
     <button data-page="categories"><i data-lucide="layers"></i>Categories</button>
     <button data-page="approvals"><i data-lucide="clock-3"></i>Pending Approvals <b class="badge" id="approvalBadge">0</b></button>
-    <button data-page="ads"><i data-lucide="badge-dollar-sign"></i>Advertisements</button>
+    <button data-page="ads"><i data-lucide="badge-dollar-sign"></i>Advertisements</button><button data-page="mediaRules"><i data-lucide="image"></i>Media Upload Rules</button>
     <button data-page="subscriptions"><i data-lucide="crown"></i>Subscriptions</button>
     <button data-page="analytics"><i data-lucide="bar-chart-3"></i>Analytics</button>
     <button data-page="reports"><i data-lucide="file-text"></i>Reports</button>
@@ -104,6 +104,24 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
 <div id="categories" class="page"><div class="subpage-head"><h2>Categories</h2><button class="primary" onclick="openCategoryModal()">+ Add Category</button></div><div class="card"><div id="categoriesTable" class="tablewrap"></div></div></div>
 <div id="approvals" class="page"><div class="subpage-head"><h2>Pending Approvals</h2></div><div class="card"><div id="approvalsTable" class="tablewrap"></div></div></div>
 <div id="ads" class="page"><div class="subpage-head"><h2>Advertisements</h2></div><div class="card"><div class="notice">Free plan ads can be enabled here. Premium restaurants should automatically stop showing public-menu ads while their active subscription is valid.</div><div class="formgrid"><div class="field"><label>Google AdSense Client ID</label><input id="adsClient" placeholder="ca-pub-xxxxxxxx"></div><div class="field"><label>Default Ad Slot</label><input id="adsSlot" placeholder="1234567890"></div><div class="field"><label>Ads on Free Menus</label><select id="adsFree"><option value="true">Enabled</option><option value="false">Disabled</option></select></div><div class="field"><label>Ads on Premium Menus</label><select id="adsPremium"><option value="false">Disabled</option><option value="true">Enabled</option></select></div></div><div class="modalfoot"><button class="primary" onclick="saveAdSettings()">Save Ad Settings</button></div></div></div>
+
+<div id="mediaRules" class="page">
+  <div class="subpage-head"><h2>Media Upload Rules</h2></div>
+  <div class="card">
+    <div class="notice">Super Admin controls restaurant image uploads. The maximum image size cannot exceed <b>1 MB</b>.</div>
+    <div class="formgrid">
+      <div class="field"><label>Maximum Image Size (MB)</label><input id="mediaMaxMb" type="number" min="0.1" max="1" step="0.1" value="1"><small style="color:#667085">You may lower the limit, but not above 1 MB.</small></div>
+      <div class="field"><label>Logo Upload</label><select id="mediaLogoEnabled"><option value="true">ON — 1 Logo</option><option value="false">OFF</option></select></div>
+      <div class="field"><label>Banner Upload</label><select id="mediaBannerEnabled"><option value="true">ON — 1 Banner</option><option value="false">OFF</option></select></div>
+      <div class="field"><label>Paid Gallery</label><select id="mediaGalleryPaid"><option value="false">OFF</option><option value="true">ON — Premium Only</option></select><small style="color:#667085">Only active Premium restaurants can use Gallery when ON.</small></div>
+    </div>
+    <div class="modalfoot"><button class="primary" onclick="saveMediaRules()">Save Media Rules</button></div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <h3>Current Media Policy</h3>
+    <div id="mediaRulesSummary" class="empty">Loading...</div>
+  </div>
+</div>
 <div id="subscriptions" class="page"><div class="subpage-head"><h2>Subscriptions</h2></div><div class="card"><div id="subsTable" class="tablewrap"></div></div></div>
 <div id="analytics" class="page"><div class="subpage-head"><h2>Analytics</h2></div><div class="grid3"><div class="card"><h3>Total Menu Views</h3><h1 id="anViews">0</h1></div><div class="card"><h3>Premium Restaurants</h3><h1 id="anPremium">0</h1></div><div class="card"><h3>Active Restaurants</h3><h1 id="anActive">0</h1></div></div><div class="card" style="margin-top:12px"><div class="charts"><canvas id="analyticsChart"></canvas></div></div></div>
 <div id="reports" class="page"><div class="subpage-head"><h2>Reports</h2><button class="primary" onclick="exportRestaurantsCSV()">Export Restaurants CSV</button></div><div class="card"><div class="empty">Use the export button to download the current restaurant dataset. More report modules can be added without changing the public menu.</div></div></div>
@@ -164,7 +182,7 @@ async function loadAll(){
  menuItems=await q('menu_items')||[];
  profiles=await q('profiles')||[];
  subscriptions=await q('subscriptions')||[];
- updateStats();renderDashboardTable();renderCities();renderPopularCats();renderActivity();populateRestaurantFilters();renderRestaurantPage();renderMenu();renderCategories();renderApprovals();renderSubscriptions();renderOwners();renderAdmins();renderLogs();renderAnalytics();loadSettings();loadAdSettings();
+ updateStats();renderDashboardTable();renderCities();renderPopularCats();renderActivity();populateRestaurantFilters();renderRestaurantPage();renderMenu();renderCategories();renderApprovals();renderSubscriptions();renderOwners();renderAdmins();renderLogs();renderAnalytics();loadSettings();loadAdSettings();loadMediaRules();
 }
 function statusOf(r){return String(r.status|| (r.is_active===false?'blocked':r.is_active===true?'active':'active')).toLowerCase()}
 function updateStats(){
@@ -258,6 +276,40 @@ async function loadSettings(){const rows=await q('platform_settings');if(!rows?.
 async function savePlatformSettings(){const vals={platform_name:$('setName').value,support_email:$('setEmail').value,public_menus_enabled:$('setPublic').value,approval_required:$('setApproval').value};for(const [key,value] of Object.entries(vals)){const r=await db.from('platform_settings').upsert({key,value,updated_by:session.user.id},{onConflict:'key'});if(r.error)return toast(r.error.message)}await logAction('Updated platform settings');toast('Settings saved')}
 async function loadAdSettings(){const rows=await q('platform_settings');if(!rows)return;const m=Object.fromEntries(rows.map(x=>[x.key,x.value]));$('adsClient').value=m.adsense_client_id||'';$('adsSlot').value=m.ads_default_slot||'';$('adsFree').value=String(m.free_plan_ads??true);$('adsPremium').value=String(m.premium_plan_ads??false)}
 async function saveAdSettings(){const vals={adsense_client_id:$('adsClient').value,ads_default_slot:$('adsSlot').value,free_plan_ads:$('adsFree').value,premium_plan_ads:$('adsPremium').value};for(const [key,value] of Object.entries(vals)){const r=await db.from('platform_settings').upsert({key,value,updated_by:session.user.id},{onConflict:'key'});if(r.error)return toast(r.error.message)}await logAction('Updated advertisement settings');toast('Ad settings saved')}
+
+async function loadMediaRules(){
+ const rows=await q('platform_settings');if(!rows)return;
+ const m=Object.fromEntries(rows.map(x=>[x.key,x.value]));
+ $('mediaMaxMb').value=Math.min(1,Math.max(.1,Number(m.media_max_image_mb||1)));
+ $('mediaLogoEnabled').value=String(m.media_logo_enabled??true);
+ $('mediaBannerEnabled').value=String(m.media_banner_enabled??true);
+ $('mediaGalleryPaid').value=String(m.media_gallery_paid_enabled??false);
+ renderMediaRulesSummary();
+}
+function renderMediaRulesSummary(){
+ const mb=Math.min(1,Math.max(.1,Number($('mediaMaxMb').value||1)));
+ const logo=$('mediaLogoEnabled').value==='true',banner=$('mediaBannerEnabled').value==='true',gallery=$('mediaGalleryPaid').value==='true';
+ $('mediaRulesSummary').innerHTML=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px"><div><b>${mb} MB</b><small>Max image size</small></div><div><b>${logo?'ON':'OFF'}</b><small>Logo (1 max)</small></div><div><b>${banner?'ON':'OFF'}</b><small>Banner (1 max)</small></div><div><b>${gallery?'ON':'OFF'}</b><small>Paid Gallery</small></div></div>`;
+}
+async function saveMediaRules(){
+ let mb=Math.min(1,Math.max(.1,Number($('mediaMaxMb').value||1)));$('mediaMaxMb').value=mb;
+ const vals={
+  media_max_image_mb:String(mb),
+  media_logo_enabled:$('mediaLogoEnabled').value,
+  media_banner_enabled:$('mediaBannerEnabled').value,
+  media_gallery_paid_enabled:$('mediaGalleryPaid').value
+ };
+ for(const [key,value] of Object.entries(vals)){
+  const r=await db.from('platform_settings').upsert({key,value,updated_by:session.user.id},{onConflict:'key'});
+  if(r.error)return toast(r.error.message);
+ }
+ await logAction('Updated media upload rules');renderMediaRulesSummary();toast('Media rules saved');
+}
+$('mediaMaxMb')?.addEventListener('input',renderMediaRulesSummary);
+$('mediaLogoEnabled')?.addEventListener('change',renderMediaRulesSummary);
+$('mediaBannerEnabled')?.addEventListener('change',renderMediaRulesSummary);
+$('mediaGalleryPaid')?.addEventListener('change',renderMediaRulesSummary);
+
 function exportRestaurantsCSV(){const rows=[['id','name','slug','phone','address','status'],...restaurants.map(r=>[r.id,r.name,r.slug,r.phone,r.address,statusOf(r)])];const csv=rows.map(row=>row.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='freemenu-restaurants.csv';a.click()}
 async function logout(){await db.auth.signOut();location.reload()}
 function startClock(){const tick=()=>{const d=new Date();$('todayDate').textContent=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});$('todayTime').textContent=d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});};tick();setInterval(tick,1000)}
