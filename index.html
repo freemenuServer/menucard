@@ -47,5 +47,12 @@ document.getElementById("mainSearch").addEventListener("input",()=>{selectedCuis
 // Public Index: NO LOGIN REQUIRED. Customers can browse/search restaurants and open menus without authentication.
 // Login/Sign Up buttons are optional and are only for restaurant owners.
 </script>
+
+<script>
+function openOwnerAuth(mode){
+  window.location.assign("restaurant-owner-dashboard-fixed-v2.html?auth="+encodeURIComponent(mode));
+}
+</script>
+
 </body>
 </html>
