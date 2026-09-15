@@ -68,107 +68,29 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
 
 <style id="ownerLoginStyles">
-#ownerAuth{
-  position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;
-  padding:24px;overflow:auto;
-}
+#ownerAuth{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:18px}
 #ownerAuth.show{display:flex}
-.ownerAuthBackdrop{
-  position:absolute;inset:0;
-  background:
-    radial-gradient(circle at 15% 20%,rgba(207,34,76,.26),transparent 28%),
-    radial-gradient(circle at 85% 15%,rgba(255,173,102,.18),transparent 24%),
-    linear-gradient(135deg,#120b12 0%,#271018 48%,#120f18 100%);
-}
-.ownerAuthBackdrop:before{
-  content:"";position:absolute;inset:0;
-  background:url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80") center/cover;
-  opacity:.13;mix-blend-mode:screen;
-}
-.ownerAuthCard{
-  position:relative;width:min(500px,100%);max-height:92vh;overflow:auto;
-  background:rgba(255,255,255,.98);border:1px solid rgba(255,255,255,.65);
-  border-radius:28px;padding:32px;box-shadow:0 35px 100px rgba(0,0,0,.42);
-}
-.ownerAuthCard:before{
-  content:"";display:block;height:5px;border-radius:999px;margin:-32px -32px 26px;
-  background:linear-gradient(90deg,#7e102e,#bf2348,#ef9b42);
-}
-.authBrand{
-  width:72px;height:72px;border-radius:22px;margin:0 auto 14px;
-  display:grid;place-items:center;
-  background:linear-gradient(145deg,#8c1733,#c92950);
-  color:#fff;font-size:30px;box-shadow:0 12px 28px rgba(140,23,51,.28);
-}
-.ownerAuthCard h1{
-  text-align:center;font-family:"Cormorant Garamond",Georgia,serif;
-  font-size:36px;line-height:1.05;margin:0;color:#171b26;letter-spacing:-.4px
-}
-.authSub{text-align:center;color:#7b8492;font-size:12px;margin:7px 0 24px}
-.authChoiceGrid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
-.authChoiceBtn{
-  position:relative;border:1px solid #ebedf1;background:linear-gradient(180deg,#fff,#fafbfc);
-  border-radius:18px;padding:22px 17px;cursor:pointer;text-align:left;transition:.22s;
-  box-shadow:0 4px 14px rgba(20,26,36,.04);
-}
-.authChoiceBtn:hover{
-  transform:translateY(-3px);border-color:#d4d8df;
-  box-shadow:0 16px 30px rgba(20,26,36,.10);
-}
-.authChoiceBtn:after{
-  content:"→";position:absolute;right:15px;top:15px;color:#a11939;font-weight:800;font-size:17px;
-}
-.authChoiceBtn span{display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:#fff1f4;font-size:21px;margin-bottom:12px}
-.authChoiceBtn b{display:block;font-size:17px;color:#182030}
-.authChoiceBtn small{display:block;color:#8a92a0;font-size:10px;margin-top:6px;line-height:1.45;padding-right:16px}
+.ownerAuthBackdrop{position:absolute;inset:0;background:linear-gradient(135deg,#0d1624,#18263b)}
+.ownerAuthCard{position:relative;width:min(460px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:20px;padding:28px;box-shadow:0 25px 70px rgba(0,0,0,.32)}
+.authBrand{width:64px;height:64px;border-radius:18px;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(135deg,#8f1831,#c52345);color:#fff;font-size:27px}
+.ownerAuthCard h1{text-align:center;font-family:"Cormorant Garamond",serif;font-size:32px;margin:0;color:#151c2a}
+.authSub{text-align:center;color:#718096;font-size:12px;margin:4px 0 22px}
+.authChoiceGrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.authChoiceBtn{border:1px solid #e5e7eb;background:#fafbfc;border-radius:15px;padding:18px 14px;cursor:pointer;text-align:left;transition:.18s}
+.authChoiceBtn:hover{transform:translateY(-2px);box-shadow:0 9px 25px rgba(0,0,0,.08);border-color:#cbd5e1}
+.authChoiceBtn span{display:block;font-size:24px;margin-bottom:8px}
+.authChoiceBtn b{display:block;font-size:16px;color:#172033}
+.authChoiceBtn small{display:block;color:#7a8495;font-size:10px;margin-top:5px;line-height:1.4}
 .authFormCard{text-align:left}
 .authFormCard .authBrand{margin-left:auto;margin-right:auto}
 .authFormCard h1,.authFormCard .authSub{text-align:center}
-.authBack{
-  border:0;background:#f5f6f8;color:#616b7b;font-weight:700;cursor:pointer;
-  padding:8px 11px;border-radius:10px;margin-bottom:12px
-}
-.authBack:hover{background:#eceef2}
-.authSwitch{
-  display:block;margin:15px auto 0;border:0;background:none;
-  color:#99163a;font-weight:800;cursor:pointer;padding:4px
-}
-.authSwitch:hover{text-decoration:underline}
-.authFormCard .formGroup{margin-bottom:14px}
-.authFormCard label{
-  display:block;margin:0 0 6px;font-size:11px;font-weight:800;letter-spacing:.02em;color:#4c5666
-}
-.authFormCard .input{
-  width:100%;border:1px solid #dfe3e8;border-radius:12px;padding:12px 13px;
-  background:#fff;color:#1c2533;outline:none;transition:.2s;
-}
-.authFormCard .input:focus{
-  border-color:#b21d42;box-shadow:0 0 0 4px rgba(178,29,66,.09)
-}
-.loginSubmit{
-  width:100%;border:0;border-radius:13px;padding:13px 15px;margin-top:5px;
-  background:linear-gradient(135deg,#871231,#b91f45);color:#fff;font-weight:800;
-  cursor:pointer;box-shadow:0 10px 22px rgba(137,20,50,.22);transition:.2s
-}
-.loginSubmit:hover{transform:translateY(-1px);box-shadow:0 14px 27px rgba(137,20,50,.28)}
-.loginSubmit:disabled{opacity:.68;cursor:not-allowed;transform:none}
-.authError{
-  background:#fff3f3;color:#b21f30;border:1px solid #ffd7da;border-radius:10px;
-  padding:10px 11px;font-size:11px;margin-bottom:13px
-}
-.authSuccess{
-  background:#effaf3;color:#167345;border:1px solid #ccebd7;border-radius:10px;
-  padding:10px 11px;font-size:11px;margin-bottom:13px
-}
-.slugHint{font-size:9px;color:#9199a6;margin-top:5px}
-@media(max-width:560px){
-  #ownerAuth{padding:13px}
-  .ownerAuthCard{padding:24px 18px;border-radius:22px}
-  .ownerAuthCard:before{margin:-24px -18px 21px}
-  .ownerAuthCard h1{font-size:31px}
-  .authChoiceGrid{grid-template-columns:1fr}
-  .twoCol{grid-template-columns:1fr}
-}
+.authBack,.authSwitch{border:0;background:none;color:#5b6474;font-weight:700;cursor:pointer;padding:0}
+.authBack{margin-bottom:9px}
+.authSwitch{display:block;margin:13px auto 0;color:#8f1831}
+.authError{background:#fff0f0;color:#b4232e;border:1px solid #ffd0d0;border-radius:8px;padding:9px 10px;font-size:11px;margin-bottom:12px}
+.authSuccess{background:#edfff5;color:#167647;border:1px solid #bce8cc;border-radius:8px;padding:9px 10px;font-size:11px;margin-bottom:12px}
+.slugHint{font-size:9px;color:#8a93a3;margin-top:4px}
+@media(max-width:560px){.authChoiceGrid{grid-template-columns:1fr}.ownerAuthCard{padding:22px}.twoCol{grid-template-columns:1fr}}
 </style></head>
 
 <body>
@@ -262,7 +184,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     </div>
 
     <button type="button" class="loginSubmit" id="signupSubmitNew">📝 Create Restaurant Account</button>
-    <button type="button" class="authSwitch" id="goLoginFromSignup">Already have an account? Login</button><div style="text-align:center;color:#98a0ad;font-size:9px;margin-top:13px">🔒 Secure authentication powered by FreeMenu</div>
+    <button type="button" class="authSwitch" id="goLoginFromSignup">Already have an account? Login</button>
   </div>
 </div>
 </div>
@@ -457,11 +379,49 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 <!-- GALLERY -->
 <section id="section-gallery" class="hidden">
   <div class="card">
-    <div class="cardTitle">Gallery & Cover <small>Your current schema exposes logo_url; cover/gallery database fields were not present in the owner code.</small></div>
-    <div class="formGroup"><label>Cover / Hero Image URL (optional)</label><input class="input" id="fCover" placeholder="https://..."></div>
-    <div class="formGroup"><label>Gallery Image URLs — one per line (optional)</label><textarea class="textarea" id="fGallery" placeholder="https://image1.jpg&#10;https://image2.jpg"></textarea></div>
-    <button class="btn primary" id="saveMedia"><i class="fa-solid fa-floppy-disk"></i> Save Media</button>
-    <div class="muted" style="font-size:11px;margin-top:10px">If these fields do not exist in your database yet, the profile save will not write them. The existing logo upload uses the <b>restaurant-logos</b> bucket.</div>
+    <div class="cardTitle">Restaurant Images
+      <small id="mediaRuleNote">Upload rules are controlled by Super Admin.</small>
+    </div>
+
+    <div id="mediaPolicyStatus" style="margin:0 0 14px;padding:11px;border-radius:10px;background:#fff8e8;border:1px solid #f4d58b;font-size:11px;color:#6b4b00">
+      Loading media policy...
+    </div>
+
+    <div class="formGroup">
+      <label>Restaurant Logo <small>(Maximum 1 image)</small></label>
+      <div class="uploadRow">
+        <input class="input" id="fLogoMedia" placeholder="Logo image URL">
+        <input type="file" id="logoMediaFile" accept="image/*" hidden>
+        <button class="fileBtn" type="button" id="chooseLogoMedia">Choose</button>
+        <button class="btn blue" type="button" id="uploadLogoMedia">Upload</button>
+      </div>
+      <div class="muted" style="font-size:10px">Maximum image size: <b id="logoMaxText">1 MB</b></div>
+    </div>
+
+    <div class="formGroup">
+      <label>Banner / Hero Image <small>(Maximum 1 image)</small></label>
+      <div class="uploadRow">
+        <input class="input" id="fBannerMedia" placeholder="Banner image URL">
+        <input type="file" id="bannerMediaFile" accept="image/*" hidden>
+        <button class="fileBtn" type="button" id="chooseBannerMedia">Choose</button>
+        <button class="btn blue" type="button" id="uploadBannerMedia">Upload</button>
+      </div>
+      <div class="muted" style="font-size:10px">Maximum image size: <b id="bannerMaxText">1 MB</b></div>
+    </div>
+
+    <div id="galleryPaidBox" class="formGroup" style="display:none">
+      <label>Photo Gallery <span style="padding:3px 7px;background:#fff0d6;color:#8a5600;border-radius:99px;font-size:9px;font-weight:800">PREMIUM</span></label>
+      <div id="galleryLocked" style="padding:12px;border-radius:10px;background:#f8fafc;border:1px solid var(--border);font-size:11px;color:#667085"></div>
+      <div id="galleryUploadBox" style="display:none;margin-top:10px">
+        <input type="file" id="galleryMediaFile" accept="image/*" hidden>
+        <button class="fileBtn" type="button" id="chooseGalleryMedia">Choose Gallery Image</button>
+        <button class="btn blue" type="button" id="uploadGalleryMedia">Upload to Gallery</button>
+        <div id="galleryList" style="margin-top:11px"></div>
+      </div>
+    </div>
+
+    <button class="btn primary" id="saveMedia"><i class="fa-solid fa-floppy-disk"></i> Save Image Settings</button>
+    <div class="muted" style="font-size:10px;margin-top:9px">One logo + one banner are allowed. Gallery uploads are available only for active Premium restaurants when Super Admin has enabled the paid gallery.</div>
   </div>
 </section>
 
@@ -573,6 +533,8 @@ const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let session=null,currentRestaurant=null,currentRestaurantId=null,items=[],activeSection="dashboard";
+let mediaRules={max_mb:1,logo_enabled:true,banner_enabled:true,gallery_paid_enabled:false};
+let isPremiumRestaurant=false;
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
@@ -800,6 +762,8 @@ function fillProfile(){
   $("topAddress").textContent=r.address||"Restaurant Owner";
   $("profilePhone").textContent=r.phone||"—";$("profileAddress").textContent=r.address||"—";$("profileSlug").textContent=r.slug||"—";
   $("fName").value=r.name||"";$("fPhone").value=r.phone||"";$("fSlug").value=r.slug||"";$("fLogo").value=r.logo_url||"";$("fAddress").value=r.address||"";
+  if($("fLogoMedia"))$("fLogoMedia").value=r.logo_url||"";
+  if($("fBannerMedia"))$("fBannerMedia").value=r.banner_url||r.cover_url||"";
   $("fWelcome").value=r.welcome_text??"Welcome to";
   $("fTagline").value=r.tagline??r.name??"";
   $("fSubtitle").value=r.subtitle_text??"THE TASTE YOU'LL LOVE";
@@ -922,18 +886,7 @@ $("saveProfile").onclick=async()=>{
 };
 $("chooseLogo").onclick=()=>$("logoFile").click();
 $("logoFile").onchange=()=>{$("chooseLogo").textContent=$("logoFile").files[0]?.name?.slice(0,18)||"Choose"};
-$("uploadLogo").onclick=async()=>{
- const file=$("logoFile").files[0];if(!file)return toast("Choose an image first");
- const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"");
- const path=`logo_${currentRestaurantId}_${Date.now()}.${ext}`;
- $("uploadLogo").disabled=true;$("uploadLogo").textContent="Uploading...";
- const {error}=await supabaseClient.storage.from("restaurant-logos").upload(path,file,{cacheControl:"3600",upsert:true,contentType:file.type});
- $("uploadLogo").disabled=false;$("uploadLogo").textContent="Upload";
- if(error){toast("Upload failed: "+error.message);return}
- const {data}=supabaseClient.storage.from("restaurant-logos").getPublicUrl(path);
- $("fLogo").value=data.publicUrl;toast("Logo uploaded — click Save to publish it");
-};
-
+$("uploadLogo").onclick=()=>uploadMediaFile("logo");
 
 $("saveHeroInfo").onclick=async()=>{
   const payload={
@@ -995,14 +948,125 @@ function updateTheme(){
 ["cPrimary","cAccent","cBg"].forEach(id=>$(id).addEventListener("input",updateTheme));
 $("quickTheme").onclick=()=>{showSection("settings");history.replaceState(null,"","#settings")};
 
-/* ---------- Media ---------- */
+/* ---------- Media & Upload Policy ---------- */
+async function loadMediaRules(){
+  try{
+    const {data,error}=await supabaseClient.rpc("get_media_upload_rules");
+    if(!error && data?.length){
+      mediaRules={
+        max_mb:Math.min(1,Number(data[0].max_image_size_mb||1)),
+        logo_enabled:data[0].logo_upload_enabled!==false,
+        banner_enabled:data[0].banner_upload_enabled!==false,
+        gallery_paid_enabled:data[0].gallery_paid_enabled===true
+      };
+    }
+  }catch(e){console.warn("Media policy RPC unavailable",e)}
+  await refreshMediaPolicyUI();
+}
+async function refreshMediaPolicyUI(){
+  const mb=Math.min(1,Number(mediaRules.max_mb||1));
+  if($("logoMaxText"))$("logoMaxText").textContent=mb+" MB";
+  if($("bannerMaxText"))$("bannerMaxText").textContent=mb+" MB";
+  if($("mediaRuleNote"))$("mediaRuleNote").textContent=
+    `Logo: ${mediaRules.logo_enabled?"1 allowed":"OFF"} • Banner: ${mediaRules.banner_enabled?"1 allowed":"OFF"} • Gallery: ${mediaRules.gallery_paid_enabled?"Premium only":"OFF"} • Max image: ${mb} MB`;
+
+  if($("chooseLogoMedia"))$("chooseLogoMedia").disabled=!mediaRules.logo_enabled;
+  if($("uploadLogoMedia"))$("uploadLogoMedia").disabled=!mediaRules.logo_enabled;
+  if($("chooseBannerMedia"))$("chooseBannerMedia").disabled=!mediaRules.banner_enabled;
+  if($("uploadBannerMedia"))$("uploadBannerMedia").disabled=!mediaRules.banner_enabled;
+
+  const r=currentRestaurant||{};
+  isPremiumRestaurant=
+    String(r.plan||"").toLowerCase()==="premium" &&
+    String(r.subscription_status||"").toLowerCase()==="active" &&
+    (!r.subscription_expires_at || new Date(r.subscription_expires_at)>new Date());
+
+  if($("galleryPaidBox"))$("galleryPaidBox").style.display=mediaRules.gallery_paid_enabled?"block":"none";
+  if($("galleryLocked")){
+    if(!mediaRules.gallery_paid_enabled){
+      $("galleryLocked").textContent="Photo Gallery is disabled by Super Admin.";
+      $("galleryUploadBox").style.display="none";
+    }else if(!isPremiumRestaurant){
+      $("galleryLocked").innerHTML="🔒 Photo Gallery is a <b>Premium feature</b>. An active Premium subscription is required.";
+      $("galleryUploadBox").style.display="none";
+    }else{
+      $("galleryLocked").innerHTML="✅ Premium Gallery access is active.";
+      $("galleryUploadBox").style.display="block";
+    }
+  }
+  renderGalleryList();
+}
+function validateMediaFile(file){
+  if(!file)return "Choose an image first.";
+  if(!file.type.startsWith("image/"))return "Only image files are allowed.";
+  const mb=Math.min(1,Number(mediaRules.max_mb||1));
+  if(file.size>mb*1024*1024)return `Image must be ${mb} MB or smaller.`;
+  return "";
+}
+async function uploadMediaFile(kind){
+  const enabled=kind==="logo"?mediaRules.logo_enabled:mediaRules.banner_enabled;
+  if(!enabled)return toast(`${kind==="logo"?"Logo":"Banner"} upload is disabled by Super Admin.`);
+  const file=kind==="logo"?$("logoFile").files[0]:$("bannerMediaFile").files[0];
+  const bad=validateMediaFile(file);if(bad)return toast(bad);
+  const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"");
+  const path=`${kind}_${currentRestaurantId}.${ext}`;
+  const btn=kind==="logo"?$("uploadLogo"):$("uploadBannerMedia");
+  if(btn){btn.disabled=true;btn.textContent="Uploading...";}
+  const {error}=await supabaseClient.storage.from("restaurant-logos").upload(path,file,{cacheControl:"3600",upsert:true,contentType:file.type});
+  if(btn){btn.disabled=false;btn.textContent="Upload";}
+  if(error)return toast("Upload failed: "+error.message);
+  const {data}=supabaseClient.storage.from("restaurant-logos").getPublicUrl(path);
+  if(kind==="logo"){ $("fLogo").value=data.publicUrl; $("fLogoMedia").value=data.publicUrl; }
+  else $("fBannerMedia").value=data.publicUrl;
+  toast(`${kind==="logo"?"Logo":"Banner"} uploaded — click Save`);
+}
+$("chooseLogoMedia").onclick=()=>$("logoMediaFile").click();
+$("logoMediaFile").onchange=()=>{$("chooseLogoMedia").textContent=$("logoMediaFile").files[0]?.name?.slice(0,18)||"Choose"};
+$("uploadLogoMedia").onclick=()=>uploadMediaFile("logo");
+
+$("chooseBannerMedia").onclick=()=>$("bannerMediaFile").click();
+$("bannerMediaFile").onchange=()=>{$("chooseBannerMedia").textContent=$("bannerMediaFile").files[0]?.name?.slice(0,18)||"Choose"};
+$("uploadBannerMedia").onclick=()=>uploadMediaFile("banner");
+
+$("chooseGalleryMedia").onclick=()=>$("galleryMediaFile").click();
+$("galleryMediaFile").onchange=()=>{$("chooseGalleryMedia").textContent=$("galleryMediaFile").files[0]?.name?.slice(0,18)||"Choose"};
+$("uploadGalleryMedia").onclick=async()=>{
+  if(!mediaRules.gallery_paid_enabled)return toast("Gallery is disabled by Super Admin.");
+  if(!isPremiumRestaurant)return toast("Upgrade to Premium to use the Gallery.");
+  const file=$("galleryMediaFile").files[0],bad=validateMediaFile(file);if(bad)return toast(bad);
+  const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"");
+  const path=`gallery/${currentRestaurantId}/${Date.now()}.${ext}`;
+  $("uploadGalleryMedia").disabled=true;$("uploadGalleryMedia").textContent="Uploading...";
+  const {error}=await supabaseClient.storage.from("restaurant-logos").upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type});
+  $("uploadGalleryMedia").disabled=false;$("uploadGalleryMedia").textContent="Upload to Gallery";
+  if(error)return toast("Gallery upload failed: "+error.message);
+  const {data}=supabaseClient.storage.from("restaurant-logos").getPublicUrl(path);
+  const gallery=Array.isArray(currentRestaurant.gallery)?[...currentRestaurant.gallery]:[];
+  gallery.push(data.publicUrl);
+  const {data:updated,error:updateError}=await supabaseClient.from("restaurants").update({gallery}).eq("id",currentRestaurantId).select("*").single();
+  if(updateError)return toast("Gallery save failed: "+updateError.message);
+  currentRestaurant=updated;fillProfile();renderGalleryList();toast("Gallery image added");
+};
+function renderGalleryList(){
+  const el=$("galleryList");if(!el)return;
+  const g=Array.isArray(currentRestaurant?.gallery)?currentRestaurant.gallery:[];
+  el.innerHTML=g.length?g.map((u,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)"><img src="${esc(u)}" style="width:48px;height:38px;object-fit:cover;border-radius:7px"><span style="flex:1;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(u)}</span><button class="btn sm" type="button" onclick="removeGalleryImage(${i})">Remove</button></div>`).join(""):'<div class="muted" style="font-size:10px">No gallery images yet.</div>';
+}
+async function removeGalleryImage(i){
+  if(!mediaRules.gallery_paid_enabled||!isPremiumRestaurant)return toast("Gallery access is not available.");
+  const g=Array.isArray(currentRestaurant?.gallery)?[...currentRestaurant.gallery]:[];
+  g.splice(i,1);
+  const {data,error}=await supabaseClient.from("restaurants").update({gallery:g}).eq("id",currentRestaurantId).select("*").single();
+  if(error)return toast(error.message);
+  currentRestaurant=data;fillProfile();renderGalleryList();toast("Gallery image removed");
+}
 $("saveMedia").onclick=async()=>{
- const cover=$("fCover").value.trim();
- const gallery=$("fGallery").value.split(/\n+/).map(x=>x.trim()).filter(Boolean);
- /* Only attempt fields if they exist; these were not present in the supplied owner schema. */
- const {error}=await supabaseClient.from("restaurants").update({cover_url:cover,gallery}).eq("id",currentRestaurantId);
- if(error){toast("Cover/gallery fields are not in your current restaurants table. Logo is already supported.");return}
- currentRestaurant={...currentRestaurant,cover_url:cover,gallery};fillProfile();toast("Media saved");
+  const payload={logo_url:$("fLogoMedia").value.trim(),banner_url:$("fBannerMedia").value.trim()};
+  $("saveMedia").disabled=true;
+  const {data,error}=await supabaseClient.from("restaurants").update(payload).eq("id",currentRestaurantId).select("*").single();
+  $("saveMedia").disabled=false;
+  if(error)return toast("Media save failed: "+error.message);
+  currentRestaurant=data;fillProfile();toast("Image settings saved");
 };
 
 /* ---------- Logout ---------- */
