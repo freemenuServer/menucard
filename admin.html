@@ -14,7 +14,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
 @media(max-width:1150px){.stats{grid-template-columns:repeat(3,1fr)}.grid3,.bottom3{grid-template-columns:1fr}.lower{grid-template-columns:1fr}}
 @media(max-width:800px){.sidebar{transform:translateX(-100%);transition:.2s}.sidebar.open{transform:translateX(0)}.main{margin-left:0;width:100%}.mobile-only{display:block}.topbar{padding:0 12px}.content{padding:16px 12px}.stats{grid-template-columns:1fr 1fr}.search{display:none}.formgrid{grid-template-columns:1fr}.welcome h1{font-size:22px}.date{display:none}}
 
-/* AI Menu Scanner */
+/* OCR Menu Scanner — Free */
 
 .ai-ready{border-color:#12b76a!important;background:#ecfdf3!important}
 .ai-working{opacity:.65;pointer-events:none}
@@ -25,6 +25,16 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
 .ai-confidence{font-size:10px;margin-top:4px;color:#667085}
 .ai-low{border-color:#f79009 !important;background:#fffaeb !important}
 .ai-file{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid #eaecf0;border-radius:9px;background:#f9fafb;margin-top:7px;font-size:12px}
+
+
+/* Free OCR Menu Scanner */
+#aiReviewTable .ai-input{width:100%;min-width:85px;padding:7px 8px;border:1px solid #d0d5dd;border-radius:8px;background:#fff;font:inherit;font-size:12px}
+#aiReviewTable .ai-textarea{min-height:48px;resize:vertical}
+#aiReviewTable td{vertical-align:top}
+.ai-file{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid #eaecf0;border-radius:9px;background:#f9fafb;margin-top:7px;font-size:12px}
+.ai-low{border-color:#f79009!important;background:#fffaeb!important}
+.ai-progress{height:8px;background:#eef2f6;border-radius:99px;overflow:hidden;margin-top:8px}
+.ai-progress>div{height:100%;width:0;background:#ef3340;transition:width .25s}
 
 </style>
 </head>
@@ -52,7 +62,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
     <button data-page="menu"><i data-lucide="book-open"></i>Menu Management</button>
     <button data-page="categories"><i data-lucide="layers"></i>Categories</button>
     <button data-page="approvals"><i data-lucide="clock-3"></i>Pending Approvals <b class="badge" id="approvalBadge">0</b></button>
-    <button data-page="ads"><i data-lucide="badge-dollar-sign"></i>Advertisements</button><button data-page="mediaRules"><i data-lucide="image"></i>Media Upload Rules</button><button data-page="aiScanner"><i data-lucide="scan-line"></i>AI Menu Scanner</button>
+    <button data-page="ads"><i data-lucide="badge-dollar-sign"></i>Advertisements</button><button data-page="mediaRules"><i data-lucide="image"></i>Media Upload Rules</button><button data-page="aiScanner"><i data-lucide="scan-line"></i>OCR Menu Scanner — Free</button>
     <button data-page="subscriptions"><i data-lucide="crown"></i>Subscriptions</button>
     <button data-page="analytics"><i data-lucide="bar-chart-3"></i>Analytics</button>
     <button data-page="reports"><i data-lucide="file-text"></i>Reports</button>
@@ -136,13 +146,14 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
   </div>
 </div>
 
+
 <div id="aiScanner" class="page">
   <div class="subpage-head">
     <div>
-      <h2>AI Menu Scanner</h2>
-      <p style="color:#667085">Upload one or multiple menu images. Gemini reads the complete menu, prepares structured items, then you review/correct before publishing.</p>
+      <h2>OCR Menu Scanner — Free</h2>
+      <p style="color:#667085">No Gemini/API billing. Read PDF text directly or use browser OCR for image/scanned menus, then correct before publishing.</p>
     </div>
-    <span id="aiStatusPill" class="pill orange">● Setup Required</span><span id="aiSessionPill" class="pill red" style="margin-left:6px">● Session checking...</span>
+    <span id="aiStatusPill" class="pill green">● No AI / Free</span>
   </div>
 
   <div class="grid3" style="margin-bottom:12px">
@@ -153,82 +164,81 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
         <select class="input" id="aiRestaurant"></select>
       </div>
       <div class="field" style="margin-top:10px">
-        <label>Scanner Mode</label>
+        <label>Import Mode</label>
         <select class="input" id="aiMode">
           <option value="append">Add scanned items to existing menu</option>
           <option value="replace">Replace existing menu on final publish</option>
         </select>
       </div>
-      <small style="display:block;color:#667085;margin-top:10px">Replace mode is destructive and only happens after you press Final Submit.</small>
+      <small style="display:block;color:#667085;margin-top:10px">Replace mode only runs after Final Submit.</small>
     </div>
 
     <div class="card">
-      <div class="card-head"><h3>2. Upload Menu Images</h3></div>
-      <input id="aiFiles" type="file" accept="image/png,image/jpeg,image/webp,image/heic,image/heif" multiple hidden>
-      <button class="primary" onclick="document.getElementById('aiFiles').click()">＋ Choose Menu Images</button>
+      <div class="card-head"><h3>2. Upload Menu</h3></div>
+      <input id="aiFiles" type="file" accept="application/pdf,image/png,image/jpeg,image/webp" multiple hidden>
+      <button class="primary" onclick="document.getElementById('aiFiles').click()">＋ Choose PDF / Images</button>
       <div id="aiFileList" style="margin-top:12px"></div>
       <div id="aiUploadActions" style="display:none;margin-top:12px;padding:12px;border:1px solid #d0d5dd;border-radius:10px;background:#f9fafb">
-        <div style="font-size:12px;color:#475467;margin-bottom:8px"><b id="aiUploadStatus">Images ready.</b> Select the restaurant above, then scan.</div>
-        <button class="primary" id="aiScanNowBtn" type="button" onclick="runAiMenuScan()">✦ Scan Uploaded Menu Now</button>
+        <div style="font-size:12px;color:#475467;margin-bottom:8px"><b id="aiUploadStatus">Files ready.</b></div>
+        <button class="primary" type="button" id="aiScanNowBtn" onclick="runAiMenuScan()">▣ Extract Menu Now</button>
       </div>
-      <small style="display:block;color:#667085;margin-top:10px">Recommended: upload all pages of the menu. After both restaurant and images are selected, the scanner can start automatically. Up to 15 images / 20 MB total in this UI.</small>
+      <small style="display:block;color:#667085;margin-top:10px">PDF files are text-extracted first. Scanned/image PDFs fall back to browser OCR.</small>
     </div>
 
     <div class="card">
-      <div class="card-head"><h3>3. AI Settings</h3></div>
-      <div class="field"><label>Gemini Model</label>
-        <select class="input" id="aiModel">
-          <option value="gemini-3.8-flash">Gemini 3.8 Flash — Recommended</option>
-          <option value="gemini-3.7-flash">Gemini 3.7 Flash</option>
-          <option value="gemini-3.6-flash">Gemini 3.6 Flash</option>
-          <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite — Cost Efficient</option>
+      <div class="card-head"><h3>3. OCR Settings</h3></div>
+      <div class="field">
+        <label>OCR Language</label>
+        <select class="input" id="aiOcrLang">
+          <option value="eng">English</option>
+          <option value="eng+hin">English + Hindi</option>
         </select>
       </div>
       <label style="display:flex;align-items:center;gap:9px;margin-top:12px;font-size:13px">
-        <input type="checkbox" id="aiEnabled" checked>
-        Enable AI scanner
+        <input type="checkbox" id="aiOcrEnabled" checked>
+        Enable browser OCR fallback
       </label>
-      <small style="display:block;color:#667085;margin-top:10px">The Gemini API key is stored server-side in the Supabase Edge Function secret, not in this HTML page.</small>
-      <div style="margin-top:12px"><button class="smallbtn" onclick="saveAiSettings()">Save AI Settings</button></div>
+      <small style="display:block;color:#667085;margin-top:10px">OCR runs in your browser. There is no Gemini API key and no AI usage charge.</small>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-head"><h3>AI Scan</h3><span id="aiScanMeta" style="color:#667085;font-size:12px">No scan yet</span></div>
-    <div id="aiScannerEmpty" class="empty">
-      <div style="font-size:36px">✦</div>
-      <h3 style="margin:8px 0 4px;color:#101828">Scan a restaurant menu</h3>
-      <p style="margin:0;color:#667085">The AI will extract categories, item names, descriptions, veg/non-veg type and single / Q / H / F prices where visible.</p>
+    <div class="card-head">
+      <h3>OCR Extraction & Correction</h3>
+      <span id="aiScanMeta" style="color:#667085;font-size:12px">No extraction yet</span>
     </div>
+
+    <div class="notice">
+      <b>Important:</b> OCR is rule-based and can misread prices or columns. Always check the correction table before submitting.
+    </div>
+
+    <div id="aiScannerEmpty" class="empty">
+      <div style="font-size:36px">▦</div>
+      <h3 style="margin:8px 0 4px;color:#101828">Upload a restaurant menu</h3>
+      <p style="margin:0;color:#667085">Supports PDF, JPG, PNG and WebP. Text PDFs are parsed directly; image/scanned pages use local browser OCR.</p>
+    </div>
+
     <div id="aiReviewWrap" style="display:none">
-      <div class="notice" style="margin-bottom:12px">
-        <b>Review required:</b> AI results are suggestions. Check spelling, category names and prices before publishing.
-        <span id="aiUncertainCount"></span>
-      </div>
       <div class="toolbar">
-        <button class="primary" id="aiScanBtn" onclick="runAiMenuScan()">✦ Scan Menu With AI</button>
         <button class="smallbtn" onclick="addAiRow()">＋ Add Row</button>
         <button class="smallbtn" onclick="clearAiReview()">Clear</button>
-        <button class="primary" id="aiSubmitBtn" style="margin-left:auto" onclick="publishAiMenu()">Final Submit to Restaurant</button>
+        <button class="smallbtn" onclick="downloadOcrJson()">Download JSON</button>
+        <button class="primary" style="margin-left:auto" id="aiSubmitBtn" onclick="publishAiMenu()">Final Submit to Restaurant</button>
       </div>
       <div id="aiReviewTable" class="tablewrap" style="margin-top:12px"></div>
     </div>
   </div>
 
   <div class="card" style="margin-top:12px">
-    <div class="card-head"><h3>Google AI Studio Setup</h3></div>
-    <div class="notice">
-      1) Open Google AI Studio and create/copy a Gemini API key.<br>
-      2) In Supabase Dashboard → Edge Functions → Secrets, add <b>GEMINI_API_KEY</b>.<br>
-      3) Deploy the supplied <b>scan-menu</b> Edge Function.<br>
-      4) Come back here, enable AI Scanner and test with one restaurant menu.
-    </div>
-    <div style="margin-top:10px;color:#667085;font-size:12px">
-      For production, do not paste the Gemini key into this page or into <b>platform_settings</b>. The browser should only call the protected Edge Function.
+    <div class="card-head"><h3>How the Free Scanner Works</h3></div>
+    <div style="color:#475467;font-size:12px;line-height:1.8">
+      <b>PDF text:</b> PDF.js reads embedded text locally. &nbsp;
+      <b>Image PDF:</b> pages are rendered in the browser and OCR is applied. &nbsp;
+      <b>JPG/PNG/WebP:</b> OCR runs directly in the browser. &nbsp;
+      <b>Publish:</b> corrected rows are inserted into the existing <code>menu_items</code> table.
     </div>
   </div>
 </div>
-
 <div id="subscriptions" class="page"><div class="subpage-head"><h2>Subscriptions</h2></div><div class="card"><div id="subsTable" class="tablewrap"></div></div></div>
 <div id="analytics" class="page"><div class="subpage-head"><h2>Analytics</h2></div><div class="grid3"><div class="card"><h3>Total Menu Views</h3><h1 id="anViews">0</h1></div><div class="card"><h3>Premium Restaurants</h3><h1 id="anPremium">0</h1></div><div class="card"><h3>Active Restaurants</h3><h1 id="anActive">0</h1></div></div><div class="card" style="margin-top:12px"><div class="charts"><canvas id="analyticsChart"></canvas></div></div></div>
 <div id="reports" class="page"><div class="subpage-head"><h2>Reports</h2><button class="primary" onclick="exportRestaurantsCSV()">Export Restaurants CSV</button></div><div class="card"><div class="empty">Use the export button to download the current restaurant dataset. More report modules can be added without changing the public menu.</div></div></div>
@@ -424,294 +434,286 @@ document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLower
 $('globalSearch').addEventListener('input',e=>{const v=e.target.value.toLowerCase();const found=restaurants.filter(r=>`${r.name} ${r.slug} ${r.address}`.toLowerCase().includes(v));if(v){showPage('restaurants');$('restaurantSearch').value=v;renderRestaurantPage()}})
 window.addEventListener('load',async()=>{lucide.createIcons();startClock();try{if(await adminCheck()){await loadAll();buildCharts();updateStats();}}catch(e){console.error(e);alert('Supabase error: '+e.message)}})
 
-/* ---------- AI MENU SCANNER ---------- */
-let aiFiles = [];
-let aiRows = [];
 
-function aiToast(msg){ toast("AI Scanner: " + msg); }
+/* ---------- FREE OCR MENU SCANNER ---------- */
+let aiFiles=[], aiRows=[];
 
 function populateAiRestaurants(){
-  const s = $('aiRestaurant');
-  if(!s) return;
-  s.innerHTML = '<option value="">Select restaurant</option>' +
-    restaurants.map(r => `<option value="${r.id}">${esc(r.name)} — ${esc(r.slug||'')}</option>`).join('');
+  const s=$('aiRestaurant'); if(!s)return;
+  s.innerHTML='<option value="">Select restaurant</option>'+
+    restaurants.map(r=>`<option value="${r.id}">${esc(r.name)} — ${esc(r.slug||'')}</option>`).join('');
 }
-
-function loadAiSettings(){
-  const rows = window.__fmPlatformSettingsRows || [];
-  const m = Object.fromEntries(rows.map(x => [x.key, x.value]));
-  $('aiModel').value = m.ai_menu_model || 'gemini-3.8-flash';
-  $('aiEnabled').checked = String(m.ai_menu_enabled ?? 'true') !== 'false';
-  const enabled = $('aiEnabled').checked;
-  $('aiStatusPill').className = `pill ${enabled ? 'green' : 'red'}`;
-  $('aiStatusPill').textContent = enabled ? '● AI Enabled' : '● AI Disabled';
+function setOcrStatus(text, cls='green'){
+  if($('aiStatusPill')){ $('aiStatusPill').className=`pill ${cls}`; $('aiStatusPill').textContent='● '+text; }
 }
-
-async function saveAiSettings(){
-  const vals = {
-    ai_menu_model: $('aiModel').value,
-    ai_menu_enabled: String($('aiEnabled').checked)
-  };
-  for(const [key,value] of Object.entries(vals)){
-    const r = await db.from('platform_settings').upsert({key,value,updated_by:session.user.id},{onConflict:'key'});
-    if(r.error) return toast(r.error.message);
-  }
-  window.__fmPlatformSettingsRows = [...(window.__fmPlatformSettingsRows||[]),
-    ...Object.entries(vals).map(([key,value])=>({key,value}))]
-      .reduce((a,x)=>{const i=a.findIndex(y=>y.key===x.key);i>=0?a[i]=x:a.push(x);return a},[]);
-  loadAiSettings();
-  await logAction('Updated AI menu scanner settings');
-  toast('AI settings saved');
-}
-
 function renderAiFiles(){
-  const box = $('aiFileList');
-  if(!aiFiles.length){ box.innerHTML = '<div class="empty" style="padding:15px">No files selected.</div>'; return; }
-  box.innerHTML = aiFiles.map((f,i)=>`<div class="ai-file"><span>🖼️ ${esc(f.name)} <small>(${(f.size/1024/1024).toFixed(2)} MB)</small></span><button class="iconbtn" onclick="removeAiFile(${i})">✕</button></div>`).join('');
+  const box=$('aiFileList');
+  if(!aiFiles.length){box.innerHTML='<div class="empty" style="padding:15px">No files selected.</div>';return}
+  box.innerHTML=aiFiles.map((f,i)=>`<div class="ai-file"><span>📄 ${esc(f.name)} <small>(${(f.size/1024/1024).toFixed(2)} MB)</small></span><button class="iconbtn" onclick="removeAiFile(${i})">✕</button></div>`).join('');
 }
-function removeAiFile(i){aiFiles.splice(i,1);renderAiFiles();}
-$('aiFiles')?.addEventListener('change', async e=>{
+function removeAiFile(i){aiFiles.splice(i,1);renderAiFiles();updateOcrReady();}
+function updateOcrReady(){
+  const box=$('aiUploadActions'); if(!box)return;
+  box.style.display=aiFiles.length?'block':'none';
+  $('aiUploadStatus').textContent=aiFiles.length?`${aiFiles.length} file(s) ready. Select restaurant and extract.`:'No files selected.';
+}
+$('aiFiles')?.addEventListener('change',e=>{
   const incoming=[...e.target.files];
-  const merged=[...aiFiles,...incoming];
-  const unique=[];
-  const seen=new Set();
-  let total=0;
+  const merged=[...aiFiles,...incoming], seen=new Set(), out=[]; let total=0;
   for(const f of merged){
-    const k=`${f.name}:${f.size}:${f.lastModified}`;
-    if(seen.has(k)) continue;
-    if(unique.length>=15){ aiToast('Maximum 15 images allowed'); break; }
-    if(!/^image\//.test(f.type)){ aiToast('Only image files are allowed'); continue; }
-    total += f.size;
-    if(total > 20*1024*1024){ total -= f.size; aiToast('Total upload size cannot exceed 20 MB'); break; }
-    seen.add(k); unique.push(f);
+    const key=`${f.name}:${f.size}:${f.lastModified}`; if(seen.has(key))continue;
+    if(out.length>=10){toast('Maximum 10 files per OCR batch');break}
+    if(!/^(application\/pdf|image\/)/.test(f.type)){toast('Only PDF or image files are allowed');continue}
+    total+=f.size;
+    if(total>30*1024*1024){total-=f.size;toast('Batch size limit is 30 MB');break}
+    seen.add(key);out.push(f);
   }
-  aiFiles=unique;
-  e.target.value='';
-  renderAiFiles();
-  updateAiScanReady(true);
-  if(aiFiles.length && $('aiRestaurant').value && $('aiEnabled').checked){
-    await runAiMenuScan();
-  }
+  aiFiles=out;e.target.value='';renderAiFiles();updateOcrReady();
 });
 
-function updateAiScanReady(showMessage=false){
-  const box=$('aiUploadActions');
-  if(!box)return;
-  const ready=aiFiles.length>0;
-  box.style.display=ready?'block':'none';
-  box.classList.toggle('ai-ready', ready && !!$('aiRestaurant').value);
-  $('aiUploadStatus').textContent = !ready ? 'No images selected.'
-    : (!$('aiRestaurant').value ? 'Images ready — select a restaurant above.'
-      : 'Images ready — click Scan or the scan will start automatically.');
-}
-
-$('aiRestaurant')?.addEventListener('change', async ()=>{
-  updateAiScanReady();
-  if(aiFiles.length && $('aiRestaurant').value && $('aiEnabled').checked){
-    await runAiMenuScan();
+async function ensureLibs(){
+  if(!window.pdfjsLib){
+    await new Promise((resolve,reject)=>{
+      const s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.min.mjs';
+      s.type='module';
+      s.onload=resolve;s.onerror=reject;document.head.appendChild(s);
+    });
   }
-});
-
-
-
-function clearAiReview(){
-  aiRows=[];
-  $('aiReviewWrap').style.display='none';
-  $('aiScannerEmpty').style.display='block';
-  $('aiReviewTable').innerHTML='';
-  $('aiScanMeta').textContent='No scan yet';
+  if(!window.Tesseract){
+    await new Promise((resolve,reject)=>{
+      const s=document.createElement('script');
+      s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+      s.onload=resolve;s.onerror=reject;document.head.appendChild(s);
+    });
+  }
 }
 
-function addAiRow(row={}){
-  aiRows.push({
-    category: row.category || 'General',
-    name: row.name || '',
-    description: row.description || '',
-    item_type: row.item_type || 'veg',
-    price: row.price ?? '',
-    price_quarter: row.price_quarter ?? '',
-    price_half: row.price_half ?? '',
-    price_full: row.price_full ?? '',
-    confidence: row.confidence ?? 0.5
+/* PDF.js classic global fallback */
+async function loadPdfJs(){
+  if(window.pdfjsLib)return window.pdfjsLib;
+  await new Promise((resolve,reject)=>{
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.js';
+    s.onload=resolve;s.onerror=reject;document.head.appendChild(s);
   });
-  renderAiReview();
+  if(window.pdfjsLib?.GlobalWorkerOptions){
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.js';
+  }
+  return window.pdfjsLib;
 }
 
+function normalizeText(t){
+  return String(t||'')
+    .replace(/[₹$£€]/g,' ')
+    .replace(/[|•·]/g,' ')
+    .replace(/[ \t]+/g,' ')
+    .replace(/\u00a0/g,' ')
+    .trim();
+}
+function n(v){const x=String(v??'').replace(/,/g,'').match(/-?\d+(?:\.\d+)?/);return x?Number(x[0]):null}
+function cleanName(s){return normalizeText(s).replace(/\s{2,}/g,' ').trim()}
+function isNoise(line){
+  const x=cleanName(line);
+  if(!x)return true;
+  if(/^(menu|starters?|main course|rice|breads?|soups?|momos?|rolls?|desserts?|beverages?|drinks?|snacks?|specials?|tandoori|chinese|raita|salads?|our other branches|online order|family-food|restaurant)$/i.test(x))return true;
+  if(x.length<2)return true;
+  return false;
+}
+function detectCategory(line,current){
+  const x=cleanName(line);
+  const common=/^(spl items|tawa special|momos|raita|soups?|tandoori khazana|starters?|fry special|chinese|main course|rolls special|rice|breads?|desserts?|beverages?|drinks?|snacks?)$/i;
+  if(common.test(x)) return x.replace(/\s+/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  return current;
+}
+function parseMenuText(raw){
+  const lines=String(raw||'').split(/\r?\n/).map(cleanName).filter(Boolean);
+  let category='General'; const rows=[];
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i];
+    const cat=detectCategory(line,category);
+    if(cat!==category){category=cat;continue}
+
+    // Common format: Name [description-ish] 330 240  |  numbers at end are prices.
+    const nums=[...line.matchAll(/(?:₹\s*)?(\d{1,5}(?:\.\d{1,2})?)(?=\s|$)/g)].map(m=>Number(m[1]));
+    if(!nums.length)continue;
+
+    // Avoid interpreting phone/address lines as menu items.
+    if(nums.length===1 && /^\+?\d[\d\s\-]{7,}$/.test(line))continue;
+
+    let name=line;
+    const firstNum=line.search(/(?:₹\s*)?\d{1,5}(?:\.\d{1,2})?(?=\s|$)/);
+    if(firstNum>=0)name=cleanName(line.slice(0,firstNum));
+    // If digits are embedded in a normal food name, keep them.
+    if(!name || isNoise(name))continue;
+
+    let price=null,q=null,h=null,f=null;
+    if(nums.length===1)price=nums[0];
+    else if(nums.length===2){f=nums[0];h=nums[1];}
+    else if(nums.length>=3){price=nums[0];q=nums[1];h=nums[2];if(nums.length>=4)f=nums[3];}
+
+    // Map a known "FULL HALF" category/header using 2 numbers to full/half.
+    if(/\b(full|half)\b/i.test(line) && nums.length===2){f=nums[0];h=nums[1];price=null}
+    rows.push({category:category||'General',name,description:'',item_type:/chicken|mutton|lamb|fish|prawn|prawns|kebab|chaap/i.test(name)?'nonveg':'veg',price,price_quarter:q,price_half:h,price_full:f,confidence:0.65});
+  }
+  // De-duplicate exact same category/name, keeping richer pricing.
+  const map=new Map();
+  for(const r of rows){
+    const key=(r.category+'|'+r.name).toLowerCase();
+    const old=map.get(key);
+    if(!old)map.set(key,r);
+    else{
+      ['price','price_quarter','price_half','price_full'].forEach(k=>{if(old[k]==null&&r[k]!=null)old[k]=r[k]});
+      if(r.description && !old.description)old.description=r.description;
+      old.confidence=Math.max(old.confidence,r.confidence);
+    }
+  }
+  return [...map.values()];
+}
 function renderAiReview(){
-  const wrap=$('aiReviewWrap');
-  wrap.style.display='block';
-  $('aiScannerEmpty').style.display='none';
-  const bad=aiRows.filter(x=>Number(x.confidence)<0.75).length;
-  $('aiUncertainCount').textContent = bad ? ` ${bad} row(s) have low confidence — please verify.` : ' Confidence looks good.';
-  $('aiReviewTable').innerHTML = `
-  <table class="table">
-    <thead><tr>
-      <th>#</th><th>Category</th><th>Item Name</th><th>Description</th><th>Type</th>
-      <th>Price</th><th>Qtr</th><th>Half</th><th>Full</th><th>Conf.</th><th></th>
-    </tr></thead>
-    <tbody>
-      ${aiRows.map((r,i)=>{
-        const low=Number(r.confidence)<0.75;
-        return `<tr>
-          <td>${i+1}</td>
-          <td><input class="ai-input ${low?'ai-low':''}" value="${esc(r.category)}" onchange="aiEdit(${i},'category',this.value)"></td>
-          <td><input class="ai-input ${low?'ai-low':''}" value="${esc(r.name)}" onchange="aiEdit(${i},'name',this.value)"></td>
-          <td><textarea class="ai-input ai-textarea" onchange="aiEdit(${i},'description',this.value)">${esc(r.description)}</textarea></td>
-          <td><select class="ai-input" onchange="aiEdit(${i},'item_type',this.value)">
-            <option value="veg" ${r.item_type==='veg'?'selected':''}>Veg</option>
-            <option value="nonveg" ${r.item_type==='nonveg'?'selected':''}>Non-Veg</option>
-            <option value="egg" ${r.item_type==='egg'?'selected':''}>Egg</option>
-          </select></td>
-          <td><input class="ai-input" type="number" value="${r.price??''}" onchange="aiEdit(${i},'price',this.value)"></td>
-          <td><input class="ai-input" type="number" value="${r.price_quarter??''}" onchange="aiEdit(${i},'price_quarter',this.value)"></td>
-          <td><input class="ai-input" type="number" value="${r.price_half??''}" onchange="aiEdit(${i},'price_half',this.value)"></td>
-          <td><input class="ai-input" type="number" value="${r.price_full??''}" onchange="aiEdit(${i},'price_full',this.value)"></td>
-          <td><span class="${low?'pill orange':'pill green'}">${Math.round(Number(r.confidence||0)*100)}%</span></td>
-          <td><button class="iconbtn" onclick="removeAiRow(${i})">✕</button></td>
-        </tr>`;
-      }).join('') || `<tr><td colspan="11"><div class="empty">No items. Scan the menu or add a row.</div></td></tr>`}
-    </tbody>
-  </table>`;
+  $('aiReviewWrap').style.display='block';$('aiScannerEmpty').style.display='none';
+  const low=aiRows.filter(x=>x.confidence<.75).length;
+  $('aiReviewTable').innerHTML=`<table class="table"><thead><tr>
+    <th>#</th><th>Category</th><th>Item Name</th><th>Description</th><th>Type</th><th>Price</th><th>Qtr</th><th>Half</th><th>Full</th><th>Conf.</th><th></th>
+  </tr></thead><tbody>${
+    aiRows.map((r,i)=>`<tr>
+      <td>${i+1}</td>
+      <td><input class="ai-input ${r.confidence<.75?'ai-low':''}" value="${esc(r.category)}" onchange="aiEdit(${i},'category',this.value)"></td>
+      <td><input class="ai-input ${r.confidence<.75?'ai-low':''}" value="${esc(r.name)}" onchange="aiEdit(${i},'name',this.value)"></td>
+      <td><textarea class="ai-input ai-textarea" onchange="aiEdit(${i},'description',this.value)">${esc(r.description)}</textarea></td>
+      <td><select class="ai-input" onchange="aiEdit(${i},'item_type',this.value)">
+        <option value="veg" ${r.item_type==='veg'?'selected':''}>Veg</option>
+        <option value="nonveg" ${r.item_type==='nonveg'?'selected':''}>Non-Veg</option>
+        <option value="egg" ${r.item_type==='egg'?'selected':''}>Egg</option>
+      </select></td>
+      <td><input class="ai-input" type="number" value="${r.price??''}" onchange="aiEdit(${i},'price',this.value)"></td>
+      <td><input class="ai-input" type="number" value="${r.price_quarter??''}" onchange="aiEdit(${i},'price_quarter',this.value)"></td>
+      <td><input class="ai-input" type="number" value="${r.price_half??''}" onchange="aiEdit(${i},'price_half',this.value)"></td>
+      <td><input class="ai-input" type="number" value="${r.price_full??''}" onchange="aiEdit(${i},'price_full',this.value)"></td>
+      <td><span class="pill ${r.confidence<.75?'orange':'green'}">${Math.round(r.confidence*100)}%</span></td>
+      <td><button class="iconbtn" onclick="removeAiRow(${i})">✕</button></td>
+    </tr>`).join('')||`<tr><td colspan="11"><div class="empty">No menu rows detected.</div></td></tr>`
+  }</tbody></table>
+  <div class="notice" style="margin-top:10px">${low?`${low} row(s) need careful checking.`:'Extraction confidence is acceptable, but still verify prices.'}</div>`;
 }
-function aiEdit(i,k,v){
-  if(['price','price_quarter','price_half','price_full'].includes(k)) aiRows[i][k]=v===''?'':Number(v);
-  else aiRows[i][k]=v;
-}
-function removeAiRow(i){aiRows.splice(i,1);renderAiReview();}
+function aiEdit(i,k,v){aiRows[i][k]=['price','price_quarter','price_half','price_full'].includes(k)?(v===''?'':Number(v)):v}
+function removeAiRow(i){aiRows.splice(i,1);renderAiReview()}
+function addAiRow(){aiRows.push({category:'General',name:'',description:'',item_type:'veg',price:null,price_quarter:null,price_half:null,price_full:null,confidence:1});renderAiReview()}
+function clearAiReview(){aiRows=[];$('aiReviewWrap').style.display='none';$('aiScannerEmpty').style.display='block';$('aiReviewTable').innerHTML='';$('aiScanMeta').textContent='No extraction yet'}
 
-async function fileToBase64(file){
-  return new Promise((resolve,reject)=>{
-    const fr=new FileReader();
-    fr.onload=()=>resolve(String(fr.result).split(',')[1]);
-    fr.onerror=reject;
-    fr.readAsDataURL(file);
-  });
+async function extractPdfText(file){
+  const pdfjs=await loadPdfJs();
+  const buf=await file.arrayBuffer();
+  const pdf=await pdfjs.getDocument({data:buf}).promise;
+  let text='', imagePages=0;
+  for(let p=1;p<=pdf.numPages;p++){
+    const page=await pdf.getPage(p);
+    const tc=await page.getTextContent();
+    const pageText=tc.items.map(x=>x.str).join(' ');
+    text+=`\n${pageText}\n`;
+    if(!pageText.trim())imagePages++;
+  }
+  return {text,pdf};
+}
+async function renderPdfPagesForOcr(pdf,fileCount){
+  const pdfPages=pdf.numPages; const all=[];
+  let worker=null;
+  if(!$('aiOcrEnabled').checked)return all;
+  worker=await Tesseract.createWorker($('aiOcrLang').value,null,{logger:m=>{
+    if(m.status && m.progress!=null)$('aiUploadStatus').textContent=`OCR: ${m.status} ${Math.round(m.progress*100)}%`;
+  }});
+  for(let p=1;p<=pdfPages;p++){
+    const page=await pdf.getPage(p);
+    const viewport=page.getViewport({scale:1.8});
+    const canvas=document.createElement('canvas');
+    canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
+    await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+    const res=await worker.recognize(canvas);
+    all.push(res.data.text);
+    $('aiUploadStatus').textContent=`OCR page ${p}/${pdfPages}`;
+  }
+  await worker.terminate();
+  return all;
+}
+async function ocrImage(file){
+  if(!$('aiOcrEnabled').checked) return '';
+  const worker=await Tesseract.createWorker($('aiOcrLang').value,null,{logger:m=>{
+    if(m.status && m.progress!=null)$('aiUploadStatus').textContent=`OCR: ${m.status} ${Math.round(m.progress*100)}%`;
+  }});
+  const r=await worker.recognize(file);
+  await worker.terminate();
+  return r.data.text||'';
 }
 
 async function runAiMenuScan(){
-  if(!$('aiEnabled').checked)return aiToast('AI scanner is disabled in settings');
-  const restaurantId=$('aiRestaurant').value;
-  if(!restaurantId)return aiToast('Please select a restaurant');
-  if(!aiFiles.length)return aiToast('Please choose menu images');
-  const btn=$('aiScanBtn');
-  const nowBtn=$('aiScanNowBtn');
-  if(btn){btn.disabled=true;btn.textContent='Scanning menu...';}
-  if(nowBtn){nowBtn.disabled=true;nowBtn.textContent='⏳ Scanning...';}
-  $('aiUploadStatus').textContent='AI is scanning the uploaded menu images...';
+  const rid=$('aiRestaurant').value;
+  if(!rid)return toast('Please select a restaurant');
+  if(!aiFiles.length)return toast('Please choose a PDF/image');
+  const btn=$('aiScanNowBtn');btn.disabled=true;btn.textContent='Extracting...';setOcrStatus('Processing','orange');
   try{
-    const images=[];
-    for(const f of aiFiles){
-      images.push({mime_type:f.type || 'image/jpeg', data:await fileToBase64(f)});
+    let combined='';
+    for(let fi=0;fi<aiFiles.length;fi++){
+      const f=aiFiles[fi];
+      $('aiUploadStatus').textContent=`Reading ${fi+1}/${aiFiles.length}: ${f.name}`;
+      if(f.type==='application/pdf'){
+        const {text,pdf}=await extractPdfText(f);
+        combined+=`\n${text}\n`;
+        // If embedded text is too short or clearly absent, OCR all pages.
+        if($('aiOcrEnabled').checked && text.trim().length<120){
+          const ocr=await renderPdfPagesForOcr(pdf,aiFiles.length);
+          combined+=`\n${ocr.join('\n')}\n`;
+        }
+      }else{
+        combined+=`\n${await ocrImage(f)}\n`;
+      }
     }
-    // Explicitly attach the CURRENT Supabase access token.
-    // This fixes "Login required" when the browser does not automatically
-    // forward the session to the Edge Function.
-    const {data:sessionData,error:sessionError}=await db.auth.getSession();
-    if(sessionError) throw new Error('Could not read Supabase login session: '+sessionError.message);
-    const accessToken=sessionData?.session?.access_token;
-    if(!accessToken) throw new Error('Super Admin session expired. Please logout and login again.');
-
-    const edgeUrl=`${SUPABASE_URL}/functions/v1/scan-menu`;
-    const response=await fetch(edgeUrl,{method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${accessToken}`,'apikey':SUPABASE_KEY},
-      body:JSON.stringify({model:$('aiModel').value,restaurant_id:restaurantId,images})
-    });
-    const rawResponse=await response.text();
-    let data=null; try{data=rawResponse?JSON.parse(rawResponse):null;}catch{}
-    if(!response.ok){
-      throw new Error(`Edge Function ${response.status}: ${data?.detail||data?.error||rawResponse||'Unknown error'}`);
-    }
-    if(data?.error) throw new Error(data.error);
-    if(!data?.items) throw new Error(data?.error || 'No menu data returned');
-    aiRows=data.items.map(x=>({
-      category:x.category||'General',
-      name:x.name||'',
-      description:x.description||'',
-      item_type:x.item_type||'veg',
-      price:x.price ?? '',
-      price_quarter:x.price_quarter ?? '',
-      price_half:x.price_half ?? '',
-      price_full:x.price_full ?? '',
-      confidence:Number(x.confidence ?? 0.5)
-    })).filter(x=>x.name);
-    $('aiScanMeta').textContent=`Scanned ${aiFiles.length} image(s) → ${aiRows.length} item(s)`;
+    aiRows=parseMenuText(combined).filter(x=>x.name.length>=2);
+    $('aiScanMeta').textContent=`Extracted ${aiRows.length} menu item(s) from ${aiFiles.length} file(s)`;
     renderAiReview();
-    await logAction(`AI scanned ${aiRows.length} menu items`);
-    toast(`Scan complete — ${aiRows.length} items found`);
+    toast(`OCR complete — ${aiRows.length} items detected`);
   }catch(e){
     console.error(e);
-    const msg=String(e?.message||e);
-    if(msg.toLowerCase().includes('login required') || msg.toLowerCase().includes('session expired')){
-      toast('Super Admin login session issue. Please logout → login again, then scan.');
-    }else{
-      toast('Scan failed: '+msg);
-    }
+    toast('OCR failed: '+(e?.message||e));
   }finally{
-    if(btn){btn.disabled=false;btn.textContent='✦ Scan Menu With AI';}
-    if(nowBtn){nowBtn.disabled=false;nowBtn.textContent='✦ Scan Uploaded Menu Now';}
-    updateAiScanReady();
+    btn.disabled=false;btn.textContent='▣ Extract Menu Now';setOcrStatus('No AI / Free','green');updateOcrReady();
   }
 }
-
+function downloadOcrJson(){
+  const blob=new Blob([JSON.stringify(aiRows,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='freemenu-ocr-menu.json';a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
 async function publishAiMenu(){
-  const restaurantId=$('aiRestaurant').value;
-  if(!restaurantId)return aiToast('Select a restaurant');
+  const rid=$('aiRestaurant').value;
   const clean=aiRows.map(x=>({
-    restaurant_id:restaurantId,
-    name:String(x.name||'').trim(),
+    restaurant_id:rid,name:String(x.name||'').trim(),
     category:String(x.category||'General').trim()||'General',
     description:String(x.description||'').trim(),
-    item_type:x.item_type||'veg',
-    is_veg:(x.item_type||'veg')==='veg',
+    item_type:x.item_type||'veg',is_veg:(x.item_type||'veg')==='veg',
     price:x.price===''?null:Number(x.price)||null,
     price_quarter:x.price_quarter===''?null:Number(x.price_quarter)||null,
     price_half:x.price_half===''?null:Number(x.price_half)||null,
     price_full:x.price_full===''?null:Number(x.price_full)||null,
     is_available:true
   })).filter(x=>x.name);
-
-  if(!clean.length)return aiToast('No valid menu items to publish');
-  if(!confirm(`Publish ${clean.length} item(s) to this restaurant?`))return;
-
-  const btn=$('aiSubmitBtn');btn.disabled=true;btn.textContent='Publishing...';
+  if(!clean.length)return toast('No valid rows to publish');
+  if(!confirm(`Publish ${clean.length} menu item(s) to this restaurant?`))return;
+  const b=$('aiSubmitBtn');b.disabled=true;b.textContent='Publishing...';
   try{
     if($('aiMode').value==='replace'){
-      const d=await db.from('menu_items').delete().eq('restaurant_id',restaurantId);
+      const d=await db.from('menu_items').delete().eq('restaurant_id',rid);
       if(d.error)throw d.error;
     }
     const ins=await db.from('menu_items').insert(clean);
     if(ins.error)throw ins.error;
-    await logAction(`AI menu published: ${clean.length} items`);
-    await loadAll();
-    toast(`Published ${clean.length} items successfully`);
-    $('aiMode').value='append';
-    clearAiReview();
-  }catch(e){
-    console.error(e);
-    toast('Publish failed: '+(e.message||e));
-  }finally{
-    btn.disabled=false;btn.textContent='Final Submit to Restaurant';
-  }
+    await logAction(`OCR menu published: ${clean.length} items`,rid);
+    await loadAll();toast(`Published ${clean.length} items successfully`);clearAiReview();
+  }catch(e){toast('Publish failed: '+(e?.message||e))}
+  finally{b.disabled=false;b.textContent='Final Submit to Restaurant'}
 }
-
 async function prepareAiScanner(){
   populateAiRestaurants();
-  try{
-    const {data}=await db.auth.getSession();
-    const ok=!!data?.session?.access_token;
-    if($('aiSessionPill')){
-      $('aiSessionPill').className=`pill ${ok?'green':'red'}`;
-      $('aiSessionPill').textContent=ok?'● Logged in':'● Login required';
-    }
-  }catch(e){
-    if($('aiSessionPill')){
-      $('aiSessionPill').className='pill red';
-      $('aiSessionPill').textContent='● Session error';
-    }
-  }
-  const rows=await q('platform_settings')||[];
-  window.__fmPlatformSettingsRows=rows;
-  loadAiSettings();
+  setOcrStatus('No AI / Free','green');
 }
 
 </script>
