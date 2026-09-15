@@ -950,8 +950,17 @@ $("quickTheme").onclick=()=>{showSection("settings");history.replaceState(null,"
 
 /* ---------- Media & Upload Policy ---------- */
 async function loadMediaRules(){
+  // Defaults are intentionally safe and let the dashboard load even when
+  // the optional RPC has not been added yet.
   try{
-    const {data,error}=await supabaseClient.rpc("get_media_upload_rules");
+    const controller = new AbortController();
+    const timer = setTimeout(()=>controller.abort(),4500);
+    const result = await Promise.race([
+      supabaseClient.rpc("get_media_upload_rules"),
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error("Media policy timeout")),4500))
+    ]);
+    clearTimeout(timer);
+    const {data,error}=result||{};
     if(!error && data?.length){
       mediaRules={
         max_mb:Math.min(1,Number(data[0].max_image_size_mb||1)),
@@ -960,8 +969,8 @@ async function loadMediaRules(){
         gallery_paid_enabled:data[0].gallery_paid_enabled===true
       };
     }
-  }catch(e){console.warn("Media policy RPC unavailable",e)}
-  await refreshMediaPolicyUI();
+  }catch(e){console.warn("Media policy RPC unavailable; using defaults.",e)}
+  try{ await refreshMediaPolicyUI(); }catch(e){console.warn("Media policy UI skipped",e)}
 }
 async function refreshMediaPolicyUI(){
   const mb=Math.min(1,Number(mediaRules.max_mb||1));
@@ -1085,7 +1094,17 @@ supabaseClient.auth.onAuthStateChange((event, newSession)=>{
     showOwnerLogin();
   }
 });
-window.addEventListener("load",init);
+window.addEventListener("load",()=>{
+  Promise.resolve(init()).catch(err=>{
+    console.error("Owner init failed:",err);
+    $("loader").innerHTML=`<div style="text-align:center;padding:25px">
+      <i class="fa-solid fa-circle-exclamation" style="font-size:38px;color:#c33"></i>
+      <h3>Unable to open Owner Panel</h3>
+      <p>${esc(err?.message||"Unexpected error while loading the owner dashboard.")}</p>
+      <button class="btn" onclick="location.reload()">Retry</button>
+    </div>`;
+  });
+});
 </script>
 
 <script>
