@@ -91,6 +91,11 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .authSuccess{background:#edfff5;color:#167647;border:1px solid #bce8cc;border-radius:8px;padding:9px 10px;font-size:11px;margin-bottom:12px}
 .slugHint{font-size:9px;color:#8a93a3;margin-top:4px}
 @media(max-width:560px){.authChoiceGrid{grid-template-columns:1fr}.ownerAuthCard{padding:22px}.twoCol{grid-template-columns:1fr}}
+.loginSubmit{width:100%;border:0;border-radius:13px;padding:13px 16px;background:linear-gradient(135deg,#8f1831,#d21f4a 60%,#f02e6f);color:#fff;font-weight:800;font-size:13px;box-shadow:0 10px 24px rgba(181,29,59,.24);transition:.2s}.loginSubmit:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(181,29,59,.32)}
+.authFormCard .formGroup{margin-bottom:13px}.authFormCard label{font-size:11px;font-weight:800;color:#445066;margin-bottom:6px;display:block}.authFormCard .input{width:100%;border:1px solid #dfe4ec;border-radius:11px;padding:12px 13px;background:#fbfcfe;outline:none}.authFormCard .input:focus{border-color:#b51d3b;box-shadow:0 0 0 4px rgba(181,29,59,.08)}
+.authFeatureBar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0 20px}.authFeature{border:1px solid #eceff4;border-radius:11px;padding:9px 7px;text-align:center;background:#fafbfd}.authFeature strong{display:block;font-size:10px;color:#253046}.authFeature span{font-size:15px;display:block;margin-bottom:3px}
+.menuStatusBtn{display:inline-flex;align-items:center;gap:8px;border:1px solid #e2e7ee;border-radius:999px;padding:6px 10px;background:#f8fafc;font-size:10px;font-weight:900;cursor:pointer;min-width:74px;justify-content:center;transition:.18s}.menuStatusBtn.on{background:#eafaf2;border-color:#9cddbd;color:#087443}.menuStatusBtn.off{background:#fff4e8;border-color:#f2c58d;color:#a35a00}.menuStatusBtn .dot{width:8px;height:8px;border-radius:50%;background:#12a36b}.menuStatusBtn.off .dot{background:#d97706}.menuStatusBtn:hover{transform:translateY(-1px)}
+@media(max-width:560px){.authFeatureBar{grid-template-columns:1fr 1fr 1fr}.menuStatusBtn{min-width:68px}}
 </style></head>
 
 <body>
@@ -102,8 +107,10 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
   <!-- FIRST SCREEN: choose Login or Sign Up -->
   <div class="ownerAuthCard" id="authChoiceCard">
     <div class="authBrand">🍽</div>
+    <div class="authKicker">FREEMENU • RESTAURANT PARTNER</div>
     <h1>Restaurant Owner</h1>
-    <p class="authSub">Manage your FreeMenu restaurant</p>
+    <p class="authSub">Manage your digital menu, items and restaurant profile</p>
+    <div class="authFeatureBar"><div class="authFeature"><span>🍽️</span><strong>Digital Menu</strong></div><div class="authFeature"><span>📱</span><strong>QR Ready</strong></div><div class="authFeature"><span>⚡</span><strong>Easy Control</strong></div></div>
     <div class="authChoiceGrid">
       <button type="button" class="authChoiceBtn" id="openLoginBtn">
         <span>🔐</span>
@@ -505,7 +512,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
    <input class="input" type="number" id="mHalf" placeholder="Half ₹" min="0">
    <input class="input" type="number" id="mFull" placeholder="Full ₹" min="0">
   </div>
-  <div class="formGroup" style="margin-top:16px"><label>Menu Item Status</label><label class="statusToggle" style="font-size:11px"><button type="button" class="switch on" id="mAvailableSwitch" aria-label="Toggle item availability"></button><span class="statusText" id="mAvailableText">ON — Visible</span></label></div>
+  <div class="formGroup" style="margin-top:16px"><label>Menu Item Status</label><button type="button" class="menuStatusBtn on" id="mAvailableSwitch"><span class="dot"></span><span id="mAvailableText">ON • Visible</span></button></div>
   <div style="margin-top:18px;display:flex;justify-content:flex-end;gap:8px><button class="btn" data-close="itemModal">Cancel</button><button class="btn primary" id="saveItem"><i class="fa-solid fa-floppy-disk"></i> Save Item</button></div>
  </div>
 </div>
@@ -816,11 +823,11 @@ function filtered(source,search,cat,type){
 function rowActions(i){return `<div class="actions"><button class="btn blue sm editItem" data-id="${i.id}"><i class="fa-solid fa-pen"></i></button><button class="btn danger sm deleteItem" data-id="${i.id}"><i class="fa-solid fa-trash"></i></button></div>`}
 function renderDashboardTable(){
  const list=filtered(items,$("menuSearch").value,$("menuCategoryFilter").value,$("menuTypeFilter").value);
- $("dashboardItems").innerHTML=list.length?list.slice(0,8).map(i=>`<tr><td><div class="foodName">${esc(i.name)}</div><div class="foodCat">${esc(i.category||"General")}</div></td><td>${typeCell(i)}</td><td class="pricesMini">${esc(priceText(i))}</td><td><button class="statusToggle ${i.is_available!==false?"on":"off"}" data-status="${i.id}"><span class="switch ${i.is_available!==false?"on":""}"></span><span class="statusText">${i.is_available!==false?"ON":"OFF"}</span></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="5" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
+ $("dashboardItems").innerHTML=list.length?list.slice(0,8).map(i=>`<tr><td><div class="foodName">${esc(i.name)}</div><div class="foodCat">${esc(i.category||"General")}</div></td><td>${typeCell(i)}</td><td class="pricesMini">${esc(priceText(i))}</td><td><button type="button" class="menuStatusBtn ${i.is_available!==false?"on":"off"}" data-status="${i.id}" title="Click to turn menu item ${i.is_available!==false?"OFF":"ON"}"><span class="dot"></span><span>${i.is_available!==false?"ON • Visible":"OFF • Hidden"}</span></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="5" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
 }
 function renderFullTable(){
  const list=filtered(items,$("fullSearch").value,$("fullCatFilter").value,$("fullTypeFilter").value);
- $("fullItems").innerHTML=list.length?list.map(i=>`<tr><td><div class="foodName">${esc(i.name)}</div><div class="foodCat">${esc(i.description||"")}</div></td><td>${esc(i.category||"General")}</td><td>${typeCell(i)}</td><td>${i.price??"—"}</td><td>${i.price_quarter??"—"}</td><td>${i.price_half??"—"}</td><td>${i.price_full??"—"}</td><td><button class="statusToggle ${i.is_available!==false?"on":"off"}" data-status="${i.id}"><span class="switch ${i.is_available!==false?"on":""}"></span><span class="statusText">${i.is_available!==false?"ON":"OFF"}</span></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="9" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
+ $("fullItems").innerHTML=list.length?list.map(i=>`<tr><td><div class="foodName">${esc(i.name)}</div><div class="foodCat">${esc(i.description||"")}</div></td><td>${esc(i.category||"General")}</td><td>${typeCell(i)}</td><td>${i.price??"—"}</td><td>${i.price_quarter??"—"}</td><td>${i.price_half??"—"}</td><td>${i.price_full??"—"}</td><td><button type="button" class="menuStatusBtn ${i.is_available!==false?"on":"off"}" data-status="${i.id}" title="Click to turn menu item ${i.is_available!==false?"OFF":"ON"}"><span class="dot"></span><span>${i.is_available!==false?"ON • Visible":"OFF • Hidden"}</span></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="9" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
 }
 function renderCategories(){
  const html=categories().map(c=>{
