@@ -1083,8 +1083,21 @@
       restaurant = rest;
       applyRestaurantTheme(rest);
 
-      $("rest-name").textContent = rest.name || "Menu";
-      document.title = `${rest.name || "Restaurant"} • Menu`;
+      const restaurantName = rest.name || "Restaurant";
+      $("rest-welcome").textContent = rest.welcome_text || "Welcome to";
+      $("rest-name").textContent = rest.tagline || restaurantName;
+      $("rest-subtitle").textContent = rest.subtitle_text || "THE TASTE YOU\'LL LOVE";
+      const featureDefaults = ["Pure Veg & Non-Veg", "Hygienic Food", "Great Taste"];
+      ["rest-feature1","rest-feature2","rest-feature3"].forEach((id, i) => {
+        const el = $(id);
+        if (!el) return;
+        const value = rest[`feature_${i+1}`] || featureDefaults[i];
+        el.textContent = value;
+        el.style.display = value ? "inline-flex" : "none";
+      });
+      $("rest-slogan1").textContent = rest.slogan_1 || "Good Food";
+      $("rest-slogan2").textContent = rest.slogan_2 || "Good Mood";
+      document.title = `${restaurantName} • Menu`;
       const brandName = document.getElementById("site-brand-name");
       if (brandName) brandName.textContent = rest.name || "Restaurant";
 
@@ -1122,6 +1135,9 @@
         const phone = String(rest.phone).replace(/[^+\d]/g, "");
         $("rest-call-btn").href = `tel:${phone}`;
         $("rest-call-btn").style.display = "grid";
+        const callText = rest.call_button_text || "Call Restaurant";
+        $("rest-call-btn").setAttribute("aria-label", callText);
+        $("rest-call-btn").title = callText;
       }
 
       const address = rest.address || rest.location || rest.city;
