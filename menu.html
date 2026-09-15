@@ -568,10 +568,180 @@
       .service-strip{align-items:flex-start;flex-direction:column}.services{gap:10px}
     }
 
+
+    /* ===== Modern restaurant menu refresh ===== */
+    .app-shell{background:var(--bg);}
+    .hero{
+      min-height:330px;
+      border-radius:0 0 28px 28px;
+      isolation:isolate;
+      box-shadow:0 14px 40px rgba(30,20,10,.16);
+    }
+    .hero-cover{opacity:.48;filter:saturate(1.05) contrast(1.04);transform:scale(1.02);}
+    .hero-overlay{
+      background:
+        linear-gradient(180deg,rgba(8,8,8,.05) 0%,rgba(8,8,8,.18) 40%,rgba(8,8,8,.82) 100%),
+        linear-gradient(135deg,rgba(0,0,0,.18),transparent 60%);
+    }
+    .hero::before{width:260px;height:260px;right:-120px;top:-110px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12)}
+    .hero::after{width:180px;height:180px;left:-90px;bottom:-110px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10)}
+    .hero-content{min-height:330px;align-items:flex-end;padding:24px 18px 20px;gap:14px;}
+    .logo-wrap{
+      width:78px;height:78px;border-radius:22px;border:4px solid rgba(255,255,255,.9);
+      box-shadow:0 12px 28px rgba(0,0,0,.28);background:#fff;
+    }
+    .hero-info{padding-bottom:2px;}
+    .hero-welcome{font-size:17px;opacity:.94}
+    .hero-tagline{font-size:clamp(30px,8vw,52px);text-shadow:0 3px 18px rgba(0,0,0,.25)}
+    .hero-subtitle{font-size:11px;letter-spacing:2.4px;opacity:.94}
+    .hero-features{gap:7px;margin-top:12px}
+    .hero-feature{padding:5px 9px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.10);border-radius:999px;backdrop-filter:blur(10px)}
+    .hero-slogans{margin-top:14px;font-size:18px}
+    .hero-action{display:grid;align-self:flex-end;width:44px;height:44px;border-radius:15px;box-shadow:0 10px 24px rgba(0,0,0,.2)}
+
+    .service-strip{
+      margin:-14px 12px 0;position:relative;z-index:4;border:1px solid rgba(255,255,255,.8);
+      border-radius:18px;box-shadow:0 10px 26px rgba(20,20,20,.10);padding:12px 14px;
+    }
+    .open-pill{padding:7px 11px;font-size:11px}
+    .services{font-size:11px;gap:9px;color:#4b5563}
+    .service{padding:4px 7px;background:#f8fafc;border-radius:999px}
+
+    .sticky-panel{
+      top:0;margin-top:10px;padding:10px 12px 7px;background:linear-gradient(180deg,rgba(245,238,229,.97),rgba(245,238,229,.82));
+      border-bottom:0;
+    }
+    .search-wrap{border-radius:17px;box-shadow:0 10px 24px rgba(0,0,0,.07);background:rgba(255,255,255,.9)}
+    .search-icon{width:46px;height:46px;color:var(--primary)}
+    #menu-search{height:46px;font-size:14px}
+    .category-scroll{gap:9px;padding:10px 1px 5px;margin-bottom:12px}
+    .cat-chip{border-radius:999px!important;padding:9px 14px!important;font-weight:800!important;box-shadow:0 3px 10px rgba(0,0,0,.05)}
+
+    .menu-wrap{padding:8px 12px 18px}
+    .summary-line{font-size:11px;font-weight:700;padding:3px 3px 10px}
+    .category-section{margin-bottom:20px}
+    .category-heading{
+      padding:13px 15px;border-radius:18px 18px 0 0;box-shadow:0 5px 16px rgba(60,20,10,.12);position:relative;overflow:hidden;
+    }
+    .category-heading::after{content:"";position:absolute;right:-15px;top:-24px;width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.09)}
+    .category-title{font-size:15px;letter-spacing:.8px}
+    .items-list{border-radius:0 0 18px 18px;box-shadow:0 8px 22px rgba(30,20,10,.08);}
+    .menu-item{padding:14px 13px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,250,242,.94));}
+    .menu-item + .menu-item{background:rgba(255,250,242,.92)}
+    .menu-item:active{transform:scale(.997);background:var(--surface-2)}
+    .item-main-row{align-items:center}
+    .item-topline{align-items:center}
+    .item-name{font-size:15.5px;letter-spacing:-.1px}
+    .item-desc{font-size:12px;line-height:1.5;margin-top:6px}
+    .item-tags{margin-top:7px}
+    .tag{padding:4px 8px;font-size:9.5px}
+    .item-price-area{flex-basis:156px;width:156px}
+    .price-header{font-size:9px;opacity:.7}
+    .portion-price .amount,.single-price{font-size:13.5px}
+    .food-symbol{width:16px;height:16px}
+
+    .footer-note{padding:12px 16px 22px;font-size:10px}
+    @media(max-width:560px){
+      .hero{min-height:300px}
+      .hero-content{min-height:300px;padding:20px 14px 18px}
+      .logo-wrap{width:70px;height:70px;border-radius:19px}
+      .service-strip{margin-top:-12px}
+      .menu-wrap{padding-inline:10px}
+      .item-price-area{flex-basis:144px;width:144px}
+      .price-header,.portion-prices{grid-template-columns:repeat(3,41px);gap:3px}
+      .portion-price{width:41px;min-width:41px}
+      .price-header.single{grid-template-columns:52px}.single-price{width:52px}
+      .item-name{font-size:14.2px}
+    }
+    @media(min-width:640px){
+      .app-shell{border-radius:28px;overflow:visible}
+      .hero{border-radius:28px}
+      .service-strip{margin-inline:18px}
+      .sticky-panel{padding-inline:18px}
+      .menu-wrap{padding-inline:18px}
+    }
+
+
+    /* ===== Official restaurant website look ===== */
+    body{
+      background:
+        radial-gradient(circle at 10% 0%, rgba(180,130,60,.08), transparent 28%),
+        linear-gradient(180deg,#f7f7f5 0%,#f4f4f2 100%);
+      color:var(--text);
+    }
+    .app-shell{max-width:1180px;width:calc(100% - 28px);}
+    .site-nav{
+      height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px;
+      padding:0 8px;margin:0 0 14px;border-bottom:1px solid rgba(0,0,0,.07);
+    }
+    .site-brand{display:flex;align-items:center;gap:10px;min-width:0;}
+    .site-brand-mark{width:40px;height:40px;border-radius:12px;background:var(--primary);display:grid;place-items:center;color:#fff;box-shadow:0 8px 18px rgba(0,0,0,.10);overflow:hidden}
+    .site-brand-mark img{width:100%;height:100%;object-fit:cover}
+    .site-brand-name{font-weight:850;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .site-nav-links{display:flex;gap:8px;align-items:center}
+    .site-nav-link{border:0;background:transparent;color:var(--muted);font-weight:750;font-size:12px;padding:10px 12px;border-radius:10px;cursor:pointer}
+    .site-nav-link:hover{background:#fff;color:var(--text)}
+    .hero{border-radius:28px;box-shadow:0 18px 50px rgba(28,25,23,.13);min-height:460px}
+    .hero-cover{opacity:.72;filter:saturate(1.04) contrast(1.03);}
+    .hero-overlay{background:linear-gradient(180deg,rgba(12,10,8,.10) 10%,rgba(12,10,8,.18) 35%,rgba(12,10,8,.72) 100%)}
+    .hero-content{min-height:460px;padding:34px 38px 34px;align-items:flex-end}
+    .logo-wrap{width:110px;height:110px;border-radius:28px;border:5px solid rgba(255,255,255,.9);box-shadow:0 14px 34px rgba(0,0,0,.24)}
+    .hero-info{padding-bottom:4px}
+    .hero-welcome{font-size:18px;letter-spacing:.2px}
+    .hero-tagline{font-size:clamp(34px,6vw,64px);letter-spacing:-1.5px;line-height:.95}
+    .hero-subtitle{font-size:12px;letter-spacing:3px;margin-top:10px}
+    .hero-features{margin-top:16px}
+    .hero-feature{padding:7px 11px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.20);border-radius:999px}
+    .hero-slogans{font-size:21px;margin-top:18px}
+    .hero-action{width:48px;height:48px;border-radius:16px}
+    .service-strip{
+      margin:14px 0 0;padding:14px 18px;background:#fff;border:1px solid rgba(0,0,0,.07);
+      border-radius:18px;box-shadow:0 10px 28px rgba(0,0,0,.05);
+    }
+    .sticky-panel{margin-top:14px;border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:12px 14px 10px;background:rgba(255,255,255,.91);box-shadow:0 10px 28px rgba(0,0,0,.05)}
+    .search-wrap{height:52px;border-radius:15px;box-shadow:none;background:#f7f7f5}
+    #menu-search{height:50px;font-size:14px}
+    .menu-wrap{padding:24px 4px 40px}
+    .category-section{margin-bottom:28px}
+    .category-heading{background:transparent;border-radius:0;padding:0 2px 10px;margin:0}
+    .category-title{color:var(--text);font-size:22px;text-transform:none;letter-spacing:-.3px}
+    .item-count{color:#8c8c86}
+    .items-list{border:1px solid rgba(0,0,0,.075);border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.045)}
+    .menu-item{padding:17px 18px;background:#fff;border-bottom:1px solid #efefec}
+    .menu-item + .menu-item{background:#fff}
+    .menu-item:hover{background:#fcfcfb}
+    .item-name{color:var(--text);font-size:15px}
+    .item-desc{color:#7c7d77}
+    .portion-price,.single-price{color:var(--primary)}
+    .footer-note{text-align:center;color:#a0a09b;padding:18px 16px 32px}
+    @media (max-width:900px){
+      .app-shell{width:calc(100% - 20px)}
+      .hero{min-height:410px}.hero-content{min-height:410px;padding:28px 24px}
+    }
+    @media (max-width:640px){
+      .app-shell{width:100%}.site-nav{padding:0 14px;height:62px;margin-bottom:10px}.site-nav-links{display:none}
+      .hero{border-radius:0;min-height:380px;box-shadow:none}.hero-content{min-height:380px;padding:22px 18px}
+      .logo-wrap{width:82px;height:82px;border-radius:22px}
+      .service-strip,.sticky-panel{border-radius:0;margin-top:10px}.menu-wrap{padding:20px 12px 32px}.category-title{font-size:20px}
+    }
+
   </style>
 </head>
 <body>
   <div class="app-shell">
+
+
+    <nav class="site-nav" aria-label="Restaurant navigation">
+      <div class="site-brand">
+        <div class="site-brand-mark" id="site-brand-mark"></div>
+        <div class="site-brand-name" id="site-brand-name">Restaurant</div>
+      </div>
+      <div class="site-nav-links">
+        <button class="site-nav-link" type="button" onclick="document.getElementById('menu-sections').scrollIntoView({behavior:'smooth'})">Menu</button>
+        <button class="site-nav-link" type="button" onclick="document.getElementById('service-strip').scrollIntoView({behavior:'smooth'})">About</button>
+        <a class="site-nav-link" id="site-contact-link" href="#">Contact</a>
+      </div>
+    </nav>
 
     <header class="hero" id="hero">
       <img id="rest-cover" class="hero-cover" alt="" style="display:none;" />
@@ -728,7 +898,6 @@
                 <div class="skeleton sk-text sk-line"></div>
                 <div class="skeleton sk-price sk-line"></div>
               </div>
-              <div class="skeleton sk-img"></div>
             </div>
           `).join("")}
         </div>
@@ -754,17 +923,6 @@
       `;
     }
 
-    function itemImageHTML(item) {
-      const imageUrl = safeUrl(item.image_url || item.photo_url || item.image);
-      if (!imageUrl) return "";
-
-      return `
-        <div class="item-image-wrap">
-          <img class="item-image" src="${escapeHTML(imageUrl)}" alt="${escapeHTML(item.name || "Menu item")}" loading="lazy"
-               onerror="this.parentElement.innerHTML='<div class=&quot;img-placeholder&quot;><svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot;><path d=&quot;M4 5h16v14H4z&quot;/><path d=&quot;m4 15 4-4 4 4 3-3 5 5&quot;/><circle cx=&quot;15&quot; cy=&quot;9&quot; r=&quot;1.5&quot;/></svg></div>'" />
-        </div>
-      `;
-    }
 
     function getItemType(item) {
       if (String(item.item_type || "").toLowerCase() === "egg") return "egg";
@@ -839,7 +997,6 @@
               </div>
             </div>
           </div>
-          ${itemImageHTML(item)}
         </article>
       `;
     }
@@ -928,17 +1085,38 @@
 
       $("rest-name").textContent = rest.name || "Menu";
       document.title = `${rest.name || "Restaurant"} • Menu`;
+      const brandName = document.getElementById("site-brand-name");
+      if (brandName) brandName.textContent = rest.name || "Restaurant";
 
       const logoUrl = safeUrl(rest.logo_url);
+      const brandMark = document.getElementById("site-brand-mark");
       $("logo-container").innerHTML = logoUrl
         ? `<img src="${escapeHTML(logoUrl)}" alt="${escapeHTML(rest.name || "Restaurant")} logo" onerror="this.parentElement.innerHTML=logoFallback()" />`
         : logoFallback();
-
-      const coverUrl = safeUrl(rest.cover_url || rest.banner_url || rest.cover_image);
-      if (coverUrl) {
-        $("rest-cover").src = coverUrl;
-        $("rest-cover").style.display = "block";
+      if (brandMark) {
+        brandMark.innerHTML = logoUrl
+          ? `<img src="${escapeHTML(logoUrl)}" alt="" onerror="this.parentElement.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/></svg>'" />`
+          : `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/></svg>`;
       }
+      const contactLink=document.getElementById("site-contact-link");
+      if(contactLink && rest.phone){
+        const phone=String(rest.phone).replace(/[^+\d]/g,"");
+        contactLink.href=`tel:${phone}`;
+      }
+
+      const coverUrl = safeUrl(rest.banner_url || rest.cover_url || rest.cover_image);
+      const dummyBanner = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520">
+          <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#6b1f1a"/><stop offset="0.55" stop-color="#9f5a32"/><stop offset="1" stop-color="#d8a84e"/></linearGradient></defs>
+          <rect width="1200" height="520" fill="url(#g)"/>
+          <circle cx="960" cy="110" r="160" fill="rgba(255,255,255,.10)"/>
+          <circle cx="180" cy="470" r="220" fill="rgba(255,255,255,.08)"/>
+          <path d="M0 390 C260 280 420 480 650 350 S1020 260 1200 360 L1200 520 L0 520Z" fill="rgba(0,0,0,.16)"/>
+          <text x="600" y="270" text-anchor="middle" font-family="Georgia,serif" font-size="54" font-weight="700" fill="white" opacity=".95">YOUR RESTAURANT</text>
+          <text x="600" y="315" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" letter-spacing="6" fill="white" opacity=".78">FOOD • FLAVOUR • EXPERIENCE</text>
+        </svg>`)} `;
+      $("rest-cover").src = coverUrl || dummyBanner;
+      $("rest-cover").style.display = "block";
 
       if (rest.phone) {
         const phone = String(rest.phone).replace(/[^+\d]/g, "");
