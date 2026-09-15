@@ -1084,3 +1084,43 @@ window.addEventListener("load",init);
 
 </body>
 </html>
+
+
+
+<script>
+/* ==========================================================
+   FREEMENU OWNER AUTH ROUTER
+   ?auth=login  -> Login form
+   ?auth=signup -> Sign Up form
+   No auth query -> normal owner portal / choice screen
+   ========================================================== */
+(function(){
+  function routeOwnerAuth(){
+    const mode = new URLSearchParams(window.location.search).get("auth");
+    if(mode === "login"){
+      if(typeof window.showLoginForm === "function"){
+        window.showLoginForm();
+      }else if(typeof window.showOwnerLogin === "function"){
+        window.showOwnerLogin();
+        setTimeout(()=>window.showLoginForm?.(),50);
+      }
+    }else if(mode === "signup"){
+      if(typeof window.showSignupForm === "function"){
+        window.showSignupForm();
+      }else if(typeof window.showOwnerLogin === "function"){
+        window.showOwnerLogin();
+        setTimeout(()=>window.showSignupForm?.(),50);
+      }
+    }
+  }
+
+  // The original dashboard functions are declared earlier in this file.
+  // Wait until the DOM and those functions are ready.
+  document.addEventListener("DOMContentLoaded",()=>{
+    setTimeout(routeOwnerAuth,250);
+  });
+  window.addEventListener("load",()=>{
+    setTimeout(routeOwnerAuth,350);
+  });
+})();
+</script>
