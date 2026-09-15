@@ -68,107 +68,29 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
 
 <style id="ownerLoginStyles">
-#ownerAuth{
-  position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;
-  padding:24px;overflow:auto;
-}
+#ownerAuth{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:18px}
 #ownerAuth.show{display:flex}
-.ownerAuthBackdrop{
-  position:absolute;inset:0;
-  background:
-    radial-gradient(circle at 15% 20%,rgba(207,34,76,.26),transparent 28%),
-    radial-gradient(circle at 85% 15%,rgba(255,173,102,.18),transparent 24%),
-    linear-gradient(135deg,#120b12 0%,#271018 48%,#120f18 100%);
-}
-.ownerAuthBackdrop:before{
-  content:"";position:absolute;inset:0;
-  background:url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=80") center/cover;
-  opacity:.13;mix-blend-mode:screen;
-}
-.ownerAuthCard{
-  position:relative;width:min(500px,100%);max-height:92vh;overflow:auto;
-  background:rgba(255,255,255,.98);border:1px solid rgba(255,255,255,.65);
-  border-radius:28px;padding:32px;box-shadow:0 35px 100px rgba(0,0,0,.42);
-}
-.ownerAuthCard:before{
-  content:"";display:block;height:5px;border-radius:999px;margin:-32px -32px 26px;
-  background:linear-gradient(90deg,#7e102e,#bf2348,#ef9b42);
-}
-.authBrand{
-  width:72px;height:72px;border-radius:22px;margin:0 auto 14px;
-  display:grid;place-items:center;
-  background:linear-gradient(145deg,#8c1733,#c92950);
-  color:#fff;font-size:30px;box-shadow:0 12px 28px rgba(140,23,51,.28);
-}
-.ownerAuthCard h1{
-  text-align:center;font-family:"Cormorant Garamond",Georgia,serif;
-  font-size:36px;line-height:1.05;margin:0;color:#171b26;letter-spacing:-.4px
-}
-.authSub{text-align:center;color:#7b8492;font-size:12px;margin:7px 0 24px}
-.authChoiceGrid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
-.authChoiceBtn{
-  position:relative;border:1px solid #ebedf1;background:linear-gradient(180deg,#fff,#fafbfc);
-  border-radius:18px;padding:22px 17px;cursor:pointer;text-align:left;transition:.22s;
-  box-shadow:0 4px 14px rgba(20,26,36,.04);
-}
-.authChoiceBtn:hover{
-  transform:translateY(-3px);border-color:#d4d8df;
-  box-shadow:0 16px 30px rgba(20,26,36,.10);
-}
-.authChoiceBtn:after{
-  content:"→";position:absolute;right:15px;top:15px;color:#a11939;font-weight:800;font-size:17px;
-}
-.authChoiceBtn span{display:grid;place-items:center;width:44px;height:44px;border-radius:13px;background:#fff1f4;font-size:21px;margin-bottom:12px}
-.authChoiceBtn b{display:block;font-size:17px;color:#182030}
-.authChoiceBtn small{display:block;color:#8a92a0;font-size:10px;margin-top:6px;line-height:1.45;padding-right:16px}
+.ownerAuthBackdrop{position:absolute;inset:0;background:linear-gradient(135deg,#0d1624,#18263b)}
+.ownerAuthCard{position:relative;width:min(460px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:20px;padding:28px;box-shadow:0 25px 70px rgba(0,0,0,.32)}
+.authBrand{width:64px;height:64px;border-radius:18px;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(135deg,#8f1831,#c52345);color:#fff;font-size:27px}
+.ownerAuthCard h1{text-align:center;font-family:"Cormorant Garamond",serif;font-size:32px;margin:0;color:#151c2a}
+.authSub{text-align:center;color:#718096;font-size:12px;margin:4px 0 22px}
+.authChoiceGrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.authChoiceBtn{border:1px solid #e5e7eb;background:#fafbfc;border-radius:15px;padding:18px 14px;cursor:pointer;text-align:left;transition:.18s}
+.authChoiceBtn:hover{transform:translateY(-2px);box-shadow:0 9px 25px rgba(0,0,0,.08);border-color:#cbd5e1}
+.authChoiceBtn span{display:block;font-size:24px;margin-bottom:8px}
+.authChoiceBtn b{display:block;font-size:16px;color:#172033}
+.authChoiceBtn small{display:block;color:#7a8495;font-size:10px;margin-top:5px;line-height:1.4}
 .authFormCard{text-align:left}
 .authFormCard .authBrand{margin-left:auto;margin-right:auto}
 .authFormCard h1,.authFormCard .authSub{text-align:center}
-.authBack{
-  border:0;background:#f5f6f8;color:#616b7b;font-weight:700;cursor:pointer;
-  padding:8px 11px;border-radius:10px;margin-bottom:12px
-}
-.authBack:hover{background:#eceef2}
-.authSwitch{
-  display:block;margin:15px auto 0;border:0;background:none;
-  color:#99163a;font-weight:800;cursor:pointer;padding:4px
-}
-.authSwitch:hover{text-decoration:underline}
-.authFormCard .formGroup{margin-bottom:14px}
-.authFormCard label{
-  display:block;margin:0 0 6px;font-size:11px;font-weight:800;letter-spacing:.02em;color:#4c5666
-}
-.authFormCard .input{
-  width:100%;border:1px solid #dfe3e8;border-radius:12px;padding:12px 13px;
-  background:#fff;color:#1c2533;outline:none;transition:.2s;
-}
-.authFormCard .input:focus{
-  border-color:#b21d42;box-shadow:0 0 0 4px rgba(178,29,66,.09)
-}
-.loginSubmit{
-  width:100%;border:0;border-radius:13px;padding:13px 15px;margin-top:5px;
-  background:linear-gradient(135deg,#871231,#b91f45);color:#fff;font-weight:800;
-  cursor:pointer;box-shadow:0 10px 22px rgba(137,20,50,.22);transition:.2s
-}
-.loginSubmit:hover{transform:translateY(-1px);box-shadow:0 14px 27px rgba(137,20,50,.28)}
-.loginSubmit:disabled{opacity:.68;cursor:not-allowed;transform:none}
-.authError{
-  background:#fff3f3;color:#b21f30;border:1px solid #ffd7da;border-radius:10px;
-  padding:10px 11px;font-size:11px;margin-bottom:13px
-}
-.authSuccess{
-  background:#effaf3;color:#167345;border:1px solid #ccebd7;border-radius:10px;
-  padding:10px 11px;font-size:11px;margin-bottom:13px
-}
-.slugHint{font-size:9px;color:#9199a6;margin-top:5px}
-@media(max-width:560px){
-  #ownerAuth{padding:13px}
-  .ownerAuthCard{padding:24px 18px;border-radius:22px}
-  .ownerAuthCard:before{margin:-24px -18px 21px}
-  .ownerAuthCard h1{font-size:31px}
-  .authChoiceGrid{grid-template-columns:1fr}
-  .twoCol{grid-template-columns:1fr}
-}
+.authBack,.authSwitch{border:0;background:none;color:#5b6474;font-weight:700;cursor:pointer;padding:0}
+.authBack{margin-bottom:9px}
+.authSwitch{display:block;margin:13px auto 0;color:#8f1831}
+.authError{background:#fff0f0;color:#b4232e;border:1px solid #ffd0d0;border-radius:8px;padding:9px 10px;font-size:11px;margin-bottom:12px}
+.authSuccess{background:#edfff5;color:#167647;border:1px solid #bce8cc;border-radius:8px;padding:9px 10px;font-size:11px;margin-bottom:12px}
+.slugHint{font-size:9px;color:#8a93a3;margin-top:4px}
+@media(max-width:560px){.authChoiceGrid{grid-template-columns:1fr}.ownerAuthCard{padding:22px}.twoCol{grid-template-columns:1fr}}
 </style></head>
 
 <body>
@@ -262,7 +184,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     </div>
 
     <button type="button" class="loginSubmit" id="signupSubmitNew">📝 Create Restaurant Account</button>
-    <button type="button" class="authSwitch" id="goLoginFromSignup">Already have an account? Login</button><div style="text-align:center;color:#98a0ad;font-size:9px;margin-top:13px">🔒 Secure authentication powered by FreeMenu</div>
+    <button type="button" class="authSwitch" id="goLoginFromSignup">Already have an account? Login</button>
   </div>
 </div>
 </div>
@@ -414,6 +336,34 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     <div class="formGroup"><label>Logo Image URL</label><div class="uploadRow"><input class="input" id="fLogo" placeholder="https://..."><input type="file" id="logoFile" accept="image/*" hidden><button class="fileBtn" id="chooseLogo">Choose</button><button class="btn blue" id="uploadLogo">Upload</button></div></div>
     <div class="formGroup"><label>Address</label><textarea class="textarea" id="fAddress" placeholder="Your restaurant address"></textarea></div>
     <button class="btn primary" id="saveProfile"><i class="fa-solid fa-floppy-disk"></i> Save Restaurant Details</button>
+    <div class="card" style="margin-top:15px;background:linear-gradient(180deg,#fff,#fffaf7)">
+      <div class="cardTitle">Public Menu Hero Information <small>Customize the restaurant information shown on the public menu</small></div>
+      <div class="formGroup"><label>Welcome Text</label><input class="input" id="fWelcome" placeholder="Welcome to"></div>
+      <div class="formGroup"><label>Tagline / Main Heading</label><input class="input" id="fTagline" placeholder="URBAN PUNJAB"></div>
+      <div class="formGroup"><label>Subtitle</label><input class="input" id="fSubtitle" placeholder="THE TASTE YOU'LL LOVE"></div>
+      <div class="threeCol">
+        <div class="formGroup"><label>Feature 1</label><input class="input" id="fFeature1" placeholder="Pure Veg & Non-Veg"></div>
+        <div class="formGroup"><label>Feature 2</label><input class="input" id="fFeature2" placeholder="Hygienic Food"></div>
+        <div class="formGroup"><label>Feature 3</label><input class="input" id="fFeature3" placeholder="Great Taste"></div>
+      </div>
+      <div class="twoCol equal">
+        <div class="formGroup"><label>Slogan Line 1</label><input class="input" id="fSlogan1" placeholder="Good Food"></div>
+        <div class="formGroup"><label>Slogan Line 2</label><input class="input" id="fSlogan2" placeholder="Good Mood"></div>
+      </div>
+      <div class="threeCol">
+        <div class="formGroup"><label>Opening Time</label><input class="input" id="fOpenTime" type="time" value="11:00"></div>
+        <div class="formGroup"><label>Closing Time</label><input class="input" id="fCloseTime" type="time" value="23:00"></div>
+        <div class="formGroup"><label>Call Button Text</label><input class="input" id="fCallText" placeholder="Call Restaurant"></div>
+      </div>
+      <div class="serviceBtns" style="grid-template-columns:repeat(3,1fr)">
+        <label class="serviceBtn"><input type="checkbox" id="fDineIn" checked> 🍴 Dine In</label>
+        <label class="serviceBtn"><input type="checkbox" id="fTakeaway" checked> 🛍 Takeaway</label>
+        <label class="serviceBtn"><input type="checkbox" id="fDelivery" checked> 🛵 Home Delivery</label>
+      </div>
+      <button class="btn primary" id="saveHeroInfo" style="margin-top:15px"><i class="fa-solid fa-floppy-disk"></i> Save Public Information</button>
+      <p class="muted" style="font-size:10px;margin:10px 0 0">These fields require the accompanying FreeMenu SQL migration before Supabase can store them.</p>
+    </div>
+
   </div>
 </section>
 
@@ -772,6 +722,21 @@ function fillProfile(){
   $("topAddress").textContent=r.address||"Restaurant Owner";
   $("profilePhone").textContent=r.phone||"—";$("profileAddress").textContent=r.address||"—";$("profileSlug").textContent=r.slug||"—";
   $("fName").value=r.name||"";$("fPhone").value=r.phone||"";$("fSlug").value=r.slug||"";$("fLogo").value=r.logo_url||"";$("fAddress").value=r.address||"";
+  $("fWelcome").value=r.welcome_text??"Welcome to";
+  $("fTagline").value=r.tagline??r.name??"";
+  $("fSubtitle").value=r.subtitle_text??"THE TASTE YOU'LL LOVE";
+  $("fFeature1").value=r.feature_1??"";
+  $("fFeature2").value=r.feature_2??"";
+  $("fFeature3").value=r.feature_3??"";
+  $("fSlogan1").value=r.slogan_1??"Good Food";
+  $("fSlogan2").value=r.slogan_2??"Good Mood";
+  $("fOpenTime").value=r.opening_time??"11:00";
+  $("fCloseTime").value=r.closing_time??"23:00";
+  $("fCallText").value=r.call_button_text??"Call Restaurant";
+  $("fDineIn").checked=r.dine_in!==false;
+  $("fTakeaway").checked=r.takeaway!==false;
+  $("fDelivery").checked=r.home_delivery!==false;
+
   const logoEl=$("topLogo");logoEl.src=logo||"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='100%25' height='100%25' rx='40' fill='%23641219'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' fill='white' font-size='30'%3E🍽%3C/text%3E%3C/svg%3E";
   $("profileLogo").src=logoEl.src;$("mediaLogo").style.backgroundImage=`url("${logo}")`;
   if(r.cover_url) $("mediaCover").style.backgroundImage=`url("${r.cover_url}")`;
@@ -889,6 +854,33 @@ $("uploadLogo").onclick=async()=>{
  if(error){toast("Upload failed: "+error.message);return}
  const {data}=supabaseClient.storage.from("restaurant-logos").getPublicUrl(path);
  $("fLogo").value=data.publicUrl;toast("Logo uploaded — click Save to publish it");
+};
+
+
+$("saveHeroInfo").onclick=async()=>{
+  const payload={
+    welcome_text:$("fWelcome").value.trim(),
+    tagline:$("fTagline").value.trim() || $("fName").value.trim(),
+    subtitle_text:$("fSubtitle").value.trim(),
+    feature_1:$("fFeature1").value.trim(),
+    feature_2:$("fFeature2").value.trim(),
+    feature_3:$("fFeature3").value.trim(),
+    slogan_1:$("fSlogan1").value.trim(),
+    slogan_2:$("fSlogan2").value.trim(),
+    opening_time:$("fOpenTime").value || null,
+    closing_time:$("fCloseTime").value || null,
+    call_button_text:$("fCallText").value.trim() || "Call Restaurant",
+    dine_in:$("fDineIn").checked,
+    takeaway:$("fTakeaway").checked,
+    home_delivery:$("fDelivery").checked
+  };
+  $("saveHeroInfo").disabled=true;
+  const {data,error}=await supabaseClient.from("restaurants").update(payload).eq("id",currentRestaurantId).select().single();
+  $("saveHeroInfo").disabled=false;
+  if(error){toast("Public information save failed: "+error.message);return}
+  currentRestaurant=data;
+  fillProfile();
+  toast("Public menu information saved");
 };
 
 /* ---------- Categories ---------- */
