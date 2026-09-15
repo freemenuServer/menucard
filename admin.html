@@ -142,7 +142,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
       <h2>AI Menu Scanner</h2>
       <p style="color:#667085">Upload one or multiple menu images. Gemini reads the complete menu, prepares structured items, then you review/correct before publishing.</p>
     </div>
-    <span id="aiStatusPill" class="pill orange">● Setup Required</span>
+    <span id="aiStatusPill" class="pill orange">● Setup Required</span><span id="aiSessionPill" class="pill red" style="margin-left:6px">● Session checking...</span>
   </div>
 
   <div class="grid3" style="margin-bottom:12px">
@@ -603,8 +603,20 @@ async function runAiMenuScan(){
     for(const f of aiFiles){
       images.push({mime_type:f.type || 'image/jpeg', data:await fileToBase64(f)});
     }
+    // Explicitly attach the CURRENT Supabase access token.
+    // This fixes "Login required" when the browser does not automatically
+    // forward the session to the Edge Function.
+    const {data:sessionData,error:sessionError}=await db.auth.getSession();
+    if(sessionError) throw new Error('Could not read Supabase login session: '+sessionError.message);
+    const accessToken=sessionData?.session?.access_token;
+    if(!accessToken) throw new Error('Super Admin session expired. Please logout and login again.');
+
     const {data,error}=await db.functions.invoke('scan-menu',{
-      body:{model:$('aiModel').value, restaurant_id:restaurantId, images}
+      body:{model:$('aiModel').value, restaurant_id:restaurantId, images},
+      headers:{
+        Authorization:`Bearer ${accessToken}`,
+        apikey:SUPABASE_KEY
+      }
     });
     if(error) throw new Error(error.message || 'Edge Function error');
     if(!data?.items) throw new Error(data?.error || 'No menu data returned');
@@ -625,7 +637,12 @@ async function runAiMenuScan(){
     toast(`Scan complete — ${aiRows.length} items found`);
   }catch(e){
     console.error(e);
-    toast('Scan failed: '+(e.message||e));
+    const msg=String(e?.message||e);
+    if(msg.toLowerCase().includes('login required') || msg.toLowerCase().includes('session expired')){
+      toast('Super Admin login session issue. Please logout → login again, then scan.');
+    }else{
+      toast('Scan failed: '+msg);
+    }
   }finally{
     if(btn){btn.disabled=false;btn.textContent='✦ Scan Menu With AI';}
     if(nowBtn){nowBtn.disabled=false;nowBtn.textContent='✦ Scan Uploaded Menu Now';}
@@ -676,6 +693,19 @@ async function publishAiMenu(){
 
 async function prepareAiScanner(){
   populateAiRestaurants();
+  try{
+    const {data}=await db.auth.getSession();
+    const ok=!!data?.session?.access_token;
+    if($('aiSessionPill')){
+      $('aiSessionPill').className=`pill ${ok?'green':'red'}`;
+      $('aiSessionPill').textContent=ok?'● Logged in':'● Login required';
+    }
+  }catch(e){
+    if($('aiSessionPill')){
+      $('aiSessionPill').className='pill red';
+      $('aiSessionPill').textContent='● Session error';
+    }
+  }
   const rows=await q('platform_settings')||[];
   window.__fmPlatformSettingsRows=rows;
   loadAiSettings();
