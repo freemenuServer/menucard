@@ -785,9 +785,21 @@ async function init(afterLogin=false){
     // Secure Admin Preview: the current Supabase session must itself be an admin.
     // The restaurant id in the URL is NOT trusted; the RPC validates admin role server-side.
     if(isAdminPreview){
-      const {data:previewRows,error:previewError}=await supabaseClient.rpc("admin_get_restaurant_preview",{p_restaurant_id:previewId});
+      // Admin Preview: use a SECURITY DEFINER RPC so RLS on restaurants does not
+      // block the Super Admin from opening another owner's restaurant.
+      let previewRows=null, previewError=null;
+      const rpc=await supabaseClient.rpc("admin_get_restaurant_preview",{p_restaurant_id:previewId});
+      previewRows=rpc.data; previewError=rpc.error;
+      // Backward-compatible fallback for the newer JSON-returning RPC.
       if(previewError || !Array.isArray(previewRows) || !previewRows.length){
-        return fail("Admin preview denied or restaurant not found. Please check the Super Admin session and RPC setup.");
+        const rpc2=await supabaseClient.rpc("admin_get_restaurant_preview_json",{p_restaurant_id:previewId});
+        if(!rpc2.error && rpc2.data){
+          const row=Array.isArray(rpc2.data)?rpc2.data[0]:rpc2.data;
+          if(row) previewRows=[row], previewError=null;
+        }
+      }
+      if(previewError || !Array.isArray(previewRows) || !previewRows.length){
+        return fail("Admin preview denied. Run the included freemenu-admin-owner-preview.sql in Supabase SQL Editor, then try again.");
       }
       currentRestaurant=previewRows[0];
       currentRestaurantId=currentRestaurant.id;
