@@ -212,7 +212,7 @@ async function loadAll(){
  profiles=await q('profiles')||[];
  subscriptions=await q('subscriptions')||[];
  await loadOwnerEmails();
- updateStats();renderDashboardTable();renderCities();renderPopularCats();renderActivity();populateRestaurantFilters();renderRestaurantPage();renderMenu();renderCategories();renderApprovals();renderSubscriptions();renderOwners();renderAdmins();renderLogs();renderAnalytics();loadSettings();loadAdSettings();loadMediaRules();
+ await loadOwnerEmails(); updateStats();renderDashboardTable();renderCities();renderPopularCats();renderActivity();populateRestaurantFilters();renderRestaurantPage();renderMenu();renderCategories();renderApprovals();renderSubscriptions();renderOwners();renderAdmins();renderLogs();renderAnalytics();loadSettings();loadAdSettings();loadMediaRules();
 }
 function statusOf(r){return String(r.status|| (r.is_active===false?'blocked':r.is_active===true?'active':'active')).toLowerCase()}
 function updateStats(){
@@ -228,7 +228,7 @@ async function openOwnerAsAdmin(restaurantId){
     const {data,error}=await db.auth.getSession();
     if(error||!data?.session) return toast('Super Admin session expired. Please login again.');
     localStorage.setItem('fm_admin_return_url', location.href);
-    const url=`owner.html?admin_preview=1&restaurant_id=${encodeURIComponent(restaurantId)}`;
+    const base=new URL("owner.html", location.href); base.searchParams.set("admin_preview","1"); base.searchParams.set("restaurant_id",restaurantId); const url=base.href;
     window.location.href=url;
   }catch(e){ toast(e?.message||'Unable to open Owner Panel'); }
 }
