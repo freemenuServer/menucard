@@ -1009,6 +1009,18 @@
       return `cat-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "general"}`;
     }
 
+
+/* FreeMenu owner-controlled menu ordering */
+function getSavedCategoryOrder(rest, items) {
+  const names = [...new Set(items.map(item => categoryKey(item.category)))];
+  const saved = Array.isArray(rest?.category_order) ? rest.category_order.map(String) : [];
+  const rank = new Map(saved.map((x,i)=>[x,i]));
+  return names.sort((a,b)=>{
+    const ar=rank.has(a)?rank.get(a):999999, br=rank.has(b)?rank.get(b):999999;
+    return ar-br || a.localeCompare(b);
+  });
+}
+
     function getCategories(items) {
       const categories = [];
       const seen = new Set();
@@ -1023,7 +1035,7 @@
     }
 
     function renderCategoryChips() {
-      const categories = getCategories(allItems);
+      const categories = getSavedCategoryOrder(restaurant, allItems);
       $("category-chips").innerHTML = [
         `<button class="cat-chip ${currentCategory === "all" ? "active" : ""}" data-category="all">All Menu</button>`,
         ...categories.map(category => `
@@ -1048,11 +1060,20 @@
     function renderMenu() {
       const filtered = getFilteredItems();
       const grouped = {};
-
       filtered.forEach(item => {
         const category = categoryKey(item.category);
         if (!grouped[category]) grouped[category] = [];
         grouped[category].push(item);
+      });
+      const orderedCategories = getSavedCategoryOrder(restaurant, Object.values(grouped).flat());
+      orderedCategories.forEach(category => {
+        if (grouped[category]) {
+          grouped[category].sort((a,b) => {
+            const ao = Number(a.sort_order ?? a.position ?? 999999);
+            const bo = Number(b.sort_order ?? b.position ?? 999999);
+            return ao - bo || String(a.name||"").localeCompare(String(b.name||""));
+          });
+        }
       });
 
       $("summary-line").style.display = "flex";
@@ -1066,7 +1087,9 @@
         return;
       }
 
-      $("menu-sections").innerHTML = Object.entries(grouped).map(([category, items]) => `
+      $("menu-sections").innerHTML = orderedCategories.filter(category => grouped[category]).map(category => {
+        const items = grouped[category];
+        return `
         <section class="category-section" id="${sectionId(category)}" data-category="${escapeHTML(category)}">
           <div class="category-heading">
             <h2 class="category-title">${escapeHTML(category)}</h2>
@@ -1076,7 +1099,7 @@
             ${items.map(renderItem).join("")}
           </div>
         </section>
-      `).join("");
+      `}).join("");
     }
 
     function renderRestaurant(rest) {
