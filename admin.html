@@ -111,7 +111,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
 
 <div id="restaurants" class="page"><div class="subpage-head"><div><h2>Restaurants</h2><p style="color:#667085">Manage the actual restaurant profiles, menus, plans and status.</p></div><button class="primary" onclick="openRestaurantModal()">+ Add Restaurant</button></div><div class="card"><div class="toolbar"><input class="input" id="restaurantSearch" placeholder="Search restaurant, phone, address..."><select class="input" id="restaurantOwnerFilter"><option value="">All Owners</option></select><select class="input" id="restaurantStatus"><option value="">All Status</option><option>active</option><option>pending</option><option>blocked</option></select></div><div id="restaurantPageTable" class="tablewrap" style="margin-top:12px"></div></div></div>
 
-<div id="owners" class="page"><div class="subpage-head"><div><h2>Restaurant Owners</h2><p style="color:#667085">Manage owner accounts separately from the restaurants they control.</p></div></div><div class="card"><div class="toolbar"><input class="input" id="ownerSearch" placeholder="Search owner name, email, mobile..."></div><div id="ownersTable" class="tablewrap" style="margin-top:12px"></div></div></div>
+<div id="owners" class="page"><div class="subpage-head"><div><h2>Restaurant Owners</h2><p style="color:#667085">Manage owner accounts separately from the restaurants they control.</p></div></div><div class="card"><div class="notice" style="margin-bottom:12px">Restaurant Owners are detected from <b>restaurants.owner_id</b>. This keeps owners visible even when their profile role is not exposed by RLS.</div><div class="toolbar"><input class="input" id="ownerSearch" placeholder="Search owner name, email, mobile..."></div><div id="ownersTable" class="tablewrap" style="margin-top:12px"></div></div></div>
 
 <div id="menu" class="page"><div class="subpage-head"><h2>Menu Management</h2></div><div class="card"><div class="toolbar"><select class="input" id="menuRestaurantFilter"><option value="">All Restaurants</option></select><input class="input" id="menuSearch" placeholder="Search item/category..."><button class="primary" onclick="openMenuModal()">+ Add Menu Item</button></div><div id="menuTable" class="tablewrap" style="margin-top:12px"></div></div></div>
 
@@ -268,7 +268,37 @@ function renderCategories(){const c={};menuItems.forEach(m=>{if(m.category)c[m.c
 function openCategoryModal(){modal('Add Category',`<div class="formgrid"><div class="field"><label>Restaurant</label><select id="cf_rest">${restaurants.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('')}</select></div><div class="field"><label>Category Name</label><input id="cf_name" placeholder="Main Course"></div></div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCategory()">Create</button></div>`)}
 async function saveCategory(){const rid=$('cf_rest').value,n=$('cf_name').value.trim();if(!n)return;const first=menuItems.find(m=>m.restaurant_id===rid);if(first){const p={...first};delete p.id;p.category=n;delete p.created_at;const r=await db.from('menu_items').insert({...p,name:'New Item'});if(r.error)return toast(r.error.message)}closeModal();toast('Category created by adding a starter menu item');await loadAll()}
 function renderApprovals(){const list=restaurants.filter(r=>statusOf(r)==='pending');$('approvalsTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Phone</th><th>Address</th><th>Action</th></tr></thead><tbody>${list.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.phone||'—')}</td><td>${esc(r.address||'—')}</td><td><button class="primary" onclick="setRestaurantStatus('${r.id}','active')">Approve</button> <button class="danger" onclick="setRestaurantStatus('${r.id}','blocked')">Reject</button></td></tr>`).join('')||'<tr><td colspan="4"><div class="empty">No pending approvals.</div></td></tr>'}</tbody></table>`}
-function renderOwners(){let list=profiles.filter(p=>p.role==='owner'||p.role==='restaurant_owner');const s=($('ownerSearch')?.value||'').toLowerCase();list=list.filter(p=>`${p.name||''} ${p.full_name||''} ${p.email||''} ${p.phone||p.mobile||''}`.toLowerCase().includes(s));$('ownersTable').innerHTML=`<table class="table"><thead><tr><th>Owner</th><th>Email</th><th>Mobile</th><th>Restaurants</th><th>Status</th><th>Action</th></tr></thead><tbody>${list.map(p=>{const owned=restaurants.filter(r=>r.owner_id===p.id);const active=owned.filter(r=>statusOf(r)==='active').length;const status=p.is_active===false||p.status==='blocked'?'blocked':(owned.length?'active':'no restaurant');return `<tr><td><b>${esc(p.name||p.full_name||'—')}</b><br><small>${esc(p.role||'owner')}</small></td><td>${esc(p.email||'—')}</td><td>${esc(p.phone||p.mobile||'—')}</td><td><b>${owned.length}</b>${active?` <small>(${active} active)</small>`:''}</td><td>${pill(status)}</td><td><button class="iconbtn" onclick="viewOwnerRestaurants('${p.id}')">View Restaurants</button></td></tr>`}).join('')||'<tr><td colspan="6"><div class="empty">No owner profiles found or RLS is restricting profile rows.</div></td></tr>'}</tbody></table>`}
+function renderOwners(){
+  /*
+   * Owner accounts are linked to restaurants through restaurants.owner_id.
+   * Do NOT depend only on profiles.role here: many Supabase setups keep
+   * restaurant owners in auth.users while profiles may contain only admins.
+   * Build a resilient owner list from both sources.
+   */
+  const map=new Map();
+  profiles.filter(p=>p.role==='owner'||p.role==='restaurant_owner').forEach(p=>map.set(String(p.id),{...p}));
+  restaurants.forEach(r=>{
+    if(!r.owner_id) return;
+    const id=String(r.owner_id);
+    if(!map.has(id)) map.set(id,{id:r.owner_id});
+    const x=map.get(id);
+    x.restaurantNames=x.restaurantNames||[];
+    if(r.name && !x.restaurantNames.includes(r.name)) x.restaurantNames.push(r.name);
+    if(!x.email && r.owner_email) x.email=r.owner_email;
+    if(!x.phone && r.owner_phone) x.phone=r.owner_phone;
+  });
+  let list=[...map.values()];
+  const s=($('ownerSearch')?.value||'').toLowerCase();
+  list=list.filter(p=>`${p.name||''} ${p.full_name||''} ${p.email||''} ${p.phone||p.mobile||''} ${(p.restaurantNames||[]).join(' ')}`.toLowerCase().includes(s));
+  $('ownersTable').innerHTML=`<table class="table"><thead><tr><th>Owner</th><th>Email</th><th>Mobile</th><th>Restaurants</th><th>Status</th><th>Action</th></tr></thead><tbody>${list.map(p=>{
+    const owned=restaurants.filter(r=>String(r.owner_id)===String(p.id));
+    const active=owned.filter(r=>statusOf(r)==='active').length;
+    const status=p.is_active===false||p.status==='blocked'?'blocked':(owned.length?'active':'no restaurant');
+    const displayName=p.name||p.full_name||p.email||'Restaurant Owner';
+    const restaurantNames=owned.map(r=>r.name).filter(Boolean).join(', ');
+    return `<tr><td><b>${esc(displayName)}</b><br><small>ID: ${esc(p.id||'—')}</small></td><td>${esc(p.email||'—')}</td><td>${esc(p.phone||p.mobile||'—')}</td><td><b>${owned.length}</b>${active?` <small>(${active} active)</small>`:''}${restaurantNames?`<br><small>${esc(restaurantNames)}</small>`:''}</td><td>${pill(status)}</td><td>${owned.length?`<button class="iconbtn" onclick="viewOwnerRestaurants('${esc(String(p.id))}')">View Restaurants</button>`:'—'}</td></tr>`;
+  }).join('')||'<tr><td colspan="6"><div class="empty">No restaurant owners are linked to any restaurant yet.</div></td></tr>'}</tbody></table>`;
+}
 function viewOwnerRestaurants(ownerId){showPage('restaurants');const el=$('restaurantOwnerFilter');if(el){el.value=ownerId;renderRestaurantPage();}}
 $('ownerSearch')?.addEventListener('input',renderOwners);$('restaurantSearch')?.addEventListener('input',renderRestaurantPage);$('restaurantStatus')?.addEventListener('change',renderRestaurantPage);$('restaurantOwnerFilter')?.addEventListener('change',renderRestaurantPage);
 function renderSubscriptions(){$('subsTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Plan</th><th>Status</th><th>Amount</th><th>Start</th><th>Expiry</th></tr></thead><tbody>${subscriptions.map(s=>{const r=restaurants.find(x=>x.id===s.restaurant_id);return `<tr><td>${esc(r?.name||s.restaurant_id)}</td><td>${esc(s.plan||'free')}</td><td>${pill(s.status||'pending')}</td><td>₹${Number(s.amount||0).toLocaleString('en-IN')}</td><td>${fmt(s.start_date)}</td><td>${fmt(s.expiry_date)}</td></tr>`}).join('')||'<tr><td colspan="6"><div class="empty">No subscriptions table/data yet.</div></td></tr>'}</tbody></table>`}
