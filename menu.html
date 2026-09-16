@@ -726,6 +726,22 @@
     }
 
   </style>
+
+<style id="freemenu-category-price-switch">
+.categoryHeadWithPrices{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.categoryPriceSwitch{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.categoryPriceSwitch button{
+  border:1px solid #d8dce2;background:#fff;border-radius:7px;padding:4px 8px;
+  font-size:10px;font-weight:800;cursor:pointer;line-height:1.1
+}
+.categoryPriceSwitch button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+@media(max-width:600px){
+ .categoryHeadWithPrices{gap:7px}
+ .categoryPriceSwitch{gap:3px}
+ .categoryPriceSwitch button{padding:4px 6px;font-size:9px}
+}
+</style>
+
 </head>
 <body>
   <div class="app-shell">
@@ -896,7 +912,7 @@
               <div style="flex:1; padding-top:4px;">
                 <div class="skeleton sk-title sk-line"></div>
                 <div class="skeleton sk-text sk-line"></div>
-                <div class="skeleton sk-price sk-line"></div>
+                <div class="skeleton sk-price sk-line" data-price data-price-quarter="${esc(item.price_quarter ?? item.quarter ?? \'\')}" data-price-half="${esc(item.price_half ?? item.half ?? \'\')}" data-price-full="${esc(item.price_full ?? item.price ?? item.full ?? \'\')}"></div>
               </div>
             </div>
           `).join("")}
@@ -1271,5 +1287,26 @@ function getSavedCategoryOrder(rest, items) {
 
     window.addEventListener("load", loadPublicMenu);
   </script>
+
+<script id="freemenu-category-price-behavior">
+(function(){
+  function setPriceMode(mode, scope){
+    document.querySelectorAll('[data-price-mode]').forEach(b=>{
+      b.classList.toggle('active', b.dataset.priceMode===mode);
+    });
+    document.querySelectorAll('[data-price]').forEach(el=>{
+      const val=el.getAttribute('data-price-'+mode);
+      if(val!==null && val!=="") el.textContent=val;
+    });
+  }
+  document.addEventListener('click',function(e){
+    const btn=e.target.closest('[data-price-mode]');
+    if(!btn)return;
+    e.preventDefault();
+    setPriceMode(btn.dataset.priceMode, btn.closest('section'));
+  });
+})();
+</script>
+
 </body>
 </html>
