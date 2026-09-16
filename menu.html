@@ -727,19 +727,17 @@
 
   </style>
 
-<style id="freemenu-category-price-switch">
-.categoryHeadWithPrices{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.categoryPriceSwitch{display:flex;align-items:center;gap:5px;flex-shrink:0}
-.categoryPriceSwitch button{
-  border:1px solid #d8dce2;background:#fff;border-radius:7px;padding:4px 8px;
-  font-size:10px;font-weight:800;cursor:pointer;line-height:1.1
-}
-.categoryPriceSwitch button.active{background:var(--primary);color:#fff;border-color:var(--primary)}
-@media(max-width:600px){
- .categoryHeadWithPrices{gap:7px}
- .categoryPriceSwitch{gap:3px}
- .categoryPriceSwitch button{padding:4px 6px;font-size:9px}
-}
+<style id="freemenu-no-banner-header">
+.hero{background:var(--surface)!important;color:var(--text)!important;min-height:0!important;border-radius:0 0 18px 18px!important;box-shadow:0 6px 24px rgba(0,0,0,.06)!important}
+.hero-cover,.hero-overlay{display:none!important}
+.hero-content{padding:22px 28px!important;min-height:0!important}
+.hero-info{color:var(--text)!important}
+.hero-welcome{color:var(--primary)!important}
+.hero-tagline,.hero-subtitle,.hero-slogans,.hero-feature{color:var(--text)!important}
+.hero-feature{background:rgba(0,0,0,.045)!important;border-color:rgba(0,0,0,.08)!important}
+.hero-action{position:static!important;margin-left:auto!important}
+.logo-wrap{background:#fff!important}
+@media(max-width:650px){.hero-content{padding:16px!important;gap:12px!important}.hero-slogans,.hero-features{display:none!important}}
 </style>
 
 </head>
@@ -912,7 +910,7 @@
               <div style="flex:1; padding-top:4px;">
                 <div class="skeleton sk-title sk-line"></div>
                 <div class="skeleton sk-text sk-line"></div>
-                <div class="skeleton sk-price sk-line" data-price data-price-quarter="${esc(item.price_quarter ?? item.quarter ?? \'\')}" data-price-half="${esc(item.price_half ?? item.half ?? \'\')}" data-price-full="${esc(item.price_full ?? item.price ?? item.full ?? \'\')}"></div>
+                <div class="skeleton sk-price sk-line"></div>
               </div>
             </div>
           `).join("")}
@@ -950,36 +948,19 @@
       return item.is_available === false || item.available === false || item.status === "unavailable" || item.status === "out_of_stock";
     }
 
-    function renderPrice(item) {
-      const qtr = item.price_quarter;
-      const half = item.price_half;
-      const full = item.price_full || item.price;
-      const hasPortions = qtr || half || item.price_full;
-
-      if (hasPortions) {
-        const portions = [
-          ["Qtr", qtr],
-          ["Half", half],
-          ["Full", full]
-        ];
-
-        return `
-          <div class="price-header" aria-hidden="true">
-            <span>Qtr</span><span>Half</span><span>Full</span>
-          </div>
-          <div class="portion-prices">
-            ${portions.map(([label, value]) => `
-              <div class="portion-price ${value === null || value === undefined || value === "" ? "empty" : ""}">
-                <span class="amount">${value !== null && value !== undefined && value !== "" ? `₹${escapeHTML(value)}` : "—"}</span>
-              </div>
-            `).join("")}
-          </div>
-        `;
+    function renderPrice(item, category) {
+      const mode = (window.fmCategoryPriceMode && window.fmCategoryPriceMode[category]) || "full";
+      const values = {
+        quarter: item.price_quarter,
+        half: item.price_half,
+        full: item.price_full || item.price
+      };
+      let value = values[mode];
+      if (value === null || value === undefined || value === "") {
+        value = values.full ?? values.half ?? values.quarter;
       }
-
-      const single = item.price ?? item.price_full ?? item.price_half ?? item.price_quarter;
-      return single !== null && single !== undefined && single !== ""
-        ? `<div class="price-header single" aria-hidden="true"><span>Price</span></div><div class="single-price-area"><div class="single-price">₹${escapeHTML(single)}</div></div>`
+      return value !== null && value !== undefined && value !== ""
+        ? `<div class="single-price-area"><div class="single-price">₹${escapeHTML(value)}</div></div>`
         : "";
     }
 
@@ -1009,7 +990,7 @@
                 ${item.description ? `<p class="item-desc">${escapeHTML(item.description)}</p>` : ""}
               </div>
               <div class="item-price-area">
-                ${renderPrice(item)}
+                ${renderPrice(item, categoryKey(item.category))}
               </div>
             </div>
           </div>
@@ -1107,9 +1088,16 @@ function getSavedCategoryOrder(rest, items) {
         const items = grouped[category];
         return `
         <section class="category-section" id="${sectionId(category)}" data-category="${escapeHTML(category)}">
-          <div class="category-heading">
-            <h2 class="category-title">${escapeHTML(category)}</h2>
-            <span class="item-count">${items.length} item${items.length === 1 ? "" : "s"}</span>
+          <div class="category-heading categoryHeadWithPrices">
+            <div style="display:flex;align-items:center;gap:9px;min-width:0">
+              <h2 class="category-title">${escapeHTML(category)}</h2>
+              <span class="item-count">${items.length} item${items.length === 1 ? "" : "s"}</span>
+            </div>
+            <div class="categoryPriceSwitch" aria-label="Price size">
+              <button type="button" class="${((window.fmCategoryPriceMode||{})[category]||"full")==="quarter"?"active":""}" onclick='fmSetCategoryPriceMode(${JSON.stringify(category)},"quarter")'>Quarter</button>
+              <button type="button" class="${((window.fmCategoryPriceMode||{})[category]||"full")==="half"?"active":""}" onclick='fmSetCategoryPriceMode(${JSON.stringify(category)},"half")'>Half</button>
+              <button type="button" class="${((window.fmCategoryPriceMode||{})[category]||"full")==="full"?"active":""}" onclick='fmSetCategoryPriceMode(${JSON.stringify(category)},"full")'>Full</button>
+            </div>
           </div>
           <div class="items-list">
             ${items.map(renderItem).join("")}
@@ -1287,26 +1275,12 @@ function getSavedCategoryOrder(rest, items) {
 
     window.addEventListener("load", loadPublicMenu);
   </script>
-
-<script id="freemenu-category-price-behavior">
-(function(){
-  function setPriceMode(mode, scope){
-    document.querySelectorAll('[data-price-mode]').forEach(b=>{
-      b.classList.toggle('active', b.dataset.priceMode===mode);
-    });
-    document.querySelectorAll('[data-price]').forEach(el=>{
-      const val=el.getAttribute('data-price-'+mode);
-      if(val!==null && val!=="") el.textContent=val;
-    });
-  }
-  document.addEventListener('click',function(e){
-    const btn=e.target.closest('[data-price-mode]');
-    if(!btn)return;
-    e.preventDefault();
-    setPriceMode(btn.dataset.priceMode, btn.closest('section'));
-  });
-})();
+<script id="freemenu-category-price-mode">
+window.fmCategoryPriceMode = window.fmCategoryPriceMode || {};
+window.fmSetCategoryPriceMode = function(category, mode){
+  window.fmCategoryPriceMode[category] = mode;
+  renderMenu();
+};
 </script>
-
 </body>
 </html>
