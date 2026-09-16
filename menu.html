@@ -1004,6 +1004,84 @@ footer{
 }
 </style>
 
+
+<style id="freemenu-price-visible-final">
+.item-main-row{
+  display:flex!important;
+  align-items:center!important;
+  width:100%!important;
+}
+.item-info{
+  flex:1 1 auto!important;
+  min-width:0!important;
+}
+.item-price-area{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  flex:0 0 232px!important;
+  width:232px!important;
+  min-width:232px!important;
+  margin-left:auto!important;
+  position:relative!important;
+  z-index:2!important;
+}
+.three-price-area{
+  display:grid!important;
+  grid-template-columns:repeat(3,72px)!important;
+  gap:8px!important;
+  width:232px!important;
+  min-width:232px!important;
+  margin-left:auto!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+.three-price-cell{
+  display:block!important;
+  width:72px!important;
+  min-height:18px!important;
+  text-align:center!important;
+  color:#171412!important;
+  font-family:Arial,sans-serif!important;
+  font-size:13px!important;
+  font-weight:900!important;
+  line-height:18px!important;
+  font-variant-numeric:tabular-nums!important;
+  visibility:visible!important;
+}
+.three-price-cell.empty-price{color:transparent!important}
+.categoryPriceSwitch{
+  width:232px!important;
+  min-width:232px!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,72px)!important;
+  gap:8px!important;
+  margin-left:auto!important;
+  text-align:center!important;
+}
+.categoryPriceSwitch span{
+  width:72px!important;
+  text-align:center!important;
+  font-weight:800!important;
+}
+@media(max-width:700px){
+  .item-price-area{flex-basis:164px!important;width:164px!important;min-width:164px!important}
+  .three-price-area,.categoryPriceSwitch{
+    width:164px!important;min-width:164px!important;
+    grid-template-columns:repeat(3,52px)!important;gap:4px!important;
+  }
+  .three-price-cell,.categoryPriceSwitch span{width:52px!important}
+}
+@media(max-width:430px){
+  .item-price-area{flex-basis:141px!important;width:141px!important;min-width:141px!important}
+  .three-price-area,.categoryPriceSwitch{
+    width:141px!important;min-width:141px!important;
+    grid-template-columns:repeat(3,45px)!important;gap:3px!important;
+  }
+  .three-price-cell,.categoryPriceSwitch span{width:45px!important}
+}
+</style>
+
 </head>
 <body>
   <div class="app-shell">
@@ -1213,18 +1291,18 @@ footer{
 
     function renderPrice(item, category) {
       const catItems = (allItems || []).filter(x => categoryKey(x.category) === category);
-      const hasQuarter = catItems.some(x => x.price_quarter !== null && x.price_quarter !== undefined && x.price_quarter !== "");
-      const hasHalf = catItems.some(x => x.price_half !== null && x.price_half !== undefined && x.price_half !== "");
-      const hasFull = catItems.some(x => (x.price_full ?? x.price) !== null && (x.price_full ?? x.price) !== undefined && (x.price_full ?? x.price) !== "");
+      const getQ = x => x.price_quarter ?? x.quarter ?? x.priceQuarter ?? "";
+      const getH = x => x.price_half ?? x.half ?? x.priceHalf ?? "";
+      const getF = x => x.price_full ?? x.full ?? x.priceFull ?? x.price ?? "";
+      const hasQuarter = catItems.some(x => String(getQ(x)).trim() !== "");
+      const hasHalf = catItems.some(x => String(getH(x)).trim() !== "");
+      const hasFull = catItems.some(x => String(getF(x)).trim() !== "");
 
-      const q = item.price_quarter;
-      const h = item.price_half;
-      const f = item.price_full ?? item.price;
-
+      const q = getQ(item), h = getH(item), f = getF(item);
       return `<div class="three-price-area">
-        <div class="three-price-cell">${hasQuarter && q !== null && q !== undefined && q !== "" ? "₹"+escapeHTML(q) : ""}</div>
-        <div class="three-price-cell">${hasHalf && h !== null && h !== undefined && h !== "" ? "₹"+escapeHTML(h) : ""}</div>
-        <div class="three-price-cell">${hasFull && f !== null && f !== undefined && f !== "" ? "₹"+escapeHTML(f) : ""}</div>
+        <div class="three-price-cell ${hasQuarter ? "show-price" : "empty-price"}">${hasQuarter && String(q).trim() !== "" ? "₹"+escapeHTML(q) : ""}</div>
+        <div class="three-price-cell ${hasHalf ? "show-price" : "empty-price"}">${hasHalf && String(h).trim() !== "" ? "₹"+escapeHTML(h) : ""}</div>
+        <div class="three-price-cell ${hasFull ? "show-price" : "empty-price"}">${hasFull && String(f).trim() !== "" ? "₹"+escapeHTML(f) : ""}</div>
       </div>`;
     }
 
