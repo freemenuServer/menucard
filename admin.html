@@ -160,6 +160,7 @@ const SUPABASE_URL='https://pfsrpowopbrevocwsuii.supabase.co';
 const SUPABASE_KEY='sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let session=null, restaurants=[], menuItems=[], profiles=[], subscriptions=[], charts={};
+let ownerEmails={};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 function toast(m){$('toast').textContent=m;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2400)}
@@ -193,11 +194,24 @@ async function adminCheck(){
  $('adminName').textContent=p.name||p.full_name||'Super Admin';$('avatar').textContent=(p.name||p.full_name||'SA').slice(0,2).toUpperCase();
  $('securityUser').textContent=session.user.email||session.user.id;return true
 }
+async function loadOwnerEmails(){
+  ownerEmails={};
+  const ids=[...new Set(restaurants.map(r=>r.owner_id).filter(Boolean).map(String))];
+  if(!ids.length)return;
+  try{
+    const {data,error}=await db.rpc('admin_get_owner_emails',{owner_ids:ids});
+    if(!error && Array.isArray(data)){
+      data.forEach(x=>{if(x.owner_id && x.email) ownerEmails[String(x.owner_id)]=x.email;});
+    } else if(error) console.warn('Owner email RPC:',error.message);
+  }catch(e){console.warn('Owner email lookup failed:',e)}
+}
+
 async function loadAll(){
  restaurants=await q('restaurants')||[];
  menuItems=await q('menu_items')||[];
  profiles=await q('profiles')||[];
  subscriptions=await q('subscriptions')||[];
+ await loadOwnerEmails();
  updateStats();renderDashboardTable();renderCities();renderPopularCats();renderActivity();populateRestaurantFilters();renderRestaurantPage();renderMenu();renderCategories();renderApprovals();renderSubscriptions();renderOwners();renderAdmins();renderLogs();renderAnalytics();loadSettings();loadAdSettings();loadMediaRules();
 }
 function statusOf(r){return String(r.status|| (r.is_active===false?'blocked':r.is_active===true?'active':'active')).toLowerCase()}
@@ -294,9 +308,10 @@ function renderOwners(){
     const owned=restaurants.filter(r=>String(r.owner_id)===String(p.id));
     const active=owned.filter(r=>statusOf(r)==='active').length;
     const status=p.is_active===false||p.status==='blocked'?'blocked':(owned.length?'active':'no restaurant');
-    const displayName=p.name||p.full_name||p.email||'Restaurant Owner';
+    const email=p.email||p.owner_email||ownerEmails[String(p.id)]||'';
+     const displayName=p.name||p.full_name||email||'Restaurant Owner';
     const restaurantNames=owned.map(r=>r.name).filter(Boolean).join(', ');
-    return `<tr><td><b>${esc(displayName)}</b><br><small>ID: ${esc(p.id||'—')}</small></td><td>${esc(p.email||p.owner_email||'—')}</td><td>${esc(p.phone||p.mobile||p.owner_phone||'—')}</td><td><b>${owned.length}</b>${active?` <small>(${active} active)</small>`:''}${restaurantNames?`<br><small>${esc(restaurantNames)}</small>`:''}</td><td>${owned.map(r=>pill(String(r.plan||'free'))).join(' ')||pill('free')}</td><td>${pill(status)}</td><td><div class="actions"><button class="iconbtn" onclick="viewOwnerRestaurants('${esc(String(p.id))}')">View Restaurants</button><button class="iconbtn" onclick="openOwnerEdit('${esc(String(p.id))}')">✎ Edit</button></div></td></tr>`;
+    return `<tr><td><b>${esc(displayName)}</b><br><small>ID: ${esc(p.id||'—')}</small></td><td>${esc(email||'—')}</td><td>${esc(p.phone||p.mobile||p.owner_phone||'—')}</td><td><b>${owned.length}</b>${active?` <small>(${active} active)</small>`:''}${restaurantNames?`<br><small>${esc(restaurantNames)}</small>`:''}</td><td>${owned.map(r=>pill(String(r.plan||'free'))).join(' ')||pill('free')}</td><td>${pill(status)}</td><td><div class="actions"><button class="iconbtn" onclick="viewOwnerRestaurants('${esc(String(p.id))}')">View Restaurants</button><button class="iconbtn" onclick="openOwnerEdit('${esc(String(p.id))}')">✎ Edit</button></div></td></tr>`;
   }).join('')||'<tr><td colspan="7"><div class="empty">No restaurant owners are linked to any restaurant yet.</div></td></tr>'}</tbody></table>`;
 }
 
@@ -304,7 +319,7 @@ function openOwnerEdit(ownerId){
   const owned=restaurants.filter(r=>String(r.owner_id)===String(ownerId));
   const p=profiles.find(x=>String(x.id)===String(ownerId))||{};
   const first=owned[0]||{};
-  const email=p.email||p.owner_email||first.owner_email||'';
+  const email=p.email||p.owner_email||ownerEmails[String(ownerId)]||first.owner_email||'';
   const phone=p.phone||p.mobile||p.owner_phone||first.owner_phone||'';
   const name=p.name||p.full_name||'';
   const rows=owned.map(r=>`<div class="field full" style="border:1px solid #e4e7ec;border-radius:12px;padding:12px"><label>${esc(r.name||'Restaurant')} — Plan</label><select class="owner-plan-select" data-rid="${esc(r.id)}"><option value="free" ${String(r.plan||'free').toLowerCase()==='free'?'selected':''}>FREE</option><option value="premium" ${String(r.plan||'free').toLowerCase()==='premium'?'selected':''}>PAID / PREMIUM</option></select></div>`).join('');
