@@ -767,90 +767,100 @@ $("signupSubmitNew").onclick=ownerSignup;
 /* ---------- Init/Auth ---------- */
 async function init(afterLogin=false){
   try{
-    $("loader")?.classList.remove("hidden");
-    const result=await Promise.race([
-      supabaseClient.auth.getSession(),
-      new Promise((_,reject)=>setTimeout(()=>reject(new Error("Supabase connection timed out. Please refresh and try again.")),10000))
-    ]);
-    session=result?.data?.session||null;
+    $('loader')?.classList.remove('hidden');
     const params=new URLSearchParams(location.search);
-    let previewId=params.get("restaurant_id");
-    // Same-origin fallback set by Super Admin before opening this page.
-    // It is only a hint; the server-side RPC below still verifies the current user is an admin.
-    const handoffId=localStorage.getItem("fm_admin_preview_restaurant");
-    const handoffTs=Number(localStorage.getItem("fm_admin_preview_ts")||0);
-    if(!previewId && handoffId && handoffTs && (Date.now()-handoffTs)<5*60*1000) previewId=handoffId;
-    isAdminPreview=!!previewId && (params.get("admin_preview")==="1" || !!handoffId);
+    let previewToken=params.get('preview_token') || sessionStorage.getItem('fm_admin_preview_token') || '';
+    let previewId=params.get('restaurant_id');
+    const legacyHandoff=localStorage.getItem('fm_admin_preview_restaurant');
+    const legacyTs=Number(localStorage.getItem('fm_admin_preview_ts')||0);
+    if(!previewToken && !previewId && legacyHandoff && legacyTs && (Date.now()-legacyTs)<5*60*1000) previewId=legacyHandoff;
+    isAdminPreview=!!previewToken || (!!previewId && (params.get('admin_preview')==='1' || !!legacyHandoff));
 
-    if(!session?.user){
-      showAuthChoice();
+    // FIRST: Admin handoff. Do not require an owner login/session for this path.
+    // The database RPC validates that the token was created by a real Super Admin.
+    if(previewToken){
+      const rpc=await supabaseClient.rpc('admin_consume_owner_preview_token',{p_token:previewToken});
+      if(rpc.error || !rpc.data || !Array.isArray(rpc.data) || !rpc.data.length){
+        return fail('Admin Preview failed: '+(rpc.error?.message||'Invalid or expired admin preview token.'));
+      }
+      currentRestaurant=rpc.data[0];
+      currentRestaurantId=currentRestaurant.id;
+      sessionStorage.removeItem('fm_admin_preview_token');
+      if($('accountEmail')) $('accountEmail').value='Super Admin Preview';
+      if($('ownerName')) $('ownerName').textContent='Admin Preview';
+      if($('avatar')) $('avatar').textContent='AD';
+      showAdminPreviewBanner();
+      fillProfile();
+      await loadItems();
+      await loadMediaRules();
+      $('loader')?.classList.add('hidden');
+      showSection(location.hash.slice(1)||'dashboard');
       return;
     }
 
-    // Secure Admin Preview: the current Supabase session must itself be an admin.
-    // The restaurant id in the URL is NOT trusted; the RPC validates admin role server-side.
-    if(isAdminPreview){
-      // Admin Preview: use a SECURITY DEFINER RPC so RLS on restaurants does not
-      // block the Super Admin from opening another owner's restaurant.
+    const result=await Promise.race([
+      supabaseClient.auth.getSession(),
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error('Supabase connection timed out. Please refresh and try again.')),10000))
+    ]);
+    session=result?.data?.session||null;
+
+    // Legacy admin preview URL/RLS RPC path.
+    if(isAdminPreview && previewId){
+      if(!session?.user) return fail('Admin preview link expired. Please open the restaurant again from Super Admin.');
       let previewRows=null, previewError=null;
-      const rpc=await supabaseClient.rpc("admin_get_restaurant_preview",{p_restaurant_id:previewId});
+      const rpc=await supabaseClient.rpc('admin_get_restaurant_preview',{p_restaurant_id:previewId});
       previewRows=rpc.data; previewError=rpc.error;
-      // Backward-compatible fallback for the newer JSON-returning RPC.
       if(previewError || !Array.isArray(previewRows) || !previewRows.length){
-        const rpc2=await supabaseClient.rpc("admin_get_restaurant_preview_json",{p_restaurant_id:previewId});
+        const rpc2=await supabaseClient.rpc('admin_get_restaurant_preview_json',{p_restaurant_id:previewId});
         if(!rpc2.error && rpc2.data){
           const row=Array.isArray(rpc2.data)?rpc2.data[0]:rpc2.data;
           if(row) previewRows=[row], previewError=null;
         }
       }
       if(previewError || !Array.isArray(previewRows) || !previewRows.length){
-        return fail("Admin preview denied. Run the included freemenu-admin-owner-preview.sql in Supabase SQL Editor, then try again.");
+        return fail('Admin preview denied: '+(previewError?.message||'Run the admin preview SQL and try again.'));
       }
       currentRestaurant=previewRows[0];
       currentRestaurantId=currentRestaurant.id;
-      localStorage.removeItem("fm_admin_preview_restaurant");
-      localStorage.removeItem("fm_admin_preview_ts");
-      if($("accountEmail")) $("accountEmail").value=session.user.email||"";
-      if($("ownerName")) $("ownerName").textContent="Admin Preview";
-      if($("avatar")) $("avatar").textContent="AD";
+      localStorage.removeItem('fm_admin_preview_restaurant');
+      localStorage.removeItem('fm_admin_preview_ts');
+      if($('accountEmail')) $('accountEmail').value=session.user.email||'';
+      if($('ownerName')) $('ownerName').textContent='Admin Preview';
+      if($('avatar')) $('avatar').textContent='AD';
       showAdminPreviewBanner();
       fillProfile();
       await loadItems();
       await loadMediaRules();
-      $("loader")?.classList.add("hidden");
-      showSection(location.hash.slice(1)||"dashboard");
+      $('loader')?.classList.add('hidden');
+      showSection(location.hash.slice(1)||'dashboard');
       return;
     }
 
-    if(!afterLogin){
-      // Fresh page load: always show Login/Sign Up for normal owner access.
+    if(!session?.user){
       showAuthChoice();
       return;
     }
+    if(!afterLogin){
+      showAuthChoice();
+      return;
+    }
+    if($('accountEmail')) $('accountEmail').value=session.user.email||'';
+    if($('ownerName')) $('ownerName').textContent=session.user.user_metadata?.full_name||session.user.email?.split('@')[0]||'Owner';
+    if($('avatar')) $('avatar').textContent=initials($('ownerName')?.textContent);
 
-    if($("accountEmail")) $("accountEmail").value=session.user.email||"";
-    if($("ownerName")) $("ownerName").textContent=session.user.user_metadata?.full_name||session.user.email?.split("@")[0]||"Owner";
-    if($("avatar")) $("avatar").textContent=initials($("ownerName")?.textContent);
-
-    const {data,error}=await supabaseClient
-      .from("restaurants")
-      .select("*")
-      .eq("owner_id",session.user.id)
-      .limit(1);
-
-    if(error) return fail("Could not load your restaurant profile: "+error.message);
-    if(!data?.length) return fail("No restaurant is linked to this login account. Please login with the restaurant owner account.");
-
+    const {data,error}=await supabaseClient.from('restaurants').select('*').eq('owner_id',session.user.id).limit(1);
+    if(error) return fail('Could not load your restaurant profile: '+error.message);
+    if(!data?.length) return fail('No restaurant is linked to this login account. Please login with the restaurant owner account.');
     currentRestaurant=data[0];
     currentRestaurantId=currentRestaurant.id;
     fillProfile();
     await loadItems();
     await loadMediaRules();
-    $("loader")?.classList.add("hidden");
-    showSection(location.hash.slice(1)||"dashboard");
+    $('loader')?.classList.add('hidden');
+    showSection(location.hash.slice(1)||'dashboard');
   }catch(e){
-    console.error("Owner init failed:",e);
-    fail(e?.message||"Unexpected error while loading the Owner Panel.");
+    console.error('Owner init failed:',e);
+    fail(e?.message||'Unexpected error while loading the Owner Panel.');
   }
 }
 function showAdminPreviewBanner(){
@@ -861,7 +871,7 @@ function showAdminPreviewBanner(){
   bar.innerHTML=`<span>🔐 Super Admin Mode — Viewing <b>${esc(currentRestaurant?.name||"Restaurant")}</b></span><button id="exitAdminPreview" style="border:0;border-radius:8px;padding:7px 12px;cursor:pointer;background:#fff;color:#111827;font-weight:700">Exit Admin Mode</button>`;
   document.body.appendChild(bar);
   document.body.style.paddingTop="42px";
-  document.getElementById("exitAdminPreview").onclick=()=>{ const u=localStorage.getItem("fm_admin_return_url"); localStorage.removeItem("fm_admin_return_url"); location.href=u||"./"; };
+  document.getElementById("exitAdminPreview").onclick=()=>{ const u=localStorage.getItem('fm_admin_return_url'); localStorage.removeItem('fm_admin_return_url'); sessionStorage.removeItem('fm_admin_preview_token'); localStorage.removeItem('fm_admin_preview_restaurant'); localStorage.removeItem('fm_admin_preview_ts'); location.href=u||'./'; };
 }
 
 function fail(msg){
