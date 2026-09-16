@@ -1317,17 +1317,17 @@ body{
         </div>
 
         <div class="hero-info">
-          <div id="rest-welcome" class="hero-welcome">Welcome to</div>
+          <div id="rest-welcome" class="hero-welcome" style="display:none"></div>
           <h1 id="rest-name" class="hero-tagline restaurant-name">Loading Menu...</h1>
-          <div id="rest-subtitle" class="hero-subtitle">THE TASTE YOU'LL LOVE</div>
-          <div class="hero-features">
+          <div id="rest-subtitle" class="hero-subtitle" style="display:none"></div>
+          <div id="rest-features" class="hero-features" style="display:none">
             <span id="rest-feature1" class="hero-feature"></span>
             <span id="rest-feature2" class="hero-feature"></span>
             <span id="rest-feature3" class="hero-feature"></span>
           </div>
-          <div class="hero-slogans">
-            <div id="rest-slogan1">Good Food</div>
-            <div id="rest-slogan2">Good Mood</div>
+          <div id="rest-slogans" class="hero-slogans" style="display:none">
+            <div id="rest-slogan1"></div>
+            <div id="rest-slogan2"></div>
           </div>
           <div class="restaurant-meta" style="margin-top:11px">
             <span id="rest-status" class="status-badge">
@@ -1350,7 +1350,7 @@ body{
     <section class="service-strip" id="service-strip">
       <div class="service-left">
         <span id="rest-open-pill" class="open-pill">● Open Now</span>
-        <span id="rest-hours" class="service-time">11:00 AM – 11:00 PM</span>
+        <span id="rest-hours" class="service-time" style="display:none"></span>
       </div>
       <div class="services">
         <span id="svc-dine" class="service">🍴 Dine In</span>
@@ -1657,19 +1657,33 @@ function getSavedCategoryOrder(rest, items) {
       applyRestaurantTheme(rest);
 
       const restaurantName = rest.name || "Restaurant";
-      $("rest-welcome").textContent = rest.welcome_text || "Welcome to";
-      $("rest-name").textContent = restaurantName;
-      $("rest-subtitle").textContent = rest.tagline || rest.subtitle_text || "THE TASTE YOU\'LL LOVE";
-      const featureDefaults = ["Pure Veg & Non-Veg", "Hygienic Food", "Great Taste"];
-      ["rest-feature1","rest-feature2","rest-feature3"].forEach((id, i) => {
+      // Optional restaurant information is shown ONLY when the owner has entered it.
+      // No hard-coded fallback text is used here.
+      const setOptionalText = (id, value, displayMode = "block") => {
         const el = $(id);
-        if (!el) return;
-        const value = rest[`feature_${i+1}`] || featureDefaults[i];
-        el.textContent = value;
-        el.style.display = value ? "inline-flex" : "none";
+        if (!el) return false;
+        const text = value == null ? "" : String(value).trim();
+        el.textContent = text;
+        el.style.display = text ? displayMode : "none";
+        return !!text;
+      };
+
+      setOptionalText("rest-welcome", rest.welcome_text);
+      $("rest-name").textContent = restaurantName;
+      setOptionalText("rest-subtitle", rest.tagline || rest.subtitle_text);
+
+      let hasFeature = false;
+      ["rest-feature1","rest-feature2","rest-feature3"].forEach((id, i) => {
+        hasFeature = setOptionalText(id, rest[`feature_${i+1}`], "inline-flex") || hasFeature;
       });
-      $("rest-slogan1").textContent = rest.slogan_1 || "Good Food";
-      $("rest-slogan2").textContent = rest.slogan_2 || "Good Mood";
+      const features = $("rest-features");
+      if (features) features.style.display = hasFeature ? "flex" : "none";
+
+      const hasSlogan1 = setOptionalText("rest-slogan1", rest.slogan_1);
+      const hasSlogan2 = setOptionalText("rest-slogan2", rest.slogan_2);
+      const slogans = $("rest-slogans");
+      if (slogans) slogans.style.display = (hasSlogan1 || hasSlogan2) ? "flex" : "none";
+
       document.title = `${restaurantName} • Menu`;
 
       const logoUrl = safeUrl(rest.logo_url);
@@ -1733,8 +1747,13 @@ function getSavedCategoryOrder(rest, items) {
         h=h%12||12;
         return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")} ${suffix}`;
       };
-      const hrs=`${fmtTime(rest.opening_time)||"11:00 AM"} – ${fmtTime(rest.closing_time)||"11:00 PM"}`;
-      if($("rest-hours")) $("rest-hours").textContent=hrs;
+      const opening = fmtTime(rest.opening_time);
+      const closing = fmtTime(rest.closing_time);
+      const hoursEl = $("rest-hours");
+      if (hoursEl) {
+        hoursEl.textContent = opening && closing ? `${opening} – ${closing}` : "";
+        hoursEl.style.display = opening && closing ? "inline-flex" : "none";
+      }
       if($("svc-dine")) $("svc-dine").style.display=rest.dine_in===false?"none":"inline-flex";
       if($("svc-take")) $("svc-take").style.display=rest.takeaway===false?"none":"inline-flex";
       if($("svc-delivery")) $("svc-delivery").style.display=rest.home_delivery===false?"none":"inline-flex";
