@@ -738,31 +738,54 @@ $("signupSubmitNew").onclick=ownerSignup;
 
 /* ---------- Init/Auth ---------- */
 async function init(){
-  const result=await supabaseClient.auth.getSession();
-  session=result.data.session;
-  if(!session?.user){
-    showAuthChoice();
-    return;
-  }
-  $("accountEmail").value=session.user.email||"";
-  $("ownerName").textContent=session.user.user_metadata?.full_name||session.user.email?.split("@")[0]||"Owner";
-  $("avatar").textContent=initials($("ownerName").textContent);
+  try{
+    $("loader")?.classList.remove("hidden");
+    const result=await Promise.race([
+      supabaseClient.auth.getSession(),
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error("Supabase connection timed out. Please refresh and try again.")),10000))
+    ]);
+    session=result?.data?.session||null;
+    if(!session?.user){
+      showAuthChoice();
+      return;
+    }
 
-  const urlSlug=new URLSearchParams(location.search).get("r");
-  let q=supabaseClient.from("restaurants").select("*");
-  if(urlSlug) q=q.eq("slug",urlSlug.toLowerCase());
-  else q=q.eq("owner_id",session.user.id);
-  const {data,error}=await q.limit(1);
-  if(error) return fail(error.message);
-  if(!data?.length) return fail("Restaurant profile not found for this owner.");
-  currentRestaurant=data[0];currentRestaurantId=currentRestaurant.id;
-  fillProfile();
-  await loadItems();
-  $("loader").classList.add("hidden");
-  showSection(location.hash.slice(1)||"dashboard");
+    if($("accountEmail")) $("accountEmail").value=session.user.email||"";
+    if($("ownerName")) $("ownerName").textContent=session.user.user_metadata?.full_name||session.user.email?.split("@")[0]||"Owner";
+    if($("avatar")) $("avatar").textContent=initials($("ownerName")?.textContent);
+
+    // IMPORTANT: Owner Panel always loads the restaurant linked to the
+    // currently authenticated owner. A URL slug must never override owner_id.
+    const {data,error}=await supabaseClient
+      .from("restaurants")
+      .select("*")
+      .eq("owner_id",session.user.id)
+      .limit(1);
+
+    if(error){
+      return fail("Could not load your restaurant profile: "+error.message);
+    }
+    if(!data?.length){
+      return fail("No restaurant is linked to this login account. Please login with the restaurant owner account.");
+    }
+
+    currentRestaurant=data[0];
+    currentRestaurantId=currentRestaurant.id;
+    fillProfile();
+    await loadItems();
+    await loadMediaRules();
+    $("loader")?.classList.add("hidden");
+    showSection(location.hash.slice(1)||"dashboard");
+  }catch(e){
+    console.error("Owner init failed:",e);
+    fail(e?.message||"Unexpected error while loading the Owner Panel.");
+  }
 }
 function fail(msg){
-  $("loader").innerHTML=`<div style="text-align:center;padding:25px"><i class="fa-solid fa-circle-exclamation" style="font-size:38px;color:#c33"></i><h3>Unable to open Owner Panel</h3><p>${esc(msg)}</p><button class="btn" onclick="location.reload()">Retry</button></div>`;
+  const loader=$("loader");
+  if(!loader) return alert(msg||"Unable to open Owner Panel");
+  loader.classList.remove("hidden");
+  loader.innerHTML=`<div style="text-align:center;padding:25px;max-width:520px"><i class="fa-solid fa-circle-exclamation" style="font-size:38px;color:#c33"></i><h3>Unable to open Owner Panel</h3><p>${esc(msg)}</p><button class="btn" onclick="location.href=location.pathname">Retry</button></div>`;
 }
 function fillProfile(){
   const r=currentRestaurant;
