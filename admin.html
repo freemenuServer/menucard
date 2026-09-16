@@ -228,8 +228,11 @@ async function openOwnerAsAdmin(restaurantId){
     const {data,error}=await db.auth.getSession();
     if(error||!data?.session) return toast('Super Admin session expired. Please login again.');
     localStorage.setItem('fm_admin_return_url', location.href);
+    // Keep a same-origin handoff marker as a fallback in case the host strips query parameters.
+    localStorage.setItem('fm_admin_preview_restaurant', String(restaurantId));
+    localStorage.setItem('fm_admin_preview_ts', String(Date.now()));
     const base=new URL("owner.html", location.href); base.searchParams.set("admin_preview","1"); base.searchParams.set("restaurant_id",restaurantId); const url=base.href;
-    window.location.href=url;
+    window.location.assign(url);
   }catch(e){ toast(e?.message||'Unable to open Owner Panel'); }
 }
 
