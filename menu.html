@@ -746,179 +746,10 @@
 
 
 
-<style id="freemenu-dynamic-price-columns">
-.categoryPriceSwitch,.three-price-area{
-  display:grid!important;
-  gap:8px!important;
-  margin-left:auto!important;
-  flex-shrink:0!important;
-  text-align:center!important;
-}
-.categoryPriceSwitch{grid-template-columns:repeat(3,58px)!important}
-.three-price-area.price-cols-1{grid-template-columns:58px!important}
-.three-price-area.price-cols-2{grid-template-columns:repeat(2,58px)!important}
-.three-price-area.price-cols-3{grid-template-columns:repeat(3,58px)!important}
-.categoryPriceSwitch span{font:700 10px/1.2 Arial,sans-serif!important;color:#6f655e!important}
-.three-price-cell{font:800 11px/1.2 Arial,sans-serif!important;color:#241719!important;text-align:center!important}
-@media(max-width:600px){
- .categoryPriceSwitch{gap:4px!important}
- .categoryPriceSwitch span{font-size:9px!important}
- .three-price-area.price-cols-1{grid-template-columns:48px!important}
- .three-price-area.price-cols-2{grid-template-columns:repeat(2,48px)!important}
- .three-price-area.price-cols-3{grid-template-columns:repeat(3,48px)!important}
-}
-</style>
 
 
-<style id="freemenu-official-menu-style">
-/* Official restaurant-menu polish: restrained typography, spacing and pricing */
-body{
-  background:#f7f5f2!important;
-  color:#1f1f1f!important;
-}
-.hero{
-  background:#fff!important;
-  border:1px solid #e7e1db!important;
-  border-radius:0 0 14px 14px!important;
-  box-shadow:none!important;
-}
-.hero-content{
-  max-width:1120px!important;
-  margin:0 auto!important;
-  padding:28px 34px!important;
-}
-.hero-welcome{
-  font-family:Georgia,"Times New Roman",serif!important;
-  font-size:17px!important;
-  font-weight:400!important;
-  letter-spacing:.2px!important;
-}
-.hero h1{
-  font-family:Georgia,"Times New Roman",serif!important;
-  font-size:52px!important;
-  line-height:1.02!important;
-  letter-spacing:-1.5px!important;
-  color:#211a18!important;
-  text-shadow:none!important;
-}
-.hero-tagline{
-  font-size:11px!important;
-  letter-spacing:3px!important;
-  font-weight:800!important;
-  color:#6d625b!important;
-}
-.hero-feature{
-  background:#faf8f5!important;
-  border:1px solid #e9e2db!important;
-  color:#554b45!important;
-  box-shadow:none!important;
-}
-.hero-slogans{
-  font-family:Georgia,"Times New Roman",serif!important;
-  color:#51463f!important;
-}
-.logo-wrap{
-  border:1px solid #e5ded7!important;
-  box-shadow:0 5px 16px rgba(30,20,15,.08)!important;
-}
-.menu-shell,.menu-container,.menu-content{
-  max-width:1120px!important;
-  margin-left:auto!important;
-  margin-right:auto!important;
-}
-.search-panel,.search-card{
-  border:1px solid #e8e1da!important;
-  box-shadow:none!important;
-  border-radius:12px!important;
-}
-.category-chip,.chip{
-  border-color:#ded6ce!important;
-  background:#fff!important;
-  color:#514842!important;
-  box-shadow:none!important;
-}
-.category-chip.active,.chip.active{
-  background:#25211f!important;
-  border-color:#25211f!important;
-  color:#fff!important;
-}
-.category-section,.menu-section{
-  background:#fff!important;
-  border:1px solid #e8e1da!important;
-  border-radius:12px!important;
-  box-shadow:0 2px 10px rgba(40,30,20,.035)!important;
-  overflow:hidden!important;
-  margin-bottom:18px!important;
-}
-.category-heading,.categoryHeadWithPrices{
-  background:#fbfaf8!important;
-  border-bottom:1px solid #e9e3dd!important;
-  padding:14px 16px!important;
-}
-.category-title{
-  font-family:Georgia,"Times New Roman",serif!important;
-  font-size:22px!important;
-  color:#251e1b!important;
-  letter-spacing:-.2px!important;
-}
-.item-count{
-  color:#887b72!important;
-  font-size:10px!important;
-}
-.menu-item,.food-item{
-  background:#fff!important;
-  border-bottom:1px solid #eee9e4!important;
-  box-shadow:none!important;
-}
-.menu-item:last-child,.food-item:last-child{border-bottom:0!important}
-.item-name{
-  font-size:14px!important;
-  font-weight:700!important;
-  color:#28221f!important;
-}
-.item-description{
-  color:#82766d!important;
-  font-size:11px!important;
-  line-height:1.5!important;
-}
-.three-price-area{
-  align-self:center!important;
-}
-.three-price-cell{
-  color:#27211e!important;
-  font-size:12px!important;
-  font-weight:800!important;
-}
-.categoryPriceSwitch{
-  color:#796d64!important;
-  font-size:10px!important;
-  font-weight:700!important;
-}
-.categoryPriceSwitch span{
-  font-size:10px!important;
-  letter-spacing:.2px!important;
-}
-.price-cols-1{grid-template-columns:58px!important}
-.price-cols-2{grid-template-columns:repeat(2,58px)!important}
-.price-cols-3{grid-template-columns:repeat(3,58px)!important}
-.status-strip{
-  border:1px solid #e8e1da!important;
-  box-shadow:none!important;
-  border-radius:12px!important;
-}
-footer{
-  color:#95887f!important;
-}
-@media(max-width:700px){
-  .hero-content{padding:22px 18px!important}
-  .hero h1{font-size:36px!important}
-  .category-title{font-size:19px!important}
-  .category-heading,.categoryHeadWithPrices{padding:12px!important}
-  .price-cols-1{grid-template-columns:52px!important}
-  .price-cols-2{grid-template-columns:repeat(2,52px)!important}
-  .price-cols-3{grid-template-columns:repeat(3,52px)!important}
-}
-</style>
+
+
 
 
 <style id="freemenu-price-ruler-fix">
@@ -1005,127 +836,7 @@ footer{
 </style>
 
 
-<style id="freemenu-price-ruler-final">
-.categoryHeadWithPrices{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) 232px!important;
-  align-items:center!important;
-  gap:12px!important;
-}
-.categoryPriceSwitch{
-  width:232px!important;
-  display:grid!important;
-  grid-template-columns:repeat(3,72px)!important;
-  gap:8px!important;
-  margin:0!important;
-  justify-self:end!important;
-}
-.categoryPriceSwitch span{
-  width:72px!important;
-  text-align:center!important;
-  font-family:Arial,sans-serif!important;
-  font-size:11px!important;
-  font-weight:800!important;
-  color:#6b6058!important;
-}
 
-.menu-item .item-content{
-  width:100%!important;
-}
-.menu-item .item-main-row{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) 232px!important;
-  align-items:center!important;
-  column-gap:12px!important;
-  width:100%!important;
-}
-.menu-item .item-info{
-  min-width:0!important;
-}
-.menu-item .item-price-area{
-  display:block!important;
-  width:232px!important;
-  min-width:232px!important;
-  max-width:232px!important;
-  visibility:visible!important;
-  opacity:1!important;
-  justify-self:end!important;
-}
-.menu-item .three-price-area{
-  display:grid!important;
-  grid-template-columns:repeat(3,72px)!important;
-  gap:8px!important;
-  width:232px!important;
-  min-width:232px!important;
-  margin:0!important;
-}
-.menu-item .three-price-cell{
-  display:block!important;
-  width:72px!important;
-  min-height:18px!important;
-  text-align:center!important;
-  font-family:Arial,sans-serif!important;
-  font-size:13px!important;
-  font-weight:900!important;
-  line-height:18px!important;
-  color:#171412!important;
-  font-variant-numeric:tabular-nums!important;
-}
-
-@media(max-width:700px){
-  .categoryHeadWithPrices{
-    grid-template-columns:minmax(0,1fr) 164px!important;
-    gap:8px!important;
-  }
-  .categoryPriceSwitch{
-    width:164px!important;
-    grid-template-columns:repeat(3,52px)!important;
-    gap:4px!important;
-  }
-  .categoryPriceSwitch span{width:52px!important;font-size:9px!important}
-  .menu-item .item-main-row{
-    grid-template-columns:minmax(0,1fr) 164px!important;
-    gap:8px!important;
-  }
-  .menu-item .item-price-area,
-  .menu-item .three-price-area{
-    width:164px!important;
-    min-width:164px!important;
-    max-width:164px!important;
-  }
-  .menu-item .three-price-area{
-    grid-template-columns:repeat(3,52px)!important;
-    gap:4px!important;
-  }
-  .menu-item .three-price-cell{width:52px!important;font-size:11px!important}
-}
-@media(max-width:430px){
-  .categoryHeadWithPrices{
-    grid-template-columns:minmax(0,1fr) 141px!important;
-  }
-  .categoryPriceSwitch{
-    width:141px!important;
-    grid-template-columns:repeat(3,45px)!important;
-    gap:3px!important;
-  }
-  .categoryPriceSwitch span{width:45px!important;font-size:8.5px!important}
-  .menu-item .item-main-row{
-    grid-template-columns:minmax(0,1fr) 141px!important;
-    gap:6px!important;
-  }
-  .menu-item .item-price-area,
-  .menu-item .three-price-area{
-    width:141px!important;
-    min-width:141px!important;
-    max-width:141px!important;
-  }
-  .menu-item .three-price-area{
-    grid-template-columns:repeat(3,45px)!important;
-    gap:3px!important;
-  }
-  .menu-item .three-price-cell{width:45px!important;font-size:10.5px!important}
-}
-</style>
 
 
 <style id="freemenu-image-style-v2">
@@ -1453,6 +1164,138 @@ body{
 }
 </style>
 
+
+<style id="freemenu-final-grid-fix">
+/* Equal-height category rows: the blank area between two category cards is filled. */
+#menu-sections{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:14px!important;
+  align-items:stretch!important;
+}
+.category-section{
+  height:100%!important;
+  min-width:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  margin:0!important;
+}
+.category-section .items-list{
+  flex:1 1 auto!important;
+}
+
+/* Exact price ruler shared by category headings and every item. */
+.categoryHeadWithPrices{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 232px!important;
+  align-items:center!important;
+  column-gap:10px!important;
+}
+.categoryPriceSwitch,
+.menu-item .three-price-area{
+  width:232px!important;
+  min-width:232px!important;
+  max-width:232px!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,72px)!important;
+  column-gap:8px!important;
+  justify-self:end!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+}
+.categoryPriceSwitch span,
+.menu-item .three-price-cell{
+  width:72px!important;
+  min-width:72px!important;
+  max-width:72px!important;
+  box-sizing:border-box!important;
+  text-align:center!important;
+}
+.categoryPriceSwitch span{
+  color:#c9bcae!important;
+  font:800 9px/1.2 Arial,sans-serif!important;
+  text-transform:uppercase!important;
+  letter-spacing:.5px!important;
+}
+.menu-item{
+  display:block!important;
+}
+.menu-item .item-content{
+  width:100%!important;
+}
+.menu-item .item-main-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 232px!important;
+  align-items:center!important;
+  column-gap:10px!important;
+  width:100%!important;
+}
+.menu-item .item-info{
+  min-width:0!important;
+}
+.menu-item .item-price-area{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  width:232px!important;
+  min-width:232px!important;
+  max-width:232px!important;
+  justify-self:end!important;
+  align-self:center!important;
+}
+.menu-item .three-price-cell{
+  display:block!important;
+  color:#f2c77e!important;
+  font:900 13px/18px Arial,sans-serif!important;
+  font-variant-numeric:tabular-nums!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+@media(max-width:800px){
+  #menu-sections{grid-template-columns:1fr!important}
+}
+@media(max-width:560px){
+  .categoryHeadWithPrices{
+    grid-template-columns:minmax(0,1fr) 164px!important;
+  }
+  .categoryPriceSwitch,
+  .menu-item .three-price-area{
+    width:164px!important;min-width:164px!important;max-width:164px!important;
+    grid-template-columns:repeat(3,52px)!important;column-gap:4px!important;
+  }
+  .categoryPriceSwitch span,
+  .menu-item .three-price-cell{
+    width:52px!important;min-width:52px!important;max-width:52px!important;
+  }
+  .menu-item .item-main-row{
+    grid-template-columns:minmax(0,1fr) 164px!important;
+  }
+  .menu-item .item-price-area{
+    width:164px!important;min-width:164px!important;max-width:164px!important;
+  }
+}
+@media(max-width:430px){
+  .categoryHeadWithPrices{
+    grid-template-columns:minmax(0,1fr) 141px!important;
+  }
+  .categoryPriceSwitch,
+  .menu-item .three-price-area{
+    width:141px!important;min-width:141px!important;max-width:141px!important;
+    grid-template-columns:repeat(3,45px)!important;column-gap:3px!important;
+  }
+  .categoryPriceSwitch span,
+  .menu-item .three-price-cell{
+    width:45px!important;min-width:45px!important;max-width:45px!important;
+  }
+  .menu-item .item-main-row{
+    grid-template-columns:minmax(0,1fr) 141px!important;
+  }
+  .menu-item .item-price-area{
+    width:141px!important;min-width:141px!important;max-width:141px!important;
+  }
+}
+</style>
+
 </head>
 <body>
   <div class="app-shell">
@@ -1652,15 +1495,15 @@ body{
     }
 
     function renderPrice(item, category) {
-      const val = v => (v !== null && v !== undefined && String(v).trim() !== "") ? String(v).trim() : "";
-      const q = val(item.price_quarter);
-      const h = val(item.price_half);
-      const f = val(item.price_full) || val(item.price);
+      const clean = v => (v !== null && v !== undefined && String(v).trim() !== "") ? String(v).trim() : "";
+      const q = clean(item.price_quarter);
+      const h = clean(item.price_half);
+      const f = clean(item.price_full) || clean(item.price);
 
       return `<div class="three-price-area">
-        <div class="three-price-cell">${q ? "₹" + escapeHTML(q) : ""}</div>
-        <div class="three-price-cell">${h ? "₹" + escapeHTML(h) : ""}</div>
-        <div class="three-price-cell">${f ? "₹" + escapeHTML(f) : ""}</div>
+        <span class="three-price-cell">${q ? "₹" + escapeHTML(q) : ""}</span>
+        <span class="three-price-cell">${h ? "₹" + escapeHTML(h) : ""}</span>
+        <span class="three-price-cell">${f ? "₹" + escapeHTML(f) : ""}</span>
       </div>`;
     }
 
@@ -1795,9 +1638,9 @@ function getSavedCategoryOrder(rest, items) {
             </div>
             <div class="categoryPriceSwitch" aria-label="Prices">
   ${(() => {
-    const hasQ = items.some(x => x.price_quarter !== null && x.price_quarter !== undefined && String(x.price_quarter).trim() !== "");
-    const hasH = items.some(x => x.price_half !== null && x.price_half !== undefined && String(x.price_half).trim() !== "");
-    const hasF = items.some(x => (x.price_full !== null && x.price_full !== undefined && String(x.price_full).trim() !== "") || (x.price !== null && x.price !== undefined && String(x.price).trim() !== ""));
+    const hasQ = items.some(x => String(x.price_quarter ?? "").trim() !== "");
+    const hasH = items.some(x => String(x.price_half ?? "").trim() !== "");
+    const hasF = items.some(x => String(x.price_full ?? x.price ?? "").trim() !== "");
     return `<span>${hasQ ? "Quarter" : ""}</span><span>${hasH ? "Half" : ""}</span><span>${hasF ? "Full" : ""}</span>`;
   })()}
 </div>
