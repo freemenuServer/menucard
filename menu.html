@@ -920,6 +920,90 @@ footer{
 }
 </style>
 
+
+<style id="freemenu-price-ruler-fix">
+:root{
+  --fm-price-col:72px;
+  --fm-price-gap:8px;
+  --fm-price-width:232px;
+}
+
+/* Both heading and every menu row use EXACTLY the same ruler */
+.categoryPriceSwitch,
+.three-price-area{
+  width:var(--fm-price-width)!important;
+  min-width:var(--fm-price-width)!important;
+  max-width:var(--fm-price-width)!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,var(--fm-price-col))!important;
+  column-gap:var(--fm-price-gap)!important;
+  align-items:center!important;
+  justify-content:end!important;
+  margin-left:auto!important;
+  flex:0 0 var(--fm-price-width)!important;
+  box-sizing:border-box!important;
+}
+
+.categoryPriceSwitch span,
+.three-price-cell{
+  width:var(--fm-price-col)!important;
+  min-width:var(--fm-price-col)!important;
+  max-width:var(--fm-price-col)!important;
+  text-align:center!important;
+  box-sizing:border-box!important;
+}
+
+.categoryPriceSwitch span{
+  font-family:Arial,sans-serif!important;
+  font-size:11px!important;
+  line-height:1.2!important;
+  font-weight:800!important;
+  color:#5f554f!important;
+  letter-spacing:.15px!important;
+}
+
+.three-price-cell{
+  font-family:Arial,sans-serif!important;
+  font-size:13px!important;
+  line-height:1.2!important;
+  font-weight:900!important;
+  color:#171412!important;
+  font-variant-numeric:tabular-nums!important;
+}
+
+/* Ensure item text does not push price ruler out of alignment */
+.menu-item,
+.food-item{
+  display:flex!important;
+  align-items:center!important;
+}
+
+.menu-item > :not(.three-price-area),
+.food-item > :not(.three-price-area){
+  min-width:0!important;
+}
+
+@media(max-width:700px){
+  :root{
+    --fm-price-col:52px;
+    --fm-price-gap:4px;
+    --fm-price-width:164px;
+  }
+  .categoryPriceSwitch span{font-size:9px!important;font-weight:800!important}
+  .three-price-cell{font-size:11px!important;font-weight:900!important}
+}
+
+@media(max-width:430px){
+  :root{
+    --fm-price-col:45px;
+    --fm-price-gap:3px;
+    --fm-price-width:141px;
+  }
+  .categoryPriceSwitch span{font-size:8.5px!important}
+  .three-price-cell{font-size:10.5px!important}
+}
+</style>
+
 </head>
 <body>
   <div class="app-shell">
@@ -1131,16 +1215,17 @@ footer{
       const catItems = (allItems || []).filter(x => categoryKey(x.category) === category);
       const hasQuarter = catItems.some(x => x.price_quarter !== null && x.price_quarter !== undefined && x.price_quarter !== "");
       const hasHalf = catItems.some(x => x.price_half !== null && x.price_half !== undefined && x.price_half !== "");
-      const hasFull = catItems.some(x => (x.price_full || x.price) !== null && (x.price_full || x.price) !== undefined && (x.price_full || x.price) !== "");
-      const cols = [];
-      if (hasQuarter) cols.push(["quarter", item.price_quarter]);
-      if (hasHalf) cols.push(["half", item.price_half]);
-      if (hasFull) cols.push(["full", item.price_full || item.price]);
-      return `<div class="three-price-area price-cols-${cols.length}">` +
-        cols.map(([mode, value]) =>
-          `<div class="three-price-cell">${value !== null && value !== undefined && value !== "" ? "₹"+escapeHTML(value) : "—"}</div>`
-        ).join("") +
-        `</div>`;
+      const hasFull = catItems.some(x => (x.price_full ?? x.price) !== null && (x.price_full ?? x.price) !== undefined && (x.price_full ?? x.price) !== "");
+
+      const q = item.price_quarter;
+      const h = item.price_half;
+      const f = item.price_full ?? item.price;
+
+      return `<div class="three-price-area">
+        <div class="three-price-cell">${hasQuarter && q !== null && q !== undefined && q !== "" ? "₹"+escapeHTML(q) : ""}</div>
+        <div class="three-price-cell">${hasHalf && h !== null && h !== undefined && h !== "" ? "₹"+escapeHTML(h) : ""}</div>
+        <div class="three-price-cell">${hasFull && f !== null && f !== undefined && f !== "" ? "₹"+escapeHTML(f) : ""}</div>
+      </div>`;
     }
 
     function renderTags(item) {
@@ -1277,8 +1362,8 @@ function getSavedCategoryOrder(rest, items) {
     const catItems = items || [];
     const q = catItems.some(x => x.price_quarter !== null && x.price_quarter !== undefined && x.price_quarter !== "");
     const h = catItems.some(x => x.price_half !== null && x.price_half !== undefined && x.price_half !== "");
-    const f = catItems.some(x => (x.price_full || x.price) !== null && (x.price_full || x.price) !== undefined && (x.price_full || x.price) !== "");
-    return [q ? "<span>Quarter</span>" : "", h ? "<span>Half</span>" : "", f ? "<span>Full</span>" : ""].join("");
+    const f = catItems.some(x => (x.price_full ?? x.price) !== null && (x.price_full ?? x.price) !== undefined && (x.price_full ?? x.price) !== "");
+    return `<span>${q ? "Quarter" : ""}</span><span>${h ? "Half" : ""}</span><span>${f ? "Full" : ""}</span>`;
   })()}
 </div>
           </div>
