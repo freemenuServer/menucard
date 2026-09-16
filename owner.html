@@ -146,24 +146,6 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .authCombinedForm .loginCard.active{display:block!important}
 @media(max-width:760px){.ownerAuthSplit{grid-template-columns:1fr!important}.freemenu-login-brand{display:block!important;min-height:250px}.freemenu-login-brand-inner{padding:28px}.freemenu-login-brand h1{font-size:36px}.authRightPanel{min-height:auto!important;padding:28px 22px!important}}
 </style>
-
-<style id="freemenu-reorder-style">
-.reorderGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
-.reorderPanel{border:1px solid var(--border);border-radius:12px;background:#fff;padding:14px}
-.reorderPanel h4{margin:0 0 5px;font-size:14px}.reorderHint{font-size:11px;color:var(--muted);margin-bottom:12px}
-.reorderList{display:flex;flex-direction:column;gap:7px;min-height:20px}
-.reorderCat{border:1px solid #e5e7eb;border-radius:10px;background:#fafafa;cursor:grab}
-.reorderCat.dragging,.reorderItem.dragging{opacity:.45}
-.reorderCatHead{display:flex;align-items:center;gap:8px;padding:9px 10px;font-weight:800;font-size:12px}
-.reorderCatHead .dragIcon,.reorderItem .dragIcon{color:#9ca3af}
-.reorderCatItems{padding:0 8px 8px 28px;display:flex;flex-direction:column;gap:5px}
-.reorderItem{display:flex;align-items:center;gap:7px;padding:7px 8px;background:#fff;border:1px solid #edf0f3;border-radius:8px;cursor:grab;font-size:11px}
-.reorderItemName{font-weight:700;flex:1}.reorderItemPrice{color:#6b7280}
-.reorderDrop{outline:2px dashed #cbd5e1;outline-offset:2px}
-.reorderActions{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:12px}
-@media(max-width:760px){.reorderGrid{grid-template-columns:1fr}}
-</style>
-
 </head>
 
 <body>
@@ -518,23 +500,6 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 <section id="section-preview" class="hidden">
   <div class="card" style="max-width:850px;margin:auto">
     <div class="cardTitle">Menu Preview <button class="btn primary sm" id="openPublic2">Open Public Menu</button></div>
-<div class="reorderGrid">
-  <div class="reorderPanel">
-    <h4><i class="fa-solid fa-layer-group"></i> Category Order</h4>
-    <div class="reorderHint">Drag categories up/down. The order will be used on the live public menu.</div>
-    <div id="reorderCategories" class="reorderList"></div>
-  </div>
-  <div class="reorderPanel">
-    <h4><i class="fa-solid fa-up-down"></i> Item Order</h4>
-    <div class="reorderHint">Drag an item only inside its own category. Items cannot move between categories here.</div>
-    <div id="reorderItems" class="reorderList"></div>
-  </div>
-</div>
-<div class="reorderActions">
-  <span id="reorderStatus" class="muted" style="font-size:11px;margin-right:auto">Changes are saved to the menu order.</span>
-  <button class="btn primary sm" id="saveMenuOrder"><i class="fa-solid fa-floppy-disk"></i> Save Menu Order</button>
-</div>
-
     <iframe id="previewFrame" title="Public Menu Preview" style="width:100%;height:700px;border:1px solid var(--border);border-radius:12px;background:#fff"></iframe>
   </div>
 </section>
@@ -638,7 +603,12 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const cleanNum=v=>v!==""&&v!==null&&v!==undefined&&!Number.isNaN(Number(v))?Number(v):null;
 function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),2300)}
 function initials(name){return (name||"Owner").split(/\s+/).slice(0,2).map(x=>x[0]).join("").toUpperCase()}
-function publicUrl(){return new URL("menu.html?r="+encodeURIComponent(currentRestaurant?.slug||""),location.href).href}
+function publicUrl(){
+  const url=new URL("menu.html",location.href);
+  url.searchParams.set("r",currentRestaurant?.slug||"");
+  url.searchParams.set("v",Date.now().toString());
+  return url.href;
+}
 
 /* ---------- Navigation ---------- */
 const sections=["dashboard","restaurant","menu","categories","gallery","qr","preview","analytics","settings","orders","support"];
@@ -900,7 +870,6 @@ function fillProfile(){
   $("fOpenTime").value=r.opening_time??"11:00";
   $("fCloseTime").value=r.closing_time??"23:00";
   $("fCallText").value=r.call_button_text??"Call Restaurant";
-  if(!Array.isArray(r.category_order)) r.category_order=[];
   $("fDineIn").checked=r.dine_in!==false;
   $("fTakeaway").checked=r.takeaway!==false;
   $("fDelivery").checked=r.home_delivery!==false;
@@ -916,7 +885,7 @@ function fillProfile(){
   if(r.cover_url && $("fCover")) $("fCover").value=r.cover_url;
 }
 async function loadItems(){
-  const {data,error}=await supabaseClient.from("menu_items").select("*").eq("restaurant_id",currentRestaurantId);
+  const {data,error}=await supabaseClient.from("menu_items").select("*").eq("restaurant_id",currentRestaurantId).order("id",{ascending:false});
   if(error){toast(error.message);return}
   items=data||[];renderAll();
 }
@@ -933,7 +902,7 @@ function renderAll(){
   fillCategorySelects();
   $("statItems").textContent=items.length;$("statusItems").textContent=items.length;$("aItems").textContent=items.length;
   $("statCats").textContent=categories().length;$("aCats").textContent=categories().length;
-  renderDashboardTable();renderFullTable();renderCategories();renderReorder();
+  renderDashboardTable();renderFullTable();renderCategories();
   $("statViews").textContent="—";
 }
 function typeCell(item){const t=item.item_type||((item.is_veg===false)?"nonveg":"veg");return `<span class="foodType ${t}"></span>`}
@@ -1073,105 +1042,6 @@ $("quickQR").onclick=()=>{showSection("qr");history.replaceState(null,"","#qr")}
 $("copyQR").onclick=async()=>{await navigator.clipboard.writeText(publicUrl());toast("Menu link copied")};
 $("copyMenu").onclick=async()=>{await navigator.clipboard.writeText(publicUrl());toast("Menu link copied")};
 $("downloadQR").onclick=()=>{const a=document.createElement("a");a.href=$("qrBox").querySelector("img").src;a.download=(currentRestaurant.slug||"restaurant")+"-menu-qr.png";a.target="_blank";a.click()};
-
-
-/* ---------- Menu Reorder ---------- */
-function categoryOrderList(){
-  const names = [...new Set(items.map(i => (i.category || "General").trim() || "General"))];
-  const saved = Array.isArray(currentRestaurant?.category_order) ? currentRestaurant.category_order.map(String) : [];
-  const rank = new Map(saved.map((x,i)=>[String(x),i]));
-  return names.sort((a,b)=>{
-    const ar=rank.has(a)?rank.get(a):999999, br=rank.has(b)?rank.get(b):999999;
-    return ar-br || a.localeCompare(b);
-  });
-}
-function itemOrderList(cat){
-  return items.filter(i => ((i.category||"General").trim()||"General")===cat)
-    .slice().sort((a,b)=>{
-      const ao=Number(a.sort_order ?? a.position ?? 999999);
-      const bo=Number(b.sort_order ?? b.position ?? 999999);
-      return ao-bo || String(a.name||"").localeCompare(String(b.name||""));
-    });
-}
-function renderReorder(){
-  const cats=categoryOrderList();
-  const catEl=$("reorderCategories"), itemEl=$("reorderItems");
-  if(!catEl||!itemEl)return;
-  catEl.innerHTML=cats.map((c,i)=>`
-    <div class="reorderCat" draggable="true" data-cat="${esc(c)}">
-      <div class="reorderCatHead"><span class="dragIcon">☷</span><span>${esc(c)}</span><span class="muted" style="margin-left:auto">${items.filter(x=>((x.category||"General").trim()||"General")===c).length}</span></div>
-    </div>`).join("") || '<div class="muted" style="font-size:11px">No categories yet.</div>';
-  itemEl.innerHTML=cats.map(c=>`
-    <div class="reorderCat" data-cat-group="${esc(c)}">
-      <div class="reorderCatHead" style="cursor:default"><span>▾</span><span>${esc(c)}</span></div>
-      <div class="reorderCatItems" data-item-group="${esc(c)}">
-        ${itemOrderList(c).map(i=>`<div class="reorderItem" draggable="true" data-item-id="${i.id}" data-item-cat="${esc(c)}">
-          <span class="dragIcon">☷</span><span class="reorderItemName">${esc(i.name||"Unnamed item")}</span><span class="reorderItemPrice">${esc(priceText(i))}</span>
-        </div>`).join("") || '<div class="muted" style="font-size:10px">No items</div>'}
-      </div>
-    </div>`).join("");
-  bindReorderDrag();
-}
-function bindReorderDrag(){
-  const catList=$("reorderCategories");
-  catList?.querySelectorAll(".reorderCat").forEach(el=>{
-    el.addEventListener("dragstart",e=>{el.classList.add("dragging");e.dataTransfer.effectAllowed="move";});
-    el.addEventListener("dragend",()=>{el.classList.remove("dragging");});
-    el.addEventListener("dragover",e=>{
-      e.preventDefault();
-      const drag=catList.querySelector(".dragging");
-      if(drag&&drag!==el){
-        const rect=el.getBoundingClientRect();
-        catList.insertBefore(drag,e.clientY<rect.top+rect.height/2?el:el.nextSibling);
-      }
-    });
-  });
-  document.querySelectorAll("#reorderItems .reorderCatItems").forEach(group=>{
-    group.addEventListener("dragover",e=>{
-      e.preventDefault();
-      const drag=document.querySelector("#reorderItems .reorderItem.dragging");
-      if(!drag || drag.dataset.itemCat!==group.dataset.itemGroup)return;
-      const siblings=[...group.querySelectorAll(".reorderItem:not(.dragging)")];
-      const before=siblings.find(el=>e.clientY<el.getBoundingClientRect().top+el.getBoundingClientRect().height/2);
-      group.insertBefore(drag,before||null);
-    });
-  });
-  document.querySelectorAll("#reorderItems .reorderItem").forEach(el=>{
-    el.addEventListener("dragstart",e=>{el.classList.add("dragging");e.dataTransfer.effectAllowed="move";});
-    el.addEventListener("dragend",()=>{el.classList.remove("dragging");});
-  });
-}
-async function saveMenuOrder(){
-  if(!currentRestaurantId)return;
-  const catNodes=[...$("reorderCategories").querySelectorAll(".reorderCat")];
-  const category_order=catNodes.map(x=>x.dataset.cat);
-  const updates=[];
-  document.querySelectorAll("#reorderItems .reorderCatItems").forEach(group=>{
-    [...group.querySelectorAll(".reorderItem")].forEach((el,index)=>{
-      updates.push({id:el.dataset.itemId, sort_order:index+1, restaurant_id:currentRestaurantId});
-    });
-  });
-  $("saveMenuOrder").disabled=true;
-  $("reorderStatus").textContent="Saving order...";
-  const restRes=await supabaseClient.from("restaurants").update({category_order}).eq("id",currentRestaurantId);
-  if(restRes.error){
-    $("saveMenuOrder").disabled=false;$("reorderStatus").textContent="Save failed";
-    toast("Category order save failed: "+restRes.error.message);return;
-  }
-  for(const u of updates){
-    const r=await supabaseClient.from("menu_items").update({sort_order:u.sort_order}).eq("id",u.id).eq("restaurant_id",currentRestaurantId);
-    if(r.error){
-      $("saveMenuOrder").disabled=false;$("reorderStatus").textContent="Save failed";
-      toast("Item order save failed: "+r.error.message);return;
-    }
-  }
-  currentRestaurant.category_order=category_order;
-  updates.forEach(u=>{const it=items.find(x=>String(x.id)===String(u.id));if(it)it.sort_order=u.sort_order;});
-  $("saveMenuOrder").disabled=false;$("reorderStatus").textContent="Saved • Live menu order updated";
-  toast("Menu order saved. Public menu will use this order.");
-  renderAll();
-}
-if($("saveMenuOrder")) $("saveMenuOrder").onclick=saveMenuOrder;
 
 /* ---------- Public menu ---------- */
 function openPublic(){window.open(publicUrl(),"_blank","noopener")}
