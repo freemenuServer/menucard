@@ -1005,80 +1005,125 @@ footer{
 </style>
 
 
-<style id="freemenu-price-visible-final">
-.item-main-row{
-  display:flex!important;
-  align-items:center!important;
-  width:100%!important;
-}
-.item-info{
-  flex:1 1 auto!important;
-  min-width:0!important;
-}
-.item-price-area{
-  display:block!important;
-  visibility:visible!important;
-  opacity:1!important;
-  flex:0 0 232px!important;
-  width:232px!important;
-  min-width:232px!important;
-  margin-left:auto!important;
-  position:relative!important;
-  z-index:2!important;
-}
-.three-price-area{
+<style id="freemenu-price-ruler-final">
+.categoryHeadWithPrices{
   display:grid!important;
-  grid-template-columns:repeat(3,72px)!important;
-  gap:8px!important;
-  width:232px!important;
-  min-width:232px!important;
-  margin-left:auto!important;
-  visibility:visible!important;
-  opacity:1!important;
+  grid-template-columns:minmax(0,1fr) 232px!important;
+  align-items:center!important;
+  gap:12px!important;
 }
-.three-price-cell{
-  display:block!important;
-  width:72px!important;
-  min-height:18px!important;
-  text-align:center!important;
-  color:#171412!important;
-  font-family:Arial,sans-serif!important;
-  font-size:13px!important;
-  font-weight:900!important;
-  line-height:18px!important;
-  font-variant-numeric:tabular-nums!important;
-  visibility:visible!important;
-}
-.three-price-cell.empty-price{color:transparent!important}
 .categoryPriceSwitch{
   width:232px!important;
-  min-width:232px!important;
   display:grid!important;
   grid-template-columns:repeat(3,72px)!important;
   gap:8px!important;
-  margin-left:auto!important;
-  text-align:center!important;
+  margin:0!important;
+  justify-self:end!important;
 }
 .categoryPriceSwitch span{
   width:72px!important;
   text-align:center!important;
+  font-family:Arial,sans-serif!important;
+  font-size:11px!important;
   font-weight:800!important;
+  color:#6b6058!important;
 }
+
+.menu-item .item-content{
+  width:100%!important;
+}
+.menu-item .item-main-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 232px!important;
+  align-items:center!important;
+  column-gap:12px!important;
+  width:100%!important;
+}
+.menu-item .item-info{
+  min-width:0!important;
+}
+.menu-item .item-price-area{
+  display:block!important;
+  width:232px!important;
+  min-width:232px!important;
+  max-width:232px!important;
+  visibility:visible!important;
+  opacity:1!important;
+  justify-self:end!important;
+}
+.menu-item .three-price-area{
+  display:grid!important;
+  grid-template-columns:repeat(3,72px)!important;
+  gap:8px!important;
+  width:232px!important;
+  min-width:232px!important;
+  margin:0!important;
+}
+.menu-item .three-price-cell{
+  display:block!important;
+  width:72px!important;
+  min-height:18px!important;
+  text-align:center!important;
+  font-family:Arial,sans-serif!important;
+  font-size:13px!important;
+  font-weight:900!important;
+  line-height:18px!important;
+  color:#171412!important;
+  font-variant-numeric:tabular-nums!important;
+}
+
 @media(max-width:700px){
-  .item-price-area{flex-basis:164px!important;width:164px!important;min-width:164px!important}
-  .three-price-area,.categoryPriceSwitch{
-    width:164px!important;min-width:164px!important;
-    grid-template-columns:repeat(3,52px)!important;gap:4px!important;
+  .categoryHeadWithPrices{
+    grid-template-columns:minmax(0,1fr) 164px!important;
+    gap:8px!important;
   }
-  .three-price-cell,.categoryPriceSwitch span{width:52px!important}
+  .categoryPriceSwitch{
+    width:164px!important;
+    grid-template-columns:repeat(3,52px)!important;
+    gap:4px!important;
+  }
+  .categoryPriceSwitch span{width:52px!important;font-size:9px!important}
+  .menu-item .item-main-row{
+    grid-template-columns:minmax(0,1fr) 164px!important;
+    gap:8px!important;
+  }
+  .menu-item .item-price-area,
+  .menu-item .three-price-area{
+    width:164px!important;
+    min-width:164px!important;
+    max-width:164px!important;
+  }
+  .menu-item .three-price-area{
+    grid-template-columns:repeat(3,52px)!important;
+    gap:4px!important;
+  }
+  .menu-item .three-price-cell{width:52px!important;font-size:11px!important}
 }
 @media(max-width:430px){
-  .item-price-area{flex-basis:141px!important;width:141px!important;min-width:141px!important}
-  .three-price-area,.categoryPriceSwitch{
-    width:141px!important;min-width:141px!important;
-    grid-template-columns:repeat(3,45px)!important;gap:3px!important;
+  .categoryHeadWithPrices{
+    grid-template-columns:minmax(0,1fr) 141px!important;
   }
-  .three-price-cell,.categoryPriceSwitch span{width:45px!important}
+  .categoryPriceSwitch{
+    width:141px!important;
+    grid-template-columns:repeat(3,45px)!important;
+    gap:3px!important;
+  }
+  .categoryPriceSwitch span{width:45px!important;font-size:8.5px!important}
+  .menu-item .item-main-row{
+    grid-template-columns:minmax(0,1fr) 141px!important;
+    gap:6px!important;
+  }
+  .menu-item .item-price-area,
+  .menu-item .three-price-area{
+    width:141px!important;
+    min-width:141px!important;
+    max-width:141px!important;
+  }
+  .menu-item .three-price-area{
+    grid-template-columns:repeat(3,45px)!important;
+    gap:3px!important;
+  }
+  .menu-item .three-price-cell{width:45px!important;font-size:10.5px!important}
 }
 </style>
 
@@ -1290,19 +1335,15 @@ footer{
     }
 
     function renderPrice(item, category) {
-      const catItems = (allItems || []).filter(x => categoryKey(x.category) === category);
-      const getQ = x => x.price_quarter ?? x.quarter ?? x.priceQuarter ?? "";
-      const getH = x => x.price_half ?? x.half ?? x.priceHalf ?? "";
-      const getF = x => x.price_full ?? x.full ?? x.priceFull ?? x.price ?? "";
-      const hasQuarter = catItems.some(x => String(getQ(x)).trim() !== "");
-      const hasHalf = catItems.some(x => String(getH(x)).trim() !== "");
-      const hasFull = catItems.some(x => String(getF(x)).trim() !== "");
+      const val = v => (v !== null && v !== undefined && String(v).trim() !== "") ? String(v).trim() : "";
+      const q = val(item.price_quarter);
+      const h = val(item.price_half);
+      const f = val(item.price_full) || val(item.price);
 
-      const q = getQ(item), h = getH(item), f = getF(item);
       return `<div class="three-price-area">
-        <div class="three-price-cell ${hasQuarter ? "show-price" : "empty-price"}">${hasQuarter && String(q).trim() !== "" ? "₹"+escapeHTML(q) : ""}</div>
-        <div class="three-price-cell ${hasHalf ? "show-price" : "empty-price"}">${hasHalf && String(h).trim() !== "" ? "₹"+escapeHTML(h) : ""}</div>
-        <div class="three-price-cell ${hasFull ? "show-price" : "empty-price"}">${hasFull && String(f).trim() !== "" ? "₹"+escapeHTML(f) : ""}</div>
+        <div class="three-price-cell">${q ? "₹" + escapeHTML(q) : ""}</div>
+        <div class="three-price-cell">${h ? "₹" + escapeHTML(h) : ""}</div>
+        <div class="three-price-cell">${f ? "₹" + escapeHTML(f) : ""}</div>
       </div>`;
     }
 
@@ -1435,13 +1476,12 @@ function getSavedCategoryOrder(rest, items) {
               <h2 class="category-title">${escapeHTML(category)}</h2>
               <span class="item-count">${items.length} item${items.length === 1 ? "" : "s"}</span>
             </div>
-            <div class="categoryPriceSwitch" aria-label="Prices" title="Available portion prices">
+            <div class="categoryPriceSwitch" aria-label="Prices">
   ${(() => {
-    const catItems = items || [];
-    const q = catItems.some(x => x.price_quarter !== null && x.price_quarter !== undefined && x.price_quarter !== "");
-    const h = catItems.some(x => x.price_half !== null && x.price_half !== undefined && x.price_half !== "");
-    const f = catItems.some(x => (x.price_full ?? x.price) !== null && (x.price_full ?? x.price) !== undefined && (x.price_full ?? x.price) !== "");
-    return `<span>${q ? "Quarter" : ""}</span><span>${h ? "Half" : ""}</span><span>${f ? "Full" : ""}</span>`;
+    const hasQ = items.some(x => x.price_quarter !== null && x.price_quarter !== undefined && String(x.price_quarter).trim() !== "");
+    const hasH = items.some(x => x.price_half !== null && x.price_half !== undefined && String(x.price_half).trim() !== "");
+    const hasF = items.some(x => (x.price_full !== null && x.price_full !== undefined && String(x.price_full).trim() !== "") || (x.price !== null && x.price !== undefined && String(x.price).trim() !== ""));
+    return `<span>${hasQ ? "Quarter" : ""}</span><span>${hasH ? "Half" : ""}</span><span>${hasF ? "Full" : ""}</span>`;
   })()}
 </div>
           </div>
