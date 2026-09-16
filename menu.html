@@ -1330,10 +1330,6 @@ body{
             <div id="rest-slogan2"></div>
           </div>
           <div class="restaurant-meta" style="margin-top:11px">
-            <span id="rest-status" class="status-badge">
-              <span class="status-dot"></span>
-              <span>Open</span>
-            </span>
             <span id="rest-address" style="display:none;"></span>
             <a id="rest-phone" href="#" style="display:none;color:inherit;text-decoration:none"></a>
           </div>
@@ -1434,10 +1430,14 @@ body{
       const surface = cssColor(rest.card_color || rest.theme_card, "#ffffff");
       const text = cssColor(rest.text_color || rest.theme_text, "#111827");
 
+      const accent = cssColor(rest.accent_color || rest.theme_accent, "#c8943e");
       root.setProperty("--primary", primary);
       root.setProperty("--primary-dark", primaryDark);
+      root.setProperty("--accent", accent);
+      root.setProperty("--primary-soft", `color-mix(in srgb, ${primary} 10%, white)`);
       root.setProperty("--bg", bg);
       root.setProperty("--surface", surface);
+      root.setProperty("--surface-2", `color-mix(in srgb, ${surface} 92%, ${primary} 8%)`);
       root.setProperty("--text", text);
 
       const radius = Number(rest.card_radius || rest.theme_radius);
