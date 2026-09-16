@@ -114,12 +114,20 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
 
 <style id="freemenu-login-layout">
-#authChoice{grid-template-columns:minmax(300px,1fr) minmax(340px,1fr)!important}
-#ownerLogin{grid-template-columns:minmax(300px,1fr) minmax(340px,1fr)!important}
-#loginScreen{grid-template-columns:minmax(300px,1fr) minmax(340px,1fr)!important}
+.ownerAuthSplit{width:min(920px,96vw)!important;max-height:92vh!important;padding:0!important;overflow:hidden!important;display:grid!important;grid-template-columns:1fr 1fr;gap:0;background:#fff!important}
+.ownerAuthSplit .freemenu-login-brand{display:block!important;min-height:520px}
+.ownerAuthSplit .authRightPanel{padding:42px 42px 38px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.ownerAuthSplit .authRightPanel .authBrand{margin:0 auto 12px}
+.ownerAuthSplit .authRightPanel h1,.ownerAuthSplit .authRightPanel .authSub{text-align:center}
+.ownerAuthSplit .authChoiceGrid{grid-template-columns:1fr 1fr}
+.fm-kicker{font-size:10px;letter-spacing:2px;font-weight:800;color:#e3c271;margin-bottom:8px}
 @media(max-width:760px){
-#authChoice,#ownerLogin,#loginScreen{grid-template-columns:1fr!important}
+.ownerAuthSplit{grid-template-columns:1fr!important;width:min(470px,96vw)!important;overflow:auto!important}
+.ownerAuthSplit .freemenu-login-brand{min-height:250px}
+.ownerAuthSplit .freemenu-login-brand-inner{padding:30px}
+.ownerAuthSplit .authRightPanel{padding:30px 24px}
 }
+@media(max-width:560px){.ownerAuthSplit .authChoiceGrid{grid-template-columns:1fr}}
 </style>
 
 </head>
@@ -131,23 +139,38 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
   <div class="ownerAuthBackdrop"></div>
 
   <!-- FIRST SCREEN: choose Login or Sign Up -->
-  <div class="ownerAuthCard" id="authChoiceCard">
-    <div class="authBrand">🍽</div>
-    <div class="authKicker">FREEMENU • RESTAURANT PARTNER</div>
-    <h1>Restaurant Owner</h1>
-    <p class="authSub">Manage your digital menu, items and restaurant profile</p>
-    <div class="authFeatureBar"><div class="authFeature"><span>🍽️</span><strong>Digital Menu</strong></div><div class="authFeature"><span>📱</span><strong>QR Ready</strong></div><div class="authFeature"><span>⚡</span><strong>Easy Control</strong></div></div>
-    <div class="authChoiceGrid">
-      <button type="button" class="authChoiceBtn" id="openLoginBtn">
-        <span>🔐</span>
-        <b>Login</b>
-        <small>Already have an owner account</small>
-      </button>
-      <button type="button" class="authChoiceBtn" id="openSignupBtn">
-        <span>📝</span>
-        <b>Sign Up</b>
-        <small>Create a new restaurant account</small>
-      </button>
+  <div class="ownerAuthCard ownerAuthSplit" id="authChoiceCard">
+    <div class="freemenu-login-brand">
+      <div class="freemenu-login-brand-inner">
+        <div class="freemenu-login-logo">FM</div>
+        <div class="fm-kicker">RESTAURANT PARTNER</div>
+        <h1>FreeMenu</h1>
+        <p class="fm-tagline">Your restaurant menu, profile, QR and daily menu management — all in one simple owner panel.</p>
+        <div class="freemenu-login-points">
+          <div class="freemenu-login-point"><i class="fa-solid fa-utensils"></i><span>Manage your digital menu</span></div>
+          <div class="freemenu-login-point"><i class="fa-solid fa-qrcode"></i><span>Share your QR menu</span></div>
+          <div class="freemenu-login-point"><i class="fa-solid fa-palette"></i><span>Customize your restaurant theme</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="authRightPanel">
+      <div class="authBrand">🍽</div>
+      <div class="authKicker">FREEMENU • RESTAURANT PARTNER</div>
+      <h1>Restaurant Owner</h1>
+      <p class="authSub">Manage your digital menu, items and restaurant profile</p>
+      <div class="authFeatureBar"><div class="authFeature"><span>🍽️</span><strong>Digital Menu</strong></div><div class="authFeature"><span>📱</span><strong>QR Ready</strong></div><div class="authFeature"><span>⚡</span><strong>Easy Control</strong></div></div>
+      <div class="authChoiceGrid">
+        <button type="button" class="authChoiceBtn" id="openLoginBtn">
+          <span>🔐</span>
+          <b>Login</b>
+          <small>Already have an owner account</small>
+        </button>
+        <button type="button" class="authChoiceBtn" id="openSignupBtn">
+          <span>📝</span>
+          <b>Sign Up</b>
+          <small>Create a new restaurant account</small>
+        </button>
+      </div>
     </div>
   </div>
 
