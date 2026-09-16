@@ -290,15 +290,59 @@ function renderOwners(){
   let list=[...map.values()];
   const s=($('ownerSearch')?.value||'').toLowerCase();
   list=list.filter(p=>`${p.name||''} ${p.full_name||''} ${p.email||''} ${p.phone||p.mobile||''} ${(p.restaurantNames||[]).join(' ')}`.toLowerCase().includes(s));
-  $('ownersTable').innerHTML=`<table class="table"><thead><tr><th>Owner</th><th>Email</th><th>Mobile</th><th>Restaurants</th><th>Status</th><th>Action</th></tr></thead><tbody>${list.map(p=>{
+  $('ownersTable').innerHTML=`<table class="table"><thead><tr><th>Owner</th><th>Email</th><th>Mobile</th><th>Restaurants</th><th>Plan</th><th>Status</th><th>Action</th></tr></thead><tbody>${list.map(p=>{
     const owned=restaurants.filter(r=>String(r.owner_id)===String(p.id));
     const active=owned.filter(r=>statusOf(r)==='active').length;
     const status=p.is_active===false||p.status==='blocked'?'blocked':(owned.length?'active':'no restaurant');
     const displayName=p.name||p.full_name||p.email||'Restaurant Owner';
     const restaurantNames=owned.map(r=>r.name).filter(Boolean).join(', ');
-    return `<tr><td><b>${esc(displayName)}</b><br><small>ID: ${esc(p.id||'—')}</small></td><td>${esc(p.email||'—')}</td><td>${esc(p.phone||p.mobile||'—')}</td><td><b>${owned.length}</b>${active?` <small>(${active} active)</small>`:''}${restaurantNames?`<br><small>${esc(restaurantNames)}</small>`:''}</td><td>${pill(status)}</td><td>${owned.length?`<button class="iconbtn" onclick="viewOwnerRestaurants('${esc(String(p.id))}')">View Restaurants</button>`:'—'}</td></tr>`;
-  }).join('')||'<tr><td colspan="6"><div class="empty">No restaurant owners are linked to any restaurant yet.</div></td></tr>'}</tbody></table>`;
+    return `<tr><td><b>${esc(displayName)}</b><br><small>ID: ${esc(p.id||'—')}</small></td><td>${esc(p.email||p.owner_email||'—')}</td><td>${esc(p.phone||p.mobile||p.owner_phone||'—')}</td><td><b>${owned.length}</b>${active?` <small>(${active} active)</small>`:''}${restaurantNames?`<br><small>${esc(restaurantNames)}</small>`:''}</td><td>${owned.map(r=>pill(String(r.plan||'free'))).join(' ')||pill('free')}</td><td>${pill(status)}</td><td><div class="actions"><button class="iconbtn" onclick="viewOwnerRestaurants('${esc(String(p.id))}')">View Restaurants</button><button class="iconbtn" onclick="openOwnerEdit('${esc(String(p.id))}')">✎ Edit</button></div></td></tr>`;
+  }).join('')||'<tr><td colspan="7"><div class="empty">No restaurant owners are linked to any restaurant yet.</div></td></tr>'}</tbody></table>`;
 }
+
+function openOwnerEdit(ownerId){
+  const owned=restaurants.filter(r=>String(r.owner_id)===String(ownerId));
+  const p=profiles.find(x=>String(x.id)===String(ownerId))||{};
+  const first=owned[0]||{};
+  const email=p.email||p.owner_email||first.owner_email||'';
+  const phone=p.phone||p.mobile||p.owner_phone||first.owner_phone||'';
+  const name=p.name||p.full_name||'';
+  const rows=owned.map(r=>`<div class="field full" style="border:1px solid #e4e7ec;border-radius:12px;padding:12px"><label>${esc(r.name||'Restaurant')} — Plan</label><select class="owner-plan-select" data-rid="${esc(r.id)}"><option value="free" ${String(r.plan||'free').toLowerCase()==='free'?'selected':''}>FREE</option><option value="premium" ${String(r.plan||'free').toLowerCase()==='premium'?'selected':''}>PAID / PREMIUM</option></select></div>`).join('');
+  modal('Edit Restaurant Owner',`<div class="formgrid">
+    <div class="field"><label>Owner Name</label><input id="of_name" value="${esc(name)}" placeholder="Owner name"></div>
+    <div class="field"><label>Email ID</label><input id="of_email" type="email" value="${esc(email)}" placeholder="owner@example.com"><small style="color:#667085">This updates the owner profile/contact email. Supabase Auth login email requires Auth/Admin API or an Edge Function.</small></div>
+    <div class="field"><label>Mobile</label><input id="of_phone" value="${esc(phone)}" placeholder="Mobile number"></div>
+    <div class="field full"><label>Restaurant Plans</label>${rows||'<div class="empty">No restaurants linked to this owner.</div>'}</div>
+  </div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveOwnerEdit('${esc(String(ownerId))}')">Save Changes</button></div>`);
+}
+async function saveOwnerEdit(ownerId){
+  const owned=restaurants.filter(r=>String(r.owner_id)===String(ownerId));
+  const p=profiles.find(x=>String(x.id)===String(ownerId));
+  const name=$('of_name')?.value.trim()||'';
+  const email=$('of_email')?.value.trim()||'';
+  const phone=$('of_phone')?.value.trim()||'';
+  if(p){
+    const payload={};
+    if(Object.prototype.hasOwnProperty.call(p,'name')) payload.name=name;
+    else if(Object.prototype.hasOwnProperty.call(p,'full_name')) payload.full_name=name;
+    if(Object.prototype.hasOwnProperty.call(p,'email')) payload.email=email;
+    if(Object.prototype.hasOwnProperty.call(p,'phone')) payload.phone=phone;
+    else if(Object.prototype.hasOwnProperty.call(p,'mobile')) payload.mobile=phone;
+    if(Object.keys(payload).length){const pr=await db.from('profiles').update(payload).eq('id',ownerId);if(pr.error)return toast(pr.error.message)}
+  }
+  for(const r of owned){
+    const sel=document.querySelector(`.owner-plan-select[data-rid="${CSS.escape(String(r.id))}"]`);
+    const payload={plan:sel?.value||String(r.plan||'free').toLowerCase()};
+    if(!p){ if(email) payload.owner_email=email; if(phone) payload.owner_phone=phone; }
+    else if(Object.prototype.hasOwnProperty.call(r,'owner_email') && email) payload.owner_email=email;
+    else if(Object.prototype.hasOwnProperty.call(r,'owner_email') && !email) payload.owner_email=null;
+    if(Object.prototype.hasOwnProperty.call(r,'owner_phone') && phone) payload.owner_phone=phone;
+    const rr=await db.from('restaurants').update(payload).eq('id',r.id);
+    if(rr.error)return toast(`Could not update ${r.name}: ${rr.error.message}`);
+  }
+  await logAction('Updated restaurant owner and plan settings',owned[0]?.id||null);closeModal();toast('Owner details and plans updated');await loadAll();showPage('owners');
+}
+
 function viewOwnerRestaurants(ownerId){showPage('restaurants');const el=$('restaurantOwnerFilter');if(el){el.value=ownerId;renderRestaurantPage();}}
 $('ownerSearch')?.addEventListener('input',renderOwners);$('restaurantSearch')?.addEventListener('input',renderRestaurantPage);$('restaurantStatus')?.addEventListener('change',renderRestaurantPage);$('restaurantOwnerFilter')?.addEventListener('change',renderRestaurantPage);
 function renderSubscriptions(){$('subsTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Plan</th><th>Status</th><th>Amount</th><th>Start</th><th>Expiry</th></tr></thead><tbody>${subscriptions.map(s=>{const r=restaurants.find(x=>x.id===s.restaurant_id);return `<tr><td>${esc(r?.name||s.restaurant_id)}</td><td>${esc(s.plan||'free')}</td><td>${pill(s.status||'pending')}</td><td>₹${Number(s.amount||0).toLocaleString('en-IN')}</td><td>${fmt(s.start_date)}</td><td>${fmt(s.expiry_date)}</td></tr>`}).join('')||'<tr><td colspan="6"><div class="empty">No subscriptions table/data yet.</div></td></tr>'}</tbody></table>`}
