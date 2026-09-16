@@ -325,7 +325,7 @@ function openOwnerEdit(ownerId){
   const rows=owned.map(r=>`<div class="field full" style="border:1px solid #e4e7ec;border-radius:12px;padding:12px"><label>${esc(r.name||'Restaurant')} — Plan</label><select class="owner-plan-select" data-rid="${esc(r.id)}"><option value="free" ${String(r.plan||'free').toLowerCase()==='free'?'selected':''}>FREE</option><option value="premium" ${String(r.plan||'free').toLowerCase()==='premium'?'selected':''}>PAID / PREMIUM</option></select></div>`).join('');
   modal('Edit Restaurant Owner',`<div class="formgrid">
     <div class="field"><label>Owner Name</label><input id="of_name" value="${esc(name)}" placeholder="Owner name"></div>
-    <div class="field"><label>Email ID</label><input id="of_email" type="email" value="${esc(email)}" placeholder="owner@example.com"><small style="color:#667085">This updates the owner profile/contact email. Supabase Auth login email requires Auth/Admin API or an Edge Function.</small></div>
+    <div class="field"><label>Email ID</label><input id="of_email" readonly type="email" value="${esc(email)}" placeholder="owner@example.com"><small style="color:#667085">This updates the owner profile/contact email. Supabase Auth login email requires Auth/Admin API or an Edge Function.</small></div>
     <div class="field"><label>Mobile</label><input id="of_phone" value="${esc(phone)}" placeholder="Mobile number"></div>
     <div class="field full"><label>Restaurant Plans</label>${rows||'<div class="empty">No restaurants linked to this owner.</div>'}</div>
   </div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveOwnerEdit('${esc(String(ownerId))}')">Save Changes</button></div>`);
@@ -340,18 +340,16 @@ async function saveOwnerEdit(ownerId){
     const payload={};
     if(Object.prototype.hasOwnProperty.call(p,'name')) payload.name=name;
     else if(Object.prototype.hasOwnProperty.call(p,'full_name')) payload.full_name=name;
-    if(Object.prototype.hasOwnProperty.call(p,'email')) payload.email=email;
     if(Object.prototype.hasOwnProperty.call(p,'phone')) payload.phone=phone;
     else if(Object.prototype.hasOwnProperty.call(p,'mobile')) payload.mobile=phone;
     if(Object.keys(payload).length){const pr=await db.from('profiles').update(payload).eq('id',ownerId);if(pr.error)return toast(pr.error.message)}
   }
   for(const r of owned){
     const sel=document.querySelector(`.owner-plan-select[data-rid="${CSS.escape(String(r.id))}"]`);
+    // Restaurant owner identity is linked by owner_id. Do not write owner_email/owner_phone
+    // into restaurants because those columns are not part of the restaurant schema.
+    // Auth email is read securely through admin_get_owner_emails().
     const payload={plan:sel?.value||String(r.plan||'free').toLowerCase()};
-    if(!p){ if(email) payload.owner_email=email; if(phone) payload.owner_phone=phone; }
-    else if(Object.prototype.hasOwnProperty.call(r,'owner_email') && email) payload.owner_email=email;
-    else if(Object.prototype.hasOwnProperty.call(r,'owner_email') && !email) payload.owner_email=null;
-    if(Object.prototype.hasOwnProperty.call(r,'owner_phone') && phone) payload.owner_phone=phone;
     const rr=await db.from('restaurants').update(payload).eq('id',r.id);
     if(rr.error)return toast(`Could not update ${r.name}: ${rr.error.message}`);
   }
