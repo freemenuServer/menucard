@@ -1335,6 +1335,7 @@ body{
               <span>Open</span>
             </span>
             <span id="rest-address" style="display:none;"></span>
+            <a id="rest-phone" href="#" style="display:none;color:inherit;text-decoration:none"></a>
           </div>
         </div>
 
@@ -1696,11 +1697,6 @@ function getSavedCategoryOrder(rest, items) {
           ? `<img src="${escapeHTML(logoUrl)}" alt="" onerror="this.parentElement.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/></svg>'" />`
           : `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/></svg>`;
       }
-      const contactLink=null;
-      if(contactLink && rest.phone){
-        const phone=String(rest.phone).replace(/[^+\d]/g,"");
-        contactLink.href=`tel:${phone}`;
-      }
 
       const coverUrl = safeUrl(rest.banner_url || rest.cover_url || rest.cover_image);
       const dummyBanner = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
@@ -1716,19 +1712,39 @@ function getSavedCategoryOrder(rest, items) {
       $("rest-cover").src = coverUrl || dummyBanner;
       $("rest-cover").style.display = "block";
 
-      if (rest.phone) {
-        const phone = String(rest.phone).replace(/[^+\d]/g, "");
-        $("rest-call-btn").href = `tel:${phone}`;
-        $("rest-call-btn").style.display = "grid";
-        const callText = rest.call_button_text || "Call Restaurant";
-        $("rest-call-btn").setAttribute("aria-label", callText);
-        $("rest-call-btn").title = callText;
+      // Contact details: show only values actually available in Supabase.
+      const phoneEl = $("rest-phone");
+      const phoneRaw = rest.phone == null ? "" : String(rest.phone).trim();
+      if (phoneEl && phoneRaw) {
+        const phone = phoneRaw.replace(/[^+\d]/g, "");
+        phoneEl.href = `tel:${phone}`;
+        phoneEl.textContent = `• ${phoneRaw}`;
+        phoneEl.style.display = "inline";
+      } else if (phoneEl) {
+        phoneEl.style.display = "none";
+        phoneEl.textContent = "";
       }
 
-      const address = rest.address || rest.location || rest.city;
-      if (address) {
-        $("rest-address").textContent = `• ${address}`;
-        $("rest-address").style.display = "inline";
+      const callBtn = $("rest-call-btn");
+      if (callBtn && phoneRaw) {
+        const phone = phoneRaw.replace(/[^+\d]/g, "");
+        callBtn.href = `tel:${phone}`;
+        callBtn.style.display = "grid";
+        const callText = rest.call_button_text ? String(rest.call_button_text).trim() : "";
+        callBtn.setAttribute("aria-label", callText || "Call restaurant");
+        callBtn.title = callText || phoneRaw;
+      } else if (callBtn) {
+        callBtn.style.display = "none";
+      }
+
+      const address = rest.address == null ? "" : String(rest.address).trim();
+      const addressEl = $("rest-address");
+      if (addressEl && address) {
+        addressEl.textContent = `• ${address}`;
+        addressEl.style.display = "inline";
+      } else if (addressEl) {
+        addressEl.style.display = "none";
+        addressEl.textContent = "";
       }
 
       const isOpen = rest.is_open !== false && rest.status !== "closed" && rest.is_active !== false;
