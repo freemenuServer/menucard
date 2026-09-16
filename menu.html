@@ -1296,6 +1296,12 @@ body{
 }
 </style>
 
+
+<style id="freemenu-ads-style">
+.fm-ad-wrap{grid-column:1/-1;display:flex;justify-content:center;align-items:center;min-height:90px;margin:2px 0 14px;padding:8px 0;overflow:hidden}
+.fm-ad-wrap ins{display:block;max-width:100%;width:100%;min-height:50px}
+@media(max-width:800px){.fm-ad-wrap{min-height:70px;margin-bottom:10px}}
+</style>
 </head>
 <body>
   <div class="app-shell">
@@ -1628,9 +1634,11 @@ function getSavedCategoryOrder(rest, items) {
         return;
       }
 
-      $("menu-sections").innerHTML = orderedCategories.filter(category => grouped[category]).map(category => {
+      const visibleCategories = orderedCategories.filter(category => grouped[category]);
+      const parts = [];
+      visibleCategories.forEach((category, categoryIndex) => {
         const items = grouped[category];
-        return `
+        parts.push(`
         <section class="category-section" id="${sectionId(category)}" data-category="${escapeHTML(category)}">
           <div class="category-heading categoryHeadWithPrices">
             <div style="display:flex;align-items:center;gap:9px;min-width:0">
@@ -1650,7 +1658,13 @@ function getSavedCategoryOrder(rest, items) {
             ${items.map(renderItem).join("")}
           </div>
         </section>
-      `}).join("");
+      `);
+        // Put one responsive ad after every two menu categories.
+        if (fmAdConfig && categoryIndex < visibleCategories.length - 1 && ((fmAdConfig.position === "after_1_category") || (fmAdConfig.position !== "after_1_category" && (categoryIndex + 1) % 2 === 0))) {
+          parts.push(renderMenuAd());
+        }
+      });
+      $("menu-sections").innerHTML = parts.join("");
     }
 
     function renderRestaurant(rest) {
@@ -1779,6 +1793,97 @@ function getSavedCategoryOrder(rest, items) {
       if($("svc-delivery")) $("svc-delivery").style.display=rest.home_delivery===false?"none":"inline-flex";
     }
 
+    // ==================== FreeMenu Google AdSense ====================
+    // Super Admin controls these values in platform_settings.
+    // No arbitrary HTML is accepted from the admin panel.
+    let fmAdConfig = null;
+
+    function fmSettingValue(rows, key, fallback = "") {
+      const row = (rows || []).find(x => x.key === key);
+      return row ? row.value : fallback;
+    }
+
+    function fmBool(value, fallback = false) {
+      if (value === true || value === false) return value;
+      if (value == null || value === "") return fallback;
+      return String(value).toLowerCase() === "true";
+    }
+
+    async function loadFreeMenuAdConfig(rest) {
+      try {
+        const settingsResult = await supabaseClient
+          .from("platform_settings")
+          .select("key,value")
+          .in("key", ["adsense_client_id", "ads_default_slot", "free_plan_ads", "premium_plan_ads", "ads_position"]);
+
+        if (settingsResult.error) {
+          console.warn("Ad settings unavailable; ads hidden.", settingsResult.error.message);
+          return null;
+        }
+
+        const rows = settingsResult.data || [];
+        const client = String(fmSettingValue(rows, "adsense_client_id", "")).trim();
+        const slot = String(fmSettingValue(rows, "ads_default_slot", "")).trim();
+        const freeAds = fmBool(fmSettingValue(rows, "free_plan_ads", true), true);
+        const premiumAds = fmBool(fmSettingValue(rows, "premium_plan_ads", false), false);
+        const plan = String(rest.plan || "free").toLowerCase();
+
+        // If restaurant is premium and its subscription table is available,
+        // require an active premium subscription before suppressing ads.
+        let activePremium = false;
+        const subResult = await supabaseClient
+          .from("subscriptions")
+          .select("plan,status,expiry_date")
+          .eq("restaurant_id", rest.id)
+          .eq("status", "active");
+
+        if (!subResult.error && Array.isArray(subResult.data)) {
+          activePremium = subResult.data.some(s => {
+            if (String(s.plan || "").toLowerCase() !== "premium") return false;
+            if (!s.expiry_date) return true;
+            const expiry = new Date(s.expiry_date);
+            return Number.isNaN(expiry.getTime()) || expiry >= new Date();
+          });
+        }
+
+        const shouldShow = activePremium ? premiumAds : (plan === "premium" ? premiumAds : freeAds);
+        if (!shouldShow) return null;
+        if (!/^ca-pub-\d{6,}$/.test(client) || !/^\d{4,}$/.test(slot)) return null;
+        return { client, slot, position: String(fmSettingValue(rows, "ads_position", "after_2_categories")) };
+      } catch (e) {
+        console.warn("Ad configuration error; ads hidden.", e);
+        return null;
+      }
+    }
+
+    function ensureAdSenseScript(client) {
+      if (!client || document.querySelector('script[data-freemenu-adsense="1"]')) return;
+      const script = document.createElement("script");
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" + encodeURIComponent(client);
+      script.setAttribute("data-freemenu-adsense", "1");
+      document.head.appendChild(script);
+    }
+
+    function renderMenuAd() {
+      if (!fmAdConfig) return "";
+      const id = "fm-ad-" + Math.random().toString(36).slice(2, 9);
+      setTimeout(() => {
+        const wrap = document.getElementById(id);
+        if (!wrap) return;
+        const ins = wrap.querySelector("ins");
+        if (!ins) return;
+        ins.setAttribute("data-ad-client", fmAdConfig.client);
+        ins.setAttribute("data-ad-slot", fmAdConfig.slot);
+        ins.setAttribute("data-ad-format", "auto");
+        ins.setAttribute("data-full-width-responsive", "true");
+        try { (window.adsbygoogle = window.adsbygoogle || []).push({}); }
+        catch (e) { console.warn("AdSense render skipped", e); }
+      }, 50);
+      return `<div id="${id}" class="fm-ad-wrap" aria-label="Advertisement"><ins class="adsbygoogle"></ins></div>`;
+    }
+
     async function loadPublicMenu() {
       showLoading();
 
@@ -1802,6 +1907,8 @@ function getSavedCategoryOrder(rest, items) {
 
         const rest = restaurants[0];
         renderRestaurant(rest);
+        fmAdConfig = await loadFreeMenuAdConfig(rest);
+        if (fmAdConfig) ensureAdSenseScript(fmAdConfig.client);
 
         const { data: items, error: itemsError } = await supabaseClient
           .from("menu_items")
