@@ -211,7 +211,6 @@ async function loadAll(){
  menuItems=await q('menu_items')||[];
  profiles=await q('profiles')||[];
  subscriptions=await q('subscriptions')||[];
- await loadOwnerEmails();
  await loadOwnerEmails(); updateStats();renderDashboardTable();renderCities();renderPopularCats();renderActivity();populateRestaurantFilters();renderRestaurantPage();renderMenu();renderCategories();renderApprovals();renderSubscriptions();renderOwners();renderAdmins();renderLogs();renderAnalytics();loadSettings();loadAdSettings();loadMediaRules();
 }
 function statusOf(r){return String(r.status|| (r.is_active===false?'blocked':r.is_active===true?'active':'active')).toLowerCase()}
@@ -228,11 +227,17 @@ async function openOwnerAsAdmin(restaurantId){
     const {data,error}=await db.auth.getSession();
     if(error||!data?.session) return toast('Super Admin session expired. Please login again.');
     localStorage.setItem('fm_admin_return_url', location.href);
-    // Keep a same-origin handoff marker as a fallback in case the host strips query parameters.
-    localStorage.setItem('fm_admin_preview_restaurant', String(restaurantId));
-    localStorage.setItem('fm_admin_preview_ts', String(Date.now()));
-    const base=new URL("owner.html", location.href); base.searchParams.set("admin_preview","1"); base.searchParams.set("restaurant_id",restaurantId); const url=base.href;
-    window.location.assign(url);
+    // Create a short-lived server-side handoff token. This avoids depending on the
+    // owner page being able to restore the Supabase session immediately.
+    const {data:token,error:tokenError}=await db.rpc('admin_create_owner_preview_token',{p_restaurant_id:restaurantId});
+    if(tokenError || !token) return toast('Admin preview token failed: '+(tokenError?.message||'RPC not available'));
+    const previewToken=typeof token==='string'?token:(token?.token||token?.[0]?.token||'');
+    if(!previewToken) return toast('Admin preview token was empty.');
+    sessionStorage.setItem('fm_admin_preview_token',previewToken);
+    const base=new URL('owner.html', location.href);
+    base.searchParams.set('admin_preview','1');
+    base.searchParams.set('preview_token',previewToken);
+    window.location.assign(base.href);
   }catch(e){ toast(e?.message||'Unable to open Owner Panel'); }
 }
 
