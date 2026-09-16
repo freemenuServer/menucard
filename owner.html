@@ -774,8 +774,13 @@ async function init(afterLogin=false){
     ]);
     session=result?.data?.session||null;
     const params=new URLSearchParams(location.search);
-    const previewId=params.get("restaurant_id");
-    isAdminPreview=params.get("admin_preview")==="1" && !!previewId;
+    let previewId=params.get("restaurant_id");
+    // Same-origin fallback set by Super Admin before opening this page.
+    // It is only a hint; the server-side RPC below still verifies the current user is an admin.
+    const handoffId=localStorage.getItem("fm_admin_preview_restaurant");
+    const handoffTs=Number(localStorage.getItem("fm_admin_preview_ts")||0);
+    if(!previewId && handoffId && handoffTs && (Date.now()-handoffTs)<5*60*1000) previewId=handoffId;
+    isAdminPreview=!!previewId && (params.get("admin_preview")==="1" || !!handoffId);
 
     if(!session?.user){
       showAuthChoice();
@@ -803,6 +808,8 @@ async function init(afterLogin=false){
       }
       currentRestaurant=previewRows[0];
       currentRestaurantId=currentRestaurant.id;
+      localStorage.removeItem("fm_admin_preview_restaurant");
+      localStorage.removeItem("fm_admin_preview_ts");
       if($("accountEmail")) $("accountEmail").value=session.user.email||"";
       if($("ownerName")) $("ownerName").textContent="Admin Preview";
       if($("avatar")) $("avatar").textContent="AD";
