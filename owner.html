@@ -2,1187 +2,290 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Owner Dashboard — Digital Menu</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>FreeMenu — Owner Panel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{
- --navy:#101827;--navy2:#172235;--primary:#b51d3b;--primary-dark:#89142b;
- --pink:#f52f72;--bg:#f6f7fb;--card:#fff;--text:#111827;--muted:#697386;
- --border:#e5e7eb;--green:#13a66b;--danger:#e5484d;--blue:#3283e8;
- --shadow:0 8px 25px rgba(15,23,42,.06);--radius:14px;
-}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif}
-button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoration:none;color:inherit}
-.hidden{display:none!important}.muted{color:var(--muted)}
-#loader{position:fixed;inset:0;background:#f6f7fb;display:grid;place-items:center;z-index:9999}
-.loader-card{text-align:center}.spinner{width:42px;height:42px;border:4px solid #ddd;border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:auto}@keyframes spin{to{transform:rotate(360deg)}}
-
-/* Layout */
-.app{min-height:100vh}.sidebar{position:fixed;left:0;top:0;bottom:0;width:238px;background:linear-gradient(180deg,#0d1624,#121b2b);color:#dce4f0;padding:22px 14px;z-index:100;overflow:auto}
-.logoArea{text-align:center;padding:5px 8px 22px}.chefLogo{font-size:32px;color:#f5bf47}.sideBrand{font-family:"Cormorant Garamond",serif;font-size:25px;font-weight:700;color:#fff}.sideSub{font-size:10px;letter-spacing:1.5px;color:#aab5c7}
-.navItem{display:flex;align-items:center;gap:13px;padding:12px 13px;margin:4px 0;border-radius:8px;font-size:13px;font-weight:600;color:#bdc8d9}
-.navItem i{width:19px;text-align:center}.navItem:hover{background:#1c2a40;color:#fff}.navItem.active{background:linear-gradient(90deg,#8f1831,#b51d3b);color:#fff;box-shadow:0 6px 18px rgba(181,29,59,.2)}
-.sidePromo{margin:24px 0 0;padding:20px 12px;border:1px solid rgba(255,255,255,.13);border-radius:10px;background:linear-gradient(145deg,#242039,#321f3a);text-align:center}
-.sidePromo i{color:#ffd34f;font-size:24px}.sidePromo strong{display:block;margin:8px 0 5px}.sidePromo p{font-size:11px;color:#c7c9d5;line-height:1.5;margin:0 0 12px}
-.btn-pink{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:0;background:#f32f72;color:#fff;border-radius:8px;padding:10px 12px;font-weight:800;font-size:12px;width:100%}
-.content{margin-left:238px;min-height:100vh}.topbar{height:78px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 25px;position:sticky;top:0;z-index:80}
-.restIdentity{display:flex;align-items:center;gap:12px}.restLogo{width:44px;height:44px;border-radius:50%;object-fit:cover;border:1px solid #ddd;background:#eee}.restTitle{font-size:17px;font-weight:800}.restAddress{font-size:11px;color:var(--muted);margin-top:2px}.topActions{display:flex;align-items:center;gap:12px}.openToggle{display:flex;align-items:center;gap:8px;background:#dff7ea;color:#087443;border:0;border-radius:20px;padding:9px 14px;font-size:12px;font-weight:800}.profile{display:flex;align-items:center;gap:9px;padding-left:13px;border-left:1px solid var(--border)}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#d91f35;color:#fff;font-weight:800}
-.container{max-width:1200px;margin:auto;padding:22px 20px 45px}.mobileMenu{display:none}
-
-/* Cards / common */
-.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}.cardTitle{font-size:16px;font-weight:800;margin:0 0 15px;display:flex;align-items:center;justify-content:space-between;gap:10px}.cardTitle small{font-size:11px;color:var(--muted);font-weight:500}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.stat{padding:17px;border-radius:12px;border:1px solid var(--border);background:#fff;box-shadow:var(--shadow);min-height:105px}.statTop{display:flex;justify-content:space-between;align-items:center}.statIcon{width:39px;height:39px;border-radius:10px;display:grid;place-items:center;background:#edf4ff;color:#287be0}.stat:nth-child(2) .statIcon{background:#fff0fa;color:#df2d8a}.stat:nth-child(3) .statIcon{background:#e9fbf5;color:#12a36b}.stat:nth-child(4) .statIcon{background:#f4edff;color:#8238d5}.statLabel{font-size:11px;margin-top:10px}.statValue{font-size:24px;font-weight:800;margin-top:2px}.statChange{font-size:10px;color:var(--green);font-weight:700}
-.twoCol{display:grid;grid-template-columns:1.15fr .85fr;gap:15px;margin-top:15px}.twoCol.equal{grid-template-columns:1fr 1fr}.threeCol{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
-.btn{border:1px solid var(--border);background:#fff;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:800;color:#263244}.btn:hover{background:#f8fafc}.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}.btn.danger{color:var(--danger);background:#fff1f1;border-color:#ffd0d0}.btn.blue{color:#1671d8;background:#edf6ff;border-color:#cde5ff}.btn.green{color:#087443;background:#e8faef;border-color:#bdeccf}.btn.sm{padding:7px 9px;font-size:11px}.actions{display:flex;gap:7px;flex-wrap:wrap}
-.formGroup{margin-bottom:13px}.formGroup label{display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px}.input,.select,.textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 11px;background:#fff;color:#172033;outline:none;font-size:13px}.textarea{min-height:82px;resize:vertical}.input:focus,.select:focus,.textarea:focus{border-color:#b7a0a5;box-shadow:0 0 0 3px rgba(181,29,59,.06)}
-.uploadRow{display:flex;gap:7px}.uploadRow .input{flex:1}.fileBtn{border:1px solid var(--border);background:#f5f7fa;border-radius:8px;padding:9px 11px;font-size:11px;font-weight:800;white-space:nowrap}
-.profileBox{display:grid;grid-template-columns:145px 1fr;gap:20px;align-items:center}.bigLogo{width:140px;height:140px;border-radius:50%;object-fit:cover;background:#f3f4f6;border:1px solid var(--border)}
-.mediaCover{height:180px;border-radius:11px;background:#e9e5df center/cover no-repeat;position:relative;overflow:hidden}.mediaCover .overlay{position:absolute;inset:auto 10px 10px auto;background:#fff;border-radius:8px;padding:8px 10px;font-size:11px;font-weight:800}.mediaTiles{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:9px}.mediaTile{height:105px;border-radius:10px;background:#f2eee8 center/cover no-repeat;display:flex;align-items:flex-end;justify-content:center;padding:7px}.mediaTile span{background:#fff;border-radius:6px;padding:6px 7px;font-size:9px;font-weight:800}
-.serviceBtns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:15px}.serviceBtn{border:1px solid var(--border);background:#fff;border-radius:9px;padding:10px;font-size:11px;font-weight:700}.serviceBtn i{margin-right:5px}
-
-/* Menu */
-.menuToolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.menuToolbar .input{max-width:260px}.menuTable{width:100%;border-collapse:collapse;font-size:12px}.menuTable th{text-align:left;color:#6b7280;font-size:10px;text-transform:uppercase;padding:9px 6px;border-bottom:1px solid var(--border)}.menuTable td{padding:10px 6px;border-bottom:1px solid #eef0f3;vertical-align:middle}.menuTable tr:last-child td{border-bottom:0}.foodName{font-weight:800}.foodCat{font-size:10px;color:var(--muted);margin-top:2px}.foodType{display:inline-grid;place-items:center;width:16px;height:16px;border:1.5px solid #19a45a;border-radius:3px}.foodType.nv{border-color:#d93838}.foodType.nv:after{content:"";border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:7px solid #d93838}.foodType.veg:after{content:"";width:6px;height:6px;background:#19a45a;border-radius:50%}.foodType.egg{border-color:#d98b17}.foodType.egg:after{content:"";width:6px;height:6px;background:#d98b17;border-radius:50%}.pricesMini{white-space:nowrap;font-weight:700}.switch{width:38px;height:21px;background:#cbd5e1;border-radius:20px;padding:2px;border:0}.switch:after{content:"";display:block;width:17px;height:17px;border-radius:50%;background:#fff;transition:.2s}.switch.on{background:#17aa6b}.switch.on:after{transform:translateX(17px)}.statusToggle{display:inline-flex;align-items:center;gap:7px;border:0;background:transparent;padding:0;font-size:10px;font-weight:800}.statusToggle .statusText{min-width:30px;text-align:left}.statusToggle.off .statusText{color:#b45309}.statusToggle.on .statusText{color:#087443}.categoryCards{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.categoryCard{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff}.catImage{height:80px;background:#eee center/cover}.catBody{padding:9px}.catName{font-weight:800;font-size:12px}.catCount{font-size:10px;color:var(--muted);margin-top:3px}
-
-/* Quick actions */
-.quickGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.quick{padding:14px;border-radius:10px;border:1px solid var(--border);display:flex;gap:12px;align-items:center}.quick i{font-size:20px;color:var(--green)}.quick strong{font-size:12px}.quick small{display:block;font-size:10px;color:var(--muted);margin-top:3px}
-
-/* Modal */
-.modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;padding:18px;z-index:300}.modal.show{display:flex}.modalBox{background:#fff;border-radius:16px;width:min(650px,100%);max-height:90vh;overflow:auto;padding:20px}.modalHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.modalHead h3{margin:0;font-size:17px}.close{border:0;background:#f1f3f5;border-radius:8px;width:32px;height:32px}
-.previewFrame{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff}.previewTop{height:120px;background:linear-gradient(135deg,#461016,#9d2535);color:#fff;padding:25px}.previewTop strong{font-family:"Cormorant Garamond",serif;font-size:31px}.themeGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.colorField{display:flex;align-items:center;gap:8px;border:1px solid var(--border);padding:8px;border-radius:8px}.colorField input{width:38px;height:30px;padding:0;border:0;background:none}.colorField span{font-size:11px;font-weight:700}
-
-/* Toast */
-#toast{position:fixed;bottom:22px;right:22px;background:#172033;color:#fff;padding:11px 15px;border-radius:9px;font-size:12px;font-weight:700;opacity:0;transform:translateY(15px);transition:.25s;z-index:500}#toast.show{opacity:1;transform:none}
-
-/* Responsive */
-@media(max-width:1050px){.grid4{grid-template-columns:repeat(2,1fr)}.twoCol,.twoCol.equal{grid-template-columns:1fr}.sidebar{width:205px}.content{margin-left:205px}.profileBox{grid-template-columns:110px 1fr}.bigLogo{width:105px;height:105px}}
-@media(max-width:760px){
- .sidebar{transform:translateX(-100%);transition:.25s;width:250px}.sidebar.open{transform:none}.content{margin-left:0}.topbar{height:66px;padding:0 12px}.mobileMenu{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--border);background:#fff;border-radius:8px}.topActions .openToggle{display:none}.profile .profileName{display:none}.container{padding:15px 11px 35px}.grid4{grid-template-columns:1fr 1fr;gap:9px}.stat{padding:13px;min-height:94px}.statValue{font-size:20px}.threeCol,.categoryCards{grid-template-columns:1fr}.profileBox{grid-template-columns:1fr;text-align:center}.bigLogo{margin:auto}.mediaCover{height:150px}.menuTable{min-width:700px}.menuTableWrap{overflow:auto}.quickGrid{grid-template-columns:1fr}.heroHideMobile{display:none}}
-@media(max-width:430px){.grid4{grid-template-columns:1fr 1fr}.statLabel{font-size:9px}.statValue{font-size:18px}.restTitle{font-size:14px}.restAddress{font-size:9px}}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:#f5f6f8;color:#202124}
+button,input,textarea,select{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.auth-wrap{min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#17090b,#641219 55%,#a52a36)}
+.auth-card{width:min(980px,100%);display:grid;grid-template-columns:1fr 1fr;background:#fff;border-radius:28px;overflow:hidden;box-shadow:0 25px 80px #0005}
+.auth-brand{padding:55px;color:#fff;background:linear-gradient(150deg,#641219,#30090d);display:flex;flex-direction:column;justify-content:center}
+.logo{width:58px;height:58px;border-radius:17px;background:#d8ad62;color:#2b1012;display:grid;place-items:center;font-size:25px;font-weight:800;margin-bottom:22px}
+.auth-brand h1{font-size:42px;margin:0 0 12px}.auth-brand p{color:#eadfe0;line-height:1.7}.auth-points{margin-top:25px;display:grid;gap:14px}.auth-points div{display:flex;gap:12px;align-items:center}.auth-points i{color:#d8ad62}
+.auth-form{padding:45px}.tabs{display:flex;background:#f3f4f6;border-radius:12px;padding:4px;margin-bottom:28px}.tabs button{flex:1;border:0;background:transparent;padding:12px;border-radius:9px;font-weight:700}.tabs button.active{background:#641219;color:#fff}
+.form-group{margin-bottom:15px}.form-group label{display:block;font-size:12px;font-weight:700;margin-bottom:7px}.input,.textarea{width:100%;border:1px solid #d8dce2;border-radius:11px;padding:12px 13px;outline:none;background:#fff}.input:focus,.textarea:focus{border-color:#641219;box-shadow:0 0 0 3px #64121918}.textarea{min-height:80px;resize:vertical}
+.btn{border:0;border-radius:11px;padding:12px 16px;font-weight:700}.btn-primary{background:#641219;color:#fff;width:100%}.btn-secondary{background:#f0f1f3;color:#333}.error{background:#fff0f0;color:#b42318;padding:11px;border-radius:10px;font-size:12px;margin-bottom:14px}.success{background:#ecfdf3;color:#067647;padding:11px;border-radius:10px;font-size:12px;margin-bottom:14px}
+.app{min-height:100vh;display:flex}.sidebar{width:245px;background:#190b0d;color:#fff;padding:20px;position:fixed;inset:0 auto 0 0}.brand{font-size:21px;font-weight:800;margin:8px 10px 28px}.nav button{display:flex;width:100%;border:0;background:transparent;color:#cfc5c6;padding:12px;border-radius:10px;text-align:left;gap:12px;margin:3px 0}.nav button.active,.nav button:hover{background:#641219;color:#fff}.main{margin-left:245px;width:calc(100% - 245px);padding:28px}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.top h2{margin:0}.user{background:#fff;padding:10px 14px;border-radius:12px;border:1px solid #e3e5e8}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:20px;box-shadow:0 4px 18px #00000008}.card h3{margin-top:0}.section{display:none}.section.active{display:block}.stat{font-size:28px;font-weight:800}.muted{color:#73777d;font-size:13px}.row{display:flex;gap:10px;align-items:center}.between{justify-content:space-between}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:12px;border-bottom:1px solid #eee;text-align:left;font-size:13px}.pill{padding:5px 9px;border-radius:99px;background:#ecfdf3;color:#067647;font-size:11px;font-weight:700}.theme-preview{height:120px;border-radius:15px;display:grid;place-items:center;color:#fff;font-size:20px;font-weight:800;margin-top:15px}
+@media(max-width:760px){.auth-card{grid-template-columns:1fr}.auth-brand{display:none}.auth-form{padding:28px}.sidebar{width:70px;padding:12px}.brand{font-size:0}.brand:after{content:"FM";font-size:18px}.nav button span{display:none}.main{margin-left:70px;width:calc(100% - 70px);padding:16px}.grid{grid-template-columns:1fr}.top{align-items:flex-start;gap:10px}}
 </style>
-
-
-<style id="ownerLoginStyles">
-#ownerAuth{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:18px}
-#ownerAuth.show{display:flex}
-.ownerAuthBackdrop{position:absolute;inset:0;background:radial-gradient(circle at 15% 15%,rgba(245,47,114,.18),transparent 30%),radial-gradient(circle at 85% 80%,rgba(181,29,59,.22),transparent 32%),linear-gradient(135deg,#080e18,#162235 55%,#241321)}
-.ownerAuthCard{position:relative;width:min(470px,100%);max-height:92vh;overflow:auto;background:rgba(255,255,255,.98);border:1px solid rgba(255,255,255,.7);border-radius:24px;padding:30px;box-shadow:0 30px 90px rgba(0,0,0,.42),0 8px 30px rgba(181,29,59,.12);backdrop-filter:blur(12px)}
-.authBrand{width:72px;height:72px;border-radius:22px;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(135deg,#8f1831,#c52345 65%,#f02e6f);color:#fff;font-size:29px;box-shadow:0 12px 28px rgba(181,29,59,.28)}
-.authKicker{text-align:center;color:#8f1831;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;font-size:10px;margin-top:2px}.ownerAuthCard h1{text-align:center;font-family:"Cormorant Garamond",serif;font-size:32px;margin:0;color:#151c2a}
-.authSub{text-align:center;color:#718096;font-size:12px;margin:4px 0 22px}
-.authChoiceGrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
-.authChoiceBtn{border:1px solid #e5e7eb;background:#fafbfc;border-radius:15px;padding:19px 15px;cursor:pointer;text-align:left;transition:.2s;box-shadow:0 5px 16px rgba(15,23,42,.04)}
-.authChoiceBtn:hover{transform:translateY(-2px);box-shadow:0 9px 25px rgba(0,0,0,.08);border-color:#cbd5e1}
-.authChoiceBtn span{display:block;font-size:24px;margin-bottom:8px}
-.authChoiceBtn b{display:block;font-size:16px;color:#172033}
-.authChoiceBtn small{display:block;color:#7a8495;font-size:10px;margin-top:5px;line-height:1.4}
-.authFormCard{text-align:left}
-.authFormCard .authBrand{margin-left:auto;margin-right:auto}
-.authFormCard h1,.authFormCard .authSub{text-align:center}
-.authBack,.authSwitch{border:0;background:none;color:#5b6474;font-weight:700;cursor:pointer;padding:0}
-.authBack{margin-bottom:9px}
-.authSwitch{display:block;margin:13px auto 0;color:#8f1831}
-.authError{background:#fff0f0;color:#b4232e;border:1px solid #ffd0d0;border-radius:8px;padding:9px 10px;font-size:11px;margin-bottom:12px}
-.authSuccess{background:#edfff5;color:#167647;border:1px solid #bce8cc;border-radius:8px;padding:9px 10px;font-size:11px;margin-bottom:12px}
-.slugHint{font-size:9px;color:#8a93a3;margin-top:4px}
-@media(max-width:560px){.authChoiceGrid{grid-template-columns:1fr}.ownerAuthCard{padding:22px}.twoCol{grid-template-columns:1fr}}
-.loginSubmit{width:100%;border:0;border-radius:13px;padding:13px 16px;background:linear-gradient(135deg,#8f1831,#d21f4a 60%,#f02e6f);color:#fff;font-weight:800;font-size:13px;box-shadow:0 10px 24px rgba(181,29,59,.24);transition:.2s}.loginSubmit:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(181,29,59,.32)}
-.authFormCard .formGroup{margin-bottom:13px}.authFormCard label{font-size:11px;font-weight:800;color:#445066;margin-bottom:6px;display:block}.authFormCard .input{width:100%;border:1px solid #dfe4ec;border-radius:11px;padding:12px 13px;background:#fbfcfe;outline:none}.authFormCard .input:focus{border-color:#b51d3b;box-shadow:0 0 0 4px rgba(181,29,59,.08)}
-.authFeatureBar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0 20px}.authFeature{border:1px solid #eceff4;border-radius:11px;padding:9px 7px;text-align:center;background:#fafbfd}.authFeature strong{display:block;font-size:10px;color:#253046}.authFeature span{font-size:15px;display:block;margin-bottom:3px}
-.menuStatusBtn{display:inline-flex;align-items:center;gap:8px;border:1px solid #e2e7ee;border-radius:999px;padding:6px 10px;background:#f8fafc;font-size:10px;font-weight:900;cursor:pointer;min-width:74px;justify-content:center;transition:.18s}.menuStatusBtn.on{background:#eafaf2;border-color:#9cddbd;color:#087443}.menuStatusBtn.off{background:#fff4e8;border-color:#f2c58d;color:#a35a00}.menuStatusBtn .dot{width:8px;height:8px;border-radius:50%;background:#12a36b}.menuStatusBtn.off .dot{background:#d97706}.menuStatusBtn:hover{transform:translateY(-1px)}
-@media(max-width:560px){.authFeatureBar{grid-template-columns:1fr 1fr 1fr}.menuStatusBtn{min-width:68px}}
-</style></head>
-
+</head>
 <body>
 
-
-<div id="ownerAuth">
-  <div class="ownerAuthBackdrop"></div>
-
-  <!-- FIRST SCREEN: choose Login or Sign Up -->
-  <div class="ownerAuthCard" id="authChoiceCard">
-    <div class="authBrand">🍽</div>
-    <div class="authKicker">FREEMENU • RESTAURANT PARTNER</div>
-    <h1>Restaurant Owner</h1>
-    <p class="authSub">Manage your digital menu, items and restaurant profile</p>
-    <div class="authFeatureBar"><div class="authFeature"><span>🍽️</span><strong>Digital Menu</strong></div><div class="authFeature"><span>📱</span><strong>QR Ready</strong></div><div class="authFeature"><span>⚡</span><strong>Easy Control</strong></div></div>
-    <div class="authChoiceGrid">
-      <button type="button" class="authChoiceBtn" id="openLoginBtn">
-        <span>🔐</span>
-        <b>Login</b>
-        <small>Already have an owner account</small>
-      </button>
-      <button type="button" class="authChoiceBtn" id="openSignupBtn">
-        <span>📝</span>
-        <b>Sign Up</b>
-        <small>Create a new restaurant account</small>
-      </button>
-    </div>
+<div id="authScreen" class="auth-wrap">
+ <div class="auth-card">
+  <div class="auth-brand">
+   <div class="logo">FM</div>
+   <h1>FreeMenu</h1>
+   <p>Restaurant Owner Panel</p>
+   <div class="auth-points">
+    <div><i class="fa-solid fa-circle-check"></i><span>Manage your digital menu</span></div>
+    <div><i class="fa-solid fa-palette"></i><span>Customize your restaurant theme</span></div>
+    <div><i class="fa-solid fa-qrcode"></i><span>Share your menu with QR</span></div>
+   </div>
   </div>
+  <div class="auth-form">
+   <div class="tabs">
+    <button id="loginTab" class="active">Login</button>
+    <button id="signupTab">Sign Up</button>
+   </div>
 
-  <!-- LOGIN FORM -->
-  <div class="ownerAuthCard authFormCard" id="loginCard" style="display:none">
-    <button type="button" class="authBack" id="backLoginBtn">← Back</button>
-    <div class="authBrand">🔐</div><div class="authKicker">FreeMenu Owner Portal</div>
-    <h1>Owner Login</h1>
-    <p class="authSub">Login with your existing account</p>
-    <div id="loginErrorNew" class="authError" style="display:none"></div>
+   <div id="loginBox">
+    <h2>Welcome back 👋</h2><p class="muted">Login to open your restaurant dashboard.</p>
+    <div id="loginError" class="error hidden"></div>
+    <div class="form-group"><label>Email</label><input id="loginEmail" class="input" type="email" autocomplete="email"></div>
+    <div class="form-group"><label>Password</label><input id="loginPassword" class="input" type="password" autocomplete="current-password"></div>
+    <button id="loginBtn" class="btn btn-primary">Login to Owner Panel</button>
+   </div>
 
-    <div class="formGroup">
-      <label>Email Address</label>
-      <input class="input" id="loginEmailNew" type="email" autocomplete="email" placeholder="owner@example.com">
-    </div>
-    <div class="formGroup">
-      <label>Password</label>
-      <input class="input" id="loginPasswordNew" type="password" autocomplete="current-password" placeholder="Enter your password">
-    </div>
-    <button type="button" class="loginSubmit" id="loginSubmitNew">🔐 Login to Owner Panel</button>
-    <button type="button" class="authSwitch" id="goSignupFromLogin">New here? Create an account</button>
+   <div id="signupBox" class="hidden">
+    <h2>Create Owner Account</h2><p class="muted">Create your restaurant owner account.</p>
+    <div id="signupError" class="error hidden"></div>
+    <div class="form-group"><label>Full Name</label><input id="fullName" class="input"></div>
+    <div class="form-group"><label>Mobile</label><input id="mobile" class="input"></div>
+    <div class="form-group"><label>Email</label><input id="signupEmail" class="input" type="email"></div>
+    <div class="form-group"><label>Password</label><input id="signupPassword" class="input" type="password"></div>
+    <div class="form-group"><label>Restaurant Name</label><input id="restaurantName" class="input"></div>
+    <div class="form-group"><label>Address</label><textarea id="restaurantAddress" class="textarea"></textarea></div>
+    <div class="form-group"><label>Menu Slug</label><input id="restaurantSlug" class="input" placeholder="urban-punjab"></div>
+    <button id="signupBtn" class="btn btn-primary">Create Owner Account</button>
+   </div>
   </div>
-
-  <!-- SIGN UP FORM -->
-  <div class="ownerAuthCard authFormCard signupCard" id="signupCard" style="display:none">
-    <button type="button" class="authBack" id="backSignupBtn">← Back</button>
-    <div class="authBrand">📝</div><div class="authKicker">FreeMenu Partner</div>
-    <h1>Create Owner Account</h1>
-    <p class="authSub">Register your restaurant on FreeMenu</p>
-    <div id="signupErrorNew" class="authError" style="display:none"></div>
-    <div id="signupSuccessNew" class="authSuccess" style="display:none"></div>
-
-    <div class="formGroup">
-      <label>Full Name</label>
-      <input class="input" id="signupName" type="text" placeholder="Your full name">
-    </div>
-    <div class="formGroup">
-      <label>Mobile Number</label>
-      <input class="input" id="signupPhone" type="tel" placeholder="10 digit mobile number">
-    </div>
-    <div class="formGroup">
-      <label>Email Address</label>
-      <input class="input" id="signupEmail" type="email" autocomplete="email" placeholder="owner@example.com">
-    </div>
-    <div class="twoCol">
-      <div class="formGroup">
-        <label>Password</label>
-        <input class="input" id="signupPassword" type="password" autocomplete="new-password" placeholder="Minimum 6 characters">
-      </div>
-      <div class="formGroup">
-        <label>Confirm Password</label>
-        <input class="input" id="signupConfirm" type="password" autocomplete="new-password" placeholder="Repeat password">
-      </div>
-    </div>
-    <div class="formGroup">
-      <label>Restaurant Name</label>
-      <input class="input" id="signupRestaurant" type="text" placeholder="Your restaurant name">
-    </div>
-    <div class="formGroup">
-      <label>Restaurant Address</label>
-      <input class="input" id="signupAddress" type="text" placeholder="Full restaurant address">
-    </div>
-    <div class="formGroup">
-      <label>Menu Slug</label>
-      <input class="input" id="signupSlug" type="text" placeholder="my-restaurant-menu">
-      <div class="slugHint">Your public menu: menu.html?r=your-slug</div>
-    </div>
-
-    <button type="button" class="loginSubmit" id="signupSubmitNew">📝 Create Restaurant Account</button>
-    <button type="button" class="authSwitch" id="goLoginFromSignup">Already have an account? Login</button>
-  </div>
-</div>
-</div>
-
-<div id="loader"><div class="loader-card"><div class="spinner"></div><p style="font-weight:800">Loading Owner Panel...</p></div></div>
-
-<aside class="sidebar" id="sidebar">
-  <div class="logoArea">
-    <div class="chefLogo">👨‍🍳</div>
-    <div class="sideBrand">Digital Menu</div>
-    <div class="sideSub">RESTAURANT OWNER PANEL</div>
-  </div>
-  <nav>
-    <a class="navItem active" href="#dashboard" data-section="dashboard"><i class="fa-solid fa-house"></i> Dashboard</a>
-    <a class="navItem" href="#restaurant" data-section="restaurant"><i class="fa-solid fa-store"></i> Restaurant Details</a>
-    <a class="navItem" href="#menu" data-section="menu"><i class="fa-solid fa-clipboard-list"></i> Menu Management</a>
-    <a class="navItem" href="#categories" data-section="categories"><i class="fa-solid fa-layer-group"></i> Categories</a>
-    <a class="navItem" href="#gallery" data-section="gallery"><i class="fa-solid fa-images"></i> Gallery</a>
-    <a class="navItem" href="#orders" data-section="orders"><i class="fa-solid fa-cart-shopping"></i> Orders <small>(Preview)</small></a>
-    <a class="navItem" href="#qr" data-section="qr"><i class="fa-solid fa-qrcode"></i> QR Code</a>
-    <a class="navItem" href="#preview" data-section="preview"><i class="fa-solid fa-mobile-screen-button"></i> Menu Preview</a>
-    <a class="navItem" href="#analytics" data-section="analytics"><i class="fa-solid fa-chart-column"></i> Analytics</a>
-    <a class="navItem" href="#settings" data-section="settings"><i class="fa-solid fa-gear"></i> Settings</a>
-    <a class="navItem" href="#support" data-section="support"><i class="fa-regular fa-circle-question"></i> Help & Support</a>
-  </nav>
-  <div class="sidePromo">
-    <i class="fa-solid fa-crown"></i><strong>Grow Your Business</strong>
-    <p>Delicious Food<br>Happier Customers</p>
-    <button class="btn-pink" id="sidePublicBtn">View Public Menu</button>
-  </div>
-</aside>
-
-<div class="content">
-<header class="topbar">
-  <div style="display:flex;align-items:center;gap:10px">
-    <button class="mobileMenu" id="mobileMenu"><i class="fa-solid fa-bars"></i></button>
-    <div class="restIdentity">
-      <img class="restLogo" id="topLogo" alt="Restaurant">
-      <div><div class="restTitle" id="topName">Restaurant</div><div class="restAddress" id="topAddress">Loading...</div></div>
-    </div>
-  </div>
-  <div class="topActions">
-    <button class="openToggle" id="publicTop"><i class="fa-solid fa-globe"></i> View Public Menu <i class="fa-solid fa-arrow-up-right-from-square"></i></button>
-    <div class="profile"><div class="avatar" id="avatar">OW</div><div class="profileName"><strong id="ownerName">Owner</strong><div style="font-size:10px;color:var(--muted)">Restaurant Owner</div></div><button class="btn sm" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i></button></div>
-  </div>
-</header>
-
-<div class="container">
-
-<!-- DASHBOARD -->
-<section id="section-dashboard">
-  <div class="grid4">
-    <div class="stat"><div class="statTop"><div class="statIcon"><i class="fa-solid fa-utensils"></i></div><span class="statChange">Active</span></div><div class="statLabel">Total Menu Items</div><div class="statValue" id="statItems">0</div></div>
-    <div class="stat"><div class="statTop"><div class="statIcon"><i class="fa-solid fa-grip"></i></div><span class="statChange" id="statCatsChange">Live</span></div><div class="statLabel">Categories</div><div class="statValue" id="statCats">0</div></div>
-    <div class="stat"><div class="statTop"><div class="statIcon"><i class="fa-solid fa-eye"></i></div><span class="statChange">Ready</span></div><div class="statLabel">Profile / Menu Views</div><div class="statValue" id="statViews">—</div></div>
-    <div class="stat"><div class="statTop"><div class="statIcon"><i class="fa-solid fa-qrcode"></i></div><span class="statChange">Ready</span></div><div class="statLabel">QR Scans</div><div class="statValue">—</div></div>
-  </div>
-
-  <div class="twoCol">
-    <div class="card" id="restaurant">
-      <div class="cardTitle">Restaurant Information <button class="btn sm" data-go="restaurantEdit"><i class="fa-solid fa-pen"></i> Edit</button></div>
-      <div class="profileBox">
-        <img class="bigLogo" id="profileLogo" alt="Restaurant logo">
-        <div>
-          <div class="muted" style="font-size:10px">Restaurant Name</div><strong id="profileName">—</strong>
-          <div class="muted" style="font-size:10px;margin-top:9px">Phone Number</div><strong id="profilePhone">—</strong>
-          <div class="muted" style="font-size:10px;margin-top:9px">Address</div><strong id="profileAddress">—</strong>
-          <div class="muted" style="font-size:10px;margin-top:9px">Slug</div><strong id="profileSlug">—</strong>
-        </div>
-      </div>
-      <div class="serviceBtns">
-        <button class="serviceBtn"><i class="fa-solid fa-utensils"></i> Dine In</button>
-        <button class="serviceBtn"><i class="fa-solid fa-bag-shopping"></i> Takeaway</button>
-        <button class="serviceBtn"><i class="fa-solid fa-motorcycle"></i> Home Delivery</button>
-      </div>
-    </div>
-
-    <div class="card" id="gallery">
-      <div class="cardTitle">Restaurant Media <button class="btn sm" data-go="galleryEdit"><i class="fa-solid fa-pen"></i> Manage</button></div>
-      <div class="mediaCover" id="mediaCover"><div class="overlay"><i class="fa-solid fa-link"></i> Set Cover URL</div></div>
-      <div class="mediaTiles">
-        <div class="mediaTile" id="mediaLogo"><span>Logo</span></div>
-        <div class="mediaTile" id="mediaFood"><span>Food Photos</span></div>
-        <div class="mediaTile"><span>Gallery</span></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="twoCol">
-    <div class="card">
-      <div class="cardTitle">Menu Management <button class="btn primary sm" id="openAdd"><i class="fa-solid fa-plus"></i> Add New Item</button></div>
-      <div class="menuToolbar">
-        <input class="input" id="menuSearch" placeholder="Search food items...">
-        <select class="select" id="menuCategoryFilter" style="max-width:160px"><option value="">All Categories</option></select>
-        <select class="select" id="menuTypeFilter" style="max-width:130px"><option value="">All Types</option><option value="veg">Veg</option><option value="nonveg">Non-Veg</option><option value="egg">Egg</option></select>
-      </div>
-      <div class="menuTableWrap">
-        <table class="menuTable"><thead><tr><th>Item</th><th>Type</th><th>Price (Q/H/F)</th><th>Status</th><th>Actions</th></tr></thead><tbody id="dashboardItems"></tbody></table>
-      </div>
-    </div>
-    <div class="card" id="categories">
-      <div class="cardTitle">Menu Categories <button class="btn sm" id="addCategoryBtn"><i class="fa-solid fa-plus"></i> Category</button></div>
-      <div class="categoryCards" id="categoryCards"></div>
-    </div>
-  </div>
-
-  <div class="twoCol">
-    <div class="card">
-      <div class="cardTitle">Quick Actions</div>
-      <div class="quickGrid">
-        <button class="quick" id="quickQR"><i class="fa-solid fa-qrcode"></i><div><strong>Generate QR Code</strong><small>Open & download your menu QR</small></div></button>
-        <button class="quick" id="quickPreview"><i class="fa-solid fa-mobile-screen"></i><div><strong>View Public Menu</strong><small>See what customers see</small></div></button>
-        <button class="quick" id="quickCategory"><i class="fa-solid fa-circle-plus"></i><div><strong>Add New Category</strong><small>Organize your menu</small></div></button>
-        <button class="quick" id="quickTheme"><i class="fa-solid fa-palette"></i><div><strong>Theme & Branding</strong><small>Customize menu appearance</small></div></button>
-      </div>
-    </div>
-    <div class="card" id="qr">
-      <div class="cardTitle">Restaurant Status <span class="muted" style="font-size:10px">Based on available database fields</span></div>
-      <div class="hoursRow"><span>Restaurant</span><strong id="statusName">—</strong></div>
-      <div class="hoursRow"><span>Public Menu</span><strong style="color:var(--green)">Live</strong></div>
-      <div class="hoursRow"><span>Menu Items</span><strong id="statusItems">0</strong></div>
-      <div class="hoursRow"><span>Menu URL</span><button class="btn sm" id="copyMenu">Copy Link</button></div>
-    </div>
-  </div>
-</section>
-
-<!-- FULL MENU MANAGEMENT -->
-<section id="section-menu" class="hidden">
-  <div class="card">
-    <div class="cardTitle">Menu Management <button class="btn primary" id="openAdd2"><i class="fa-solid fa-plus"></i> Add New Item</button></div>
-    <div class="menuToolbar">
-      <input class="input" id="fullSearch" placeholder="Search item, description or category...">
-      <select class="select" id="fullCatFilter" style="max-width:190px"><option value="">All Categories</option></select>
-      <select class="select" id="fullTypeFilter" style="max-width:150px"><option value="">All Types</option><option value="veg">Veg</option><option value="nonveg">Non-Veg</option><option value="egg">Egg</option></select>
-    </div>
-    <div class="menuTableWrap"><table class="menuTable"><thead><tr><th>Item</th><th>Category</th><th>Type</th><th>Single</th><th>Qtr</th><th>Half</th><th>Full</th><th>Status</th><th>Actions</th></tr></thead><tbody id="fullItems"></tbody></table></div>
-  </div>
-</section>
-
-<!-- RESTAURANT DETAILS -->
-<section id="section-restaurant" class="hidden">
-  <div class="card">
-    <div class="cardTitle">Restaurant Details <small>These fields match your existing Supabase restaurants table.</small></div>
-    <div class="threeCol">
-      <div class="formGroup"><label>Restaurant Name</label><input class="input" id="fName"></div>
-      <div class="formGroup"><label>Phone Number</label><input class="input" id="fPhone"></div>
-      <div class="formGroup"><label>Slug</label><input class="input" id="fSlug" disabled></div>
-    </div>
-    <div class="formGroup"><label>Logo Image URL</label><div class="uploadRow"><input class="input" id="fLogo" placeholder="https://..."><input type="file" id="logoFile" accept="image/*" hidden><button class="fileBtn" id="chooseLogo">Choose</button><button class="btn blue" id="uploadLogo">Upload</button></div></div>
-    <div class="formGroup"><label>Address</label><textarea class="textarea" id="fAddress" placeholder="Your restaurant address"></textarea></div>
-    <button class="btn primary" id="saveProfile"><i class="fa-solid fa-floppy-disk"></i> Save Restaurant Details</button>
-    <div class="card" style="margin-top:15px;background:linear-gradient(180deg,#fff,#fffaf7)">
-      <div class="cardTitle">Public Menu Hero Information <small>Customize the restaurant information shown on the public menu</small></div>
-      <div class="formGroup"><label>Welcome Text</label><input class="input" id="fWelcome" placeholder="Welcome to"></div>
-      <div class="formGroup"><label>Tagline / Main Heading</label><input class="input" id="fTagline" placeholder="URBAN PUNJAB"></div>
-      <div class="formGroup"><label>Subtitle</label><input class="input" id="fSubtitle" placeholder="THE TASTE YOU'LL LOVE"></div>
-      <div class="threeCol">
-        <div class="formGroup"><label>Feature 1</label><input class="input" id="fFeature1" placeholder="Pure Veg & Non-Veg"></div>
-        <div class="formGroup"><label>Feature 2</label><input class="input" id="fFeature2" placeholder="Hygienic Food"></div>
-        <div class="formGroup"><label>Feature 3</label><input class="input" id="fFeature3" placeholder="Great Taste"></div>
-      </div>
-      <div class="twoCol equal">
-        <div class="formGroup"><label>Slogan Line 1</label><input class="input" id="fSlogan1" placeholder="Good Food"></div>
-        <div class="formGroup"><label>Slogan Line 2</label><input class="input" id="fSlogan2" placeholder="Good Mood"></div>
-      </div>
-      <div class="threeCol">
-        <div class="formGroup"><label>Opening Time</label><input class="input" id="fOpenTime" type="time" value="11:00"></div>
-        <div class="formGroup"><label>Closing Time</label><input class="input" id="fCloseTime" type="time" value="23:00"></div>
-        <div class="formGroup"><label>Call Button Text</label><input class="input" id="fCallText" placeholder="Call Restaurant"></div>
-      </div>
-      <div class="serviceBtns" style="grid-template-columns:repeat(3,1fr)">
-        <label class="serviceBtn"><input type="checkbox" id="fDineIn" checked> 🍴 Dine In</label>
-        <label class="serviceBtn"><input type="checkbox" id="fTakeaway" checked> 🛍 Takeaway</label>
-        <label class="serviceBtn"><input type="checkbox" id="fDelivery" checked> 🛵 Home Delivery</label>
-      </div>
-      <button class="btn primary" id="saveHeroInfo" style="margin-top:15px"><i class="fa-solid fa-floppy-disk"></i> Save Public Information</button>
-      <p class="muted" style="font-size:10px;margin:10px 0 0">These fields require the accompanying FreeMenu SQL migration before Supabase can store them.</p>
-    </div>
-
-  </div>
-</section>
-
-<!-- CATEGORIES -->
-<section id="section-categories" class="hidden">
-  <div class="card">
-    <div class="cardTitle">Categories <button class="btn primary" id="addCategory2"><i class="fa-solid fa-plus"></i> Add Category</button></div>
-    <p class="muted" style="font-size:12px;margin-top:-5px">Your current Supabase design stores category as text on each menu item, so categories are derived automatically from menu items.</p>
-    <div class="categoryCards" id="categoryCardsFull"></div>
-  </div>
-</section>
-
-<!-- GALLERY -->
-<section id="section-gallery" class="hidden">
-  <div class="card">
-    <div class="cardTitle">Restaurant Images
-      <small id="mediaRuleNote">Upload rules are controlled by Super Admin.</small>
-    </div>
-
-    <div id="mediaPolicyStatus" style="margin:0 0 14px;padding:11px;border-radius:10px;background:#fff8e8;border:1px solid #f4d58b;font-size:11px;color:#6b4b00">
-      Loading media policy...
-    </div>
-
-    <div class="formGroup">
-      <label>Restaurant Logo <small>(Maximum 1 image)</small></label>
-      <div class="uploadRow">
-        <input class="input" id="fLogoMedia" placeholder="Logo image URL">
-        <input type="file" id="logoMediaFile" accept="image/*" hidden>
-        <button class="fileBtn" type="button" id="chooseLogoMedia">Choose</button>
-        <button class="btn blue" type="button" id="uploadLogoMedia">Upload</button>
-      </div>
-      <div class="muted" style="font-size:10px">Maximum image size: <b id="logoMaxText">1 MB</b></div>
-    </div>
-
-    <div class="formGroup">
-      <label>Banner / Hero Image <small>(Maximum 1 image)</small></label>
-      <div class="uploadRow">
-        <input class="input" id="fBannerMedia" placeholder="Banner image URL">
-        <input type="file" id="bannerMediaFile" accept="image/*" hidden>
-        <button class="fileBtn" type="button" id="chooseBannerMedia">Choose</button>
-        <button class="btn blue" type="button" id="uploadBannerMedia">Upload</button>
-      </div>
-      <div class="muted" style="font-size:10px">Maximum image size: <b id="bannerMaxText">1 MB</b></div>
-    </div>
-
-    <div id="galleryPaidBox" class="formGroup" style="display:none">
-      <label>Photo Gallery <span style="padding:3px 7px;background:#fff0d6;color:#8a5600;border-radius:99px;font-size:9px;font-weight:800">PREMIUM</span></label>
-      <div id="galleryLocked" style="padding:12px;border-radius:10px;background:#f8fafc;border:1px solid var(--border);font-size:11px;color:#667085"></div>
-      <div id="galleryUploadBox" style="display:none;margin-top:10px">
-        <input type="file" id="galleryMediaFile" accept="image/*" hidden>
-        <button class="fileBtn" type="button" id="chooseGalleryMedia">Choose Gallery Image</button>
-        <button class="btn blue" type="button" id="uploadGalleryMedia">Upload to Gallery</button>
-        <div id="galleryList" style="margin-top:11px"></div>
-      </div>
-    </div>
-
-    <button class="btn primary" id="saveMedia"><i class="fa-solid fa-floppy-disk"></i> Save Image Settings</button>
-    <div class="muted" style="font-size:10px;margin-top:9px">One logo + one banner are allowed. Gallery uploads are available only for active Premium restaurants when Super Admin has enabled the paid gallery.</div>
-  </div>
-</section>
-
-<!-- QR -->
-<section id="section-qr" class="hidden">
-  <div class="card" style="max-width:720px;margin:auto;text-align:center">
-    <div class="cardTitle">Restaurant QR Code</div>
-    <p class="muted" style="font-size:12px">This QR opens the public menu URL for this restaurant.</p>
-    <div style="margin:18px auto;width:240px;height:240px;display:grid;place-items:center;background:#fff;border:1px solid var(--border);border-radius:12px" id="qrBox"></div>
-    <input class="input" id="qrUrl" readonly style="text-align:center;margin-bottom:10px">
-    <div class="actions" style="justify-content:center"><button class="btn primary" id="downloadQR"><i class="fa-solid fa-download"></i> Download QR</button><button class="btn" id="copyQR">Copy Link</button></div>
-  </div>
-</section>
-
-<!-- PREVIEW -->
-<section id="section-preview" class="hidden">
-  <div class="card" style="max-width:850px;margin:auto">
-    <div class="cardTitle">Menu Preview <button class="btn primary sm" id="openPublic2">Open Public Menu</button></div>
-    <iframe id="previewFrame" title="Public Menu Preview" style="width:100%;height:700px;border:1px solid var(--border);border-radius:12px;background:#fff"></iframe>
-  </div>
-</section>
-
-<!-- ANALYTICS -->
-<section id="section-analytics" class="hidden">
-  <div class="card">
-    <div class="cardTitle">Analytics <small>Real view/scan numbers are not available in the supplied Supabase schema.</small></div>
-    <div class="grid4">
-      <div class="stat"><div class="statLabel">Menu Items</div><div class="statValue" id="aItems">0</div></div>
-      <div class="stat"><div class="statLabel">Categories</div><div class="statValue" id="aCats">0</div></div>
-      <div class="stat"><div class="statLabel">Bestsellers</div><div class="statValue">—</div></div>
-      <div class="stat"><div class="statLabel">Views</div><div class="statValue">—</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- SETTINGS -->
-<section id="section-settings" class="hidden">
-  <div class="twoCol">
-    <div class="card">
-      <div class="cardTitle">Menu Theme <small>Preview settings</small></div>
-      <div class="themeGrid">
-        <label class="colorField"><input type="color" id="cPrimary" value="#641219"><span>Primary</span></label>
-        <label class="colorField"><input type="color" id="cAccent" value="#d8ad62"><span>Accent</span></label>
-        <label class="colorField"><input type="color" id="cBg" value="#fffaf1"><span>Background</span></label>
-      </div>
-      <button class="btn primary" id="saveTheme" style="margin-top:12px"><i class="fa-solid fa-floppy-disk"></i> Save Theme</button>
-      <div class="previewFrame" style="margin-top:14px">
-        <div class="previewTop" id="themePreview"><strong id="themeName">Restaurant</strong><div style="font-size:11px;margin-top:5px">Your digital menu preview</div></div>
-        <div style="padding:15px"><div style="height:11px;width:55%;background:#eee;border-radius:8px"></div><div style="height:9px;width:85%;background:#f0f0f0;border-radius:8px;margin-top:13px"></div><div style="height:50px;background:#fffaf1;border:1px solid #eee;border-radius:10px;margin-top:14px"></div></div>
-      </div>
-      <p class="muted" style="font-size:11px;margin:12px 0 0">Theme changes are saved to your restaurant and appear on the live public menu.</p>
-    </div>
-    <div class="card">
-      <div class="cardTitle">Account & Security</div>
-      <div class="formGroup"><label>Logged-in Email</label><input class="input" id="accountEmail" disabled></div>
-      <button class="btn danger" id="logout2"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
-    </div>
-  </div>
-</section>
-
-<!-- SUPPORT / ORDERS -->
-<section id="section-orders" class="hidden"><div class="card"><div class="cardTitle">Orders <small>Preview</small></div><div style="text-align:center;padding:60px 10px;color:var(--muted)"><i class="fa-solid fa-cart-shopping" style="font-size:38px;margin-bottom:12px"></i><h3 style="color:var(--text)">Ordering system is ready for a future phase</h3><p style="font-size:12px">The supplied Supabase schema contains menu_items and restaurants, but no orders table.</p></div></div></section>
-<section id="section-support" class="hidden"><div class="card"><div class="cardTitle">Help & Support</div><p class="muted" style="font-size:13px;line-height:1.7">For the current build, the owner panel is connected to your existing Supabase Auth, restaurants, menu_items table and restaurant-logos storage bucket. Additional analytics, ordering and theme persistence require database fields/tables.</p></div></section>
-
-</div></div>
-
-<!-- ITEM MODAL -->
-<div class="modal" id="itemModal">
- <div class="modalBox">
-  <div class="modalHead"><h3 id="modalTitle">Add New Menu Item</h3><button class="close" data-close="itemModal"><i class="fa-solid fa-xmark"></i></button></div>
-  <input type="hidden" id="editId"><input type="hidden" id="mAvailable" value="true">
-  <div class="threeCol">
-   <div class="formGroup" style="grid-column:span 2"><label>Item Name *</label><input class="input" id="mName" placeholder="e.g. Paneer Butter Masala"></div>
-   <div class="formGroup"><label>Food Type</label><select class="select" id="mType"><option value="veg">🟢 Veg</option><option value="nonveg">🔴 Non-Veg</option><option value="egg">🟡 Egg</option></select></div>
-  </div>
-  <div class="formGroup"><label>Category *</label><input class="input" id="mCategory" placeholder="Main Course"></div>
-  <div class="formGroup"><label>Description</label><textarea class="textarea" id="mDesc"></textarea></div>
-  <div class="formGroup"><label>Single Price (use when portions are not needed)</label><input class="input" type="number" id="mPrice" min="0"></div>
-  <label style="display:block;font-size:11px;font-weight:800;color:#64748b;margin-bottom:6px">PORTION PRICES</label>
-  <div class="threeCol">
-   <input class="input" type="number" id="mQtr" placeholder="Qtr ₹" min="0">
-   <input class="input" type="number" id="mHalf" placeholder="Half ₹" min="0">
-   <input class="input" type="number" id="mFull" placeholder="Full ₹" min="0">
-  </div>
-  <div class="formGroup" style="margin-top:16px"><label>Menu Item Status</label><button type="button" class="menuStatusBtn on" id="mAvailableSwitch"><span class="dot"></span><span id="mAvailableText">ON • Visible</span></button></div>
-  <div style="margin-top:18px;display:flex;justify-content:flex-end;gap:8px><button class="btn" data-close="itemModal">Cancel</button><button class="btn primary" id="saveItem"><i class="fa-solid fa-floppy-disk"></i> Save Item</button></div>
  </div>
 </div>
 
-<!-- CATEGORY MODAL -->
-<div class="modal" id="catModal">
- <div class="modalBox" style="max-width:420px">
-  <div class="modalHead"><h3>Add Category</h3><button class="close" data-close="catModal"><i class="fa-solid fa-xmark"></i></button></div>
-  <div class="formGroup"><label>Category Name</label><input class="input" id="newCat" placeholder="e.g. Starters"></div>
-  <button class="btn primary" id="saveCategory"><i class="fa-solid fa-plus"></i> Add Category</button>
-  <p class="muted" style="font-size:10px;margin-top:9px">Because your current database has no categories table, adding a category creates a placeholder menu item. You can edit its name/price afterward.</p>
- </div>
-</div>
+<div id="app" class="app hidden">
+ <aside class="sidebar">
+  <div class="brand">FreeMenu</div>
+  <div class="nav">
+   <button data-section="dashboard" class="active"><i class="fa-solid fa-chart-pie"></i><span>Dashboard</span></button>
+   <button data-section="profile"><i class="fa-solid fa-store"></i><span>Restaurant Profile</span></button>
+   <button data-section="menu"><i class="fa-solid fa-utensils"></i><span>Menu</span></button>
+   <button data-section="theme"><i class="fa-solid fa-palette"></i><span>Theme</span></button>
+   <button data-section="public"><i class="fa-solid fa-globe"></i><span>Public Menu Info</span></button>
+   <button id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></button>
+  </div>
+ </aside>
 
-<div id="toast"></div>
+ <main class="main">
+  <div class="top">
+   <div><h2 id="pageTitle">Dashboard</h2><div class="muted" id="restaurantTitle">Loading...</div></div>
+   <div class="user"><i class="fa-solid fa-user"></i> <span id="userEmail"></span></div>
+  </div>
+
+  <div id="dashboard" class="section active">
+   <div class="grid">
+    <div class="card"><div class="muted">Restaurant</div><div class="stat" id="dashName">—</div></div>
+    <div class="card"><div class="muted">Menu Items</div><div class="stat" id="dashItems">0</div></div>
+    <div class="card"><div class="muted">Plan</div><div class="stat" id="dashPlan">Free</div></div>
+   </div>
+   <div class="card" style="margin-top:16px"><h3>Quick Actions</h3><div class="row">
+    <button class="btn btn-primary" id="goMenu">Manage Menu</button>
+    <button class="btn btn-secondary" id="goTheme">Change Theme</button>
+    <button class="btn btn-secondary" id="openPublic">Open Public Menu</button>
+   </div></div>
+  </div>
+
+  <div id="profile" class="section">
+   <div class="card"><h3>Restaurant Profile</h3>
+    <div class="form-group"><label>Restaurant Name</label><input id="pName" class="input"></div>
+    <div class="form-group"><label>Phone</label><input id="pPhone" class="input"></div>
+    <div class="form-group"><label>Address</label><textarea id="pAddress" class="textarea"></textarea></div>
+    <div class="form-group"><label>Logo URL</label><input id="pLogo" class="input"></div>
+    <button id="saveProfile" class="btn btn-primary">Save Profile</button>
+   </div>
+  </div>
+
+  <div id="menu" class="section">
+   <div class="card"><div class="row between"><h3>Menu Items</h3><span class="muted">ON/OFF controls visibility</span></div>
+    <div style="overflow:auto"><table class="table"><thead><tr><th>Name</th><th>Category</th><th>Price</th><th>Visibility</th></tr></thead><tbody id="menuRows"></tbody></table></div>
+   </div>
+  </div>
+
+  <div id="theme" class="section">
+   <div class="card"><h3>Theme & Branding</h3><p class="muted">These colors are saved to your restaurant and used by the public menu.</p>
+    <div class="grid">
+     <div class="form-group"><label>Primary Color</label><input id="cPrimary" class="input" type="color" value="#641219"></div>
+     <div class="form-group"><label>Accent Color</label><input id="cAccent" class="input" type="color" value="#d8ad62"></div>
+     <div class="form-group"><label>Background Color</label><input id="cBg" class="input" type="color" value="#fffaf1"></div>
+    </div>
+    <div id="themePreview" class="theme-preview">Your Restaurant</div>
+    <button id="saveTheme" class="btn btn-primary" style="margin-top:15px">Save Theme</button>
+    <div id="themeMsg" class="success hidden" style="margin-top:12px"></div>
+   </div>
+  </div>
+
+  <div id="public" class="section">
+   <div class="card"><h3>Public Menu Information</h3>
+    <div class="form-group"><label>Welcome Text</label><input id="welcomeText" class="input"></div>
+    <div class="form-group"><label>Tagline</label><input id="tagline" class="input"></div>
+    <div class="form-group"><label>Subtitle</label><input id="subtitleText" class="input"></div>
+    <div class="grid">
+     <div class="form-group"><label>Feature 1</label><input id="feature1" class="input"></div>
+     <div class="form-group"><label>Feature 2</label><input id="feature2" class="input"></div>
+     <div class="form-group"><label>Feature 3</label><input id="feature3" class="input"></div>
+    </div>
+    <div class="grid">
+     <div class="form-group"><label>Slogan 1</label><input id="slogan1" class="input"></div>
+     <div class="form-group"><label>Slogan 2</label><input id="slogan2" class="input"></div>
+    </div>
+    <button id="savePublic" class="btn btn-primary">Save Public Information</button>
+   </div>
+  </div>
+ </main>
+</div>
 
 <script>
-/* ============================================================
-   OWNER PAGE AUTH — NO SEPARATE login.html REQUIRED
-   If the user is logged out, this same page shows Owner Login.
-   ============================================================
-   SUPABASE CONFIG — TAKEN FROM YOUR SUPPLIED OWNER CODE
-   ============================================================ */
-const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SUPABASE_URL="https://pfsrpowopbrevocwsuii.supabase.co";
+const SUPABASE_KEY="sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-let session=null,currentRestaurant=null,currentRestaurantId=null,items=[],activeSection="dashboard";
-let mediaRules={max_mb:1,logo_enabled:true,banner_enabled:true,gallery_paid_enabled:false};
-let isPremiumRestaurant=false;
+let restaurant=null, items=[];
 
 const $=id=>document.getElementById(id);
-const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
-const cleanNum=v=>v!==""&&v!==null&&v!==undefined&&!Number.isNaN(Number(v))?Number(v):null;
-function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),2300)}
-function initials(name){return (name||"Owner").split(/\s+/).slice(0,2).map(x=>x[0]).join("").toUpperCase()}
-function publicUrl(){return new URL("menu.html?r="+encodeURIComponent(currentRestaurant?.slug||""),location.href).href}
+const show=(el,on)=>el.classList.toggle("hidden",!on);
+const msg=(id,text,type="error")=>{const e=$(id);e.textContent=text;e.className=type;};
 
-/* ---------- Navigation ---------- */
-const sections=["dashboard","restaurant","menu","categories","gallery","qr","preview","analytics","settings","orders","support"];
-function showSection(name){
-  activeSection=sections.includes(name)?name:"dashboard";
-  sections.forEach(s=>$("section-"+s)?.classList.toggle("hidden",s!==activeSection));
-  document.querySelectorAll(".navItem").forEach(a=>a.classList.toggle("active",a.dataset.section===activeSection));
-  $("sidebar").classList.remove("open");
-  if(activeSection==="preview") $("previewFrame").src=publicUrl();
-  if(activeSection==="qr") renderQR();
+function authScreen(){
+  show($("authScreen"),true);show($("app"),false);
+  $("loginEmail").value="";$("loginPassword").value="";
 }
-document.querySelectorAll(".navItem").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();history.replaceState(null,"","#"+a.dataset.section);showSection(a.dataset.section)}));
-window.addEventListener("hashchange",()=>showSection(location.hash.slice(1)||"dashboard"));
-$("mobileMenu").onclick=()=>$("sidebar").classList.toggle("open");
+function appScreen(){show($("authScreen"),false);show($("app"),true)}
 
+$("loginTab").onclick=()=>{ $("loginTab").classList.add("active");$("signupTab").classList.remove("active");show($("loginBox"),true);show($("signupBox"),false)};
+$("signupTab").onclick=()=>{ $("signupTab").classList.add("active");$("loginTab").classList.remove("active");show($("loginBox"),false);show($("signupBox"),true)};
 
+async function login(){
+  const email=$("loginEmail").value.trim(), password=$("loginPassword").value;
+  if(!email||!password)return msg("loginError","Enter email and password.");
+  show($("loginBtn"),false);
+  const {error}=await sb.auth.signInWithPassword({email,password});
+  show($("loginBtn"),true);
+  if(error)return msg("loginError",error.message);
+  await openDashboard();
+}
+$("loginBtn").onclick=login;
+$("loginPassword").onkeydown=e=>{if(e.key==="Enter")login()};
 
-function showOwnerLogin(){
-  $("loader").classList.add("hidden");
-  $("ownerAuth").classList.add("show");
-  $("authChoiceCard").style.display="block";
-  $("loginCard").style.display="none";
-  $("signupCard").style.display="none";
+async function signup(){
+  const full_name=$("fullName").value.trim(), phone=$("mobile").value.trim(), email=$("signupEmail").value.trim();
+  const password=$("signupPassword").value, name=$("restaurantName").value.trim(), address=$("restaurantAddress").value.trim();
+  let slug=$("restaurantSlug").value.trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+  if(!full_name||!email||!password||!name||!slug)return msg("signupError","Please fill all required fields.");
+  $("signupBtn").disabled=true;$("signupBtn").textContent="Creating...";
+  const {data,error}=await sb.auth.signUp({email,password,options:{data:{full_name,phone}}});
+  if(error){$("signupBtn").disabled=false;$("signupBtn").textContent="Create Owner Account";return msg("signupError",error.message)}
+  const uid=data.user?.id;
+  if(!uid){return msg("signupError","Account created. Please verify your email and then login.")}
+  const {error:re}=await sb.from("restaurants").insert({owner_id:uid,name,slug,phone,address,status:"pending",plan:"free",subscription_status:"inactive"});
+  if(re){$("signupBtn").disabled=false;$("signupBtn").textContent="Create Owner Account";return msg("signupError",re.message)}
+  $("signupBtn").disabled=false;$("signupBtn").textContent="Create Owner Account";
+  $("loginTab").click();$("loginEmail").value=email;
+  msg("loginError","Account created. Please login.","success");
 }
-function hideOwnerLogin(){
-  $("ownerAuth").classList.remove("show");
-}
-function showLoginForm(){
-  $("ownerAuth").classList.add("show");
-  $("authChoiceCard").style.display="none";
-  $("loginCard").style.display="block";
-  $("signupCard").style.display="none";
-}
-function showSignupForm(){
-  $("ownerAuth").classList.add("show");
-  $("authChoiceCard").style.display="none";
-  $("loginCard").style.display="none";
-  $("signupCard").style.display="block";
-}
-function showAuthChoice(){
-  $("ownerAuth").classList.add("show");
-  $("authChoiceCard").style.display="block";
-  $("loginCard").style.display="none";
-  $("signupCard").style.display="none";
-}
-function setAuthMsg(id,msg,ok=false){
-  const el=$(id); el.textContent=msg; el.style.display=msg?"block":"none";
-  if(el) el.className=ok?"authSuccess":"authError";
-}
+$("signupBtn").onclick=signup;
 
-async function ownerLogin(){
-  const email=$("loginEmailNew").value.trim();
-  const password=$("loginPasswordNew").value;
-  setAuthMsg("loginErrorNew","");
-  if(!email || !password){
-    setAuthMsg("loginErrorNew","Please enter email and password.");
+async function openDashboard(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session?.user){authScreen();return}
+  $("userEmail").textContent=session.user.email||"";
+  // Always identify restaurant by the logged-in user's owner_id.
+  const {data,error}=await sb.from("restaurants").select("*").eq("owner_id",session.user.id).maybeSingle();
+  if(error){await sb.auth.signOut();authScreen();return msg("loginError",error.message)}
+  if(!data){
+    await sb.auth.signOut();authScreen();
+    alert("No restaurant is linked to this login account.");
     return;
   }
-  $("loginSubmitNew").disabled=true;
-  $("loginSubmitNew").textContent="Signing in...";
-  const {error}=await supabaseClient.auth.signInWithPassword({email,password});
-  if(error){
-    setAuthMsg("loginErrorNew",error.message);
-    $("loginSubmitNew").disabled=false;
-    $("loginSubmitNew").textContent="🔐 Login to Owner Panel";
-    return;
-  }
-  hideOwnerLogin();
-  $("loader").classList.remove("hidden");
-  await init();
-  $("loginSubmitNew").disabled=false;
-  $("loginSubmitNew").textContent="🔐 Login to Owner Panel";
+  restaurant=data;
+  appScreen();
+  fill();
+  await loadItems();
+  showSection("dashboard");
 }
 
-async function ownerSignup(){
-  setAuthMsg("signupErrorNew","");
-  setAuthMsg("signupSuccessNew","");
-  const name=$("signupName").value.trim();
-  const phone=$("signupPhone").value.trim();
-  const email=$("signupEmail").value.trim();
-  const password=$("signupPassword").value;
-  const confirm=$("signupConfirm").value;
-  const restaurant=$("signupRestaurant").value.trim();
-  const address=$("signupAddress").value.trim();
-  const slug=$("signupSlug").value.trim().toLowerCase()
-    .replace(/[^a-z0-9-]+/g,"-").replace(/^-+|-+$/g,"");
-
-  if(!name||!phone||!email||!password||!restaurant||!address||!slug){
-    setAuthMsg("signupErrorNew","Please complete all required fields.");
-    return;
-  }
-  if(password.length<6){
-    setAuthMsg("signupErrorNew","Password must be at least 6 characters.");
-    return;
-  }
-  if(password!==confirm){
-    setAuthMsg("signupErrorNew","Passwords do not match.");
-    return;
-  }
-  if(!/^\d{10}$/.test(phone.replace(/\D/g,""))){
-    setAuthMsg("signupErrorNew","Please enter a valid 10 digit mobile number.");
-    return;
-  }
-
-  $("signupSubmitNew").disabled=true;
-  $("signupSubmitNew").textContent="Creating account...";
-
-  const {data,error}=await supabaseClient.auth.signUp({
-    email,password,
-    options:{data:{full_name:name,phone,role:"owner"}}
-  });
-  if(error){
-    setAuthMsg("signupErrorNew",error.message);
-    $("signupSubmitNew").disabled=false;
-    $("signupSubmitNew").textContent="📝 Create Restaurant Account";
-    return;
-  }
-
-  // Supabase may require email confirmation. If a session exists, create the
-  // restaurant immediately; otherwise instruct the owner to confirm and login.
-  if(data.user && data.session){
-    const {data:existing,error:checkError}=await supabaseClient
-      .from("restaurants").select("id").eq("slug",slug).maybeSingle();
-
-    if(checkError){
-      setAuthMsg("signupErrorNew",checkError.message);
-      $("signupSubmitNew").disabled=false;
-      $("signupSubmitNew").textContent="📝 Create Restaurant Account";
-      return;
-    }
-    if(existing){
-      setAuthMsg("signupErrorNew","This Menu Slug is already in use. Please choose another.");
-      $("signupSubmitNew").disabled=false;
-      $("signupSubmitNew").textContent="📝 Create Restaurant Account";
-      return;
-    }
-
-    const {data:restaurantRow,error:restaurantError}=await supabaseClient
-      .from("restaurants")
-      .insert({
-        owner_id:data.user.id,
-        name:restaurant,
-        slug,
-        phone:phone.replace(/\D/g,""),
-        address,
-        status:"pending",
-        plan:"free",
-        subscription_status:"inactive"
-      })
-      .select("*").single();
-
-    if(restaurantError){
-      setAuthMsg("signupErrorNew","Account created but restaurant setup failed: "+restaurantError.message);
-      $("signupSubmitNew").disabled=false;
-      $("signupSubmitNew").textContent="📝 Create Restaurant Account";
-      return;
-    }
-
-    currentRestaurant=restaurantRow;
-    currentRestaurantId=restaurantRow.id;
-    setAuthMsg("signupSuccessNew","Account and restaurant created. Opening Owner Dashboard...",true);
-    setTimeout(async()=>{
-      hideOwnerLogin();
-      $("loader").classList.remove("hidden");
-      await init();
-    },500);
-  }else{
-    setAuthMsg("signupSuccessNew","Account created. Please verify your email, then login to open your Owner Dashboard.",true);
-    setTimeout(showLoginForm,900);
-  }
-
-  $("signupSubmitNew").disabled=false;
-  $("signupSubmitNew").textContent="📝 Create Restaurant Account";
-}
-
-$("openLoginBtn").onclick=showLoginForm;
-$("openSignupBtn").onclick=showSignupForm;
-$("backLoginBtn").onclick=showAuthChoice;
-$("backSignupBtn").onclick=showAuthChoice;
-$("goSignupFromLogin").onclick=showSignupForm;
-$("goLoginFromSignup").onclick=showLoginForm;
-$("loginSubmitNew").onclick=ownerLogin;
-$("loginPasswordNew").addEventListener("keydown",e=>{if(e.key==="Enter")ownerLogin()});
-$("signupSubmitNew").onclick=ownerSignup;
-
-/* ---------- Init/Auth ---------- */
-async function init(){
-  try{
-    $("loader")?.classList.remove("hidden");
-    const result=await Promise.race([
-      supabaseClient.auth.getSession(),
-      new Promise((_,reject)=>setTimeout(()=>reject(new Error("Supabase connection timed out. Please refresh and try again.")),10000))
-    ]);
-    session=result?.data?.session||null;
-    if(!session?.user){
-      showAuthChoice();
-      return;
-    }
-
-    if($("accountEmail")) $("accountEmail").value=session.user.email||"";
-    if($("ownerName")) $("ownerName").textContent=session.user.user_metadata?.full_name||session.user.email?.split("@")[0]||"Owner";
-    if($("avatar")) $("avatar").textContent=initials($("ownerName")?.textContent);
-
-    // IMPORTANT: Owner Panel always loads the restaurant linked to the
-    // currently authenticated owner. A URL slug must never override owner_id.
-    const {data,error}=await supabaseClient
-      .from("restaurants")
-      .select("*")
-      .eq("owner_id",session.user.id)
-      .limit(1);
-
-    if(error){
-      return fail("Could not load your restaurant profile: "+error.message);
-    }
-    if(!data?.length){
-      return fail("No restaurant is linked to this login account. Please login with the restaurant owner account.");
-    }
-
-    currentRestaurant=data[0];
-    currentRestaurantId=currentRestaurant.id;
-    fillProfile();
-    await loadItems();
-    await loadMediaRules();
-    $("loader")?.classList.add("hidden");
-    showSection(location.hash.slice(1)||"dashboard");
-  }catch(e){
-    console.error("Owner init failed:",e);
-    fail(e?.message||"Unexpected error while loading the Owner Panel.");
-  }
-}
-function fail(msg){
-  const loader=$("loader");
-  if(!loader) return alert(msg||"Unable to open Owner Panel");
-  loader.classList.remove("hidden");
-  loader.innerHTML=`<div style="text-align:center;padding:25px;max-width:520px"><i class="fa-solid fa-circle-exclamation" style="font-size:38px;color:#c33"></i><h3>Unable to open Owner Panel</h3><p>${esc(msg)}</p><button class="btn" onclick="location.href=location.pathname">Retry</button></div>`;
-}
-function fillProfile(){
-  const r=currentRestaurant;
-  const name=r.name||"Restaurant",logo=r.logo_url||"";
-  $("topName").textContent=name;$("profileName").textContent=name;$("statusName").textContent=name;$("themeName").textContent=name;
-  $("topAddress").textContent=r.address||"Restaurant Owner";
-  $("profilePhone").textContent=r.phone||"—";$("profileAddress").textContent=r.address||"—";$("profileSlug").textContent=r.slug||"—";
-  $("fName").value=r.name||"";$("fPhone").value=r.phone||"";$("fSlug").value=r.slug||"";$("fLogo").value=r.logo_url||"";$("fAddress").value=r.address||"";
-  if($("fLogoMedia")) $("fLogoMedia").value=r.logo_url||"";
-  if($("fBannerMedia")) $("fBannerMedia").value=r.banner_url||r.cover_url||"";
-  $("fWelcome").value=r.welcome_text??"Welcome to";
-  $("fTagline").value=r.tagline??r.name??"";
-  $("fSubtitle").value=r.subtitle_text??"THE TASTE YOU'LL LOVE";
-  $("fFeature1").value=r.feature_1??"";
-  $("fFeature2").value=r.feature_2??"";
-  $("fFeature3").value=r.feature_3??"";
-  $("fSlogan1").value=r.slogan_1??"Good Food";
-  $("fSlogan2").value=r.slogan_2??"Good Mood";
-  $("fOpenTime").value=r.opening_time??"11:00";
-  $("fCloseTime").value=r.closing_time??"23:00";
-  $("fCallText").value=r.call_button_text??"Call Restaurant";
-  $("fDineIn").checked=r.dine_in!==false;
-  $("fTakeaway").checked=r.takeaway!==false;
-  $("fDelivery").checked=r.home_delivery!==false;
-  $("cPrimary").value=r.primary_color||r.theme_primary||"#641219";
-  $("cAccent").value=r.accent_color||"#d8ad62";
-  $("cBg").value=r.background_color||r.theme_background||"#fffaf1";
+function fill(){
+  $("restaurantTitle").textContent=restaurant.name||"Restaurant";
+  $("dashName").textContent=restaurant.name||"—";
+  $("dashPlan").textContent=restaurant.plan||"Free";
+  $("pName").value=restaurant.name||"";$("pPhone").value=restaurant.phone||"";
+  $("pAddress").value=restaurant.address||"";$("pLogo").value=restaurant.logo_url||"";
+  $("welcomeText").value=restaurant.welcome_text||"";
+  $("tagline").value=restaurant.tagline||"";$("subtitleText").value=restaurant.subtitle_text||"";
+  $("feature1").value=restaurant.feature_1||"";$("feature2").value=restaurant.feature_2||"";$("feature3").value=restaurant.feature_3||"";
+  $("slogan1").value=restaurant.slogan_1||"";$("slogan2").value=restaurant.slogan_2||"";
+  $("cPrimary").value=restaurant.primary_color||restaurant.theme_primary||"#641219";
+  $("cAccent").value=restaurant.accent_color||restaurant.theme_accent||"#d8ad62";
+  $("cBg").value=restaurant.background_color||restaurant.theme_background||"#fffaf1";
   updateTheme();
-
-  const logoEl=$("topLogo");logoEl.src=logo||"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='100%25' height='100%25' rx='40' fill='%23641219'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' fill='white' font-size='30'%3E🍽%3C/text%3E%3C/svg%3E";
-  $("profileLogo").src=logoEl.src;$("mediaLogo").style.backgroundImage=`url("${logo}")`;
-  if(r.cover_url) $("mediaCover").style.backgroundImage=`url("${r.cover_url}")`;
-  if(r.gallery && $("fGallery")) $("fGallery").value=Array.isArray(r.gallery)?r.gallery.join("\n"):String(r.gallery);
-  if(r.cover_url && $("fCover")) $("fCover").value=r.cover_url;
 }
+
 async function loadItems(){
-  const {data,error}=await supabaseClient.from("menu_items").select("*").eq("restaurant_id",currentRestaurantId).order("id",{ascending:false});
-  if(error){toast(error.message);return}
-  items=data||[];renderAll();
+  const {data,error}=await sb.from("menu_items").select("*").eq("restaurant_id",restaurant.id).order("sort_order",{ascending:true,nullsFirst:false});
+  if(error){items=[];return}
+  items=data||[];$("dashItems").textContent=items.length;
+  $("menuRows").innerHTML=items.map(i=>`<tr><td><b>${esc(i.name||"")}</b></td><td>${esc(i.category||"")}</td><td>₹${i.price??""}</td><td><button class="btn ${i.is_available===false?"btn-secondary":"btn-primary"}" onclick="toggleItem('${i.id}',${i.is_available!==false})">${i.is_available===false?"OFF":"ON"}</button></td></tr>`).join("");
 }
+window.toggleItem=async(id,current)=>{
+  const {error}=await sb.from("menu_items").update({is_available:!current}).eq("id",id).eq("restaurant_id",restaurant.id);
+  if(error)return alert(error.message);
+  loadItems();
+};
 
-/* ---------- Rendering ---------- */
-function categories(){
-  return [...new Set(items.map(i=>(i.category||"General").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
-}
-function fillCategorySelects(){
-  const opts=categories().map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
-  ["menuCategoryFilter","fullCatFilter"].forEach(id=>$(id).innerHTML='<option value="">All Categories</option>'+opts);
-}
-function renderAll(){
-  fillCategorySelects();
-  $("statItems").textContent=items.length;$("statusItems").textContent=items.length;$("aItems").textContent=items.length;
-  $("statCats").textContent=categories().length;$("aCats").textContent=categories().length;
-  renderDashboardTable();renderFullTable();renderCategories();
-  $("statViews").textContent="—";
-}
-function typeCell(item){const t=item.item_type||((item.is_veg===false)?"nonveg":"veg");return `<span class="foodType ${t}"></span>`}
-function priceText(i){return [i.price_quarter,i.price_half,i.price_full].some(v=>v!==null&&v!==undefined)?`${i.price_quarter??"—"} / ${i.price_half??"—"} / ${i.price_full??"—"}`:(i.price!=null?`₹${i.price}`:"—")}
-function filtered(source,search,cat,type){
-  const q=(search||"").toLowerCase().trim();
-  return source.filter(i=>(!cat||(i.category||"General")===cat)&&(!type||(i.item_type||"veg")===type)&&(!q||[i.name,i.description,i.category].filter(Boolean).join(" ").toLowerCase().includes(q)));
-}
-function rowActions(i){return `<div class="actions"><button class="btn blue sm editItem" data-id="${i.id}"><i class="fa-solid fa-pen"></i></button><button class="btn danger sm deleteItem" data-id="${i.id}"><i class="fa-solid fa-trash"></i></button></div>`}
-function renderDashboardTable(){
- const list=filtered(items,$("menuSearch").value,$("menuCategoryFilter").value,$("menuTypeFilter").value);
- $("dashboardItems").innerHTML=list.length?list.slice(0,8).map(i=>`<tr><td><div class="foodName">${esc(i.name)}</div><div class="foodCat">${esc(i.category||"General")}</div></td><td>${typeCell(i)}</td><td class="pricesMini">${esc(priceText(i))}</td><td><button type="button" class="menuStatusBtn ${i.is_available!==false?"on":"off"}" data-status="${i.id}" title="Click to turn menu item ${i.is_available!==false?"OFF":"ON"}"><span class="dot"></span><span>${i.is_available!==false?"ON • Visible":"OFF • Hidden"}</span></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="5" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
-}
-function renderFullTable(){
- const list=filtered(items,$("fullSearch").value,$("fullCatFilter").value,$("fullTypeFilter").value);
- $("fullItems").innerHTML=list.length?list.map(i=>`<tr><td><div class="foodName">${esc(i.name)}</div><div class="foodCat">${esc(i.description||"")}</div></td><td>${esc(i.category||"General")}</td><td>${typeCell(i)}</td><td>${i.price??"—"}</td><td>${i.price_quarter??"—"}</td><td>${i.price_half??"—"}</td><td>${i.price_full??"—"}</td><td><button type="button" class="menuStatusBtn ${i.is_available!==false?"on":"off"}" data-status="${i.id}" title="Click to turn menu item ${i.is_available!==false?"OFF":"ON"}"><span class="dot"></span><span>${i.is_available!==false?"ON • Visible":"OFF • Hidden"}</span></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="9" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
-}
-function renderCategories(){
- const html=categories().map(c=>{
-   const count=items.filter(i=>(i.category||"General").trim()===c).length;
-   const image=items.find(i=>(i.category||"").trim()===c)?.image_url||"";
-   return `<div class="categoryCard"><div class="catImage" style="${image?`background-image:url('${esc(image)}')`:""}"></div><div class="catBody"><div class="catName">${esc(c)}</div><div class="catCount">${count} item${count===1?"":"s"}</div></div></div>`;
- }).join("");
- $("categoryCards").innerHTML=html||'<div class="muted" style="font-size:12px">No categories yet.</div>';
- $("categoryCardsFull").innerHTML=html||'<div class="muted" style="font-size:12px">No categories yet.</div>';
-}
-
-/* ---------- Item CRUD ---------- */
-function openItem(id=null){
- $("editId").value=id||"";
- $("modalTitle").textContent=id?"Edit Menu Item":"Add New Menu Item";
- const i=id?items.find(x=>String(x.id)===String(id)):null;
- $("mName").value=i?.name||"";$("mCategory").value=i?.category||"";
- $("mDesc").value=i?.description||"";$("mType").value=i?.item_type||((i?.is_veg===false)?"nonveg":"veg");
- $("mPrice").value=i?.price??"";$("mQtr").value=i?.price_quarter??"";$("mHalf").value=i?.price_half??"";$("mFull").value=i?.price_full??"";
- $("mAvailable").value=String(i?.is_available!==false);
- $("mAvailableSwitch").className=`switch ${i?.is_available!==false?"on":""}`;
- $("mAvailableText").textContent=i?.is_available!==false?"ON — Visible":"OFF — Hidden";
- $("itemModal").classList.add("show");
-}
-async function saveItem(){
- const id=$("editId").value,name=$("mName").value.trim(),category=$("mCategory").value.trim()||"General",description=$("mDesc").value.trim(),item_type=$("mType").value;
- if(!name)return toast("Item name is required");
- const payload={name,category,description,item_type,is_veg:item_type==="veg",price:cleanNum($("mPrice").value),price_quarter:cleanNum($("mQtr").value),price_half:cleanNum($("mHalf").value),price_full:cleanNum($("mFull").value),is_available:$("mAvailable").value!=="false"};
- $("saveItem").disabled=true;$("saveItem").textContent="Saving...";
- let res;
- if(id) res=await supabaseClient.from("menu_items").update(payload).eq("id",id).eq("restaurant_id",currentRestaurantId);
- else res=await supabaseClient.from("menu_items").insert([{restaurant_id:currentRestaurantId,...payload}]);
- $("saveItem").disabled=false;$("saveItem").innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Item';
- if(res.error){toast("Save failed: "+res.error.message);return}
- $("itemModal").classList.remove("show");toast(id?"Item updated":"Item added");await loadItems();
-}
-async function deleteItem(id){
- if(!confirm("Delete this menu item?"))return;
- const {error}=await supabaseClient.from("menu_items").delete().eq("id",id).eq("restaurant_id",currentRestaurantId);
- if(error)toast("Delete failed: "+error.message);else{toast("Item deleted");await loadItems()}
-}
-async function toggleAvailability(id,btn){
- const item=items.find(i=>String(i.id)===String(id));if(!item)return;
- const next=item.is_available===false;
- btn.disabled=true;
- const {error}=await supabaseClient.from("menu_items").update({is_available:next}).eq("id",id).eq("restaurant_id",currentRestaurantId);
- btn.disabled=false;
- if(error){toast("Could not change status. Run the menu-item ON/OFF SQL migration first.");return}
- item.is_available=next;
- toast(next?"Item is now ON / visible":"Item is now OFF / hidden");
- renderAll();
-}
-document.addEventListener("click",e=>{
- const modalStatus=e.target.closest("#mAvailableSwitch");
- if(modalStatus){ const on=$("mAvailable").value!=="true"; $("mAvailable").value=String(on); $("mAvailableSwitch").className=`switch ${on?"on":""}`; $("mAvailableText").textContent=on?"ON — Visible":"OFF — Hidden"; return; }
- const edit=e.target.closest(".editItem"),del=e.target.closest(".deleteItem"),status=e.target.closest("[data-status]");
- if(edit)openItem(edit.dataset.id);
- if(del)deleteItem(del.dataset.id);
- if(status)toggleAvailability(status.dataset.status,status);
-});
-$("saveItem").onclick=saveItem;$("openAdd").onclick=()=>openItem();$("openAdd2").onclick=()=>openItem();
-$("menuSearch").oninput=renderDashboardTable;$("menuCategoryFilter").onchange=renderDashboardTable;$("menuTypeFilter").onchange=renderDashboardTable;
-$("fullSearch").oninput=renderFullTable;$("fullCatFilter").onchange=renderFullTable;$("fullTypeFilter").onchange=renderFullTable;
-
-/* ---------- Profile ---------- */
 $("saveProfile").onclick=async()=>{
- const name=$("fName").value.trim(),phone=$("fPhone").value.trim(),logo_url=$("fLogo").value.trim(),address=$("fAddress").value.trim();
- if(!name)return toast("Restaurant name is required");
- const {data,error}=await supabaseClient.from("restaurants").update({name,phone,logo_url,address}).eq("id",currentRestaurantId).select().single();
- if(error){toast("Profile save failed: "+error.message);return}
- currentRestaurant=data;fillProfile();toast("Restaurant details saved");
-};
-$("chooseLogo").onclick=()=>$("logoFile").click();
-$("logoFile").onchange=()=>{$("chooseLogo").textContent=$("logoFile").files[0]?.name?.slice(0,18)||"Choose"};
-$("uploadLogo").onclick=()=>uploadMediaFile("logo");
-
-$("saveHeroInfo").onclick=async()=>{
-  const payload={
-    welcome_text:$("fWelcome").value.trim(),
-    tagline:$("fTagline").value.trim() || $("fName").value.trim(),
-    subtitle_text:$("fSubtitle").value.trim(),
-    feature_1:$("fFeature1").value.trim(),
-    feature_2:$("fFeature2").value.trim(),
-    feature_3:$("fFeature3").value.trim(),
-    slogan_1:$("fSlogan1").value.trim(),
-    slogan_2:$("fSlogan2").value.trim(),
-    opening_time:$("fOpenTime").value || null,
-    closing_time:$("fCloseTime").value || null,
-    call_button_text:$("fCallText").value.trim() || "Call Restaurant",
-    dine_in:$("fDineIn").checked,
-    takeaway:$("fTakeaway").checked,
-    home_delivery:$("fDelivery").checked
-  };
-  $("saveHeroInfo").disabled=true;
-  const {data,error}=await supabaseClient.from("restaurants").update(payload).eq("id",currentRestaurantId).select().single();
-  $("saveHeroInfo").disabled=false;
-  if(error){toast("Public information save failed: "+error.message);return}
-  currentRestaurant=data;
-  fillProfile();
-  toast("Public menu information saved");
+  const {error}=await sb.from("restaurants").update({name:$("pName").value.trim(),phone:$("pPhone").value.trim(),address:$("pAddress").value.trim(),logo_url:$("pLogo").value.trim()}).eq("id",restaurant.id).eq("owner_id",restaurant.owner_id);
+  if(error)return alert(error.message);restaurant={...restaurant,name:$("pName").value.trim(),phone:$("pPhone").value.trim(),address:$("pAddress").value.trim(),logo_url:$("pLogo").value.trim()};fill();alert("Profile saved.");
 };
 
-/* ---------- Categories ---------- */
-function openCat(){$("newCat").value="";$("catModal").classList.add("show")}
-$("addCategoryBtn").onclick=openCat;$("addCategory2").onclick=openCat;$("quickCategory").onclick=openCat;
-$("saveCategory").onclick=async()=>{
- const cat=$("newCat").value.trim();if(!cat)return toast("Enter a category name");
- if(categories().includes(cat))return toast("Category already exists");
- /* Existing schema has no category table. Create a zero-priced placeholder. */
- const {error}=await supabaseClient.from("menu_items").insert([{restaurant_id:currentRestaurantId,name:"New Item",category:cat,description:"",item_type:"veg",is_veg:true,price:null,price_quarter:null,price_half:null,price_full:null,is_available:true}]);
- if(error){toast("Could not create category: "+error.message);return}
- $("catModal").classList.remove("show");toast("Category created with a placeholder item");await loadItems();openItem(items.find(i=>i.category===cat)?.id);
-};
-
-/* ---------- QR ---------- */
-function renderQR(){
- const url=publicUrl();$("qrUrl").value=url;
- $("qrBox").innerHTML=`<img alt="QR Code" style="width:220px;height:220px" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(url)}">`;
-}
-$("quickQR").onclick=()=>{showSection("qr");history.replaceState(null,"","#qr")};
-$("copyQR").onclick=async()=>{await navigator.clipboard.writeText(publicUrl());toast("Menu link copied")};
-$("copyMenu").onclick=async()=>{await navigator.clipboard.writeText(publicUrl());toast("Menu link copied")};
-$("downloadQR").onclick=()=>{const a=document.createElement("a");a.href=$("qrBox").querySelector("img").src;a.download=(currentRestaurant.slug||"restaurant")+"-menu-qr.png";a.target="_blank";a.click()};
-
-/* ---------- Public menu ---------- */
-function openPublic(){window.open(publicUrl(),"_blank","noopener")}
-["publicTop","sidePublicBtn","quickPreview","openPublic2"].forEach(id=>$(id).onclick=openPublic);
-
-/* ---------- Theme preview ---------- */
 function updateTheme(){
- const p=$("cPrimary").value,a=$("cAccent").value,b=$("cBg").value;
- $("themePreview").style.background=`linear-gradient(135deg,${p},${a})`;
- $("themePreview").style.color="#fff";
+  $("themePreview").style.background=`linear-gradient(135deg,${$("cPrimary").value},${$("cAccent").value})`;
 }
 ["cPrimary","cAccent","cBg"].forEach(id=>$(id).addEventListener("input",updateTheme));
+
 $("saveTheme").onclick=async()=>{
- const payload={
-   primary_color:$("cPrimary").value,
-   primary_dark:$("cPrimary").value,
-   accent_color:$("cAccent").value,
-   background_color:$("cBg").value,
-   card_color:"#ffffff",
-   text_color:"#241719"
- };
- $("saveTheme").disabled=true;
- const {data,error}=await supabaseClient.from("restaurants").update(payload).eq("id",currentRestaurantId).select().single();
- $("saveTheme").disabled=false;
- if(error){toast("Theme save failed: "+error.message);return}
- currentRestaurant=data;
- fillProfile();
- toast("Theme saved — live menu updated");
-};
-$("quickTheme").onclick=()=>{showSection("settings");history.replaceState(null,"","#settings")};
-
-/* ---------- Media & Upload Policy ---------- */
-async function loadMediaRules(){
-  // Defaults are intentionally safe and let the dashboard load even when
-  // the optional RPC has not been added yet.
-  try{
-    const controller = new AbortController();
-    const timer = setTimeout(()=>controller.abort(),4500);
-    const result = await Promise.race([
-      supabaseClient.rpc("get_media_upload_rules"),
-      new Promise((_,reject)=>setTimeout(()=>reject(new Error("Media policy timeout")),4500))
-    ]);
-    clearTimeout(timer);
-    const {data,error}=result||{};
-    if(!error && data?.length){
-      mediaRules={
-        max_mb:Math.min(1,Number(data[0].max_image_size_mb||1)),
-        logo_enabled:data[0].logo_upload_enabled!==false,
-        banner_enabled:data[0].banner_upload_enabled!==false,
-        gallery_paid_enabled:data[0].gallery_paid_enabled===true
-      };
-    }
-  }catch(e){console.warn("Media policy RPC unavailable; using defaults.",e)}
-  try{ await refreshMediaPolicyUI(); }catch(e){console.warn("Media policy UI skipped",e)}
-}
-async function refreshMediaPolicyUI(){
-  const mb=Math.min(1,Number(mediaRules.max_mb||1));
-  if($("logoMaxText"))$("logoMaxText").textContent=mb+" MB";
-  if($("bannerMaxText"))$("bannerMaxText").textContent=mb+" MB";
-  if($("mediaRuleNote"))$("mediaRuleNote").textContent=
-    `Logo: ${mediaRules.logo_enabled?"1 allowed":"OFF"} • Banner: ${mediaRules.banner_enabled?"1 allowed":"OFF"} • Gallery: ${mediaRules.gallery_paid_enabled?"Premium only":"OFF"} • Max image: ${mb} MB`;
-
-  if($("chooseLogoMedia"))$("chooseLogoMedia").disabled=!mediaRules.logo_enabled;
-  if($("uploadLogoMedia"))$("uploadLogoMedia").disabled=!mediaRules.logo_enabled;
-  if($("chooseBannerMedia"))$("chooseBannerMedia").disabled=!mediaRules.banner_enabled;
-  if($("uploadBannerMedia"))$("uploadBannerMedia").disabled=!mediaRules.banner_enabled;
-
-  const r=currentRestaurant||{};
-  isPremiumRestaurant=
-    String(r.plan||"").toLowerCase()==="premium" &&
-    String(r.subscription_status||"").toLowerCase()==="active" &&
-    (!r.subscription_expires_at || new Date(r.subscription_expires_at)>new Date());
-
-  if($("galleryPaidBox"))$("galleryPaidBox").style.display=mediaRules.gallery_paid_enabled?"block":"none";
-  if($("galleryLocked")){
-    if(!mediaRules.gallery_paid_enabled){
-      $("galleryLocked").textContent="Photo Gallery is disabled by Super Admin.";
-      $("galleryUploadBox").style.display="none";
-    }else if(!isPremiumRestaurant){
-      $("galleryLocked").innerHTML="🔒 Photo Gallery is a <b>Premium feature</b>. An active Premium subscription is required.";
-      $("galleryUploadBox").style.display="none";
-    }else{
-      $("galleryLocked").innerHTML="✅ Premium Gallery access is active.";
-      $("galleryUploadBox").style.display="block";
-    }
-  }
-  renderGalleryList();
-}
-function validateMediaFile(file){
-  if(!file)return "Choose an image first.";
-  if(!file.type.startsWith("image/"))return "Only image files are allowed.";
-  const mb=Math.min(1,Number(mediaRules.max_mb||1));
-  if(file.size>mb*1024*1024)return `Image must be ${mb} MB or smaller.`;
-  return "";
-}
-async function uploadMediaFile(kind){
-  const enabled=kind==="logo"?mediaRules.logo_enabled:mediaRules.banner_enabled;
-  if(!enabled)return toast(`${kind==="logo"?"Logo":"Banner"} upload is disabled by Super Admin.`);
-  const file=kind==="logo"?$("logoFile").files[0]:$("bannerMediaFile").files[0];
-  const bad=validateMediaFile(file);if(bad)return toast(bad);
-  const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"");
-  const path=`${kind}_${currentRestaurantId}.${ext}`;
-  const btn=kind==="logo"?$("uploadLogo"):$("uploadBannerMedia");
-  if(btn){btn.disabled=true;btn.textContent="Uploading...";}
-  const {error}=await supabaseClient.storage.from("restaurant-logos").upload(path,file,{cacheControl:"3600",upsert:true,contentType:file.type});
-  if(btn){btn.disabled=false;btn.textContent="Upload";}
-  if(error)return toast("Upload failed: "+error.message);
-  const {data}=supabaseClient.storage.from("restaurant-logos").getPublicUrl(path);
-  if(kind==="logo"){ $("fLogo").value=data.publicUrl; $("fLogoMedia").value=data.publicUrl; }
-  else $("fBannerMedia").value=data.publicUrl;
-  toast(`${kind==="logo"?"Logo":"Banner"} uploaded — click Save`);
-}
-$("chooseLogoMedia").onclick=()=>$("logoMediaFile").click();
-$("logoMediaFile").onchange=()=>{$("chooseLogoMedia").textContent=$("logoMediaFile").files[0]?.name?.slice(0,18)||"Choose"};
-$("uploadLogoMedia").onclick=()=>uploadMediaFile("logo");
-
-$("chooseBannerMedia").onclick=()=>$("bannerMediaFile").click();
-$("bannerMediaFile").onchange=()=>{$("chooseBannerMedia").textContent=$("bannerMediaFile").files[0]?.name?.slice(0,18)||"Choose"};
-$("uploadBannerMedia").onclick=()=>uploadMediaFile("banner");
-
-$("chooseGalleryMedia").onclick=()=>$("galleryMediaFile").click();
-$("galleryMediaFile").onchange=()=>{$("chooseGalleryMedia").textContent=$("galleryMediaFile").files[0]?.name?.slice(0,18)||"Choose"};
-$("uploadGalleryMedia").onclick=async()=>{
-  if(!mediaRules.gallery_paid_enabled)return toast("Gallery is disabled by Super Admin.");
-  if(!isPremiumRestaurant)return toast("Upgrade to Premium to use the Gallery.");
-  const file=$("galleryMediaFile").files[0],bad=validateMediaFile(file);if(bad)return toast(bad);
-  const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"");
-  const path=`gallery/${currentRestaurantId}/${Date.now()}.${ext}`;
-  $("uploadGalleryMedia").disabled=true;$("uploadGalleryMedia").textContent="Uploading...";
-  const {error}=await supabaseClient.storage.from("restaurant-logos").upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type});
-  $("uploadGalleryMedia").disabled=false;$("uploadGalleryMedia").textContent="Upload to Gallery";
-  if(error)return toast("Gallery upload failed: "+error.message);
-  const {data}=supabaseClient.storage.from("restaurant-logos").getPublicUrl(path);
-  const gallery=Array.isArray(currentRestaurant.gallery)?[...currentRestaurant.gallery]:[];
-  gallery.push(data.publicUrl);
-  const {data:updated,error:updateError}=await supabaseClient.from("restaurants").update({gallery}).eq("id",currentRestaurantId).select("*").single();
-  if(updateError)return toast("Gallery save failed: "+updateError.message);
-  currentRestaurant=updated;fillProfile();renderGalleryList();toast("Gallery image added");
-};
-function renderGalleryList(){
-  const el=$("galleryList");if(!el)return;
-  const g=Array.isArray(currentRestaurant?.gallery)?currentRestaurant.gallery:[];
-  el.innerHTML=g.length?g.map((u,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)"><img src="${esc(u)}" style="width:48px;height:38px;object-fit:cover;border-radius:7px"><span style="flex:1;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(u)}</span><button class="btn sm" type="button" onclick="removeGalleryImage(${i})">Remove</button></div>`).join(""):'<div class="muted" style="font-size:10px">No gallery images yet.</div>';
-}
-async function removeGalleryImage(i){
-  if(!mediaRules.gallery_paid_enabled||!isPremiumRestaurant)return toast("Gallery access is not available.");
-  const g=Array.isArray(currentRestaurant?.gallery)?[...currentRestaurant.gallery]:[];
-  g.splice(i,1);
-  const {data,error}=await supabaseClient.from("restaurants").update({gallery:g}).eq("id",currentRestaurantId).select("*").single();
-  if(error)return toast(error.message);
-  currentRestaurant=data;fillProfile();renderGalleryList();toast("Gallery image removed");
-}
-$("saveMedia").onclick=async()=>{
-  const payload={logo_url:$("fLogoMedia").value.trim(),banner_url:$("fBannerMedia").value.trim()};
-  $("saveMedia").disabled=true;
-  const {data,error}=await supabaseClient.from("restaurants").update(payload).eq("id",currentRestaurantId).select("*").single();
-  $("saveMedia").disabled=false;
-  if(error)return toast("Media save failed: "+error.message);
-  currentRestaurant=data;fillProfile();toast("Image settings saved");
+  const payload={primary_color:$("cPrimary").value,accent_color:$("cAccent").value,background_color:$("cBg").value};
+  const {error}=await sb.from("restaurants").update(payload).eq("id",restaurant.id).eq("owner_id",restaurant.owner_id);
+  if(error)return msg("themeMsg",error.message);
+  restaurant={...restaurant,...payload};msg("themeMsg","Theme saved successfully. Refresh the public menu to see the changes.","success");
 };
 
-/* ---------- Logout ---------- */
-async function logout(){await supabaseClient.auth.signOut();showAuthChoice()}
-$("logoutBtn").onclick=logout;$("logout2").onclick=logout;
+$("savePublic").onclick=async()=>{
+  const payload={welcome_text:$("welcomeText").value,tagline:$("tagline").value,subtitle_text:$("subtitleText").value,feature_1:$("feature1").value,feature_2:$("feature2").value,feature_3:$("feature3").value,slogan_1:$("slogan1").value,slogan_2:$("slogan2").value};
+  const {error}=await sb.from("restaurants").update(payload).eq("id",restaurant.id).eq("owner_id",restaurant.owner_id);
+  if(error)return alert(error.message);restaurant={...restaurant,...payload};alert("Public menu information saved.");
+};
 
-/* ---------- Modal close ---------- */
-document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove("show"));
-document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("show")}));
+function showSection(id){
+  document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));
+  const el=$(id);if(el)el.classList.add("active");
+  document.querySelectorAll(".nav button[data-section]").forEach(b=>b.classList.toggle("active",b.dataset.section===id));
+  $("pageTitle").textContent={dashboard:"Dashboard",profile:"Restaurant Profile",menu:"Menu",theme:"Theme",public:"Public Menu Info"}[id]||"Dashboard";
+}
+document.querySelectorAll(".nav button[data-section]").forEach(b=>b.onclick=()=>showSection(b.dataset.section));
+$("goMenu").onclick=()=>showSection("menu");$("goTheme").onclick=()=>showSection("theme");
+$("openPublic").onclick=()=>window.open(`restaurant-public-menu-attractive.html?slug=${encodeURIComponent(restaurant.slug)}`,"_blank");
 
-/* ---------- Misc ---------- */
-document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{showSection(b.dataset.go==="restaurantEdit"?"restaurant":b.dataset.go==="galleryEdit"?"gallery":"dashboard")});
-supabaseClient.auth.onAuthStateChange((event, newSession)=>{
-  if(event==="SIGNED_OUT"){
-    currentRestaurant=null; currentRestaurantId=null; items=[];
-    showOwnerLogin();
-  }
-});
-window.addEventListener("load",()=>{
-  Promise.resolve(init()).catch(err=>{
-    console.error("Owner init failed:",err);
-    $("loader").innerHTML=`<div style="text-align:center;padding:25px">
-      <i class="fa-solid fa-circle-exclamation" style="font-size:38px;color:#c33"></i>
-      <h3>Unable to open Owner Panel</h3>
-      <p>${esc(err?.message||"Unexpected error while loading the owner dashboard.")}</p>
-      <button class="btn" onclick="location.reload()">Retry</button>
-    </div>`;
-  });
-});
+$("logoutBtn").onclick=async()=>{await sb.auth.signOut();restaurant=null;items=[];authScreen()};
+
+function esc(v){return String(v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+
+// Critical requirement: never auto-open dashboard from an existing Supabase session.
+// Every fresh owner.html load starts at Login.
+authScreen();
 </script>
-
-<script>
-/* Direct links from Index:
-   owner.html?auth=login  -> Login form
-   owner.html?auth=signup -> Sign Up form
-*/
-window.addEventListener("load",function(){
-  const mode=new URLSearchParams(location.search).get("auth");
-  if(!mode) return;
-  setTimeout(()=>{
-    if(mode==="login") showLoginForm();
-    if(mode==="signup") showSignupForm();
-  },150);
-});
-</script>
-
 </body>
 </html>
