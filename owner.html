@@ -130,6 +130,22 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 @media(max-width:560px){.ownerAuthSplit .authChoiceGrid{grid-template-columns:1fr}}
 </style>
 
+
+<style id="freemenu-two-screen-auth-fix">
+.authRightPanel{background:#fff;min-height:520px}
+.authTabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#f3f4f6;border-radius:12px;padding:4px;margin:0 0 22px}
+.authTab{border:0;background:transparent;border-radius:9px;padding:11px 10px;font-weight:800;color:#687386;cursor:pointer;font-size:13px}
+.authTab.active{background:#fff;color:#8f1831;box-shadow:0 3px 10px rgba(15,23,42,.08)}
+.authCombinedForm .authFormCard{display:block!important;padding:0;box-shadow:none;border:0;background:transparent;max-width:none;margin:0}
+.authCombinedForm .authBack{display:none}
+.authCombinedForm .authBrand,.authCombinedForm .authKicker{display:none}
+.authCombinedForm .authFormCard h1{font-size:30px;margin-bottom:4px}
+.authCombinedForm .authFormCard .authSub{margin-bottom:18px}
+.authCombinedForm .signupCard{display:none!important}
+.authCombinedForm .signupCard.active{display:block!important}
+.authCombinedForm .loginCard.active{display:block!important}
+@media(max-width:760px){.ownerAuthSplit{grid-template-columns:1fr!important}.freemenu-login-brand{display:block!important;min-height:250px}.freemenu-login-brand-inner{padding:28px}.freemenu-login-brand h1{font-size:36px}.authRightPanel{min-height:auto!important;padding:28px 22px!important}}
+</style>
 </head>
 
 <body>
@@ -138,7 +154,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 <div id="ownerAuth">
   <div class="ownerAuthBackdrop"></div>
 
-  <!-- FIRST SCREEN: choose Login or Sign Up -->
+  <!-- AUTH SCREEN: exactly 2 sides — FreeMenu branding + Login/Sign Up -->
   <div class="ownerAuthCard ownerAuthSplit" id="authChoiceCard">
     <div class="freemenu-login-brand">
       <div class="freemenu-login-brand-inner">
@@ -154,27 +170,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
       </div>
     </div>
     <div class="authRightPanel">
-      <div class="authBrand">🍽</div>
       <div class="authKicker">FREEMENU • RESTAURANT PARTNER</div>
-      <h1>Restaurant Owner</h1>
-      <p class="authSub">Manage your digital menu, items and restaurant profile</p>
-      <div class="authFeatureBar"><div class="authFeature"><span>🍽️</span><strong>Digital Menu</strong></div><div class="authFeature"><span>📱</span><strong>QR Ready</strong></div><div class="authFeature"><span>⚡</span><strong>Easy Control</strong></div></div>
-      <div class="authChoiceGrid">
-        <button type="button" class="authChoiceBtn" id="openLoginBtn">
-          <span>🔐</span>
-          <b>Login</b>
-          <small>Already have an owner account</small>
-        </button>
-        <button type="button" class="authChoiceBtn" id="openSignupBtn">
-          <span>📝</span>
-          <b>Sign Up</b>
-          <small>Create a new restaurant account</small>
-        </button>
+      <div class="authTabs">
+        <button type="button" id="authLoginTab" class="authTab active">Login</button>
+        <button type="button" id="authSignupTab" class="authTab">Sign Up</button>
       </div>
-    </div>
-  </div>
-
-  <!-- LOGIN FORM -->
+      <div class="authCombinedForm">
+<!-- LOGIN FORM -->
   <div class="ownerAuthCard authFormCard" id="loginCard" style="display:none">
     <button type="button" class="authBack" id="backLoginBtn">← Back</button>
     <div class="authBrand">🔐</div><div class="authKicker">FreeMenu Owner Portal</div>
@@ -193,8 +195,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     <button type="button" class="loginSubmit" id="loginSubmitNew">🔐 Login to Owner Panel</button>
     <button type="button" class="authSwitch" id="goSignupFromLogin">New here? Create an account</button>
   </div>
-
-  <!-- SIGN UP FORM -->
+<!-- SIGN UP FORM -->
   <div class="ownerAuthCard authFormCard signupCard" id="signupCard" style="display:none">
     <button type="button" class="authBack" id="backSignupBtn">← Back</button>
     <div class="authBrand">📝</div><div class="authKicker">FreeMenu Partner</div>
@@ -241,6 +242,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
     <button type="button" class="loginSubmit" id="signupSubmitNew">📝 Create Restaurant Account</button>
     <button type="button" class="authSwitch" id="goLoginFromSignup">Already have an account? Login</button>
+  </div>
+      </div>
+    </div>
   </div>
 </div>
 </div>
@@ -620,31 +624,35 @@ $("mobileMenu").onclick=()=>$("sidebar").classList.toggle("open");
 function showOwnerLogin(){
   $("loader").classList.add("hidden");
   $("ownerAuth").classList.add("show");
-  $("authChoiceCard").style.display="block";
-  $("loginCard").style.display="none";
-  $("signupCard").style.display="none";
+  $("authChoiceCard").style.display="grid";
+  showLoginForm();
 }
 function hideOwnerLogin(){
   $("ownerAuth").classList.remove("show");
 }
 function showLoginForm(){
   $("ownerAuth").classList.add("show");
-  $("authChoiceCard").style.display="none";
+  $("authChoiceCard").style.display="grid";
+  $("loginCard").classList.add("active");
+  $("signupCard").classList.remove("active");
   $("loginCard").style.display="block";
   $("signupCard").style.display="none";
+  $("authLoginTab")?.classList.add("active");
+  $("authSignupTab")?.classList.remove("active");
 }
 function showSignupForm(){
   $("ownerAuth").classList.add("show");
-  $("authChoiceCard").style.display="none";
+  $("authChoiceCard").style.display="grid";
+  $("loginCard").classList.remove("active");
+  $("signupCard").classList.add("active");
   $("loginCard").style.display="none";
   $("signupCard").style.display="block";
+  $("authLoginTab")?.classList.remove("active");
+  $("authSignupTab")?.classList.add("active");
 }
-function showAuthChoice(){
-  $("ownerAuth").classList.add("show");
-  $("authChoiceCard").style.display="block";
-  $("loginCard").style.display="none";
-  $("signupCard").style.display="none";
-}
+function showAuthChoice(){ showLoginForm(); }
+$("authLoginTab")?.addEventListener("click",showLoginForm);
+$("authSignupTab")?.addEventListener("click",showSignupForm);
 function setAuthMsg(id,msg,ok=false){
   const el=$(id); el.textContent=msg; el.style.display=msg?"block":"none";
   if(el) el.className=ok?"authSuccess":"authError";
@@ -775,10 +783,6 @@ async function ownerSignup(){
   $("signupSubmitNew").textContent="📝 Create Restaurant Account";
 }
 
-$("openLoginBtn").onclick=showLoginForm;
-$("openSignupBtn").onclick=showSignupForm;
-$("backLoginBtn").onclick=showAuthChoice;
-$("backSignupBtn").onclick=showAuthChoice;
 $("goSignupFromLogin").onclick=showSignupForm;
 $("goLoginFromSignup").onclick=showLoginForm;
 $("loginSubmitNew").onclick=ownerLogin;
