@@ -114,38 +114,14 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
 
 <style id="freemenu-login-layout">
-.ownerAuthSplit{width:min(920px,96vw)!important;max-height:92vh!important;padding:0!important;overflow:hidden!important;display:grid!important;grid-template-columns:1fr 1fr;gap:0;background:#fff!important}
-.ownerAuthSplit .freemenu-login-brand{display:block!important;min-height:520px}
-.ownerAuthSplit .authRightPanel{padding:42px 42px 38px;display:flex;flex-direction:column;justify-content:center;min-width:0}
-.ownerAuthSplit .authRightPanel .authBrand{margin:0 auto 12px}
-.ownerAuthSplit .authRightPanel h1,.ownerAuthSplit .authRightPanel .authSub{text-align:center}
-.ownerAuthSplit .authChoiceGrid{grid-template-columns:1fr 1fr}
-.fm-kicker{font-size:10px;letter-spacing:2px;font-weight:800;color:#e3c271;margin-bottom:8px}
+#authChoice{grid-template-columns:minmax(300px,1fr) minmax(340px,1fr)!important}
+#ownerLogin{grid-template-columns:minmax(300px,1fr) minmax(340px,1fr)!important}
+#loginScreen{grid-template-columns:minmax(300px,1fr) minmax(340px,1fr)!important}
 @media(max-width:760px){
-.ownerAuthSplit{grid-template-columns:1fr!important;width:min(470px,96vw)!important;overflow:auto!important}
-.ownerAuthSplit .freemenu-login-brand{min-height:250px}
-.ownerAuthSplit .freemenu-login-brand-inner{padding:30px}
-.ownerAuthSplit .authRightPanel{padding:30px 24px}
+#authChoice,#ownerLogin,#loginScreen{grid-template-columns:1fr!important}
 }
-@media(max-width:560px){.ownerAuthSplit .authChoiceGrid{grid-template-columns:1fr}}
 </style>
 
-
-<style id="freemenu-two-screen-auth-fix">
-.authRightPanel{background:#fff;min-height:520px}
-.authTabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#f3f4f6;border-radius:12px;padding:4px;margin:0 0 22px}
-.authTab{border:0;background:transparent;border-radius:9px;padding:11px 10px;font-weight:800;color:#687386;cursor:pointer;font-size:13px}
-.authTab.active{background:#fff;color:#8f1831;box-shadow:0 3px 10px rgba(15,23,42,.08)}
-.authCombinedForm .authFormCard{display:block!important;padding:0;box-shadow:none;border:0;background:transparent;max-width:none;margin:0}
-.authCombinedForm .authBack{display:none}
-.authCombinedForm .authBrand,.authCombinedForm .authKicker{display:none}
-.authCombinedForm .authFormCard h1{font-size:30px;margin-bottom:4px}
-.authCombinedForm .authFormCard .authSub{margin-bottom:18px}
-.authCombinedForm .signupCard{display:none!important}
-.authCombinedForm .signupCard.active{display:block!important}
-.authCombinedForm .loginCard.active{display:block!important}
-@media(max-width:760px){.ownerAuthSplit{grid-template-columns:1fr!important}.freemenu-login-brand{display:block!important;min-height:250px}.freemenu-login-brand-inner{padding:28px}.freemenu-login-brand h1{font-size:36px}.authRightPanel{min-height:auto!important;padding:28px 22px!important}}
-</style>
 </head>
 
 <body>
@@ -154,29 +130,28 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 <div id="ownerAuth">
   <div class="ownerAuthBackdrop"></div>
 
-  <!-- AUTH SCREEN: exactly 2 sides — FreeMenu branding + Login/Sign Up -->
-  <div class="ownerAuthCard ownerAuthSplit" id="authChoiceCard">
-    <div class="freemenu-login-brand">
-      <div class="freemenu-login-brand-inner">
-        <div class="freemenu-login-logo">FM</div>
-        <div class="fm-kicker">RESTAURANT PARTNER</div>
-        <h1>FreeMenu</h1>
-        <p class="fm-tagline">Your restaurant menu, profile, QR and daily menu management — all in one simple owner panel.</p>
-        <div class="freemenu-login-points">
-          <div class="freemenu-login-point"><i class="fa-solid fa-utensils"></i><span>Manage your digital menu</span></div>
-          <div class="freemenu-login-point"><i class="fa-solid fa-qrcode"></i><span>Share your QR menu</span></div>
-          <div class="freemenu-login-point"><i class="fa-solid fa-palette"></i><span>Customize your restaurant theme</span></div>
-        </div>
-      </div>
+  <!-- FIRST SCREEN: choose Login or Sign Up -->
+  <div class="ownerAuthCard" id="authChoiceCard">
+    <div class="authBrand">🍽</div>
+    <div class="authKicker">FREEMENU • RESTAURANT PARTNER</div>
+    <h1>Restaurant Owner</h1>
+    <p class="authSub">Manage your digital menu, items and restaurant profile</p>
+    <div class="authFeatureBar"><div class="authFeature"><span>🍽️</span><strong>Digital Menu</strong></div><div class="authFeature"><span>📱</span><strong>QR Ready</strong></div><div class="authFeature"><span>⚡</span><strong>Easy Control</strong></div></div>
+    <div class="authChoiceGrid">
+      <button type="button" class="authChoiceBtn" id="openLoginBtn">
+        <span>🔐</span>
+        <b>Login</b>
+        <small>Already have an owner account</small>
+      </button>
+      <button type="button" class="authChoiceBtn" id="openSignupBtn">
+        <span>📝</span>
+        <b>Sign Up</b>
+        <small>Create a new restaurant account</small>
+      </button>
     </div>
-    <div class="authRightPanel">
-      <div class="authKicker">FREEMENU • RESTAURANT PARTNER</div>
-      <div class="authTabs">
-        <button type="button" id="authLoginTab" class="authTab active">Login</button>
-        <button type="button" id="authSignupTab" class="authTab">Sign Up</button>
-      </div>
-      <div class="authCombinedForm">
-<!-- LOGIN FORM -->
+  </div>
+
+  <!-- LOGIN FORM -->
   <div class="ownerAuthCard authFormCard" id="loginCard" style="display:none">
     <button type="button" class="authBack" id="backLoginBtn">← Back</button>
     <div class="authBrand">🔐</div><div class="authKicker">FreeMenu Owner Portal</div>
@@ -195,7 +170,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     <button type="button" class="loginSubmit" id="loginSubmitNew">🔐 Login to Owner Panel</button>
     <button type="button" class="authSwitch" id="goSignupFromLogin">New here? Create an account</button>
   </div>
-<!-- SIGN UP FORM -->
+
+  <!-- SIGN UP FORM -->
   <div class="ownerAuthCard authFormCard signupCard" id="signupCard" style="display:none">
     <button type="button" class="authBack" id="backSignupBtn">← Back</button>
     <div class="authBrand">📝</div><div class="authKicker">FreeMenu Partner</div>
@@ -242,9 +218,6 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
     <button type="button" class="loginSubmit" id="signupSubmitNew">📝 Create Restaurant Account</button>
     <button type="button" class="authSwitch" id="goLoginFromSignup">Already have an account? Login</button>
-  </div>
-      </div>
-    </div>
   </div>
 </div>
 </div>
@@ -595,6 +568,8 @@ const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let session=null,currentRestaurant=null,currentRestaurantId=null,items=[],activeSection="dashboard";
+let isAdminPreview=false;
+let adminReturnUrl=localStorage.getItem("fm_admin_return_url")||"";
 let mediaRules={max_mb:1,logo_enabled:true,banner_enabled:true,gallery_paid_enabled:false};
 let isPremiumRestaurant=false;
 
@@ -603,12 +578,7 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const cleanNum=v=>v!==""&&v!==null&&v!==undefined&&!Number.isNaN(Number(v))?Number(v):null;
 function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),2300)}
 function initials(name){return (name||"Owner").split(/\s+/).slice(0,2).map(x=>x[0]).join("").toUpperCase()}
-function publicUrl(){
-  const url=new URL("menu.html",location.href);
-  url.searchParams.set("r",currentRestaurant?.slug||"");
-  url.searchParams.set("v",Date.now().toString());
-  return url.href;
-}
+function publicUrl(){return new URL("menu.html?r="+encodeURIComponent(currentRestaurant?.slug||""),location.href).href}
 
 /* ---------- Navigation ---------- */
 const sections=["dashboard","restaurant","menu","categories","gallery","qr","preview","analytics","settings","orders","support"];
@@ -629,35 +599,31 @@ $("mobileMenu").onclick=()=>$("sidebar").classList.toggle("open");
 function showOwnerLogin(){
   $("loader").classList.add("hidden");
   $("ownerAuth").classList.add("show");
-  $("authChoiceCard").style.display="grid";
-  showLoginForm();
+  $("authChoiceCard").style.display="block";
+  $("loginCard").style.display="none";
+  $("signupCard").style.display="none";
 }
 function hideOwnerLogin(){
   $("ownerAuth").classList.remove("show");
 }
 function showLoginForm(){
   $("ownerAuth").classList.add("show");
-  $("authChoiceCard").style.display="grid";
-  $("loginCard").classList.add("active");
-  $("signupCard").classList.remove("active");
+  $("authChoiceCard").style.display="none";
   $("loginCard").style.display="block";
   $("signupCard").style.display="none";
-  $("authLoginTab")?.classList.add("active");
-  $("authSignupTab")?.classList.remove("active");
 }
 function showSignupForm(){
   $("ownerAuth").classList.add("show");
-  $("authChoiceCard").style.display="grid";
-  $("loginCard").classList.remove("active");
-  $("signupCard").classList.add("active");
+  $("authChoiceCard").style.display="none";
   $("loginCard").style.display="none";
   $("signupCard").style.display="block";
-  $("authLoginTab")?.classList.remove("active");
-  $("authSignupTab")?.classList.add("active");
 }
-function showAuthChoice(){ showLoginForm(); }
-$("authLoginTab")?.addEventListener("click",showLoginForm);
-$("authSignupTab")?.addEventListener("click",showSignupForm);
+function showAuthChoice(){
+  $("ownerAuth").classList.add("show");
+  $("authChoiceCard").style.display="block";
+  $("loginCard").style.display="none";
+  $("signupCard").style.display="none";
+}
 function setAuthMsg(id,msg,ok=false){
   const el=$(id); el.textContent=msg; el.style.display=msg?"block":"none";
   if(el) el.className=ok?"authSuccess":"authError";
@@ -788,6 +754,10 @@ async function ownerSignup(){
   $("signupSubmitNew").textContent="📝 Create Restaurant Account";
 }
 
+$("openLoginBtn").onclick=showLoginForm;
+$("openSignupBtn").onclick=showSignupForm;
+$("backLoginBtn").onclick=showAuthChoice;
+$("backSignupBtn").onclick=showAuthChoice;
 $("goSignupFromLogin").onclick=showSignupForm;
 $("goLoginFromSignup").onclick=showLoginForm;
 $("loginSubmitNew").onclick=ownerLogin;
@@ -803,12 +773,38 @@ async function init(afterLogin=false){
       new Promise((_,reject)=>setTimeout(()=>reject(new Error("Supabase connection timed out. Please refresh and try again.")),10000))
     ]);
     session=result?.data?.session||null;
+    const params=new URLSearchParams(location.search);
+    const previewId=params.get("restaurant_id");
+    isAdminPreview=params.get("admin_preview")==="1" && !!previewId;
+
     if(!session?.user){
       showAuthChoice();
       return;
     }
+
+    // Secure Admin Preview: the current Supabase session must itself be an admin.
+    // The restaurant id in the URL is NOT trusted; the RPC validates admin role server-side.
+    if(isAdminPreview){
+      const {data:previewRows,error:previewError}=await supabaseClient.rpc("admin_get_restaurant_preview",{p_restaurant_id:previewId});
+      if(previewError || !Array.isArray(previewRows) || !previewRows.length){
+        return fail("Admin preview denied or restaurant not found. Please check the Super Admin session and RPC setup.");
+      }
+      currentRestaurant=previewRows[0];
+      currentRestaurantId=currentRestaurant.id;
+      if($("accountEmail")) $("accountEmail").value=session.user.email||"";
+      if($("ownerName")) $("ownerName").textContent="Admin Preview";
+      if($("avatar")) $("avatar").textContent="AD";
+      showAdminPreviewBanner();
+      fillProfile();
+      await loadItems();
+      await loadMediaRules();
+      $("loader")?.classList.add("hidden");
+      showSection(location.hash.slice(1)||"dashboard");
+      return;
+    }
+
     if(!afterLogin){
-      // Fresh page load: always show Login/Sign Up, even if Supabase has a saved session.
+      // Fresh page load: always show Login/Sign Up for normal owner access.
       showAuthChoice();
       return;
     }
@@ -817,20 +813,14 @@ async function init(afterLogin=false){
     if($("ownerName")) $("ownerName").textContent=session.user.user_metadata?.full_name||session.user.email?.split("@")[0]||"Owner";
     if($("avatar")) $("avatar").textContent=initials($("ownerName")?.textContent);
 
-    // IMPORTANT: Owner Panel always loads the restaurant linked to the
-    // currently authenticated owner. A URL slug must never override owner_id.
     const {data,error}=await supabaseClient
       .from("restaurants")
       .select("*")
       .eq("owner_id",session.user.id)
       .limit(1);
 
-    if(error){
-      return fail("Could not load your restaurant profile: "+error.message);
-    }
-    if(!data?.length){
-      return fail("No restaurant is linked to this login account. Please login with the restaurant owner account.");
-    }
+    if(error) return fail("Could not load your restaurant profile: "+error.message);
+    if(!data?.length) return fail("No restaurant is linked to this login account. Please login with the restaurant owner account.");
 
     currentRestaurant=data[0];
     currentRestaurantId=currentRestaurant.id;
@@ -844,6 +834,17 @@ async function init(afterLogin=false){
     fail(e?.message||"Unexpected error while loading the Owner Panel.");
   }
 }
+function showAdminPreviewBanner(){
+  if(document.getElementById("adminPreviewBanner")) return;
+  const bar=document.createElement("div");
+  bar.id="adminPreviewBanner";
+  bar.style.cssText="position:fixed;top:0;left:0;right:0;z-index:99999;background:#111827;color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:center;gap:14px;font:600 13px Arial,sans-serif;box-shadow:0 2px 12px rgba(0,0,0,.25)";
+  bar.innerHTML=`<span>🔐 Super Admin Mode — Viewing <b>${esc(currentRestaurant?.name||"Restaurant")}</b></span><button id="exitAdminPreview" style="border:0;border-radius:8px;padding:7px 12px;cursor:pointer;background:#fff;color:#111827;font-weight:700">Exit Admin Mode</button>`;
+  document.body.appendChild(bar);
+  document.body.style.paddingTop="42px";
+  document.getElementById("exitAdminPreview").onclick=()=>{ const u=localStorage.getItem("fm_admin_return_url"); localStorage.removeItem("fm_admin_return_url"); location.href=u||"./"; };
+}
+
 function fail(msg){
   const loader=$("loader");
   if(!loader) return alert(msg||"Unable to open Owner Panel");
@@ -1204,7 +1205,15 @@ $("saveMedia").onclick=async()=>{
 };
 
 /* ---------- Logout ---------- */
-async function logout(){await supabaseClient.auth.signOut();showAuthChoice()}
+async function logout(){
+  if(isAdminPreview){
+    const u=localStorage.getItem("fm_admin_return_url");
+    localStorage.removeItem("fm_admin_return_url");
+    location.href=u||"./";
+    return;
+  }
+  await supabaseClient.auth.signOut();showAuthChoice()
+}
 $("logoutBtn").onclick=logout;$("logout2").onclick=logout;
 
 /* ---------- Modal close ---------- */
