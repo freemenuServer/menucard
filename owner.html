@@ -96,7 +96,33 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .authFeatureBar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0 20px}.authFeature{border:1px solid #eceff4;border-radius:11px;padding:9px 7px;text-align:center;background:#fafbfd}.authFeature strong{display:block;font-size:10px;color:#253046}.authFeature span{font-size:15px;display:block;margin-bottom:3px}
 .menuStatusBtn{display:inline-flex;align-items:center;gap:8px;border:1px solid #e2e7ee;border-radius:999px;padding:6px 10px;background:#f8fafc;font-size:10px;font-weight:900;cursor:pointer;min-width:74px;justify-content:center;transition:.18s}.menuStatusBtn.on{background:#eafaf2;border-color:#9cddbd;color:#087443}.menuStatusBtn.off{background:#fff4e8;border-color:#f2c58d;color:#a35a00}.menuStatusBtn .dot{width:8px;height:8px;border-radius:50%;background:#12a36b}.menuStatusBtn.off .dot{background:#d97706}.menuStatusBtn:hover{transform:translateY(-1px)}
 @media(max-width:560px){.authFeatureBar{grid-template-columns:1fr 1fr 1fr}.menuStatusBtn{min-width:68px}}
-</style></head>
+</style>
+<style id="freemenu-login-brand-style">
+.freemenu-login-brand{position:relative;background:linear-gradient(145deg,#19070a 0%,#641219 58%,#8f252f 100%);color:#fff;overflow:hidden}
+.freemenu-login-brand:before,.freemenu-login-brand:after{content:"";position:absolute;border:1px solid rgba(216,173,98,.22);border-radius:50%}
+.freemenu-login-brand:before{width:420px;height:420px;right:-230px;top:-180px}
+.freemenu-login-brand:after{width:300px;height:300px;left:-190px;bottom:-150px}
+.freemenu-login-brand-inner{position:relative;z-index:2;padding:48px;height:100%;display:flex;flex-direction:column;justify-content:center}
+.freemenu-login-logo{width:68px;height:68px;border-radius:20px;background:linear-gradient(135deg,#ead084,#c8943e);color:#2b0b0e;display:grid;place-items:center;font-size:25px;font-weight:900;box-shadow:0 12px 30px #0005;margin-bottom:22px}
+.freemenu-login-brand h1{font-size:44px;letter-spacing:-1.5px;margin:0 0 10px}
+.freemenu-login-brand .fm-tagline{font-size:15px;line-height:1.7;color:#eadcdd;max-width:390px}
+.freemenu-login-points{display:grid;gap:14px;margin-top:28px}
+.freemenu-login-point{display:flex;align-items:center;gap:12px;font-size:13px;color:#f8eeee}
+.freemenu-login-point i{width:36px;height:36px;border-radius:11px;background:#ffffff12;display:grid;place-items:center;color:#e3c271}
+@media(max-width:760px){.freemenu-login-brand{display:none!important}}
+</style>
+
+
+<style id="freemenu-login-layout">
+#authChoice{grid-template-columns:minmax(300px,1fr) minmax(340px,1fr)!important}
+#ownerLogin{grid-template-columns:minmax(300px,1fr) minmax(340px,1fr)!important}
+#loginScreen{grid-template-columns:minmax(300px,1fr) minmax(340px,1fr)!important}
+@media(max-width:760px){
+#authChoice,#ownerLogin,#loginScreen{grid-template-columns:1fr!important}
+}
+</style>
+
+</head>
 
 <body>
 
