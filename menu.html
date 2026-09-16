@@ -1127,21 +1127,338 @@ footer{
 }
 </style>
 
+
+<style id="freemenu-image-style-v2">
+/* ===== Dark premium digital-menu design ===== */
+:root{
+  --fm-dark:#0b0e0f;
+  --fm-panel:#111516;
+  --fm-panel-2:#151a1b;
+  --fm-gold:#d9aa62;
+  --fm-gold-soft:#b98b4d;
+  --fm-cream:#f6f0e7;
+}
+body{
+  background:#e9e4dc!important;
+  color:#f5f1ea!important;
+  padding-bottom:30px!important;
+}
+.app-shell{
+  width:min(100%,1180px)!important;
+  margin:22px auto 0!important;
+  background:var(--fm-dark)!important;
+  border:1px solid rgba(217,170,98,.18)!important;
+  border-radius:24px!important;
+  overflow:hidden!important;
+  box-shadow:0 22px 70px rgba(0,0,0,.24)!important;
+}
+
+/* Header: logo + restaurant name centered, like the reference image */
+.hero{
+  min-height:178px!important;
+  border-radius:0!important;
+  background:
+    radial-gradient(circle at 18% 0%,rgba(217,170,98,.13),transparent 28%),
+    radial-gradient(circle at 84% 20%,rgba(217,170,98,.08),transparent 24%),
+    linear-gradient(180deg,#0d1112,#080b0c)!important;
+  border-bottom:1px solid rgba(217,170,98,.20)!important;
+  box-shadow:none!important;
+}
+.hero::before{width:250px!important;height:250px!important;right:-100px!important;top:-150px!important;background:rgba(217,170,98,.06)!important}
+.hero::after{width:180px!important;height:180px!important;left:-90px!important;bottom:-130px!important;background:rgba(217,170,98,.045)!important}
+.hero-cover,.hero-overlay{display:none!important}
+.hero-content{
+  min-height:178px!important;
+  padding:24px 32px 20px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  gap:7px!important;
+}
+.logo-wrap{
+  width:58px!important;
+  height:58px!important;
+  border-radius:50%!important;
+  border:1px solid var(--fm-gold)!important;
+  background:#101314!important;
+  box-shadow:0 7px 22px rgba(0,0,0,.35)!important;
+}
+.logo-wrap img{object-fit:cover!important}
+.hero-info{
+  width:100%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  min-width:0!important;
+}
+.hero-welcome{
+  order:0!important;
+  margin:0!important;
+  color:var(--fm-gold)!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-style:italic!important;
+  font-size:13px!important;
+}
+.restaurant-name,.hero .restaurant-name{
+  order:1!important;
+  margin:0!important;
+  color:#f5efe6!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-size:clamp(30px,5vw,46px)!important;
+  line-height:1.03!important;
+  letter-spacing:2px!important;
+  font-weight:700!important;
+  text-transform:uppercase!important;
+  text-shadow:none!important;
+}
+.hero-subtitle{
+  order:2!important;
+  color:#d4c8b8!important;
+  font-size:10px!important;
+  font-weight:800!important;
+  letter-spacing:3px!important;
+  text-transform:uppercase!important;
+}
+.hero-features,.hero-slogans{display:flex!important}
+.hero-features{
+  order:3!important;
+  justify-content:center!important;
+  gap:7px!important;
+  margin-top:3px!important;
+}
+.hero-feature{
+  background:transparent!important;
+  border:1px solid rgba(217,170,98,.38)!important;
+  color:#d9c8b0!important;
+  box-shadow:none!important;
+  border-radius:999px!important;
+  padding:4px 9px!important;
+  font-size:9px!important;
+}
+.hero-slogans{
+  order:4!important;
+  justify-content:center!important;
+  gap:10px!important;
+  margin-top:2px!important;
+  color:#b8aa9b!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-style:italic!important;
+  font-size:12px!important;
+}
+.hero-action{display:none!important}
+.restaurant-meta{order:5!important;margin-top:2px!important}
+.status-badge{
+  background:rgba(255,255,255,.07)!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  color:#ddd5cc!important;
+}
+
+/* Service strip becomes a clean dark information bar */
+.service-strip{
+  margin:0!important;
+  padding:11px 24px!important;
+  border:0!important;
+  border-bottom:1px solid rgba(217,170,98,.16)!important;
+  border-radius:0!important;
+  background:#0d1112!important;
+  box-shadow:none!important;
+}
+.service-left,.services{
+  color:#d8d0c7!important;
+}
+.open-pill{
+  background:#118447!important;
+  color:#fff!important;
+  box-shadow:none!important;
+}
+.service{
+  background:rgba(255,255,255,.045)!important;
+  border:1px solid rgba(255,255,255,.07)!important;
+  color:#d9d1c7!important;
+}
+
+/* Search + category navigation */
+.sticky-panel{
+  position:sticky!important;
+  top:0!important;
+  margin:0!important;
+  padding:16px 24px 12px!important;
+  background:rgba(11,14,15,.96)!important;
+  border:0!important;
+  border-bottom:1px solid rgba(217,170,98,.15)!important;
+  backdrop-filter:blur(14px)!important;
+}
+.search-wrap{
+  max-width:720px!important;
+  margin:0 auto 12px!important;
+  height:46px!important;
+  background:#14191a!important;
+  border:1px solid rgba(217,170,98,.30)!important;
+  border-radius:12px!important;
+  box-shadow:none!important;
+}
+.search-icon{color:#d9aa62!important}
+#menu-search{
+  height:44px!important;
+  background:transparent!important;
+  color:#f2ece3!important;
+}
+#menu-search::placeholder{color:#81786f!important}
+.category-scroll{
+  display:flex!important;
+  justify-content:center!important;
+  gap:8px!important;
+  overflow-x:auto!important;
+  scrollbar-width:none!important;
+}
+.category-scroll::-webkit-scrollbar{display:none!important}
+.cat-chip{
+  flex:0 0 auto!important;
+  border:1px solid rgba(217,170,98,.34)!important;
+  background:#101415!important;
+  color:#d8d0c8!important;
+  border-radius:999px!important;
+  padding:8px 15px!important;
+  font-size:11px!important;
+  font-weight:800!important;
+}
+.cat-chip.active{
+  background:var(--fm-gold)!important;
+  border-color:var(--fm-gold)!important;
+  color:#111!important;
+}
+
+/* Menu: two-column desktop layout like the reference */
+.menu-wrap{
+  padding:22px 24px 34px!important;
+  background:#0b0e0f!important;
+}
+.summary-line{
+  color:#968b81!important;
+  padding:0 2px 14px!important;
+}
+#menu-sections{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:14px!important;
+  align-items:start!important;
+}
+.category-section{
+  margin:0!important;
+  background:linear-gradient(180deg,#121718,#0f1314)!important;
+  border:1px solid rgba(217,170,98,.22)!important;
+  border-radius:15px!important;
+  overflow:hidden!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.16)!important;
+}
+.category-heading,.categoryHeadWithPrices{
+  background:transparent!important;
+  color:#f4eee5!important;
+  border-bottom:1px solid rgba(217,170,98,.18)!important;
+  padding:13px 15px!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.category-title{
+  color:#f4eee5!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-size:21px!important;
+  font-weight:700!important;
+  letter-spacing:.1px!important;
+}
+.item-count{color:#8f857c!important}
+.categoryPriceSwitch{
+  width:232px!important;
+  grid-template-columns:repeat(3,72px)!important;
+  gap:8px!important;
+}
+.categoryPriceSwitch span{
+  color:#c9bcae!important;
+  font-size:9px!important;
+  text-transform:uppercase!important;
+  letter-spacing:.5px!important;
+}
+.items-list{border:0!important;background:transparent!important}
+.menu-item{
+  background:transparent!important;
+  border-bottom:1px solid rgba(255,255,255,.07)!important;
+  padding:12px 14px!important;
+}
+.menu-item:last-child{border-bottom:0!important}
+.item-name{
+  color:#f5f0e9!important;
+  font-size:13px!important;
+  font-weight:800!important;
+}
+.item-desc{
+  color:#8f8983!important;
+  font-size:10px!important;
+  line-height:1.45!important;
+}
+.food-symbol{flex:0 0 auto!important}
+.three-price-cell{
+  color:#f2c77e!important;
+  font-size:12px!important;
+  font-weight:900!important;
+}
+.item-price-area{
+  flex:0 0 232px!important;
+  width:232px!important;
+  min-width:232px!important;
+}
+
+/* No dish photos in this design */
+.item-image-wrap,.item-image,.menu-item img:not(.logo-wrap img){display:none!important}
+
+/* Premium, restrained footer */
+.footer-note{
+  color:#746b63!important;
+  padding:22px 12px 8px!important;
+}
+
+/* Mobile */
+@media(max-width:800px){
+  .app-shell{
+    width:100%!important;
+    margin:0 auto!important;
+    border-radius:0!important;
+    border-left:0!important;
+    border-right:0!important;
+  }
+  #menu-sections{grid-template-columns:1fr!important}
+  .hero-content{padding:22px 16px 18px!important}
+  .menu-wrap{padding:18px 12px 28px!important}
+  .sticky-panel{padding:12px 12px 10px!important}
+}
+@media(max-width:560px){
+  .restaurant-name{font-size:30px!important;letter-spacing:1.2px!important}
+  .hero-features{display:none!important}
+  .service-strip{padding:9px 12px!important}
+  .service-left{font-size:10px!important}
+  .services{gap:4px!important}
+  .service{font-size:9px!important;padding:4px 6px!important}
+  .category-heading,.categoryHeadWithPrices{padding:11px 12px!important}
+  .category-title{font-size:19px!important}
+  .menu-item{padding:11px 12px!important}
+  .item-price-area{
+    flex-basis:164px!important;width:164px!important;min-width:164px!important;
+  }
+  .three-price-area,.categoryPriceSwitch{
+    width:164px!important;min-width:164px!important;
+    grid-template-columns:repeat(3,52px)!important;gap:4px!important;
+  }
+  .three-price-cell,.categoryPriceSwitch span{width:52px!important}
+}
+</style>
+
 </head>
 <body>
   <div class="app-shell">
 
 
-    <nav class="site-nav" aria-label="Restaurant navigation">
-      <div class="site-brand">
-        <div class="site-brand-mark" id="site-brand-mark"></div>
-      </div>
-      <div class="site-nav-links">
-        <button class="site-nav-link" type="button" onclick="document.getElementById('menu-sections').scrollIntoView({behavior:'smooth'})">Menu</button>
-        <button class="site-nav-link" type="button" onclick="document.getElementById('service-strip').scrollIntoView({behavior:'smooth'})">About</button>
-        <a class="site-nav-link" id="site-contact-link" href="#">Contact</a>
-      </div>
-    </nav>
+
 
     <header class="hero" id="hero">
       <img id="rest-cover" class="hero-cover" alt="" style="display:none;" />
@@ -1498,8 +1815,8 @@ function getSavedCategoryOrder(rest, items) {
 
       const restaurantName = rest.name || "Restaurant";
       $("rest-welcome").textContent = rest.welcome_text || "Welcome to";
-      $("rest-name").textContent = rest.tagline || restaurantName;
-      $("rest-subtitle").textContent = rest.subtitle_text || "THE TASTE YOU\'LL LOVE";
+      $("rest-name").textContent = restaurantName;
+      $("rest-subtitle").textContent = rest.tagline || rest.subtitle_text || "THE TASTE YOU\'LL LOVE";
       const featureDefaults = ["Pure Veg & Non-Veg", "Hygienic Food", "Great Taste"];
       ["rest-feature1","rest-feature2","rest-feature3"].forEach((id, i) => {
         const el = $(id);
@@ -1513,7 +1830,7 @@ function getSavedCategoryOrder(rest, items) {
       document.title = `${restaurantName} • Menu`;
 
       const logoUrl = safeUrl(rest.logo_url);
-      const brandMark = document.getElementById("site-brand-mark");
+      const brandMark = null;
       $("logo-container").innerHTML = logoUrl
         ? `<img src="${escapeHTML(logoUrl)}" alt="${escapeHTML(rest.name || "Restaurant")} logo" onerror="this.parentElement.innerHTML=logoFallback()" />`
         : logoFallback();
@@ -1522,7 +1839,7 @@ function getSavedCategoryOrder(rest, items) {
           ? `<img src="${escapeHTML(logoUrl)}" alt="" onerror="this.parentElement.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/></svg>'" />`
           : `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/></svg>`;
       }
-      const contactLink=document.getElementById("site-contact-link");
+      const contactLink=null;
       if(contactLink && rest.phone){
         const phone=String(rest.phone).replace(/[^+\d]/g,"");
         contactLink.href=`tel:${phone}`;
