@@ -1,1859 +1,1254 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#7b1e16" />
-  <title>Digital Menu</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-
-  <style>
-    :root {
-      --primary: #7b1e16;
-      --primary-dark: #5a140f;
-      --primary-soft: #fff4e8;
-      --accent: #c8943e;
-      --bg: #f5eee5;
-      --surface: #fffaf2;
-      --surface-2: #f7eee4;
-      --text: #4a281a;
-      --muted: #7d6558;
-      --border: #d9c39a;
-      --veg: #16a34a;
-      --nonveg: #dc2626;
-      --egg: #d97706;
-      --danger: #dc2626;
-      --radius: 18px;
-      --shadow: 0 10px 30px rgba(15, 23, 42, .06);
-      --font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: var(--font-family);
-      background: var(--bg);
-      color: var(--text);
-      padding-bottom: calc(24px + env(safe-area-inset-bottom));
-    }
-
-    button, input { font: inherit; }
-    button { -webkit-tap-highlight-color: transparent; }
-    img { display: block; max-width: 100%; }
-
-    .app-shell {
-      width: min(100%, 820px);
-      margin: 0 auto;
-    }
-
-    /* HERO */
-    .hero {
-      position: relative;
-      min-height: 190px;
-      background:
-        linear-gradient(135deg, color-mix(in srgb, var(--primary) 94%, black 6%), var(--primary-dark));
-      overflow: hidden;
-      color: #fff;
-    }
-
-    .hero::before,
-    .hero::after {
-      content: "";
-      position: absolute;
-      border-radius: 999px;
-      background: rgba(255,255,255,.08);
-      pointer-events: none;
-    }
-    .hero::before { width: 190px; height: 190px; right: -70px; top: -65px; }
-    .hero::after { width: 120px; height: 120px; left: -40px; bottom: -55px; }
-
-    .hero-cover {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: .22;
-    }
-
-    .hero-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.44));
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      min-height: 190px;
-      display: flex;
-      align-items: flex-end;
-      gap: 14px;
-      padding: 22px 16px 18px;
-    }
-
-    .logo-wrap {
-      width: 68px;
-      height: 68px;
-      border-radius: 18px;
-      flex: 0 0 auto;
-      background: rgba(255,255,255,.96);
-      border: 3px solid rgba(255,255,255,.65);
-      box-shadow: 0 8px 24px rgba(0,0,0,.2);
-      overflow: hidden;
-      display: grid;
-      place-items: center;
-      color: var(--primary);
-    }
-
-    .logo-wrap img { width: 100%; height: 100%; object-fit: cover; }
-    .logo-fallback svg { width: 30px; height: 30px; }
-
-    .hero-info { min-width: 0; flex: 1; }
-    .restaurant-name {
-      margin: 0;
-      font-size: clamp(22px, 5vw, 30px);
-      line-height: 1.1;
-      font-weight: 850;
-      letter-spacing: -.5px;
-      text-shadow: 0 2px 10px rgba(0,0,0,.2);
-    }
-
-    .restaurant-meta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px 10px;
-      margin-top: 8px;
-      font-size: 12.5px;
-      color: rgba(255,255,255,.9);
-    }
-
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 9px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.16);
-      backdrop-filter: blur(8px);
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; }
-    .status-badge.closed .status-dot { background: #f87171; }
-
-    .hero-action {
-      flex: 0 0 auto;
-      width: 42px;
-      height: 42px;
-      border: 1px solid rgba(255,255,255,.32);
-      border-radius: 14px;
-      background: rgba(255,255,255,.16);
-      color: #fff;
-      display: none;
-      place-items: center;
-      text-decoration: none;
-      backdrop-filter: blur(10px);
-    }
-
-    /* STICKY CONTROL AREA */
-    .sticky-panel {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: color-mix(in srgb, var(--bg) 90%, transparent);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
-      padding: 10px 12px 8px;
-    }
-
-    .search-wrap {
-      position: relative;
-      display: flex;
-      align-items: center;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      box-shadow: 0 4px 16px rgba(15,23,42,.04);
-      overflow: hidden;
-    }
-
-    .search-icon {
-      width: 42px;
-      height: 42px;
-      display: grid;
-      place-items: center;
-      color: var(--muted);
-      flex: 0 0 auto;
-    }
-
-    #menu-search {
-      width: 100%;
-      height: 44px;
-      border: 0;
-      outline: 0;
-      background: transparent;
-      color: var(--text);
-      padding: 0 12px 0 0;
-      font-size: 14px;
-    }
-    #menu-search::placeholder { color: #9ca3af; }
-
-    .category-scroll {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-top: 9px;
-      scrollbar-width: none;
-      overscroll-behavior-inline: contain;
-    }
-    .category-scroll::-webkit-scrollbar { display: none; }
-
-    .cat-chip {
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--muted);
-      min-height: 34px;
-      padding: 7px 13px;
-      border-radius: 999px;
-      white-space: nowrap;
-      font-size: 12.5px;
-      font-weight: 750;
-      cursor: pointer;
-      transition: .18s ease;
-    }
-    .cat-chip.active {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: #fff;
-      box-shadow: 0 5px 14px color-mix(in srgb, var(--primary) 22%, transparent);
-    }
-
-    /* CONTENT */
-    .menu-wrap { padding: 14px 12px 30px; }
-
-    .summary-line {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin: 2px 2px 12px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .category-section {
-      scroll-margin-top: 110px;
-      margin-bottom: 20px;
-    }
-
-    .category-heading {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin: 0 2px 9px;
-    }
-
-    .category-title {
-      margin: 0;
-      font-size: 18px;
-      line-height: 1.2;
-      font-weight: 850;
-      letter-spacing: -.2px;
-    }
-    .item-count {
-      color: var(--muted);
-      font-size: 11.5px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .items-list {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-    }
-
-    .menu-item {
-      position: relative;
-      display: flex;
-      gap: 13px;
-      padding: 14px;
-      border-bottom: 1px solid var(--border);
-      transition: background .2s ease;
-    }
-    .menu-item:last-child { border-bottom: 0; }
-    .menu-item:active { background: var(--surface-2); }
-    .menu-item.unavailable { opacity: .58; }
-
-    .item-content { flex: 1; min-width: 0; }
-    .item-main-row { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
-    .item-info { flex: 1; min-width: 0; }
-    .item-topline { display: flex; align-items: flex-start; gap: 7px; }
-
-    /* Menu-style right-aligned portion columns */
-    .item-price-area {
-      flex: 0 0 158px;
-      width: 158px;
-      align-self: flex-start;
-      margin-left: auto;
-    }
-    .price-header {
-      display: grid;
-      grid-template-columns: repeat(3, 45px);
-      gap: 5px;
-      justify-content: end;
-      margin-bottom: 5px;
-      color: var(--text);
-      font-size: 10px;
-      line-height: 1;
-      font-weight: 850;
-      text-transform: uppercase;
-      letter-spacing: .45px;
-      text-align: center;
-    }
-    .price-header.single { grid-template-columns: 58px; }
-    .portion-prices {
-      display: grid;
-      grid-template-columns: repeat(3, 45px);
-      gap: 5px;
-      justify-content: end;
-      align-items: center;
-    }
-    .portion-price {
-      width: 45px;
-      min-width: 45px;
-      padding: 2px 0;
-      text-align: center;
-      border: 0;
-      background: transparent;
-      border-radius: 0;
-      color: var(--primary);
-      font-weight: 850;
-    }
-    .portion-price.empty {
-      background: transparent;
-      border: 0;
-      color: #cbbdaf;
-    }
-    .portion-price .label { display: none; }
-    .portion-price .amount {
-      margin-top: 0;
-      font-size: 13px;
-      line-height: 1.25;
-      white-space: nowrap;
-    }
-    .single-price-area { display: flex; justify-content: flex-end; }
-    .single-price {
-      margin-top: 0;
-      width: 58px;
-      padding: 2px 0;
-      border: 0;
-      background: transparent;
-      border-radius: 0;
-      color: var(--primary);
-      font-size: 13px;
-      font-weight: 850;
-      text-align: center;
-      white-space: nowrap;
-    }
-
-    .food-symbol {
-      width: 15px;
-      height: 15px;
-      margin-top: 2px;
-      border-radius: 3px;
-      display: grid;
-      place-items: center;
-      flex: 0 0 auto;
-    }
-    .food-symbol::after { content: ""; width: 7px; height: 7px; border-radius: 50%; }
-    .food-symbol.veg { border: 1.6px solid var(--veg); }
-    .food-symbol.veg::after { background: var(--veg); }
-    .food-symbol.nonveg { border: 1.6px solid var(--nonveg); }
-    .food-symbol.nonveg::after { background: var(--nonveg); border-radius: 1px; transform: rotate(45deg); width: 6px; height: 6px; }
-    .food-symbol.egg { border: 1.6px solid var(--egg); }
-    .food-symbol.egg::after { background: var(--egg); }
-
-    .item-name {
-      margin: 0;
-      font-size: 15.5px;
-      line-height: 1.25;
-      font-weight: 790;
-      color: var(--text);
-    }
-
-    .item-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin-top: 7px;
-    }
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      min-height: 20px;
-      padding: 3px 7px;
-      border-radius: 999px;
-      font-size: 10px;
-      line-height: 1;
-      font-weight: 800;
-      background: var(--primary-soft);
-      color: var(--primary-dark);
-    }
-    .tag.out { background: #fef2f2; color: #b91c1c; }
-    .tag.hot { background: #fff7ed; color: #c2410c; }
-
-    .item-desc {
-      margin: 7px 0 0;
-      color: var(--muted);
-      font-size: 12.5px;
-      line-height: 1.45;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    .item-image-wrap {
-      position: relative;
-      width: 92px;
-      height: 92px;
-      flex: 0 0 92px;
-      border-radius: 14px;
-      overflow: hidden;
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-    }
-    .item-image { width: 100%; height: 100%; object-fit: cover; }
-    .img-placeholder {
-      width: 100%; height: 100%;
-      display: grid; place-items: center;
-      color: #9ca3af;
-      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    }
-    .img-placeholder svg { width: 26px; height: 26px; }
-
-    /* Warm printed-menu card styling */
-    .category-section { margin-bottom: 18px; }
-    .category-heading {
-      margin: 0;
-      padding: 11px 14px;
-      background: var(--primary);
-      border-radius: 15px 15px 0 0;
-      color: #fffaf2;
-    }
-    .category-title {
-      color: #fffaf2;
-      font-size: 17px;
-      text-transform: uppercase;
-      letter-spacing: .35px;
-    }
-    .item-count { color: rgba(255,250,242,.78); }
-    .items-list {
-      border: 1px solid var(--border);
-      border-top: 0;
-      border-radius: 0 0 15px 15px;
-      background: var(--surface);
-      box-shadow: 0 4px 12px rgba(90,20,15,.07);
-    }
-    .menu-item {
-      padding: 11px 13px;
-      border-bottom: 1px dashed #e2cda9;
-      background: var(--surface);
-    }
-    .menu-item:last-child { border-bottom: 0; }
-    .item-name { color: #6b174b; font-size: 14.5px; }
-    .item-desc { color: #8a7668; }
-    .price-header { color: #5a321e; }
-    .summary-line { color: var(--muted); }
-
-    @media (max-width: 560px) {
-      .menu-item { padding: 10px 10px; gap: 8px; }
-      .item-main-row { gap: 6px; }
-      .item-price-area { flex-basis: 151px; width: 151px; }
-      .price-header, .portion-prices { grid-template-columns: repeat(3, 43px); gap: 4px; }
-      .portion-price { width: 43px; min-width: 43px; }
-      .price-header.single { grid-template-columns: 55px; }
-      .single-price { width: 55px; }
-      .item-name { font-size: 14px; }
-      .portion-price .amount, .single-price { font-size: 12px; }
-    }
-
-    /* STATES */
-    .state-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 34px 20px;
-      text-align: center;
-      box-shadow: var(--shadow);
-      color: var(--muted);
-    }
-    .state-card strong { display: block; color: var(--text); font-size: 17px; margin-bottom: 5px; }
-
-    .skeleton {
-      overflow: hidden;
-      position: relative;
-      background: #e9edf2;
-      border-radius: 10px;
-    }
-    .skeleton::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      transform: translateX(-100%);
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.65), transparent);
-      animation: shimmer 1.25s infinite;
-    }
-    @keyframes shimmer { 100% { transform: translateX(100%); } }
-
-    .loading-list {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-    }
-    .loading-row { display: flex; gap: 12px; padding: 14px; border-bottom: 1px solid var(--border); }
-    .loading-row:last-child { border-bottom: 0; }
-    .sk-line { height: 12px; margin-bottom: 8px; }
-    .sk-title { width: 58%; height: 15px; }
-    .sk-text { width: 85%; }
-    .sk-price { width: 35%; }
-    .sk-img { width: 90px; height: 90px; flex: 0 0 90px; }
-
-    .footer-note {
-      text-align: center;
-      color: #9ca3af;
-      font-size: 11px;
-      padding: 8px 16px 0;
-    }
-
-    @media (min-width: 640px) {
-      body { padding-top: 18px; }
-      .app-shell {
-        border-radius: 24px;
-        overflow: hidden;
-        box-shadow: 0 20px 60px rgba(15,23,42,.08);
-      }
-      .hero, .hero-content { min-height: 220px; }
-      .hero-content { padding: 28px 24px 22px; }
-      .sticky-panel { padding-inline: 18px; }
-      .menu-wrap { padding-inline: 18px; }
-      .menu-item { padding: 16px; }
-      .item-image-wrap { width: 110px; height: 100px; flex-basis: 110px; }
-    }
-  
-    .hero-welcome{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-size:18px;color:var(--accent,#d8ad62);margin-bottom:2px}
-    .hero-tagline{font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(28px,6vw,48px);line-height:.98;text-transform:uppercase;letter-spacing:1px;margin:0;color:#fff}
-    .hero-subtitle{font-size:12px;font-weight:800;letter-spacing:2px;margin-top:7px;color:rgba(255,255,255,.94)}
-    .hero-features{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:13px;font-size:12px;color:#fff}
-    .hero-feature{display:inline-flex;align-items:center;gap:5px}
-    .hero-slogans{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-size:19px;line-height:.98;margin-top:18px;color:#fff}
-    .hero-slogans div:last-child{padding-left:45px;margin-top:3px}
-    .service-strip{background:#fff;color:#111827;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;font-size:12px}
-    .service-left{display:flex;align-items:center;gap:13px;flex-wrap:wrap}
-    .open-pill{background:#12964e;color:#fff;border-radius:999px;padding:8px 13px;font-weight:800}
-    .service-time{font-weight:700}
-    .services{display:flex;align-items:center;gap:15px;flex-wrap:wrap;font-weight:700}
-    .service{display:inline-flex;align-items:center;gap:5px}
-    @media(max-width:640px){
-      .hero-features{gap:7px 10px}.hero-slogans{font-size:17px}
-      .service-strip{align-items:flex-start;flex-direction:column}.services{gap:10px}
-    }
-
-
-    /* ===== Modern restaurant menu refresh ===== */
-    .app-shell{background:var(--bg);}
-    .hero{
-      min-height:330px;
-      border-radius:0 0 28px 28px;
-      isolation:isolate;
-      box-shadow:0 14px 40px rgba(30,20,10,.16);
-    }
-    .hero-cover{opacity:.48;filter:saturate(1.05) contrast(1.04);transform:scale(1.02);}
-    .hero-overlay{
-      background:
-        linear-gradient(180deg,rgba(8,8,8,.05) 0%,rgba(8,8,8,.18) 40%,rgba(8,8,8,.82) 100%),
-        linear-gradient(135deg,rgba(0,0,0,.18),transparent 60%);
-    }
-    .hero::before{width:260px;height:260px;right:-120px;top:-110px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12)}
-    .hero::after{width:180px;height:180px;left:-90px;bottom:-110px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10)}
-    .hero-content{min-height:330px;align-items:flex-end;padding:24px 18px 20px;gap:14px;}
-    .logo-wrap{
-      width:78px;height:78px;border-radius:22px;border:4px solid rgba(255,255,255,.9);
-      box-shadow:0 12px 28px rgba(0,0,0,.28);background:#fff;
-    }
-    .hero-info{padding-bottom:2px;}
-    .hero-welcome{font-size:17px;opacity:.94}
-    .hero-tagline{font-size:clamp(30px,8vw,52px);text-shadow:0 3px 18px rgba(0,0,0,.25)}
-    .hero-subtitle{font-size:11px;letter-spacing:2.4px;opacity:.94}
-    .hero-features{gap:7px;margin-top:12px}
-    .hero-feature{padding:5px 9px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.10);border-radius:999px;backdrop-filter:blur(10px)}
-    .hero-slogans{margin-top:14px;font-size:18px}
-    .hero-action{display:grid;align-self:flex-end;width:44px;height:44px;border-radius:15px;box-shadow:0 10px 24px rgba(0,0,0,.2)}
-
-    .service-strip{
-      margin:-14px 12px 0;position:relative;z-index:4;border:1px solid rgba(255,255,255,.8);
-      border-radius:18px;box-shadow:0 10px 26px rgba(20,20,20,.10);padding:12px 14px;
-    }
-    .open-pill{padding:7px 11px;font-size:11px}
-    .services{font-size:11px;gap:9px;color:#4b5563}
-    .service{padding:4px 7px;background:#f8fafc;border-radius:999px}
-
-    .sticky-panel{
-      top:0;margin-top:10px;padding:10px 12px 7px;background:linear-gradient(180deg,rgba(245,238,229,.97),rgba(245,238,229,.82));
-      border-bottom:0;
-    }
-    .search-wrap{border-radius:17px;box-shadow:0 10px 24px rgba(0,0,0,.07);background:rgba(255,255,255,.9)}
-    .search-icon{width:46px;height:46px;color:var(--primary)}
-    #menu-search{height:46px;font-size:14px}
-    .category-scroll{gap:9px;padding:10px 1px 5px;margin-bottom:12px}
-    .cat-chip{border-radius:999px!important;padding:9px 14px!important;font-weight:800!important;box-shadow:0 3px 10px rgba(0,0,0,.05)}
-
-    .menu-wrap{padding:8px 12px 18px}
-    .summary-line{font-size:11px;font-weight:700;padding:3px 3px 10px}
-    .category-section{margin-bottom:20px}
-    .category-heading{
-      padding:13px 15px;border-radius:18px 18px 0 0;box-shadow:0 5px 16px rgba(60,20,10,.12);position:relative;overflow:hidden;
-    }
-    .category-heading::after{content:"";position:absolute;right:-15px;top:-24px;width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.09)}
-    .category-title{font-size:15px;letter-spacing:.8px}
-    .items-list{border-radius:0 0 18px 18px;box-shadow:0 8px 22px rgba(30,20,10,.08);}
-    .menu-item{padding:14px 13px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,250,242,.94));}
-    .menu-item + .menu-item{background:rgba(255,250,242,.92)}
-    .menu-item:active{transform:scale(.997);background:var(--surface-2)}
-    .item-main-row{align-items:center}
-    .item-topline{align-items:center}
-    .item-name{font-size:15.5px;letter-spacing:-.1px}
-    .item-desc{font-size:12px;line-height:1.5;margin-top:6px}
-    .item-tags{margin-top:7px}
-    .tag{padding:4px 8px;font-size:9.5px}
-    .item-price-area{flex-basis:156px;width:156px}
-    .price-header{font-size:9px;opacity:.7}
-    .portion-price .amount,.single-price{font-size:13.5px}
-    .food-symbol{width:16px;height:16px}
-
-    .footer-note{padding:12px 16px 22px;font-size:10px}
-    @media(max-width:560px){
-      .hero{min-height:300px}
-      .hero-content{min-height:300px;padding:20px 14px 18px}
-      .logo-wrap{width:70px;height:70px;border-radius:19px}
-      .service-strip{margin-top:-12px}
-      .menu-wrap{padding-inline:10px}
-      .item-price-area{flex-basis:144px;width:144px}
-      .price-header,.portion-prices{grid-template-columns:repeat(3,41px);gap:3px}
-      .portion-price{width:41px;min-width:41px}
-      .price-header.single{grid-template-columns:52px}.single-price{width:52px}
-      .item-name{font-size:14.2px}
-    }
-    @media(min-width:640px){
-      .app-shell{border-radius:28px;overflow:visible}
-      .hero{border-radius:28px}
-      .service-strip{margin-inline:18px}
-      .sticky-panel{padding-inline:18px}
-      .menu-wrap{padding-inline:18px}
-    }
-
-
-    /* ===== Official restaurant website look ===== */
-    body{
-      background:
-        radial-gradient(circle at 10% 0%, rgba(180,130,60,.08), transparent 28%),
-        linear-gradient(180deg,#f7f7f5 0%,#f4f4f2 100%);
-      color:var(--text);
-    }
-    .app-shell{max-width:1180px;width:calc(100% - 28px);}
-    .site-nav{
-      height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px;
-      padding:0 8px;margin:0 0 14px;border-bottom:1px solid rgba(0,0,0,.07);
-    }
-    .site-brand{display:flex;align-items:center;gap:10px;min-width:0;}
-    .site-brand-mark{width:40px;height:40px;border-radius:12px;background:var(--primary);display:grid;place-items:center;color:#fff;box-shadow:0 8px 18px rgba(0,0,0,.10);overflow:hidden}
-    .site-brand-mark img{width:100%;height:100%;object-fit:cover}
-    .site-brand-name{font-weight:850;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .site-nav-links{display:flex;gap:8px;align-items:center}
-    .site-nav-link{border:0;background:transparent;color:var(--muted);font-weight:750;font-size:12px;padding:10px 12px;border-radius:10px;cursor:pointer}
-    .site-nav-link:hover{background:#fff;color:var(--text)}
-    .hero{border-radius:28px;box-shadow:0 18px 50px rgba(28,25,23,.13);min-height:460px}
-    .hero-cover{opacity:.72;filter:saturate(1.04) contrast(1.03);}
-    .hero-overlay{background:linear-gradient(180deg,rgba(12,10,8,.10) 10%,rgba(12,10,8,.18) 35%,rgba(12,10,8,.72) 100%)}
-    .hero-content{min-height:460px;padding:34px 38px 34px;align-items:flex-end}
-    .logo-wrap{width:110px;height:110px;border-radius:28px;border:5px solid rgba(255,255,255,.9);box-shadow:0 14px 34px rgba(0,0,0,.24)}
-    .hero-info{padding-bottom:4px}
-    .hero-welcome{font-size:18px;letter-spacing:.2px}
-    .hero-tagline{font-size:clamp(34px,6vw,64px);letter-spacing:-1.5px;line-height:.95}
-    .hero-subtitle{font-size:12px;letter-spacing:3px;margin-top:10px}
-    .hero-features{margin-top:16px}
-    .hero-feature{padding:7px 11px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.20);border-radius:999px}
-    .hero-slogans{font-size:21px;margin-top:18px}
-    .hero-action{width:48px;height:48px;border-radius:16px}
-    .service-strip{
-      margin:14px 0 0;padding:14px 18px;background:#fff;border:1px solid rgba(0,0,0,.07);
-      border-radius:18px;box-shadow:0 10px 28px rgba(0,0,0,.05);
-    }
-    .sticky-panel{margin-top:14px;border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:12px 14px 10px;background:rgba(255,255,255,.91);box-shadow:0 10px 28px rgba(0,0,0,.05)}
-    .search-wrap{height:52px;border-radius:15px;box-shadow:none;background:#f7f7f5}
-    #menu-search{height:50px;font-size:14px}
-    .menu-wrap{padding:24px 4px 40px}
-    .category-section{margin-bottom:28px}
-    .category-heading{background:transparent;border-radius:0;padding:0 2px 10px;margin:0}
-    .category-title{color:var(--text);font-size:22px;text-transform:none;letter-spacing:-.3px}
-    .item-count{color:#8c8c86}
-    .items-list{border:1px solid rgba(0,0,0,.075);border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.045)}
-    .menu-item{padding:17px 18px;background:#fff;border-bottom:1px solid #efefec}
-    .menu-item + .menu-item{background:#fff}
-    .menu-item:hover{background:#fcfcfb}
-    .item-name{color:var(--text);font-size:15px}
-    .item-desc{color:#7c7d77}
-    .portion-price,.single-price{color:var(--primary)}
-    .footer-note{text-align:center;color:#a0a09b;padding:18px 16px 32px}
-    @media (max-width:900px){
-      .app-shell{width:calc(100% - 20px)}
-      .hero{min-height:410px}.hero-content{min-height:410px;padding:28px 24px}
-    }
-    @media (max-width:640px){
-      .app-shell{width:100%}.site-nav{padding:0 14px;height:62px;margin-bottom:10px}.site-nav-links{display:none}
-      .hero{border-radius:0;min-height:380px;box-shadow:none}.hero-content{min-height:380px;padding:22px 18px}
-      .logo-wrap{width:82px;height:82px;border-radius:22px}
-      .service-strip,.sticky-panel{border-radius:0;margin-top:10px}.menu-wrap{padding:20px 12px 32px}.category-title{font-size:20px}
-    }
-
-  </style>
-
-<style id="freemenu-no-banner-header">
-.hero{background:var(--surface)!important;color:var(--text)!important;min-height:0!important;border-radius:0 0 18px 18px!important;box-shadow:0 6px 24px rgba(0,0,0,.06)!important}
-.hero-cover,.hero-overlay{display:none!important}
-.hero-content{padding:22px 28px!important;min-height:0!important}
-.hero-info{color:var(--text)!important}
-.hero-welcome{color:var(--primary)!important}
-.hero-tagline,.hero-subtitle,.hero-slogans,.hero-feature{color:var(--text)!important}
-.hero-feature{background:rgba(0,0,0,.045)!important;border-color:rgba(0,0,0,.08)!important}
-.hero-action{position:static!important;margin-left:auto!important}
-.logo-wrap{background:#fff!important}
-@media(max-width:650px){.hero-content{padding:16px!important;gap:12px!important}.hero-slogans,.hero-features{display:none!important}}
-</style>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<style id="freemenu-price-ruler-fix">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Owner Dashboard — Digital Menu</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
 :root{
-  --fm-price-col:72px;
-  --fm-price-gap:8px;
-  --fm-price-width:232px;
+ --navy:#101827;--navy2:#172235;--primary:#b51d3b;--primary-dark:#89142b;
+ --pink:#f52f72;--bg:#f6f7fb;--card:#fff;--text:#111827;--muted:#697386;
+ --border:#e5e7eb;--green:#13a66b;--danger:#e5484d;--blue:#3283e8;
+ --shadow:0 8px 25px rgba(15,23,42,.06);--radius:14px;
 }
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoration:none;color:inherit}
+.hidden{display:none!important}.muted{color:var(--muted)}
+#loader{position:fixed;inset:0;background:#f6f7fb;display:grid;place-items:center;z-index:9999}
+.loader-card{text-align:center}.spinner{width:42px;height:42px;border:4px solid #ddd;border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:auto}@keyframes spin{to{transform:rotate(360deg)}}
 
-/* Both heading and every menu row use EXACTLY the same ruler */
-.categoryPriceSwitch,
-.three-price-area{
-  width:var(--fm-price-width)!important;
-  min-width:var(--fm-price-width)!important;
-  max-width:var(--fm-price-width)!important;
-  display:grid!important;
-  grid-template-columns:repeat(3,var(--fm-price-col))!important;
-  column-gap:var(--fm-price-gap)!important;
-  align-items:center!important;
-  justify-content:end!important;
-  margin-left:auto!important;
-  flex:0 0 var(--fm-price-width)!important;
-  box-sizing:border-box!important;
-}
+/* Layout */
+.app{min-height:100vh}.sidebar{position:fixed;left:0;top:0;bottom:0;width:238px;background:linear-gradient(180deg,#0d1624,#121b2b);color:#dce4f0;padding:22px 14px;z-index:100;overflow:auto}
+.logoArea{text-align:center;padding:5px 8px 22px}.chefLogo{font-size:32px;color:#f5bf47}.sideBrand{font-family:"Cormorant Garamond",serif;font-size:25px;font-weight:700;color:#fff}.sideSub{font-size:10px;letter-spacing:1.5px;color:#aab5c7}
+.navItem{display:flex;align-items:center;gap:13px;padding:12px 13px;margin:4px 0;border-radius:8px;font-size:13px;font-weight:600;color:#bdc8d9}
+.navItem i{width:19px;text-align:center}.navItem:hover{background:#1c2a40;color:#fff}.navItem.active{background:linear-gradient(90deg,#8f1831,#b51d3b);color:#fff;box-shadow:0 6px 18px rgba(181,29,59,.2)}
+.sidePromo{margin:24px 0 0;padding:20px 12px;border:1px solid rgba(255,255,255,.13);border-radius:10px;background:linear-gradient(145deg,#242039,#321f3a);text-align:center}
+.sidePromo i{color:#ffd34f;font-size:24px}.sidePromo strong{display:block;margin:8px 0 5px}.sidePromo p{font-size:11px;color:#c7c9d5;line-height:1.5;margin:0 0 12px}
+.btn-pink{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:0;background:#f32f72;color:#fff;border-radius:8px;padding:10px 12px;font-weight:800;font-size:12px;width:100%}
+.content{margin-left:238px;min-height:100vh}.topbar{height:78px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 25px;position:sticky;top:0;z-index:80}
+.restIdentity{display:flex;align-items:center;gap:12px}.restLogo{width:44px;height:44px;border-radius:50%;object-fit:cover;border:1px solid #ddd;background:#eee}.restTitle{font-size:17px;font-weight:800}.restAddress{font-size:11px;color:var(--muted);margin-top:2px}.topActions{display:flex;align-items:center;gap:12px}.openToggle{display:flex;align-items:center;gap:8px;background:#dff7ea;color:#087443;border:0;border-radius:20px;padding:9px 14px;font-size:12px;font-weight:800}.profile{display:flex;align-items:center;gap:9px;padding-left:13px;border-left:1px solid var(--border)}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#d91f35;color:#fff;font-weight:800}
+.container{max-width:1200px;margin:auto;padding:22px 20px 45px}.mobileMenu{display:none}
 
-.categoryPriceSwitch span,
-.three-price-cell{
-  width:var(--fm-price-col)!important;
-  min-width:var(--fm-price-col)!important;
-  max-width:var(--fm-price-col)!important;
-  text-align:center!important;
-  box-sizing:border-box!important;
-}
+/* Cards / common */
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}.cardTitle{font-size:16px;font-weight:800;margin:0 0 15px;display:flex;align-items:center;justify-content:space-between;gap:10px}.cardTitle small{font-size:11px;color:var(--muted);font-weight:500}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.stat{padding:17px;border-radius:12px;border:1px solid var(--border);background:#fff;box-shadow:var(--shadow);min-height:105px}.statTop{display:flex;justify-content:space-between;align-items:center}.statIcon{width:39px;height:39px;border-radius:10px;display:grid;place-items:center;background:#edf4ff;color:#287be0}.stat:nth-child(2) .statIcon{background:#fff0fa;color:#df2d8a}.stat:nth-child(3) .statIcon{background:#e9fbf5;color:#12a36b}.stat:nth-child(4) .statIcon{background:#f4edff;color:#8238d5}.statLabel{font-size:11px;margin-top:10px}.statValue{font-size:24px;font-weight:800;margin-top:2px}.statChange{font-size:10px;color:var(--green);font-weight:700}
+.twoCol{display:grid;grid-template-columns:1.15fr .85fr;gap:15px;margin-top:15px}.twoCol.equal{grid-template-columns:1fr 1fr}.threeCol{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.btn{border:1px solid var(--border);background:#fff;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:800;color:#263244}.btn:hover{background:#f8fafc}.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}.btn.danger{color:var(--danger);background:#fff1f1;border-color:#ffd0d0}.btn.blue{color:#1671d8;background:#edf6ff;border-color:#cde5ff}.btn.green{color:#087443;background:#e8faef;border-color:#bdeccf}.btn.sm{padding:7px 9px;font-size:11px}.actions{display:flex;gap:7px;flex-wrap:wrap}
+.formGroup{margin-bottom:13px}.formGroup label{display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px}.input,.select,.textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 11px;background:#fff;color:#172033;outline:none;font-size:13px}.textarea{min-height:82px;resize:vertical}.input:focus,.select:focus,.textarea:focus{border-color:#b7a0a5;box-shadow:0 0 0 3px rgba(181,29,59,.06)}
+.uploadRow{display:flex;gap:7px}.uploadRow .input{flex:1}.fileBtn{border:1px solid var(--border);background:#f5f7fa;border-radius:8px;padding:9px 11px;font-size:11px;font-weight:800;white-space:nowrap}
+.profileBox{display:grid;grid-template-columns:145px 1fr;gap:20px;align-items:center}.bigLogo{width:140px;height:140px;border-radius:50%;object-fit:cover;background:#f3f4f6;border:1px solid var(--border)}
+.mediaCover{height:180px;border-radius:11px;background:#e9e5df center/cover no-repeat;position:relative;overflow:hidden}.mediaCover .overlay{position:absolute;inset:auto 10px 10px auto;background:#fff;border-radius:8px;padding:8px 10px;font-size:11px;font-weight:800}.mediaTiles{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:9px}.mediaTile{height:105px;border-radius:10px;background:#f2eee8 center/cover no-repeat;display:flex;align-items:flex-end;justify-content:center;padding:7px}.mediaTile span{background:#fff;border-radius:6px;padding:6px 7px;font-size:9px;font-weight:800}
+.serviceBtns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:15px}.serviceBtn{border:1px solid var(--border);background:#fff;border-radius:9px;padding:10px;font-size:11px;font-weight:700}.serviceBtn i{margin-right:5px}
 
-.categoryPriceSwitch span{
-  font-family:Arial,sans-serif!important;
-  font-size:11px!important;
-  line-height:1.2!important;
-  font-weight:800!important;
-  color:#5f554f!important;
-  letter-spacing:.15px!important;
-}
+/* Menu */
+.menuToolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.menuToolbar .input{max-width:260px}.menuTable{width:100%;border-collapse:collapse;font-size:12px}.menuTable th{text-align:left;color:#6b7280;font-size:10px;text-transform:uppercase;padding:9px 6px;border-bottom:1px solid var(--border)}.menuTable td{padding:10px 6px;border-bottom:1px solid #eef0f3;vertical-align:middle}.menuTable tr:last-child td{border-bottom:0}.foodName{font-weight:800}.foodCat{font-size:10px;color:var(--muted);margin-top:2px}.foodType{display:inline-grid;place-items:center;width:16px;height:16px;border:1.5px solid #19a45a;border-radius:3px}.foodType.nv{border-color:#d93838}.foodType.nv:after{content:"";border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:7px solid #d93838}.foodType.veg:after{content:"";width:6px;height:6px;background:#19a45a;border-radius:50%}.foodType.egg{border-color:#d98b17}.foodType.egg:after{content:"";width:6px;height:6px;background:#d98b17;border-radius:50%}.pricesMini{white-space:nowrap;font-weight:700}.switch{width:38px;height:21px;background:#cbd5e1;border-radius:20px;padding:2px;border:0}.switch:after{content:"";display:block;width:17px;height:17px;border-radius:50%;background:#fff;transition:.2s}.switch.on{background:#17aa6b}.switch.on:after{transform:translateX(17px)}.statusToggle{display:inline-flex;align-items:center;gap:7px;border:0;background:transparent;padding:0;font-size:10px;font-weight:800}.statusToggle .statusText{min-width:30px;text-align:left}.statusToggle.off .statusText{color:#b45309}.statusToggle.on .statusText{color:#087443}.categoryCards{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.categoryCard{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff}.catImage{height:80px;background:#eee center/cover}.catBody{padding:9px}.catName{font-weight:800;font-size:12px}.catCount{font-size:10px;color:var(--muted);margin-top:3px}
 
-.three-price-cell{
-  font-family:Arial,sans-serif!important;
-  font-size:13px!important;
-  line-height:1.2!important;
-  font-weight:900!important;
-  color:#171412!important;
-  font-variant-numeric:tabular-nums!important;
-}
+/* Quick actions */
+.quickGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.quick{padding:14px;border-radius:10px;border:1px solid var(--border);display:flex;gap:12px;align-items:center}.quick i{font-size:20px;color:var(--green)}.quick strong{font-size:12px}.quick small{display:block;font-size:10px;color:var(--muted);margin-top:3px}
 
-/* Ensure item text does not push price ruler out of alignment */
-.menu-item,
-.food-item{
-  display:flex!important;
-  align-items:center!important;
-}
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;padding:18px;z-index:300}.modal.show{display:flex}.modalBox{background:#fff;border-radius:16px;width:min(650px,100%);max-height:90vh;overflow:auto;padding:20px}.modalHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.modalHead h3{margin:0;font-size:17px}.close{border:0;background:#f1f3f5;border-radius:8px;width:32px;height:32px}
+.previewFrame{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff}.previewTop{height:120px;background:linear-gradient(135deg,#461016,#9d2535);color:#fff;padding:25px}.previewTop strong{font-family:"Cormorant Garamond",serif;font-size:31px}.themeGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.colorField{display:flex;align-items:center;gap:8px;border:1px solid var(--border);padding:8px;border-radius:8px}.colorField input{width:38px;height:30px;padding:0;border:0;background:none}.colorField span{font-size:11px;font-weight:700}
 
-.menu-item > :not(.three-price-area),
-.food-item > :not(.three-price-area){
-  min-width:0!important;
-}
+/* Toast */
+#toast{position:fixed;bottom:22px;right:22px;background:#172033;color:#fff;padding:11px 15px;border-radius:9px;font-size:12px;font-weight:700;opacity:0;transform:translateY(15px);transition:.25s;z-index:500}#toast.show{opacity:1;transform:none}
 
-@media(max-width:700px){
-  :root{
-    --fm-price-col:52px;
-    --fm-price-gap:4px;
-    --fm-price-width:164px;
-  }
-  .categoryPriceSwitch span{font-size:9px!important;font-weight:800!important}
-  .three-price-cell{font-size:11px!important;font-weight:900!important}
-}
-
-@media(max-width:430px){
-  :root{
-    --fm-price-col:45px;
-    --fm-price-gap:3px;
-    --fm-price-width:141px;
-  }
-  .categoryPriceSwitch span{font-size:8.5px!important}
-  .three-price-cell{font-size:10.5px!important}
-}
+/* Responsive */
+@media(max-width:1050px){.grid4{grid-template-columns:repeat(2,1fr)}.twoCol,.twoCol.equal{grid-template-columns:1fr}.sidebar{width:205px}.content{margin-left:205px}.profileBox{grid-template-columns:110px 1fr}.bigLogo{width:105px;height:105px}}
+@media(max-width:760px){
+ .sidebar{transform:translateX(-100%);transition:.25s;width:250px}.sidebar.open{transform:none}.content{margin-left:0}.topbar{height:66px;padding:0 12px}.mobileMenu{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--border);background:#fff;border-radius:8px}.topActions .openToggle{display:none}.profile .profileName{display:none}.container{padding:15px 11px 35px}.grid4{grid-template-columns:1fr 1fr;gap:9px}.stat{padding:13px;min-height:94px}.statValue{font-size:20px}.threeCol,.categoryCards{grid-template-columns:1fr}.profileBox{grid-template-columns:1fr;text-align:center}.bigLogo{margin:auto}.mediaCover{height:150px}.menuTable{min-width:700px}.menuTableWrap{overflow:auto}.quickGrid{grid-template-columns:1fr}.heroHideMobile{display:none}}
+@media(max-width:430px){.grid4{grid-template-columns:1fr 1fr}.statLabel{font-size:9px}.statValue{font-size:18px}.restTitle{font-size:14px}.restAddress{font-size:9px}}
 </style>
 
 
-
-
-
-<style id="freemenu-image-style-v2">
-/* ===== Dark premium digital-menu design ===== */
-:root{
-  --fm-dark:#0b0e0f;
-  --fm-panel:#111516;
-  --fm-panel-2:#151a1b;
-  --fm-gold:#d9aa62;
-  --fm-gold-soft:#b98b4d;
-  --fm-cream:#f6f0e7;
-}
-body{
-  background:#e9e4dc!important;
-  color:#f5f1ea!important;
-  padding-bottom:30px!important;
-}
-.app-shell{
-  width:min(100%,1180px)!important;
-  margin:22px auto 0!important;
-  background:var(--fm-dark)!important;
-  border:1px solid rgba(217,170,98,.18)!important;
-  border-radius:24px!important;
-  overflow:hidden!important;
-  box-shadow:0 22px 70px rgba(0,0,0,.24)!important;
-}
-
-/* Header: logo + restaurant name centered, like the reference image */
-.hero{
-  min-height:178px!important;
-  border-radius:0!important;
-  background:
-    radial-gradient(circle at 18% 0%,rgba(217,170,98,.13),transparent 28%),
-    radial-gradient(circle at 84% 20%,rgba(217,170,98,.08),transparent 24%),
-    linear-gradient(180deg,#0d1112,#080b0c)!important;
-  border-bottom:1px solid rgba(217,170,98,.20)!important;
-  box-shadow:none!important;
-}
-.hero::before{width:250px!important;height:250px!important;right:-100px!important;top:-150px!important;background:rgba(217,170,98,.06)!important}
-.hero::after{width:180px!important;height:180px!important;left:-90px!important;bottom:-130px!important;background:rgba(217,170,98,.045)!important}
-.hero-cover,.hero-overlay{display:none!important}
-.hero-content{
-  min-height:178px!important;
-  padding:24px 32px 20px!important;
-  display:flex!important;
-  flex-direction:column!important;
-  align-items:center!important;
-  justify-content:center!important;
-  text-align:center!important;
-  gap:7px!important;
-}
-.logo-wrap{
-  width:58px!important;
-  height:58px!important;
-  border-radius:50%!important;
-  border:1px solid var(--fm-gold)!important;
-  background:#101314!important;
-  box-shadow:0 7px 22px rgba(0,0,0,.35)!important;
-}
-.logo-wrap img{object-fit:cover!important}
-.hero-info{
-  width:100%!important;
-  display:flex!important;
-  flex-direction:column!important;
-  align-items:center!important;
-  min-width:0!important;
-}
-.hero-welcome{
-  order:0!important;
-  margin:0!important;
-  color:var(--fm-gold)!important;
-  font-family:Georgia,"Times New Roman",serif!important;
-  font-style:italic!important;
-  font-size:13px!important;
-}
-.restaurant-name,.hero .restaurant-name{
-  order:1!important;
-  margin:0!important;
-  color:#f5efe6!important;
-  font-family:Georgia,"Times New Roman",serif!important;
-  font-size:clamp(30px,5vw,46px)!important;
-  line-height:1.03!important;
-  letter-spacing:2px!important;
-  font-weight:700!important;
-  text-transform:uppercase!important;
-  text-shadow:none!important;
-}
-.hero-subtitle{
-  order:2!important;
-  color:#d4c8b8!important;
-  font-size:10px!important;
-  font-weight:800!important;
-  letter-spacing:3px!important;
-  text-transform:uppercase!important;
-}
-.hero-features,.hero-slogans{display:flex!important}
-.hero-features{
-  order:3!important;
-  justify-content:center!important;
-  gap:7px!important;
-  margin-top:3px!important;
-}
-.hero-feature{
-  background:transparent!important;
-  border:1px solid rgba(217,170,98,.38)!important;
-  color:#d9c8b0!important;
-  box-shadow:none!important;
-  border-radius:999px!important;
-  padding:4px 9px!important;
-  font-size:9px!important;
-}
-.hero-slogans{
-  order:4!important;
-  justify-content:center!important;
-  gap:10px!important;
-  margin-top:2px!important;
-  color:#b8aa9b!important;
-  font-family:Georgia,"Times New Roman",serif!important;
-  font-style:italic!important;
-  font-size:12px!important;
-}
-.hero-action{display:none!important}
-.restaurant-meta{order:5!important;margin-top:2px!important}
-.status-badge{
-  background:rgba(255,255,255,.07)!important;
-  border:1px solid rgba(255,255,255,.10)!important;
-  color:#ddd5cc!important;
-}
-
-/* Service strip becomes a clean dark information bar */
-.service-strip{
-  margin:0!important;
-  padding:11px 24px!important;
-  border:0!important;
-  border-bottom:1px solid rgba(217,170,98,.16)!important;
-  border-radius:0!important;
-  background:#0d1112!important;
-  box-shadow:none!important;
-}
-.service-left,.services{
-  color:#d8d0c7!important;
-}
-.open-pill{
-  background:#118447!important;
-  color:#fff!important;
-  box-shadow:none!important;
-}
-.service{
-  background:rgba(255,255,255,.045)!important;
-  border:1px solid rgba(255,255,255,.07)!important;
-  color:#d9d1c7!important;
-}
-
-/* Search + category navigation */
-.sticky-panel{
-  position:sticky!important;
-  top:0!important;
-  margin:0!important;
-  padding:16px 24px 12px!important;
-  background:rgba(11,14,15,.96)!important;
-  border:0!important;
-  border-bottom:1px solid rgba(217,170,98,.15)!important;
-  backdrop-filter:blur(14px)!important;
-}
-.search-wrap{
-  max-width:720px!important;
-  margin:0 auto 12px!important;
-  height:46px!important;
-  background:#14191a!important;
-  border:1px solid rgba(217,170,98,.30)!important;
-  border-radius:12px!important;
-  box-shadow:none!important;
-}
-.search-icon{color:#d9aa62!important}
-#menu-search{
-  height:44px!important;
-  background:transparent!important;
-  color:#f2ece3!important;
-}
-#menu-search::placeholder{color:#81786f!important}
-.category-scroll{
-  display:flex!important;
-  justify-content:center!important;
-  gap:8px!important;
-  overflow-x:auto!important;
-  scrollbar-width:none!important;
-}
-.category-scroll::-webkit-scrollbar{display:none!important}
-.cat-chip{
-  flex:0 0 auto!important;
-  border:1px solid rgba(217,170,98,.34)!important;
-  background:#101415!important;
-  color:#d8d0c8!important;
-  border-radius:999px!important;
-  padding:8px 15px!important;
-  font-size:11px!important;
-  font-weight:800!important;
-}
-.cat-chip.active{
-  background:var(--fm-gold)!important;
-  border-color:var(--fm-gold)!important;
-  color:#111!important;
-}
-
-/* Menu: two-column desktop layout like the reference */
-.menu-wrap{
-  padding:22px 24px 34px!important;
-  background:#0b0e0f!important;
-}
-.summary-line{
-  color:#968b81!important;
-  padding:0 2px 14px!important;
-}
-#menu-sections{
-  display:grid!important;
-  grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  gap:14px!important;
-  align-items:start!important;
-}
-.category-section{
-  margin:0!important;
-  background:linear-gradient(180deg,#121718,#0f1314)!important;
-  border:1px solid rgba(217,170,98,.22)!important;
-  border-radius:15px!important;
-  overflow:hidden!important;
-  box-shadow:0 8px 24px rgba(0,0,0,.16)!important;
-}
-.category-heading,.categoryHeadWithPrices{
-  background:transparent!important;
-  color:#f4eee5!important;
-  border-bottom:1px solid rgba(217,170,98,.18)!important;
-  padding:13px 15px!important;
-  border-radius:0!important;
-  box-shadow:none!important;
-}
-.category-title{
-  color:#f4eee5!important;
-  font-family:Georgia,"Times New Roman",serif!important;
-  font-size:21px!important;
-  font-weight:700!important;
-  letter-spacing:.1px!important;
-}
-.item-count{color:#8f857c!important}
-.categoryPriceSwitch{
-  width:232px!important;
-  grid-template-columns:repeat(3,72px)!important;
-  gap:8px!important;
-}
-.categoryPriceSwitch span{
-  color:#c9bcae!important;
-  font-size:9px!important;
-  text-transform:uppercase!important;
-  letter-spacing:.5px!important;
-}
-.items-list{border:0!important;background:transparent!important}
-.menu-item{
-  background:transparent!important;
-  border-bottom:1px solid rgba(255,255,255,.07)!important;
-  padding:12px 14px!important;
-}
-.menu-item:last-child{border-bottom:0!important}
-.item-name{
-  color:#f5f0e9!important;
-  font-size:13px!important;
-  font-weight:800!important;
-}
-.item-desc{
-  color:#8f8983!important;
-  font-size:10px!important;
-  line-height:1.45!important;
-}
-.food-symbol{flex:0 0 auto!important}
-.three-price-cell{
-  color:#f2c77e!important;
-  font-size:12px!important;
-  font-weight:900!important;
-}
-.item-price-area{
-  flex:0 0 232px!important;
-  width:232px!important;
-  min-width:232px!important;
-}
-
-/* No dish photos in this design */
-.item-image-wrap,.item-image,.menu-item img:not(.logo-wrap img){display:none!important}
-
-/* Premium, restrained footer */
-.footer-note{
-  color:#746b63!important;
-  padding:22px 12px 8px!important;
-}
-
-/* Mobile */
-@media(max-width:800px){
-  .app-shell{
-    width:100%!important;
-    margin:0 auto!important;
-    border-radius:0!important;
-    border-left:0!important;
-    border-right:0!important;
-  }
-  #menu-sections{grid-template-columns:1fr!important}
-  .hero-content{padding:22px 16px 18px!important}
-  .menu-wrap{padding:18px 12px 28px!important}
-  .sticky-panel{padding:12px 12px 10px!important}
-}
-@media(max-width:560px){
-  .restaurant-name{font-size:30px!important;letter-spacing:1.2px!important}
-  .hero-features{display:none!important}
-  .service-strip{padding:9px 12px!important}
-  .service-left{font-size:10px!important}
-  .services{gap:4px!important}
-  .service{font-size:9px!important;padding:4px 6px!important}
-  .category-heading,.categoryHeadWithPrices{padding:11px 12px!important}
-  .category-title{font-size:19px!important}
-  .menu-item{padding:11px 12px!important}
-  .item-price-area{
-    flex-basis:164px!important;width:164px!important;min-width:164px!important;
-  }
-  .three-price-area,.categoryPriceSwitch{
-    width:164px!important;min-width:164px!important;
-    grid-template-columns:repeat(3,52px)!important;gap:4px!important;
-  }
-  .three-price-cell,.categoryPriceSwitch span{width:52px!important}
-}
+<style id="ownerLoginStyles">
+#ownerAuth{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:18px}
+#ownerAuth.show{display:flex}
+.ownerAuthBackdrop{position:absolute;inset:0;background:radial-gradient(circle at 15% 15%,rgba(245,47,114,.18),transparent 30%),radial-gradient(circle at 85% 80%,rgba(181,29,59,.22),transparent 32%),linear-gradient(135deg,#080e18,#162235 55%,#241321)}
+.ownerAuthCard{position:relative;width:min(470px,100%);max-height:92vh;overflow:auto;background:rgba(255,255,255,.98);border:1px solid rgba(255,255,255,.7);border-radius:24px;padding:30px;box-shadow:0 30px 90px rgba(0,0,0,.42),0 8px 30px rgba(181,29,59,.12);backdrop-filter:blur(12px)}
+.authBrand{width:72px;height:72px;border-radius:22px;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(135deg,#8f1831,#c52345 65%,#f02e6f);color:#fff;font-size:29px;box-shadow:0 12px 28px rgba(181,29,59,.28)}
+.authKicker{text-align:center;color:#8f1831;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;font-size:10px;margin-top:2px}.ownerAuthCard h1{text-align:center;font-family:"Cormorant Garamond",serif;font-size:32px;margin:0;color:#151c2a}
+.authSub{text-align:center;color:#718096;font-size:12px;margin:4px 0 22px}
+.authChoiceGrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.authChoiceBtn{border:1px solid #e5e7eb;background:#fafbfc;border-radius:15px;padding:19px 15px;cursor:pointer;text-align:left;transition:.2s;box-shadow:0 5px 16px rgba(15,23,42,.04)}
+.authChoiceBtn:hover{transform:translateY(-2px);box-shadow:0 9px 25px rgba(0,0,0,.08);border-color:#cbd5e1}
+.authChoiceBtn span{display:block;font-size:24px;margin-bottom:8px}
+.authChoiceBtn b{display:block;font-size:16px;color:#172033}
+.authChoiceBtn small{display:block;color:#7a8495;font-size:10px;margin-top:5px;line-height:1.4}
+.authFormCard{text-align:left}
+.authFormCard .authBrand{margin-left:auto;margin-right:auto}
+.authFormCard h1,.authFormCard .authSub{text-align:center}
+.authBack,.authSwitch{border:0;background:none;color:#5b6474;font-weight:700;cursor:pointer;padding:0}
+.authBack{margin-bottom:9px}
+.authSwitch{display:block;margin:13px auto 0;color:#8f1831}
+.authError{background:#fff0f0;color:#b4232e;border:1px solid #ffd0d0;border-radius:8px;padding:9px 10px;font-size:11px;margin-bottom:12px}
+.authSuccess{background:#edfff5;color:#167647;border:1px solid #bce8cc;border-radius:8px;padding:9px 10px;font-size:11px;margin-bottom:12px}
+.slugHint{font-size:9px;color:#8a93a3;margin-top:4px}
+@media(max-width:560px){.authChoiceGrid{grid-template-columns:1fr}.ownerAuthCard{padding:22px}.twoCol{grid-template-columns:1fr}}
+.loginSubmit{width:100%;border:0;border-radius:13px;padding:13px 16px;background:linear-gradient(135deg,#8f1831,#d21f4a 60%,#f02e6f);color:#fff;font-weight:800;font-size:13px;box-shadow:0 10px 24px rgba(181,29,59,.24);transition:.2s}.loginSubmit:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(181,29,59,.32)}
+.authFormCard .formGroup{margin-bottom:13px}.authFormCard label{font-size:11px;font-weight:800;color:#445066;margin-bottom:6px;display:block}.authFormCard .input{width:100%;border:1px solid #dfe4ec;border-radius:11px;padding:12px 13px;background:#fbfcfe;outline:none}.authFormCard .input:focus{border-color:#b51d3b;box-shadow:0 0 0 4px rgba(181,29,59,.08)}
+.authFeatureBar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0 20px}.authFeature{border:1px solid #eceff4;border-radius:11px;padding:9px 7px;text-align:center;background:#fafbfd}.authFeature strong{display:block;font-size:10px;color:#253046}.authFeature span{font-size:15px;display:block;margin-bottom:3px}
+.menuStatusBtn{display:inline-flex;align-items:center;gap:8px;border:1px solid #e2e7ee;border-radius:999px;padding:6px 10px;background:#f8fafc;font-size:10px;font-weight:900;cursor:pointer;min-width:74px;justify-content:center;transition:.18s}.menuStatusBtn.on{background:#eafaf2;border-color:#9cddbd;color:#087443}.menuStatusBtn.off{background:#fff4e8;border-color:#f2c58d;color:#a35a00}.menuStatusBtn .dot{width:8px;height:8px;border-radius:50%;background:#12a36b}.menuStatusBtn.off .dot{background:#d97706}.menuStatusBtn:hover{transform:translateY(-1px)}
+@media(max-width:560px){.authFeatureBar{grid-template-columns:1fr 1fr 1fr}.menuStatusBtn{min-width:68px}}
+</style>
+<style id="freemenu-login-brand-style">
+.freemenu-login-brand{position:relative;background:linear-gradient(145deg,#19070a 0%,#641219 58%,#8f252f 100%);color:#fff;overflow:hidden}
+.freemenu-login-brand:before,.freemenu-login-brand:after{content:"";position:absolute;border:1px solid rgba(216,173,98,.22);border-radius:50%}
+.freemenu-login-brand:before{width:420px;height:420px;right:-230px;top:-180px}
+.freemenu-login-brand:after{width:300px;height:300px;left:-190px;bottom:-150px}
+.freemenu-login-brand-inner{position:relative;z-index:2;padding:48px;height:100%;display:flex;flex-direction:column;justify-content:center}
+.freemenu-login-logo{width:68px;height:68px;border-radius:20px;background:linear-gradient(135deg,#ead084,#c8943e);color:#2b0b0e;display:grid;place-items:center;font-size:25px;font-weight:900;box-shadow:0 12px 30px #0005;margin-bottom:22px}
+.freemenu-login-brand h1{font-size:44px;letter-spacing:-1.5px;margin:0 0 10px}
+.freemenu-login-brand .fm-tagline{font-size:15px;line-height:1.7;color:#eadcdd;max-width:390px}
+.freemenu-login-points{display:grid;gap:14px;margin-top:28px}
+.freemenu-login-point{display:flex;align-items:center;gap:12px;font-size:13px;color:#f8eeee}
+.freemenu-login-point i{width:36px;height:36px;border-radius:11px;background:#ffffff12;display:grid;place-items:center;color:#e3c271}
+@media(max-width:760px){.freemenu-login-brand{display:none!important}}
 </style>
 
 
-<style id="freemenu-final-grid-fix">
-/* Equal-height category rows: the blank area between two category cards is filled. */
-#menu-sections{
-  display:grid!important;
-  grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  gap:14px!important;
-  align-items:stretch!important;
+<style id="freemenu-login-layout">
+.ownerAuthSplit{width:min(920px,96vw)!important;max-height:92vh!important;padding:0!important;overflow:hidden!important;display:grid!important;grid-template-columns:1fr 1fr;gap:0;background:#fff!important}
+.ownerAuthSplit .freemenu-login-brand{display:block!important;min-height:520px}
+.ownerAuthSplit .authRightPanel{padding:42px 42px 38px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.ownerAuthSplit .authRightPanel .authBrand{margin:0 auto 12px}
+.ownerAuthSplit .authRightPanel h1,.ownerAuthSplit .authRightPanel .authSub{text-align:center}
+.ownerAuthSplit .authChoiceGrid{grid-template-columns:1fr 1fr}
+.fm-kicker{font-size:10px;letter-spacing:2px;font-weight:800;color:#e3c271;margin-bottom:8px}
+@media(max-width:760px){
+.ownerAuthSplit{grid-template-columns:1fr!important;width:min(470px,96vw)!important;overflow:auto!important}
+.ownerAuthSplit .freemenu-login-brand{min-height:250px}
+.ownerAuthSplit .freemenu-login-brand-inner{padding:30px}
+.ownerAuthSplit .authRightPanel{padding:30px 24px}
 }
-.category-section{
-  height:100%!important;
-  min-width:0!important;
-  display:flex!important;
-  flex-direction:column!important;
-  margin:0!important;
-}
-.category-section .items-list{
-  flex:1 1 auto!important;
-}
-
-/* Exact price ruler shared by category headings and every item. */
-.categoryHeadWithPrices{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) 232px!important;
-  align-items:center!important;
-  column-gap:10px!important;
-}
-.categoryPriceSwitch,
-.menu-item .three-price-area{
-  width:232px!important;
-  min-width:232px!important;
-  max-width:232px!important;
-  display:grid!important;
-  grid-template-columns:repeat(3,72px)!important;
-  column-gap:8px!important;
-  justify-self:end!important;
-  margin:0!important;
-  box-sizing:border-box!important;
-}
-.categoryPriceSwitch span,
-.menu-item .three-price-cell{
-  width:72px!important;
-  min-width:72px!important;
-  max-width:72px!important;
-  box-sizing:border-box!important;
-  text-align:center!important;
-}
-.categoryPriceSwitch span{
-  color:#c9bcae!important;
-  font:800 9px/1.2 Arial,sans-serif!important;
-  text-transform:uppercase!important;
-  letter-spacing:.5px!important;
-}
-.menu-item{
-  display:block!important;
-}
-.menu-item .item-content{
-  width:100%!important;
-}
-.menu-item .item-main-row{
-  display:grid!important;
-  grid-template-columns:minmax(0,1fr) 232px!important;
-  align-items:center!important;
-  column-gap:10px!important;
-  width:100%!important;
-}
-.menu-item .item-info{
-  min-width:0!important;
-}
-.menu-item .item-price-area{
-  display:block!important;
-  visibility:visible!important;
-  opacity:1!important;
-  width:232px!important;
-  min-width:232px!important;
-  max-width:232px!important;
-  justify-self:end!important;
-  align-self:center!important;
-}
-.menu-item .three-price-cell{
-  display:block!important;
-  color:#f2c77e!important;
-  font:900 13px/18px Arial,sans-serif!important;
-  font-variant-numeric:tabular-nums!important;
-  visibility:visible!important;
-  opacity:1!important;
-}
-@media(max-width:800px){
-  #menu-sections{grid-template-columns:1fr!important}
-}
-@media(max-width:560px){
-  .categoryHeadWithPrices{
-    grid-template-columns:minmax(0,1fr) 164px!important;
-  }
-  .categoryPriceSwitch,
-  .menu-item .three-price-area{
-    width:164px!important;min-width:164px!important;max-width:164px!important;
-    grid-template-columns:repeat(3,52px)!important;column-gap:4px!important;
-  }
-  .categoryPriceSwitch span,
-  .menu-item .three-price-cell{
-    width:52px!important;min-width:52px!important;max-width:52px!important;
-  }
-  .menu-item .item-main-row{
-    grid-template-columns:minmax(0,1fr) 164px!important;
-  }
-  .menu-item .item-price-area{
-    width:164px!important;min-width:164px!important;max-width:164px!important;
-  }
-}
-@media(max-width:430px){
-  .categoryHeadWithPrices{
-    grid-template-columns:minmax(0,1fr) 141px!important;
-  }
-  .categoryPriceSwitch,
-  .menu-item .three-price-area{
-    width:141px!important;min-width:141px!important;max-width:141px!important;
-    grid-template-columns:repeat(3,45px)!important;column-gap:3px!important;
-  }
-  .categoryPriceSwitch span,
-  .menu-item .three-price-cell{
-    width:45px!important;min-width:45px!important;max-width:45px!important;
-  }
-  .menu-item .item-main-row{
-    grid-template-columns:minmax(0,1fr) 141px!important;
-  }
-  .menu-item .item-price-area{
-    width:141px!important;min-width:141px!important;max-width:141px!important;
-  }
-}
+@media(max-width:560px){.ownerAuthSplit .authChoiceGrid{grid-template-columns:1fr}}
 </style>
 
+
+<style id="freemenu-two-screen-auth-fix">
+.authRightPanel{background:#fff;min-height:520px}
+.authTabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#f3f4f6;border-radius:12px;padding:4px;margin:0 0 22px}
+.authTab{border:0;background:transparent;border-radius:9px;padding:11px 10px;font-weight:800;color:#687386;cursor:pointer;font-size:13px}
+.authTab.active{background:#fff;color:#8f1831;box-shadow:0 3px 10px rgba(15,23,42,.08)}
+.authCombinedForm .authFormCard{display:block!important;padding:0;box-shadow:none;border:0;background:transparent;max-width:none;margin:0}
+.authCombinedForm .authBack{display:none}
+.authCombinedForm .authBrand,.authCombinedForm .authKicker{display:none}
+.authCombinedForm .authFormCard h1{font-size:30px;margin-bottom:4px}
+.authCombinedForm .authFormCard .authSub{margin-bottom:18px}
+.authCombinedForm .signupCard{display:none!important}
+.authCombinedForm .signupCard.active{display:block!important}
+.authCombinedForm .loginCard.active{display:block!important}
+@media(max-width:760px){.ownerAuthSplit{grid-template-columns:1fr!important}.freemenu-login-brand{display:block!important;min-height:250px}.freemenu-login-brand-inner{padding:28px}.freemenu-login-brand h1{font-size:36px}.authRightPanel{min-height:auto!important;padding:28px 22px!important}}
+</style>
 </head>
+
 <body>
-  <div class="app-shell">
 
 
+<div id="ownerAuth">
+  <div class="ownerAuthBackdrop"></div>
 
-
-    <header class="hero" id="hero">
-      <img id="rest-cover" class="hero-cover" alt="" style="display:none;" />
-      <div class="hero-overlay"></div>
-
-      <div class="hero-content">
-        <div class="logo-wrap" id="logo-container">
-          <div class="logo-fallback" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/>
-            </svg>
-          </div>
+  <!-- AUTH SCREEN: exactly 2 sides — FreeMenu branding + Login/Sign Up -->
+  <div class="ownerAuthCard ownerAuthSplit" id="authChoiceCard">
+    <div class="freemenu-login-brand">
+      <div class="freemenu-login-brand-inner">
+        <div class="freemenu-login-logo">FM</div>
+        <div class="fm-kicker">RESTAURANT PARTNER</div>
+        <h1>FreeMenu</h1>
+        <p class="fm-tagline">Your restaurant menu, profile, QR and daily menu management — all in one simple owner panel.</p>
+        <div class="freemenu-login-points">
+          <div class="freemenu-login-point"><i class="fa-solid fa-utensils"></i><span>Manage your digital menu</span></div>
+          <div class="freemenu-login-point"><i class="fa-solid fa-qrcode"></i><span>Share your QR menu</span></div>
+          <div class="freemenu-login-point"><i class="fa-solid fa-palette"></i><span>Customize your restaurant theme</span></div>
         </div>
-
-        <div class="hero-info">
-          <div id="rest-welcome" class="hero-welcome" style="display:none"></div>
-          <h1 id="rest-name" class="hero-tagline restaurant-name">Loading Menu...</h1>
-          <div id="rest-subtitle" class="hero-subtitle" style="display:none"></div>
-          <div id="rest-features" class="hero-features" style="display:none">
-            <span id="rest-feature1" class="hero-feature"></span>
-            <span id="rest-feature2" class="hero-feature"></span>
-            <span id="rest-feature3" class="hero-feature"></span>
-          </div>
-          <div id="rest-slogans" class="hero-slogans" style="display:none">
-            <div id="rest-slogan1"></div>
-            <div id="rest-slogan2"></div>
-          </div>
-          <div class="restaurant-meta" style="margin-top:11px">
-            <span id="rest-address" style="display:none;"></span>
-            <a id="rest-phone" href="#" style="display:none;color:inherit;text-decoration:none"></a>
-          </div>
-        </div>
-
-        <a id="rest-call-btn" class="hero-action" href="#" aria-label="Call restaurant">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24c1.12.37 2.33.57 3.57.57A1 1 0 0121 16.5V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1.02l-2.2 2.2z"/>
-          </svg>
-        </a>
       </div>
-    </header>
-
-
-    <section class="service-strip" id="service-strip">
-      <div class="service-left">
-        <span id="rest-open-pill" class="open-pill">● Open Now</span>
-        <span id="rest-hours" class="service-time" style="display:none"></span>
+    </div>
+    <div class="authRightPanel">
+      <div class="authKicker">FREEMENU • RESTAURANT PARTNER</div>
+      <div class="authTabs">
+        <button type="button" id="authLoginTab" class="authTab active">Login</button>
+        <button type="button" id="authSignupTab" class="authTab">Sign Up</button>
       </div>
-      <div class="services">
-        <span id="svc-dine" class="service">🍴 Dine In</span>
-        <span id="svc-take" class="service">🛍 Takeaway</span>
-        <span id="svc-delivery" class="service">🛵 Home Delivery</span>
-      </div>
-    </section>
+      <div class="authCombinedForm">
+<!-- LOGIN FORM -->
+  <div class="ownerAuthCard authFormCard" id="loginCard" style="display:none">
+    <button type="button" class="authBack" id="backLoginBtn">← Back</button>
+    <div class="authBrand">🔐</div><div class="authKicker">FreeMenu Owner Portal</div>
+    <h1>Owner Login</h1>
+    <p class="authSub">Login with your existing account</p>
+    <div id="loginErrorNew" class="authError" style="display:none"></div>
 
-    <section class="sticky-panel">
-      <div class="search-wrap">
-        <div class="search-icon" aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="7"></circle>
-            <path d="m20 20-3.5-3.5"></path>
-          </svg>
-        </div>
-        <input id="menu-search" type="search" placeholder="Search food or category..." autocomplete="off" />
-      </div>
-      <div class="category-scroll" id="category-chips"></div>
-    </section>
+    <div class="formGroup">
+      <label>Email Address</label>
+      <input class="input" id="loginEmailNew" type="email" autocomplete="email" placeholder="owner@example.com">
+    </div>
+    <div class="formGroup">
+      <label>Password</label>
+      <input class="input" id="loginPasswordNew" type="password" autocomplete="current-password" placeholder="Enter your password">
+    </div>
+    <button type="button" class="loginSubmit" id="loginSubmitNew">🔐 Login to Owner Panel</button>
+    <button type="button" class="authSwitch" id="goSignupFromLogin">New here? Create an account</button>
+  </div>
+<!-- SIGN UP FORM -->
+  <div class="ownerAuthCard authFormCard signupCard" id="signupCard" style="display:none">
+    <button type="button" class="authBack" id="backSignupBtn">← Back</button>
+    <div class="authBrand">📝</div><div class="authKicker">FreeMenu Partner</div>
+    <h1>Create Owner Account</h1>
+    <p class="authSub">Register your restaurant on FreeMenu</p>
+    <div id="signupErrorNew" class="authError" style="display:none"></div>
+    <div id="signupSuccessNew" class="authSuccess" style="display:none"></div>
 
-    <main class="menu-wrap">
-      <div id="summary-line" class="summary-line" style="display:none;"></div>
-      <div id="menu-sections"></div>
-      <div class="footer-note">Digital menu • Prices may be subject to change</div>
-    </main>
+    <div class="formGroup">
+      <label>Full Name</label>
+      <input class="input" id="signupName" type="text" placeholder="Your full name">
+    </div>
+    <div class="formGroup">
+      <label>Mobile Number</label>
+      <input class="input" id="signupPhone" type="tel" placeholder="10 digit mobile number">
+    </div>
+    <div class="formGroup">
+      <label>Email Address</label>
+      <input class="input" id="signupEmail" type="email" autocomplete="email" placeholder="owner@example.com">
+    </div>
+    <div class="twoCol">
+      <div class="formGroup">
+        <label>Password</label>
+        <input class="input" id="signupPassword" type="password" autocomplete="new-password" placeholder="Minimum 6 characters">
+      </div>
+      <div class="formGroup">
+        <label>Confirm Password</label>
+        <input class="input" id="signupConfirm" type="password" autocomplete="new-password" placeholder="Repeat password">
+      </div>
+    </div>
+    <div class="formGroup">
+      <label>Restaurant Name</label>
+      <input class="input" id="signupRestaurant" type="text" placeholder="Your restaurant name">
+    </div>
+    <div class="formGroup">
+      <label>Restaurant Address</label>
+      <input class="input" id="signupAddress" type="text" placeholder="Full restaurant address">
+    </div>
+    <div class="formGroup">
+      <label>Menu Slug</label>
+      <input class="input" id="signupSlug" type="text" placeholder="my-restaurant-menu">
+      <div class="slugHint">Your public menu: menu.html?r=your-slug</div>
+    </div>
+
+    <button type="button" class="loginSubmit" id="signupSubmitNew">📝 Create Restaurant Account</button>
+    <button type="button" class="authSwitch" id="goLoginFromSignup">Already have an account? Login</button>
+  </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div id="loader"><div class="loader-card"><div class="spinner"></div><p style="font-weight:800">Loading Owner Panel...</p></div></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="logoArea">
+    <div class="chefLogo">👨‍🍳</div>
+    <div class="sideBrand">Digital Menu</div>
+    <div class="sideSub">RESTAURANT OWNER PANEL</div>
+  </div>
+  <nav>
+    <a class="navItem active" href="#dashboard" data-section="dashboard"><i class="fa-solid fa-house"></i> Dashboard</a>
+    <a class="navItem" href="#restaurant" data-section="restaurant"><i class="fa-solid fa-store"></i> Restaurant Details</a>
+    <a class="navItem" href="#menu" data-section="menu"><i class="fa-solid fa-clipboard-list"></i> Menu Management</a>
+    <a class="navItem" href="#categories" data-section="categories"><i class="fa-solid fa-layer-group"></i> Categories</a>
+    <a class="navItem" href="#gallery" data-section="gallery"><i class="fa-solid fa-images"></i> Gallery</a>
+    <a class="navItem" href="#orders" data-section="orders"><i class="fa-solid fa-cart-shopping"></i> Orders <small>(Preview)</small></a>
+    <a class="navItem" href="#qr" data-section="qr"><i class="fa-solid fa-qrcode"></i> QR Code</a>
+    <a class="navItem" href="#preview" data-section="preview"><i class="fa-solid fa-mobile-screen-button"></i> Menu Preview</a>
+    <a class="navItem" href="#analytics" data-section="analytics"><i class="fa-solid fa-chart-column"></i> Analytics</a>
+    <a class="navItem" href="#settings" data-section="settings"><i class="fa-solid fa-gear"></i> Settings</a>
+    <a class="navItem" href="#support" data-section="support"><i class="fa-regular fa-circle-question"></i> Help & Support</a>
+  </nav>
+  <div class="sidePromo">
+    <i class="fa-solid fa-crown"></i><strong>Grow Your Business</strong>
+    <p>Delicious Food<br>Happier Customers</p>
+    <button class="btn-pink" id="sidePublicBtn">View Public Menu</button>
+  </div>
+</aside>
+
+<div class="content">
+<header class="topbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="mobileMenu" id="mobileMenu"><i class="fa-solid fa-bars"></i></button>
+    <div class="restIdentity">
+      <img class="restLogo" id="topLogo" alt="Restaurant">
+      <div><div class="restTitle" id="topName">Restaurant</div><div class="restAddress" id="topAddress">Loading...</div></div>
+    </div>
+  </div>
+  <div class="topActions">
+    <button class="openToggle" id="publicTop"><i class="fa-solid fa-globe"></i> View Public Menu <i class="fa-solid fa-arrow-up-right-from-square"></i></button>
+    <div class="profile"><div class="avatar" id="avatar">OW</div><div class="profileName"><strong id="ownerName">Owner</strong><div style="font-size:10px;color:var(--muted)">Restaurant Owner</div></div><button class="btn sm" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i></button></div>
+  </div>
+</header>
+
+<div class="container">
+
+<!-- DASHBOARD -->
+<section id="section-dashboard">
+  <div class="grid4">
+    <div class="stat"><div class="statTop"><div class="statIcon"><i class="fa-solid fa-utensils"></i></div><span class="statChange">Active</span></div><div class="statLabel">Total Menu Items</div><div class="statValue" id="statItems">0</div></div>
+    <div class="stat"><div class="statTop"><div class="statIcon"><i class="fa-solid fa-grip"></i></div><span class="statChange" id="statCatsChange">Live</span></div><div class="statLabel">Categories</div><div class="statValue" id="statCats">0</div></div>
+    <div class="stat"><div class="statTop"><div class="statIcon"><i class="fa-solid fa-eye"></i></div><span class="statChange">Ready</span></div><div class="statLabel">Profile / Menu Views</div><div class="statValue" id="statViews">—</div></div>
+    <div class="stat"><div class="statTop"><div class="statIcon"><i class="fa-solid fa-qrcode"></i></div><span class="statChange">Ready</span></div><div class="statLabel">QR Scans</div><div class="statValue">—</div></div>
   </div>
 
-  <script>
-    /* =========================================================
-       SUPABASE CONFIG
-       Keep RLS enabled in Supabase. An anon/public key is safe to
-       expose only when your database policies are configured correctly.
-    ========================================================== */
-    const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    let restaurant = null;
-    let allItems = [];
-    let currentCategory = "all";
-    let searchText = "";
-
-    const $ = (id) => document.getElementById(id);
-
-    function escapeHTML(value = "") {
-      return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    function safeUrl(value) {
-      if (!value) return "";
-      try {
-        const url = new URL(value, window.location.origin);
-        if (["http:", "https:"].includes(url.protocol)) return url.href;
-      } catch (_) {}
-      return "";
-    }
-
-    function cssColor(value, fallback) {
-      if (!value) return fallback;
-      const test = document.createElement("span");
-      test.style.color = "";
-      test.style.color = value;
-      return test.style.color ? value : fallback;
-    }
-
-    function applyRestaurantTheme(rest) {
-      const root = document.documentElement.style;
-
-      // These fields are OPTIONAL. If your table does not have them,
-      // the fallback colors below will be used automatically.
-      const primary = cssColor(rest.primary_color || rest.theme_primary, "#0f766e");
-      const primaryDark = cssColor(rest.primary_dark || rest.theme_primary_dark, "#115e59");
-      const bg = cssColor(rest.background_color || rest.theme_background, "#f6f7f9");
-      const surface = cssColor(rest.card_color || rest.theme_card, "#ffffff");
-      const text = cssColor(rest.text_color || rest.theme_text, "#111827");
-
-      const accent = cssColor(rest.accent_color || rest.theme_accent, "#c8943e");
-      root.setProperty("--primary", primary);
-      root.setProperty("--primary-dark", primaryDark);
-      root.setProperty("--accent", accent);
-      root.setProperty("--primary-soft", `color-mix(in srgb, ${primary} 10%, white)`);
-      root.setProperty("--bg", bg);
-      root.setProperty("--surface", surface);
-      root.setProperty("--surface-2", `color-mix(in srgb, ${surface} 92%, ${primary} 8%)`);
-      root.setProperty("--text", text);
-
-      const radius = Number(rest.card_radius || rest.theme_radius);
-      if (Number.isFinite(radius) && radius >= 0 && radius <= 40) {
-        root.setProperty("--radius", `${radius}px`);
-      }
-
-      const metaTheme = document.querySelector('meta[name="theme-color"]');
-      if (metaTheme) metaTheme.setAttribute("content", primary);
-    }
-
-    function showLoading() {
-      $("menu-sections").innerHTML = `
-        <div class="loading-list" aria-label="Loading menu">
-          ${[1,2,3,4].map(() => `
-            <div class="loading-row">
-              <div style="flex:1; padding-top:4px;">
-                <div class="skeleton sk-title sk-line"></div>
-                <div class="skeleton sk-text sk-line"></div>
-                <div class="skeleton sk-price sk-line"></div>
-              </div>
-            </div>
-          `).join("")}
+  <div class="twoCol">
+    <div class="card" id="restaurant">
+      <div class="cardTitle">Restaurant Information <button class="btn sm" data-go="restaurantEdit"><i class="fa-solid fa-pen"></i> Edit</button></div>
+      <div class="profileBox">
+        <img class="bigLogo" id="profileLogo" alt="Restaurant logo">
+        <div>
+          <div class="muted" style="font-size:10px">Restaurant Name</div><strong id="profileName">—</strong>
+          <div class="muted" style="font-size:10px;margin-top:9px">Phone Number</div><strong id="profilePhone">—</strong>
+          <div class="muted" style="font-size:10px;margin-top:9px">Address</div><strong id="profileAddress">—</strong>
+          <div class="muted" style="font-size:10px;margin-top:9px">Slug</div><strong id="profileSlug">—</strong>
         </div>
-      `;
-    }
+      </div>
+      <div class="serviceBtns">
+        <button class="serviceBtn"><i class="fa-solid fa-utensils"></i> Dine In</button>
+        <button class="serviceBtn"><i class="fa-solid fa-bag-shopping"></i> Takeaway</button>
+        <button class="serviceBtn"><i class="fa-solid fa-motorcycle"></i> Home Delivery</button>
+      </div>
+    </div>
 
-    function showState(title, message) {
-      $("menu-sections").innerHTML = `
-        <div class="state-card">
-          <strong>${escapeHTML(title)}</strong>
-          <span>${escapeHTML(message)}</span>
-        </div>
-      `;
-    }
+    <div class="card" id="gallery">
+      <div class="cardTitle">Restaurant Media <button class="btn sm" data-go="galleryEdit"><i class="fa-solid fa-pen"></i> Manage</button></div>
+      <div class="mediaCover" id="mediaCover"><div class="overlay"><i class="fa-solid fa-link"></i> Set Cover URL</div></div>
+      <div class="mediaTiles">
+        <div class="mediaTile" id="mediaLogo"><span>Logo</span></div>
+        <div class="mediaTile" id="mediaFood"><span>Food Photos</span></div>
+        <div class="mediaTile"><span>Gallery</span></div>
+      </div>
+    </div>
+  </div>
 
-    function logoFallback() {
-      return `
-        <div class="logo-fallback" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/>
-          </svg>
-        </div>
-      `;
-    }
+  <div class="twoCol">
+    <div class="card">
+      <div class="cardTitle">Menu Management <button class="btn primary sm" id="openAdd"><i class="fa-solid fa-plus"></i> Add New Item</button></div>
+      <div class="menuToolbar">
+        <input class="input" id="menuSearch" placeholder="Search food items...">
+        <select class="select" id="menuCategoryFilter" style="max-width:160px"><option value="">All Categories</option></select>
+        <select class="select" id="menuTypeFilter" style="max-width:130px"><option value="">All Types</option><option value="veg">Veg</option><option value="nonveg">Non-Veg</option><option value="egg">Egg</option></select>
+      </div>
+      <div class="menuTableWrap">
+        <table class="menuTable"><thead><tr><th>Item</th><th>Type</th><th>Price (Q/H/F)</th><th>Status</th><th>Actions</th></tr></thead><tbody id="dashboardItems"></tbody></table>
+      </div>
+    </div>
+    <div class="card" id="categories">
+      <div class="cardTitle">Menu Categories <button class="btn sm" id="addCategoryBtn"><i class="fa-solid fa-plus"></i> Category</button></div>
+      <div class="categoryCards" id="categoryCards"></div>
+    </div>
+  </div>
 
+  <div class="twoCol">
+    <div class="card">
+      <div class="cardTitle">Quick Actions</div>
+      <div class="quickGrid">
+        <button class="quick" id="quickQR"><i class="fa-solid fa-qrcode"></i><div><strong>Generate QR Code</strong><small>Open & download your menu QR</small></div></button>
+        <button class="quick" id="quickPreview"><i class="fa-solid fa-mobile-screen"></i><div><strong>View Public Menu</strong><small>See what customers see</small></div></button>
+        <button class="quick" id="quickCategory"><i class="fa-solid fa-circle-plus"></i><div><strong>Add New Category</strong><small>Organize your menu</small></div></button>
+        <button class="quick" id="quickTheme"><i class="fa-solid fa-palette"></i><div><strong>Theme & Branding</strong><small>Customize menu appearance</small></div></button>
+      </div>
+    </div>
+    <div class="card" id="qr">
+      <div class="cardTitle">Restaurant Status <span class="muted" style="font-size:10px">Based on available database fields</span></div>
+      <div class="hoursRow"><span>Restaurant</span><strong id="statusName">—</strong></div>
+      <div class="hoursRow"><span>Public Menu</span><strong style="color:var(--green)">Live</strong></div>
+      <div class="hoursRow"><span>Menu Items</span><strong id="statusItems">0</strong></div>
+      <div class="hoursRow"><span>Menu URL</span><button class="btn sm" id="copyMenu">Copy Link</button></div>
+    </div>
+  </div>
+</section>
 
-    function getItemType(item) {
-      if (String(item.item_type || "").toLowerCase() === "egg") return "egg";
-      if (String(item.item_type || "").toLowerCase() === "nonveg" || item.is_veg === false) return "nonveg";
-      return "veg";
-    }
+<!-- FULL MENU MANAGEMENT -->
+<section id="section-menu" class="hidden">
+  <div class="card">
+    <div class="cardTitle">Menu Management <button class="btn primary" id="openAdd2"><i class="fa-solid fa-plus"></i> Add New Item</button></div>
+    <div class="menuToolbar">
+      <input class="input" id="fullSearch" placeholder="Search item, description or category...">
+      <select class="select" id="fullCatFilter" style="max-width:190px"><option value="">All Categories</option></select>
+      <select class="select" id="fullTypeFilter" style="max-width:150px"><option value="">All Types</option><option value="veg">Veg</option><option value="nonveg">Non-Veg</option><option value="egg">Egg</option></select>
+    </div>
+    <div class="menuTableWrap"><table class="menuTable"><thead><tr><th>Item</th><th>Category</th><th>Type</th><th>Single</th><th>Qtr</th><th>Half</th><th>Full</th><th>Status</th><th>Actions</th></tr></thead><tbody id="fullItems"></tbody></table></div>
+  </div>
+</section>
 
-    function isUnavailable(item) {
-      return item.is_available === false || item.available === false || item.status === "unavailable" || item.status === "out_of_stock";
-    }
+<!-- RESTAURANT DETAILS -->
+<section id="section-restaurant" class="hidden">
+  <div class="card">
+    <div class="cardTitle">Restaurant Details <small>These fields match your existing Supabase restaurants table.</small></div>
+    <div class="threeCol">
+      <div class="formGroup"><label>Restaurant Name</label><input class="input" id="fName"></div>
+      <div class="formGroup"><label>Phone Number</label><input class="input" id="fPhone"></div>
+      <div class="formGroup"><label>Slug</label><input class="input" id="fSlug" disabled></div>
+    </div>
+    <div class="formGroup"><label>Logo Image URL</label><div class="uploadRow"><input class="input" id="fLogo" placeholder="https://..."><input type="file" id="logoFile" accept="image/*" hidden><button class="fileBtn" id="chooseLogo">Choose</button><button class="btn blue" id="uploadLogo">Upload</button></div></div>
+    <div class="formGroup"><label>Address</label><textarea class="textarea" id="fAddress" placeholder="Your restaurant address"></textarea></div>
+    <button class="btn primary" id="saveProfile"><i class="fa-solid fa-floppy-disk"></i> Save Restaurant Details</button>
+    <div class="card" style="margin-top:15px;background:linear-gradient(180deg,#fff,#fffaf7)">
+      <div class="cardTitle">Public Menu Hero Information <small>Customize the restaurant information shown on the public menu</small></div>
+      <div class="formGroup"><label>Welcome Text</label><input class="input" id="fWelcome" placeholder="Welcome to"></div>
+      <div class="formGroup"><label>Tagline / Main Heading</label><input class="input" id="fTagline" placeholder="URBAN PUNJAB"></div>
+      <div class="formGroup"><label>Subtitle</label><input class="input" id="fSubtitle" placeholder="THE TASTE YOU'LL LOVE"></div>
+      <div class="threeCol">
+        <div class="formGroup"><label>Feature 1</label><input class="input" id="fFeature1" placeholder="Pure Veg & Non-Veg"></div>
+        <div class="formGroup"><label>Feature 2</label><input class="input" id="fFeature2" placeholder="Hygienic Food"></div>
+        <div class="formGroup"><label>Feature 3</label><input class="input" id="fFeature3" placeholder="Great Taste"></div>
+      </div>
+      <div class="twoCol equal">
+        <div class="formGroup"><label>Slogan Line 1</label><input class="input" id="fSlogan1" placeholder="Good Food"></div>
+        <div class="formGroup"><label>Slogan Line 2</label><input class="input" id="fSlogan2" placeholder="Good Mood"></div>
+      </div>
+      <div class="threeCol">
+        <div class="formGroup"><label>Opening Time</label><input class="input" id="fOpenTime" type="time" value="11:00"></div>
+        <div class="formGroup"><label>Closing Time</label><input class="input" id="fCloseTime" type="time" value="23:00"></div>
+        <div class="formGroup"><label>Call Button Text</label><input class="input" id="fCallText" placeholder="Call Restaurant"></div>
+      </div>
+      <div class="serviceBtns" style="grid-template-columns:repeat(3,1fr)">
+        <label class="serviceBtn"><input type="checkbox" id="fDineIn" checked> 🍴 Dine In</label>
+        <label class="serviceBtn"><input type="checkbox" id="fTakeaway" checked> 🛍 Takeaway</label>
+        <label class="serviceBtn"><input type="checkbox" id="fDelivery" checked> 🛵 Home Delivery</label>
+      </div>
+      <button class="btn primary" id="saveHeroInfo" style="margin-top:15px"><i class="fa-solid fa-floppy-disk"></i> Save Public Information</button>
+      <p class="muted" style="font-size:10px;margin:10px 0 0">These fields require the accompanying FreeMenu SQL migration before Supabase can store them.</p>
+    </div>
 
-    function renderPrice(item, category) {
-      const clean = v => (v !== null && v !== undefined && String(v).trim() !== "") ? String(v).trim() : "";
-      const q = clean(item.price_quarter);
-      const h = clean(item.price_half);
-      const f = clean(item.price_full) || clean(item.price);
+  </div>
+</section>
 
-      return `<div class="three-price-area">
-        <span class="three-price-cell">${q ? "₹" + escapeHTML(q) : ""}</span>
-        <span class="three-price-cell">${h ? "₹" + escapeHTML(h) : ""}</span>
-        <span class="three-price-cell">${f ? "₹" + escapeHTML(f) : ""}</span>
-      </div>`;
-    }
+<!-- CATEGORIES -->
+<section id="section-categories" class="hidden">
+  <div class="card">
+    <div class="cardTitle">Categories <button class="btn primary" id="addCategory2"><i class="fa-solid fa-plus"></i> Add Category</button></div>
+    <p class="muted" style="font-size:12px;margin-top:-5px">Your current Supabase design stores category as text on each menu item, so categories are derived automatically from menu items.</p>
+    <div class="categoryCards" id="categoryCardsFull"></div>
+  </div>
+</section>
 
-    function renderTags(item) {
-      const tags = [];
-      if (item.is_bestseller === true || item.bestseller === true) tags.push(`<span class="tag hot">★ Bestseller</span>`);
-      if (item.is_recommended === true || item.recommended === true) tags.push(`<span class="tag">Recommended</span>`);
-      if (item.is_spicy === true || item.spicy === true) tags.push(`<span class="tag hot">🌶 Spicy</span>`);
-      if (isUnavailable(item)) tags.push(`<span class="tag out">Unavailable</span>`);
-      return tags.length ? `<div class="item-tags">${tags.join("")}</div>` : "";
-    }
+<!-- GALLERY -->
+<section id="section-gallery" class="hidden">
+  <div class="card">
+    <div class="cardTitle">Restaurant Images
+      <small id="mediaRuleNote">Upload rules are controlled by Super Admin.</small>
+    </div>
 
-    function renderItem(item) {
-      const type = getItemType(item);
-      const unavailable = isUnavailable(item);
+    <div id="mediaPolicyStatus" style="margin:0 0 14px;padding:11px;border-radius:10px;background:#fff8e8;border:1px solid #f4d58b;font-size:11px;color:#6b4b00">
+      Loading media policy...
+    </div>
 
-      return `
-        <article class="menu-item ${unavailable ? "unavailable" : ""}" data-name="${escapeHTML((item.name || "").toLowerCase())}">
-          <div class="item-content">
-            <div class="item-main-row">
-              <div class="item-info">
-                <div class="item-topline">
-                  <span class="food-symbol ${type}" aria-label="${type}"></span>
-                  <h3 class="item-name">${escapeHTML(item.name || "Unnamed item")}</h3>
-                </div>
-                ${renderTags(item)}
-                ${item.description ? `<p class="item-desc">${escapeHTML(item.description)}</p>` : ""}
-              </div>
-              <div class="item-price-area">
-                ${renderPrice(item, categoryKey(item.category))}
-              </div>
-            </div>
-          </div>
-        </article>
-      `;
-    }
+    <div class="formGroup">
+      <label>Restaurant Logo <small>(Maximum 1 image)</small></label>
+      <div class="uploadRow">
+        <input class="input" id="fLogoMedia" placeholder="Logo image URL">
+        <input type="file" id="logoMediaFile" accept="image/*" hidden>
+        <button class="fileBtn" type="button" id="chooseLogoMedia">Choose</button>
+        <button class="btn blue" type="button" id="uploadLogoMedia">Upload</button>
+      </div>
+      <div class="muted" style="font-size:10px">Maximum image size: <b id="logoMaxText">1 MB</b></div>
+    </div>
 
-    function categoryKey(category) {
-      return String(category || "General").trim() || "General";
-    }
+    <div class="formGroup">
+      <label>Banner / Hero Image <small>(Maximum 1 image)</small></label>
+      <div class="uploadRow">
+        <input class="input" id="fBannerMedia" placeholder="Banner image URL">
+        <input type="file" id="bannerMediaFile" accept="image/*" hidden>
+        <button class="fileBtn" type="button" id="chooseBannerMedia">Choose</button>
+        <button class="btn blue" type="button" id="uploadBannerMedia">Upload</button>
+      </div>
+      <div class="muted" style="font-size:10px">Maximum image size: <b id="bannerMaxText">1 MB</b></div>
+    </div>
 
-    function sectionId(name) {
-      return `cat-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "general"}`;
-    }
+    <div id="galleryPaidBox" class="formGroup" style="display:none">
+      <label>Photo Gallery <span style="padding:3px 7px;background:#fff0d6;color:#8a5600;border-radius:99px;font-size:9px;font-weight:800">PREMIUM</span></label>
+      <div id="galleryLocked" style="padding:12px;border-radius:10px;background:#f8fafc;border:1px solid var(--border);font-size:11px;color:#667085"></div>
+      <div id="galleryUploadBox" style="display:none;margin-top:10px">
+        <input type="file" id="galleryMediaFile" accept="image/*" hidden>
+        <button class="fileBtn" type="button" id="chooseGalleryMedia">Choose Gallery Image</button>
+        <button class="btn blue" type="button" id="uploadGalleryMedia">Upload to Gallery</button>
+        <div id="galleryList" style="margin-top:11px"></div>
+      </div>
+    </div>
 
+    <button class="btn primary" id="saveMedia"><i class="fa-solid fa-floppy-disk"></i> Save Image Settings</button>
+    <div class="muted" style="font-size:10px;margin-top:9px">One logo + one banner are allowed. Gallery uploads are available only for active Premium restaurants when Super Admin has enabled the paid gallery.</div>
+  </div>
+</section>
 
-/* FreeMenu owner-controlled menu ordering */
-function getSavedCategoryOrder(rest, items) {
-  const names = [...new Set(items.map(item => categoryKey(item.category)))];
-  const saved = Array.isArray(rest?.category_order) ? rest.category_order.map(String) : [];
-  const rank = new Map(saved.map((x,i)=>[x,i]));
-  return names.sort((a,b)=>{
-    const ar=rank.has(a)?rank.get(a):999999, br=rank.has(b)?rank.get(b):999999;
-    return ar-br || a.localeCompare(b);
-  });
+<!-- QR -->
+<section id="section-qr" class="hidden">
+  <div class="card" style="max-width:720px;margin:auto;text-align:center">
+    <div class="cardTitle">Restaurant QR Code</div>
+    <p class="muted" style="font-size:12px">This QR opens the public menu URL for this restaurant.</p>
+    <div style="margin:18px auto;width:240px;height:240px;display:grid;place-items:center;background:#fff;border:1px solid var(--border);border-radius:12px" id="qrBox"></div>
+    <input class="input" id="qrUrl" readonly style="text-align:center;margin-bottom:10px">
+    <div class="actions" style="justify-content:center"><button class="btn primary" id="downloadQR"><i class="fa-solid fa-download"></i> Download QR</button><button class="btn" id="copyQR">Copy Link</button></div>
+  </div>
+</section>
+
+<!-- PREVIEW -->
+<section id="section-preview" class="hidden">
+  <div class="card" style="max-width:850px;margin:auto">
+    <div class="cardTitle">Menu Preview <button class="btn primary sm" id="openPublic2">Open Public Menu</button></div>
+    <iframe id="previewFrame" title="Public Menu Preview" style="width:100%;height:700px;border:1px solid var(--border);border-radius:12px;background:#fff"></iframe>
+  </div>
+</section>
+
+<!-- ANALYTICS -->
+<section id="section-analytics" class="hidden">
+  <div class="card">
+    <div class="cardTitle">Analytics <small>Real view/scan numbers are not available in the supplied Supabase schema.</small></div>
+    <div class="grid4">
+      <div class="stat"><div class="statLabel">Menu Items</div><div class="statValue" id="aItems">0</div></div>
+      <div class="stat"><div class="statLabel">Categories</div><div class="statValue" id="aCats">0</div></div>
+      <div class="stat"><div class="statLabel">Bestsellers</div><div class="statValue">—</div></div>
+      <div class="stat"><div class="statLabel">Views</div><div class="statValue">—</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SETTINGS -->
+<section id="section-settings" class="hidden">
+  <div class="twoCol">
+    <div class="card">
+      <div class="cardTitle">Menu Theme <small>Preview settings</small></div>
+      <div class="themeGrid">
+        <label class="colorField"><input type="color" id="cPrimary" value="#641219"><span>Primary</span></label>
+        <label class="colorField"><input type="color" id="cAccent" value="#d8ad62"><span>Accent</span></label>
+        <label class="colorField"><input type="color" id="cBg" value="#fffaf1"><span>Background</span></label>
+      </div>
+      <button class="btn primary" id="saveTheme" style="margin-top:12px"><i class="fa-solid fa-floppy-disk"></i> Save Theme</button>
+      <div class="previewFrame" style="margin-top:14px">
+        <div class="previewTop" id="themePreview"><strong id="themeName">Restaurant</strong><div style="font-size:11px;margin-top:5px">Your digital menu preview</div></div>
+        <div style="padding:15px"><div style="height:11px;width:55%;background:#eee;border-radius:8px"></div><div style="height:9px;width:85%;background:#f0f0f0;border-radius:8px;margin-top:13px"></div><div style="height:50px;background:#fffaf1;border:1px solid #eee;border-radius:10px;margin-top:14px"></div></div>
+      </div>
+      <p class="muted" style="font-size:11px;margin:12px 0 0">Theme changes are saved to your restaurant and appear on the live public menu.</p>
+    </div>
+    <div class="card">
+      <div class="cardTitle">Account & Security</div>
+      <div class="formGroup"><label>Logged-in Email</label><input class="input" id="accountEmail" disabled></div>
+      <button class="btn danger" id="logout2"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+    </div>
+  </div>
+</section>
+
+<!-- SUPPORT / ORDERS -->
+<section id="section-orders" class="hidden"><div class="card"><div class="cardTitle">Orders <small>Preview</small></div><div style="text-align:center;padding:60px 10px;color:var(--muted)"><i class="fa-solid fa-cart-shopping" style="font-size:38px;margin-bottom:12px"></i><h3 style="color:var(--text)">Ordering system is ready for a future phase</h3><p style="font-size:12px">The supplied Supabase schema contains menu_items and restaurants, but no orders table.</p></div></div></section>
+<section id="section-support" class="hidden"><div class="card"><div class="cardTitle">Help & Support</div><p class="muted" style="font-size:13px;line-height:1.7">For the current build, the owner panel is connected to your existing Supabase Auth, restaurants, menu_items table and restaurant-logos storage bucket. Additional analytics, ordering and theme persistence require database fields/tables.</p></div></section>
+
+</div></div>
+
+<!-- ITEM MODAL -->
+<div class="modal" id="itemModal">
+ <div class="modalBox">
+  <div class="modalHead"><h3 id="modalTitle">Add New Menu Item</h3><button class="close" data-close="itemModal"><i class="fa-solid fa-xmark"></i></button></div>
+  <input type="hidden" id="editId"><input type="hidden" id="mAvailable" value="true">
+  <div class="threeCol">
+   <div class="formGroup" style="grid-column:span 2"><label>Item Name *</label><input class="input" id="mName" placeholder="e.g. Paneer Butter Masala"></div>
+   <div class="formGroup"><label>Food Type</label><select class="select" id="mType"><option value="veg">🟢 Veg</option><option value="nonveg">🔴 Non-Veg</option><option value="egg">🟡 Egg</option></select></div>
+  </div>
+  <div class="formGroup"><label>Category *</label><input class="input" id="mCategory" placeholder="Main Course"></div>
+  <div class="formGroup"><label>Description</label><textarea class="textarea" id="mDesc"></textarea></div>
+  <div class="formGroup"><label>Single Price (use when portions are not needed)</label><input class="input" type="number" id="mPrice" min="0"></div>
+  <label style="display:block;font-size:11px;font-weight:800;color:#64748b;margin-bottom:6px">PORTION PRICES</label>
+  <div class="threeCol">
+   <input class="input" type="number" id="mQtr" placeholder="Qtr ₹" min="0">
+   <input class="input" type="number" id="mHalf" placeholder="Half ₹" min="0">
+   <input class="input" type="number" id="mFull" placeholder="Full ₹" min="0">
+  </div>
+  <div class="formGroup" style="margin-top:16px"><label>Menu Item Status</label><button type="button" class="menuStatusBtn on" id="mAvailableSwitch"><span class="dot"></span><span id="mAvailableText">ON • Visible</span></button></div>
+  <div style="margin-top:18px;display:flex;justify-content:flex-end;gap:8px><button class="btn" data-close="itemModal">Cancel</button><button class="btn primary" id="saveItem"><i class="fa-solid fa-floppy-disk"></i> Save Item</button></div>
+ </div>
+</div>
+
+<!-- CATEGORY MODAL -->
+<div class="modal" id="catModal">
+ <div class="modalBox" style="max-width:420px">
+  <div class="modalHead"><h3>Add Category</h3><button class="close" data-close="catModal"><i class="fa-solid fa-xmark"></i></button></div>
+  <div class="formGroup"><label>Category Name</label><input class="input" id="newCat" placeholder="e.g. Starters"></div>
+  <button class="btn primary" id="saveCategory"><i class="fa-solid fa-plus"></i> Add Category</button>
+  <p class="muted" style="font-size:10px;margin-top:9px">Because your current database has no categories table, adding a category creates a placeholder menu item. You can edit its name/price afterward.</p>
+ </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   OWNER PAGE AUTH — NO SEPARATE login.html REQUIRED
+   If the user is logged out, this same page shows Owner Login.
+   ============================================================
+   SUPABASE CONFIG — TAKEN FROM YOUR SUPPLIED OWNER CODE
+   ============================================================ */
+const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let session=null,currentRestaurant=null,currentRestaurantId=null,items=[],activeSection="dashboard";
+let mediaRules={max_mb:1,logo_enabled:true,banner_enabled:true,gallery_paid_enabled:false};
+let isPremiumRestaurant=false;
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+const cleanNum=v=>v!==""&&v!==null&&v!==undefined&&!Number.isNaN(Number(v))?Number(v):null;
+function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),2300)}
+function initials(name){return (name||"Owner").split(/\s+/).slice(0,2).map(x=>x[0]).join("").toUpperCase()}
+function publicUrl(){
+  const url=new URL("menu.html",location.href);
+  url.searchParams.set("r",currentRestaurant?.slug||"");
+  url.searchParams.set("v",Date.now().toString());
+  return url.href;
 }
 
-    function getCategories(items) {
-      const categories = [];
-      const seen = new Set();
-      items.forEach(item => {
-        const category = categoryKey(item.category);
-        if (!seen.has(category)) {
-          seen.add(category);
-          categories.push(category);
-        }
-      });
-      return categories;
+/* ---------- Navigation ---------- */
+const sections=["dashboard","restaurant","menu","categories","gallery","qr","preview","analytics","settings","orders","support"];
+function showSection(name){
+  activeSection=sections.includes(name)?name:"dashboard";
+  sections.forEach(s=>$("section-"+s)?.classList.toggle("hidden",s!==activeSection));
+  document.querySelectorAll(".navItem").forEach(a=>a.classList.toggle("active",a.dataset.section===activeSection));
+  $("sidebar").classList.remove("open");
+  if(activeSection==="preview") $("previewFrame").src=publicUrl();
+  if(activeSection==="qr") renderQR();
+}
+document.querySelectorAll(".navItem").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();history.replaceState(null,"","#"+a.dataset.section);showSection(a.dataset.section)}));
+window.addEventListener("hashchange",()=>showSection(location.hash.slice(1)||"dashboard"));
+$("mobileMenu").onclick=()=>$("sidebar").classList.toggle("open");
+
+
+
+function showOwnerLogin(){
+  $("loader").classList.add("hidden");
+  $("ownerAuth").classList.add("show");
+  $("authChoiceCard").style.display="grid";
+  showLoginForm();
+}
+function hideOwnerLogin(){
+  $("ownerAuth").classList.remove("show");
+}
+function showLoginForm(){
+  $("ownerAuth").classList.add("show");
+  $("authChoiceCard").style.display="grid";
+  $("loginCard").classList.add("active");
+  $("signupCard").classList.remove("active");
+  $("loginCard").style.display="block";
+  $("signupCard").style.display="none";
+  $("authLoginTab")?.classList.add("active");
+  $("authSignupTab")?.classList.remove("active");
+}
+function showSignupForm(){
+  $("ownerAuth").classList.add("show");
+  $("authChoiceCard").style.display="grid";
+  $("loginCard").classList.remove("active");
+  $("signupCard").classList.add("active");
+  $("loginCard").style.display="none";
+  $("signupCard").style.display="block";
+  $("authLoginTab")?.classList.remove("active");
+  $("authSignupTab")?.classList.add("active");
+}
+function showAuthChoice(){ showLoginForm(); }
+$("authLoginTab")?.addEventListener("click",showLoginForm);
+$("authSignupTab")?.addEventListener("click",showSignupForm);
+function setAuthMsg(id,msg,ok=false){
+  const el=$(id); el.textContent=msg; el.style.display=msg?"block":"none";
+  if(el) el.className=ok?"authSuccess":"authError";
+}
+
+async function ownerLogin(){
+  const email=$("loginEmailNew").value.trim();
+  const password=$("loginPasswordNew").value;
+  setAuthMsg("loginErrorNew","");
+  if(!email || !password){
+    setAuthMsg("loginErrorNew","Please enter email and password.");
+    return;
+  }
+  $("loginSubmitNew").disabled=true;
+  $("loginSubmitNew").textContent="Signing in...";
+  const {error}=await supabaseClient.auth.signInWithPassword({email,password});
+  if(error){
+    setAuthMsg("loginErrorNew",error.message);
+    $("loginSubmitNew").disabled=false;
+    $("loginSubmitNew").textContent="🔐 Login to Owner Panel";
+    return;
+  }
+  hideOwnerLogin();
+  $("loader").classList.remove("hidden");
+  await init(true);
+  $("loginSubmitNew").disabled=false;
+  $("loginSubmitNew").textContent="🔐 Login to Owner Panel";
+}
+
+async function ownerSignup(){
+  setAuthMsg("signupErrorNew","");
+  setAuthMsg("signupSuccessNew","");
+  const name=$("signupName").value.trim();
+  const phone=$("signupPhone").value.trim();
+  const email=$("signupEmail").value.trim();
+  const password=$("signupPassword").value;
+  const confirm=$("signupConfirm").value;
+  const restaurant=$("signupRestaurant").value.trim();
+  const address=$("signupAddress").value.trim();
+  const slug=$("signupSlug").value.trim().toLowerCase()
+    .replace(/[^a-z0-9-]+/g,"-").replace(/^-+|-+$/g,"");
+
+  if(!name||!phone||!email||!password||!restaurant||!address||!slug){
+    setAuthMsg("signupErrorNew","Please complete all required fields.");
+    return;
+  }
+  if(password.length<6){
+    setAuthMsg("signupErrorNew","Password must be at least 6 characters.");
+    return;
+  }
+  if(password!==confirm){
+    setAuthMsg("signupErrorNew","Passwords do not match.");
+    return;
+  }
+  if(!/^\d{10}$/.test(phone.replace(/\D/g,""))){
+    setAuthMsg("signupErrorNew","Please enter a valid 10 digit mobile number.");
+    return;
+  }
+
+  $("signupSubmitNew").disabled=true;
+  $("signupSubmitNew").textContent="Creating account...";
+
+  const {data,error}=await supabaseClient.auth.signUp({
+    email,password,
+    options:{data:{full_name:name,phone,role:"owner"}}
+  });
+  if(error){
+    setAuthMsg("signupErrorNew",error.message);
+    $("signupSubmitNew").disabled=false;
+    $("signupSubmitNew").textContent="📝 Create Restaurant Account";
+    return;
+  }
+
+  // Supabase may require email confirmation. If a session exists, create the
+  // restaurant immediately; otherwise instruct the owner to confirm and login.
+  if(data.user && data.session){
+    const {data:existing,error:checkError}=await supabaseClient
+      .from("restaurants").select("id").eq("slug",slug).maybeSingle();
+
+    if(checkError){
+      setAuthMsg("signupErrorNew",checkError.message);
+      $("signupSubmitNew").disabled=false;
+      $("signupSubmitNew").textContent="📝 Create Restaurant Account";
+      return;
+    }
+    if(existing){
+      setAuthMsg("signupErrorNew","This Menu Slug is already in use. Please choose another.");
+      $("signupSubmitNew").disabled=false;
+      $("signupSubmitNew").textContent="📝 Create Restaurant Account";
+      return;
     }
 
-    function renderCategoryChips() {
-      const categories = getSavedCategoryOrder(restaurant, allItems);
-      $("category-chips").innerHTML = [
-        `<button class="cat-chip ${currentCategory === "all" ? "active" : ""}" data-category="all">All Menu</button>`,
-        ...categories.map(category => `
-          <button class="cat-chip ${currentCategory === category ? "active" : ""}" data-category="${escapeHTML(category)}">
-            ${escapeHTML(category)}
-          </button>
-        `)
-      ].join("");
+    const {data:restaurantRow,error:restaurantError}=await supabaseClient
+      .from("restaurants")
+      .insert({
+        owner_id:data.user.id,
+        name:restaurant,
+        slug,
+        phone:phone.replace(/\D/g,""),
+        address,
+        status:"pending",
+        plan:"free",
+        subscription_status:"inactive"
+      })
+      .select("*").single();
+
+    if(restaurantError){
+      setAuthMsg("signupErrorNew","Account created but restaurant setup failed: "+restaurantError.message);
+      $("signupSubmitNew").disabled=false;
+      $("signupSubmitNew").textContent="📝 Create Restaurant Account";
+      return;
     }
 
-    function getFilteredItems() {
-      const q = searchText.trim().toLowerCase();
-      return allItems.filter(item => {
-        const category = categoryKey(item.category);
-        const categoryMatch = currentCategory === "all" || category === currentCategory;
-        const haystack = `${item.name || ""} ${item.description || ""} ${category}`.toLowerCase();
-        const searchMatch = !q || haystack.includes(q);
-        return categoryMatch && searchMatch;
-      });
+    currentRestaurant=restaurantRow;
+    currentRestaurantId=restaurantRow.id;
+    setAuthMsg("signupSuccessNew","Account and restaurant created. Opening Owner Dashboard...",true);
+    setTimeout(async()=>{
+      hideOwnerLogin();
+      $("loader").classList.remove("hidden");
+      await init();
+    },500);
+  }else{
+    setAuthMsg("signupSuccessNew","Account created. Please verify your email, then login to open your Owner Dashboard.",true);
+    setTimeout(showLoginForm,900);
+  }
+
+  $("signupSubmitNew").disabled=false;
+  $("signupSubmitNew").textContent="📝 Create Restaurant Account";
+}
+
+$("goSignupFromLogin").onclick=showSignupForm;
+$("goLoginFromSignup").onclick=showLoginForm;
+$("loginSubmitNew").onclick=ownerLogin;
+$("loginPasswordNew").addEventListener("keydown",e=>{if(e.key==="Enter")ownerLogin()});
+$("signupSubmitNew").onclick=ownerSignup;
+
+/* ---------- Init/Auth ---------- */
+async function init(afterLogin=false){
+  try{
+    $("loader")?.classList.remove("hidden");
+    const result=await Promise.race([
+      supabaseClient.auth.getSession(),
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error("Supabase connection timed out. Please refresh and try again.")),10000))
+    ]);
+    session=result?.data?.session||null;
+    if(!session?.user){
+      showAuthChoice();
+      return;
+    }
+    if(!afterLogin){
+      // Fresh page load: always show Login/Sign Up, even if Supabase has a saved session.
+      showAuthChoice();
+      return;
     }
 
-    function renderMenu() {
-      const filtered = getFilteredItems();
-      const grouped = {};
-      filtered.forEach(item => {
-        const category = categoryKey(item.category);
-        if (!grouped[category]) grouped[category] = [];
-        grouped[category].push(item);
-      });
-      const orderedCategories = getSavedCategoryOrder(restaurant, Object.values(grouped).flat());
-      orderedCategories.forEach(category => {
-        if (grouped[category]) {
-          grouped[category].sort((a,b) => {
-            const ao = Number(a.sort_order ?? a.position ?? 999999);
-            const bo = Number(b.sort_order ?? b.position ?? 999999);
-            return ao - bo || String(a.name||"").localeCompare(String(b.name||""));
-          });
-        }
-      });
+    if($("accountEmail")) $("accountEmail").value=session.user.email||"";
+    if($("ownerName")) $("ownerName").textContent=session.user.user_metadata?.full_name||session.user.email?.split("@")[0]||"Owner";
+    if($("avatar")) $("avatar").textContent=initials($("ownerName")?.textContent);
 
-      $("summary-line").style.display = "flex";
-      $("summary-line").innerHTML = `
-        <span>${filtered.length} item${filtered.length === 1 ? "" : "s"}</span>
-        ${searchText ? `<span>Search: “${escapeHTML(searchText)}”</span>` : ""}
-      `;
+    // IMPORTANT: Owner Panel always loads the restaurant linked to the
+    // currently authenticated owner. A URL slug must never override owner_id.
+    const {data,error}=await supabaseClient
+      .from("restaurants")
+      .select("*")
+      .eq("owner_id",session.user.id)
+      .limit(1);
 
-      if (!filtered.length) {
-        showState("Nothing found", "Try another search or category.");
-        return;
-      }
-
-      $("menu-sections").innerHTML = orderedCategories.filter(category => grouped[category]).map(category => {
-        const items = grouped[category];
-        return `
-        <section class="category-section" id="${sectionId(category)}" data-category="${escapeHTML(category)}">
-          <div class="category-heading categoryHeadWithPrices">
-            <div style="display:flex;align-items:center;gap:9px;min-width:0">
-              <h2 class="category-title">${escapeHTML(category)}</h2>
-              <span class="item-count">${items.length} item${items.length === 1 ? "" : "s"}</span>
-            </div>
-            <div class="categoryPriceSwitch" aria-label="Prices">
-  ${(() => {
-    const hasQ = items.some(x => String(x.price_quarter ?? "").trim() !== "");
-    const hasH = items.some(x => String(x.price_half ?? "").trim() !== "");
-    const hasF = items.some(x => String(x.price_full ?? x.price ?? "").trim() !== "");
-    return `<span>${hasQ ? "Quarter" : ""}</span><span>${hasH ? "Half" : ""}</span><span>${hasF ? "Full" : ""}</span>`;
-  })()}
-</div>
-          </div>
-          <div class="items-list">
-            ${items.map(renderItem).join("")}
-          </div>
-        </section>
-      `}).join("");
+    if(error){
+      return fail("Could not load your restaurant profile: "+error.message);
+    }
+    if(!data?.length){
+      return fail("No restaurant is linked to this login account. Please login with the restaurant owner account.");
     }
 
-    function renderRestaurant(rest) {
-      restaurant = rest;
-      applyRestaurantTheme(rest);
+    currentRestaurant=data[0];
+    currentRestaurantId=currentRestaurant.id;
+    fillProfile();
+    await loadItems();
+    await loadMediaRules();
+    $("loader")?.classList.add("hidden");
+    showSection(location.hash.slice(1)||"dashboard");
+  }catch(e){
+    console.error("Owner init failed:",e);
+    fail(e?.message||"Unexpected error while loading the Owner Panel.");
+  }
+}
+function fail(msg){
+  const loader=$("loader");
+  if(!loader) return alert(msg||"Unable to open Owner Panel");
+  loader.classList.remove("hidden");
+  loader.innerHTML=`<div style="text-align:center;padding:25px;max-width:520px"><i class="fa-solid fa-circle-exclamation" style="font-size:38px;color:#c33"></i><h3>Unable to open Owner Panel</h3><p>${esc(msg)}</p><button class="btn" onclick="location.href=location.pathname">Retry</button></div>`;
+}
+function fillProfile(){
+  const r=currentRestaurant;
+  const name=r.name||"Restaurant",logo=r.logo_url||"";
+  $("topName").textContent=name;$("profileName").textContent=name;$("statusName").textContent=name;$("themeName").textContent=name;
+  $("topAddress").textContent=r.address||"Restaurant Owner";
+  $("profilePhone").textContent=r.phone||"—";$("profileAddress").textContent=r.address||"—";$("profileSlug").textContent=r.slug||"—";
+  $("fName").value=r.name||"";$("fPhone").value=r.phone||"";$("fSlug").value=r.slug||"";$("fLogo").value=r.logo_url||"";$("fAddress").value=r.address||"";
+  if($("fLogoMedia")) $("fLogoMedia").value=r.logo_url||"";
+  if($("fBannerMedia")) $("fBannerMedia").value=r.banner_url||r.cover_url||"";
+  $("fWelcome").value=r.welcome_text??"Welcome to";
+  $("fTagline").value=r.tagline??r.name??"";
+  $("fSubtitle").value=r.subtitle_text??"THE TASTE YOU'LL LOVE";
+  $("fFeature1").value=r.feature_1??"";
+  $("fFeature2").value=r.feature_2??"";
+  $("fFeature3").value=r.feature_3??"";
+  $("fSlogan1").value=r.slogan_1??"Good Food";
+  $("fSlogan2").value=r.slogan_2??"Good Mood";
+  $("fOpenTime").value=r.opening_time??"11:00";
+  $("fCloseTime").value=r.closing_time??"23:00";
+  $("fCallText").value=r.call_button_text??"Call Restaurant";
+  $("fDineIn").checked=r.dine_in!==false;
+  $("fTakeaway").checked=r.takeaway!==false;
+  $("fDelivery").checked=r.home_delivery!==false;
+  $("cPrimary").value=r.primary_color||r.theme_primary||"#641219";
+  $("cAccent").value=r.accent_color||"#d8ad62";
+  $("cBg").value=r.background_color||r.theme_background||"#fffaf1";
+  updateTheme();
 
-      const restaurantName = rest.name || "Restaurant";
-      // Optional restaurant information is shown ONLY when the owner has entered it.
-      // No hard-coded fallback text is used here.
-      const setOptionalText = (id, value, displayMode = "block") => {
-        const el = $(id);
-        if (!el) return false;
-        const text = value == null ? "" : String(value).trim();
-        el.textContent = text;
-        el.style.display = text ? displayMode : "none";
-        return !!text;
+  const logoEl=$("topLogo");logoEl.src=logo||"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='100%25' height='100%25' rx='40' fill='%23641219'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' fill='white' font-size='30'%3E🍽%3C/text%3E%3C/svg%3E";
+  $("profileLogo").src=logoEl.src;$("mediaLogo").style.backgroundImage=`url("${logo}")`;
+  if(r.cover_url) $("mediaCover").style.backgroundImage=`url("${r.cover_url}")`;
+  if(r.gallery && $("fGallery")) $("fGallery").value=Array.isArray(r.gallery)?r.gallery.join("\n"):String(r.gallery);
+  if(r.cover_url && $("fCover")) $("fCover").value=r.cover_url;
+}
+async function loadItems(){
+  const {data,error}=await supabaseClient.from("menu_items").select("*").eq("restaurant_id",currentRestaurantId).order("id",{ascending:false});
+  if(error){toast(error.message);return}
+  items=data||[];renderAll();
+}
+
+/* ---------- Rendering ---------- */
+function categories(){
+  return [...new Set(items.map(i=>(i.category||"General").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+}
+function fillCategorySelects(){
+  const opts=categories().map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
+  ["menuCategoryFilter","fullCatFilter"].forEach(id=>$(id).innerHTML='<option value="">All Categories</option>'+opts);
+}
+function renderAll(){
+  fillCategorySelects();
+  $("statItems").textContent=items.length;$("statusItems").textContent=items.length;$("aItems").textContent=items.length;
+  $("statCats").textContent=categories().length;$("aCats").textContent=categories().length;
+  renderDashboardTable();renderFullTable();renderCategories();
+  $("statViews").textContent="—";
+}
+function typeCell(item){const t=item.item_type||((item.is_veg===false)?"nonveg":"veg");return `<span class="foodType ${t}"></span>`}
+function priceText(i){return [i.price_quarter,i.price_half,i.price_full].some(v=>v!==null&&v!==undefined)?`${i.price_quarter??"—"} / ${i.price_half??"—"} / ${i.price_full??"—"}`:(i.price!=null?`₹${i.price}`:"—")}
+function filtered(source,search,cat,type){
+  const q=(search||"").toLowerCase().trim();
+  return source.filter(i=>(!cat||(i.category||"General")===cat)&&(!type||(i.item_type||"veg")===type)&&(!q||[i.name,i.description,i.category].filter(Boolean).join(" ").toLowerCase().includes(q)));
+}
+function rowActions(i){return `<div class="actions"><button class="btn blue sm editItem" data-id="${i.id}"><i class="fa-solid fa-pen"></i></button><button class="btn danger sm deleteItem" data-id="${i.id}"><i class="fa-solid fa-trash"></i></button></div>`}
+function renderDashboardTable(){
+ const list=filtered(items,$("menuSearch").value,$("menuCategoryFilter").value,$("menuTypeFilter").value);
+ $("dashboardItems").innerHTML=list.length?list.slice(0,8).map(i=>`<tr><td><div class="foodName">${esc(i.name)}</div><div class="foodCat">${esc(i.category||"General")}</div></td><td>${typeCell(i)}</td><td class="pricesMini">${esc(priceText(i))}</td><td><button type="button" class="menuStatusBtn ${i.is_available!==false?"on":"off"}" data-status="${i.id}" title="Click to turn menu item ${i.is_available!==false?"OFF":"ON"}"><span class="dot"></span><span>${i.is_available!==false?"ON • Visible":"OFF • Hidden"}</span></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="5" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
+}
+function renderFullTable(){
+ const list=filtered(items,$("fullSearch").value,$("fullCatFilter").value,$("fullTypeFilter").value);
+ $("fullItems").innerHTML=list.length?list.map(i=>`<tr><td><div class="foodName">${esc(i.name)}</div><div class="foodCat">${esc(i.description||"")}</div></td><td>${esc(i.category||"General")}</td><td>${typeCell(i)}</td><td>${i.price??"—"}</td><td>${i.price_quarter??"—"}</td><td>${i.price_half??"—"}</td><td>${i.price_full??"—"}</td><td><button type="button" class="menuStatusBtn ${i.is_available!==false?"on":"off"}" data-status="${i.id}" title="Click to turn menu item ${i.is_available!==false?"OFF":"ON"}"><span class="dot"></span><span>${i.is_available!==false?"ON • Visible":"OFF • Hidden"}</span></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="9" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
+}
+function renderCategories(){
+ const html=categories().map(c=>{
+   const count=items.filter(i=>(i.category||"General").trim()===c).length;
+   const image=items.find(i=>(i.category||"").trim()===c)?.image_url||"";
+   return `<div class="categoryCard"><div class="catImage" style="${image?`background-image:url('${esc(image)}')`:""}"></div><div class="catBody"><div class="catName">${esc(c)}</div><div class="catCount">${count} item${count===1?"":"s"}</div></div></div>`;
+ }).join("");
+ $("categoryCards").innerHTML=html||'<div class="muted" style="font-size:12px">No categories yet.</div>';
+ $("categoryCardsFull").innerHTML=html||'<div class="muted" style="font-size:12px">No categories yet.</div>';
+}
+
+/* ---------- Item CRUD ---------- */
+function openItem(id=null){
+ $("editId").value=id||"";
+ $("modalTitle").textContent=id?"Edit Menu Item":"Add New Menu Item";
+ const i=id?items.find(x=>String(x.id)===String(id)):null;
+ $("mName").value=i?.name||"";$("mCategory").value=i?.category||"";
+ $("mDesc").value=i?.description||"";$("mType").value=i?.item_type||((i?.is_veg===false)?"nonveg":"veg");
+ $("mPrice").value=i?.price??"";$("mQtr").value=i?.price_quarter??"";$("mHalf").value=i?.price_half??"";$("mFull").value=i?.price_full??"";
+ $("mAvailable").value=String(i?.is_available!==false);
+ $("mAvailableSwitch").className=`switch ${i?.is_available!==false?"on":""}`;
+ $("mAvailableText").textContent=i?.is_available!==false?"ON — Visible":"OFF — Hidden";
+ $("itemModal").classList.add("show");
+}
+async function saveItem(){
+ const id=$("editId").value,name=$("mName").value.trim(),category=$("mCategory").value.trim()||"General",description=$("mDesc").value.trim(),item_type=$("mType").value;
+ if(!name)return toast("Item name is required");
+ const payload={name,category,description,item_type,is_veg:item_type==="veg",price:cleanNum($("mPrice").value),price_quarter:cleanNum($("mQtr").value),price_half:cleanNum($("mHalf").value),price_full:cleanNum($("mFull").value),is_available:$("mAvailable").value!=="false"};
+ $("saveItem").disabled=true;$("saveItem").textContent="Saving...";
+ let res;
+ if(id) res=await supabaseClient.from("menu_items").update(payload).eq("id",id).eq("restaurant_id",currentRestaurantId);
+ else res=await supabaseClient.from("menu_items").insert([{restaurant_id:currentRestaurantId,...payload}]);
+ $("saveItem").disabled=false;$("saveItem").innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Item';
+ if(res.error){toast("Save failed: "+res.error.message);return}
+ $("itemModal").classList.remove("show");toast(id?"Item updated":"Item added");await loadItems();
+}
+async function deleteItem(id){
+ if(!confirm("Delete this menu item?"))return;
+ const {error}=await supabaseClient.from("menu_items").delete().eq("id",id).eq("restaurant_id",currentRestaurantId);
+ if(error)toast("Delete failed: "+error.message);else{toast("Item deleted");await loadItems()}
+}
+async function toggleAvailability(id,btn){
+ const item=items.find(i=>String(i.id)===String(id));if(!item)return;
+ const next=item.is_available===false;
+ btn.disabled=true;
+ const {error}=await supabaseClient.from("menu_items").update({is_available:next}).eq("id",id).eq("restaurant_id",currentRestaurantId);
+ btn.disabled=false;
+ if(error){toast("Could not change status. Run the menu-item ON/OFF SQL migration first.");return}
+ item.is_available=next;
+ toast(next?"Item is now ON / visible":"Item is now OFF / hidden");
+ renderAll();
+}
+document.addEventListener("click",e=>{
+ const modalStatus=e.target.closest("#mAvailableSwitch");
+ if(modalStatus){ const on=$("mAvailable").value!=="true"; $("mAvailable").value=String(on); $("mAvailableSwitch").className=`switch ${on?"on":""}`; $("mAvailableText").textContent=on?"ON — Visible":"OFF — Hidden"; return; }
+ const edit=e.target.closest(".editItem"),del=e.target.closest(".deleteItem"),status=e.target.closest("[data-status]");
+ if(edit)openItem(edit.dataset.id);
+ if(del)deleteItem(del.dataset.id);
+ if(status)toggleAvailability(status.dataset.status,status);
+});
+$("saveItem").onclick=saveItem;$("openAdd").onclick=()=>openItem();$("openAdd2").onclick=()=>openItem();
+$("menuSearch").oninput=renderDashboardTable;$("menuCategoryFilter").onchange=renderDashboardTable;$("menuTypeFilter").onchange=renderDashboardTable;
+$("fullSearch").oninput=renderFullTable;$("fullCatFilter").onchange=renderFullTable;$("fullTypeFilter").onchange=renderFullTable;
+
+/* ---------- Profile ---------- */
+$("saveProfile").onclick=async()=>{
+ const name=$("fName").value.trim(),phone=$("fPhone").value.trim(),logo_url=$("fLogo").value.trim(),address=$("fAddress").value.trim();
+ if(!name)return toast("Restaurant name is required");
+ const {data,error}=await supabaseClient.from("restaurants").update({name,phone,logo_url,address}).eq("id",currentRestaurantId).select().single();
+ if(error){toast("Profile save failed: "+error.message);return}
+ currentRestaurant=data;fillProfile();toast("Restaurant details saved");
+};
+$("chooseLogo").onclick=()=>$("logoFile").click();
+$("logoFile").onchange=()=>{$("chooseLogo").textContent=$("logoFile").files[0]?.name?.slice(0,18)||"Choose"};
+$("uploadLogo").onclick=()=>uploadMediaFile("logo");
+
+$("saveHeroInfo").onclick=async()=>{
+  const payload={
+    welcome_text:$("fWelcome").value.trim(),
+    tagline:$("fTagline").value.trim() || $("fName").value.trim(),
+    subtitle_text:$("fSubtitle").value.trim(),
+    feature_1:$("fFeature1").value.trim(),
+    feature_2:$("fFeature2").value.trim(),
+    feature_3:$("fFeature3").value.trim(),
+    slogan_1:$("fSlogan1").value.trim(),
+    slogan_2:$("fSlogan2").value.trim(),
+    opening_time:$("fOpenTime").value || null,
+    closing_time:$("fCloseTime").value || null,
+    call_button_text:$("fCallText").value.trim() || "Call Restaurant",
+    dine_in:$("fDineIn").checked,
+    takeaway:$("fTakeaway").checked,
+    home_delivery:$("fDelivery").checked
+  };
+  $("saveHeroInfo").disabled=true;
+  const {data,error}=await supabaseClient.from("restaurants").update(payload).eq("id",currentRestaurantId).select().single();
+  $("saveHeroInfo").disabled=false;
+  if(error){toast("Public information save failed: "+error.message);return}
+  currentRestaurant=data;
+  fillProfile();
+  toast("Public menu information saved");
+};
+
+/* ---------- Categories ---------- */
+function openCat(){$("newCat").value="";$("catModal").classList.add("show")}
+$("addCategoryBtn").onclick=openCat;$("addCategory2").onclick=openCat;$("quickCategory").onclick=openCat;
+$("saveCategory").onclick=async()=>{
+ const cat=$("newCat").value.trim();if(!cat)return toast("Enter a category name");
+ if(categories().includes(cat))return toast("Category already exists");
+ /* Existing schema has no category table. Create a zero-priced placeholder. */
+ const {error}=await supabaseClient.from("menu_items").insert([{restaurant_id:currentRestaurantId,name:"New Item",category:cat,description:"",item_type:"veg",is_veg:true,price:null,price_quarter:null,price_half:null,price_full:null,is_available:true}]);
+ if(error){toast("Could not create category: "+error.message);return}
+ $("catModal").classList.remove("show");toast("Category created with a placeholder item");await loadItems();openItem(items.find(i=>i.category===cat)?.id);
+};
+
+/* ---------- QR ---------- */
+function renderQR(){
+ const url=publicUrl();$("qrUrl").value=url;
+ $("qrBox").innerHTML=`<img alt="QR Code" style="width:220px;height:220px" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(url)}">`;
+}
+$("quickQR").onclick=()=>{showSection("qr");history.replaceState(null,"","#qr")};
+$("copyQR").onclick=async()=>{await navigator.clipboard.writeText(publicUrl());toast("Menu link copied")};
+$("copyMenu").onclick=async()=>{await navigator.clipboard.writeText(publicUrl());toast("Menu link copied")};
+$("downloadQR").onclick=()=>{const a=document.createElement("a");a.href=$("qrBox").querySelector("img").src;a.download=(currentRestaurant.slug||"restaurant")+"-menu-qr.png";a.target="_blank";a.click()};
+
+/* ---------- Public menu ---------- */
+function openPublic(){window.open(publicUrl(),"_blank","noopener")}
+["publicTop","sidePublicBtn","quickPreview","openPublic2"].forEach(id=>$(id).onclick=openPublic);
+
+/* ---------- Theme preview ---------- */
+function updateTheme(){
+ const p=$("cPrimary").value,a=$("cAccent").value,b=$("cBg").value;
+ $("themePreview").style.background=`linear-gradient(135deg,${p},${a})`;
+ $("themePreview").style.color="#fff";
+}
+["cPrimary","cAccent","cBg"].forEach(id=>$(id).addEventListener("input",updateTheme));
+$("saveTheme").onclick=async()=>{
+ const payload={
+   primary_color:$("cPrimary").value,
+   primary_dark:$("cPrimary").value,
+   accent_color:$("cAccent").value,
+   background_color:$("cBg").value,
+   card_color:"#ffffff",
+   text_color:"#241719"
+ };
+ $("saveTheme").disabled=true;
+ const {data,error}=await supabaseClient.from("restaurants").update(payload).eq("id",currentRestaurantId).select().single();
+ $("saveTheme").disabled=false;
+ if(error){toast("Theme save failed: "+error.message);return}
+ currentRestaurant=data;
+ fillProfile();
+ toast("Theme saved — live menu updated");
+};
+$("quickTheme").onclick=()=>{showSection("settings");history.replaceState(null,"","#settings")};
+
+/* ---------- Media & Upload Policy ---------- */
+async function loadMediaRules(){
+  // Defaults are intentionally safe and let the dashboard load even when
+  // the optional RPC has not been added yet.
+  try{
+    const controller = new AbortController();
+    const timer = setTimeout(()=>controller.abort(),4500);
+    const result = await Promise.race([
+      supabaseClient.rpc("get_media_upload_rules"),
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error("Media policy timeout")),4500))
+    ]);
+    clearTimeout(timer);
+    const {data,error}=result||{};
+    if(!error && data?.length){
+      mediaRules={
+        max_mb:Math.min(1,Number(data[0].max_image_size_mb||1)),
+        logo_enabled:data[0].logo_upload_enabled!==false,
+        banner_enabled:data[0].banner_upload_enabled!==false,
+        gallery_paid_enabled:data[0].gallery_paid_enabled===true
       };
-
-      setOptionalText("rest-welcome", rest.welcome_text);
-      $("rest-name").textContent = restaurantName;
-      setOptionalText("rest-subtitle", rest.tagline || rest.subtitle_text);
-
-      let hasFeature = false;
-      ["rest-feature1","rest-feature2","rest-feature3"].forEach((id, i) => {
-        hasFeature = setOptionalText(id, rest[`feature_${i+1}`], "inline-flex") || hasFeature;
-      });
-      const features = $("rest-features");
-      if (features) features.style.display = hasFeature ? "flex" : "none";
-
-      const hasSlogan1 = setOptionalText("rest-slogan1", rest.slogan_1);
-      const hasSlogan2 = setOptionalText("rest-slogan2", rest.slogan_2);
-      const slogans = $("rest-slogans");
-      if (slogans) slogans.style.display = (hasSlogan1 || hasSlogan2) ? "flex" : "none";
-
-      document.title = `${restaurantName} • Menu`;
-
-      const logoUrl = safeUrl(rest.logo_url);
-      const brandMark = null;
-      $("logo-container").innerHTML = logoUrl
-        ? `<img src="${escapeHTML(logoUrl)}" alt="${escapeHTML(rest.name || "Restaurant")} logo" onerror="this.parentElement.innerHTML=logoFallback()" />`
-        : logoFallback();
-      if (brandMark) {
-        brandMark.innerHTML = logoUrl
-          ? `<img src="${escapeHTML(logoUrl)}" alt="" onerror="this.parentElement.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/></svg>'" />`
-          : `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/></svg>`;
-      }
-
-      const coverUrl = safeUrl(rest.banner_url || rest.cover_url || rest.cover_image);
-      const dummyBanner = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-        <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520">
-          <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#6b1f1a"/><stop offset="0.55" stop-color="#9f5a32"/><stop offset="1" stop-color="#d8a84e"/></linearGradient></defs>
-          <rect width="1200" height="520" fill="url(#g)"/>
-          <circle cx="960" cy="110" r="160" fill="rgba(255,255,255,.10)"/>
-          <circle cx="180" cy="470" r="220" fill="rgba(255,255,255,.08)"/>
-          <path d="M0 390 C260 280 420 480 650 350 S1020 260 1200 360 L1200 520 L0 520Z" fill="rgba(0,0,0,.16)"/>
-          <text x="600" y="270" text-anchor="middle" font-family="Georgia,serif" font-size="54" font-weight="700" fill="white" opacity=".95">YOUR RESTAURANT</text>
-          <text x="600" y="315" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" letter-spacing="6" fill="white" opacity=".78">FOOD • FLAVOUR • EXPERIENCE</text>
-        </svg>`)} `;
-      $("rest-cover").src = coverUrl || dummyBanner;
-      $("rest-cover").style.display = "block";
-
-      // Contact details: show only values actually available in Supabase.
-      const phoneEl = $("rest-phone");
-      const phoneRaw = rest.phone == null ? "" : String(rest.phone).trim();
-      if (phoneEl && phoneRaw) {
-        const phone = phoneRaw.replace(/[^+\d]/g, "");
-        phoneEl.href = `tel:${phone}`;
-        phoneEl.textContent = `• ${phoneRaw}`;
-        phoneEl.style.display = "inline";
-      } else if (phoneEl) {
-        phoneEl.style.display = "none";
-        phoneEl.textContent = "";
-      }
-
-      const callBtn = $("rest-call-btn");
-      if (callBtn && phoneRaw) {
-        const phone = phoneRaw.replace(/[^+\d]/g, "");
-        callBtn.href = `tel:${phone}`;
-        callBtn.style.display = "grid";
-        const callText = rest.call_button_text ? String(rest.call_button_text).trim() : "";
-        callBtn.setAttribute("aria-label", callText || "Call restaurant");
-        callBtn.title = callText || phoneRaw;
-      } else if (callBtn) {
-        callBtn.style.display = "none";
-      }
-
-      const address = rest.address == null ? "" : String(rest.address).trim();
-      const addressEl = $("rest-address");
-      if (addressEl && address) {
-        addressEl.textContent = `• ${address}`;
-        addressEl.style.display = "inline";
-      } else if (addressEl) {
-        addressEl.style.display = "none";
-        addressEl.textContent = "";
-      }
-
-      const isOpen = rest.is_open !== false && rest.status !== "closed" && rest.is_active !== false;
-      const statusEl = $("rest-status");
-      statusEl.classList.toggle("closed", !isOpen);
-      statusEl.querySelector("span:last-child").textContent = isOpen ? "Open" : "Closed";
-      const openPill = $("rest-open-pill");
-      if(openPill){
-        openPill.textContent = isOpen ? "● Open Now" : "● Closed";
-        openPill.style.background = isOpen ? "#12964e" : "#b4232e";
-      }
-      const fmtTime = (v)=>{
-        if(!v) return "";
-        const parts=String(v).split(":");
-        let h=Number(parts[0]),m=Number(parts[1]||0),suffix=h>=12?"PM":"AM";
-        h=h%12||12;
-        return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")} ${suffix}`;
-      };
-      const opening = fmtTime(rest.opening_time);
-      const closing = fmtTime(rest.closing_time);
-      const hoursEl = $("rest-hours");
-      if (hoursEl) {
-        hoursEl.textContent = opening && closing ? `${opening} – ${closing}` : "";
-        hoursEl.style.display = opening && closing ? "inline-flex" : "none";
-      }
-      if($("svc-dine")) $("svc-dine").style.display=rest.dine_in===false?"none":"inline-flex";
-      if($("svc-take")) $("svc-take").style.display=rest.takeaway===false?"none":"inline-flex";
-      if($("svc-delivery")) $("svc-delivery").style.display=rest.home_delivery===false?"none":"inline-flex";
     }
+  }catch(e){console.warn("Media policy RPC unavailable; using defaults.",e)}
+  try{ await refreshMediaPolicyUI(); }catch(e){console.warn("Media policy UI skipped",e)}
+}
+async function refreshMediaPolicyUI(){
+  const mb=Math.min(1,Number(mediaRules.max_mb||1));
+  if($("logoMaxText"))$("logoMaxText").textContent=mb+" MB";
+  if($("bannerMaxText"))$("bannerMaxText").textContent=mb+" MB";
+  if($("mediaRuleNote"))$("mediaRuleNote").textContent=
+    `Logo: ${mediaRules.logo_enabled?"1 allowed":"OFF"} • Banner: ${mediaRules.banner_enabled?"1 allowed":"OFF"} • Gallery: ${mediaRules.gallery_paid_enabled?"Premium only":"OFF"} • Max image: ${mb} MB`;
 
-    async function loadPublicMenu() {
-      showLoading();
+  if($("chooseLogoMedia"))$("chooseLogoMedia").disabled=!mediaRules.logo_enabled;
+  if($("uploadLogoMedia"))$("uploadLogoMedia").disabled=!mediaRules.logo_enabled;
+  if($("chooseBannerMedia"))$("chooseBannerMedia").disabled=!mediaRules.banner_enabled;
+  if($("uploadBannerMedia"))$("uploadBannerMedia").disabled=!mediaRules.banner_enabled;
 
-      try {
-        const params = new URLSearchParams(window.location.search);
-        const slug = (params.get("r") || "").trim().toLowerCase();
+  const r=currentRestaurant||{};
+  isPremiumRestaurant=
+    String(r.plan||"").toLowerCase()==="premium" &&
+    String(r.subscription_status||"").toLowerCase()==="active" &&
+    (!r.subscription_expires_at || new Date(r.subscription_expires_at)>new Date());
 
-        let query = supabaseClient.from("restaurants").select("*");
-        if (slug) query = query.eq("slug", slug);
-
-        const { data: restaurants, error: restError } = await query.limit(1);
-        if (restError) throw restError;
-
-        if (!restaurants || !restaurants.length) {
-          $("rest-name").textContent = "Restaurant Not Found";
-          $("category-chips").innerHTML = "";
-          $("summary-line").style.display = "none";
-          showState("Restaurant not found", "Please check the menu link and try again.");
-          return;
-        }
-
-        const rest = restaurants[0];
-        renderRestaurant(rest);
-
-        const { data: items, error: itemsError } = await supabaseClient
-          .from("menu_items")
-          .select("*")
-          .eq("restaurant_id", rest.id);
-
-        if (itemsError) throw itemsError;
-
-        allItems = Array.isArray(items) ? items : [];
-
-        // Optional sorting if you later add sort_order fields.
-        allItems.sort((a, b) => {
-          const aOrder = Number(a.sort_order ?? a.position ?? 999999);
-          const bOrder = Number(b.sort_order ?? b.position ?? 999999);
-          return aOrder - bOrder;
-        });
-
-        if (!allItems.length) {
-          $("category-chips").innerHTML = "";
-          $("summary-line").style.display = "none";
-          showState("Menu is being prepared", "No menu items have been added yet.");
-          return;
-        }
-
-        renderCategoryChips();
-        renderMenu();
-      } catch (error) {
-        console.error("Menu load error:", error);
-        $("rest-name").textContent = "Menu Unavailable";
-        $("category-chips").innerHTML = "";
-        $("summary-line").style.display = "none";
-        showState("Unable to load menu", "Please refresh the page or try again shortly.");
-      }
+  if($("galleryPaidBox"))$("galleryPaidBox").style.display=mediaRules.gallery_paid_enabled?"block":"none";
+  if($("galleryLocked")){
+    if(!mediaRules.gallery_paid_enabled){
+      $("galleryLocked").textContent="Photo Gallery is disabled by Super Admin.";
+      $("galleryUploadBox").style.display="none";
+    }else if(!isPremiumRestaurant){
+      $("galleryLocked").innerHTML="🔒 Photo Gallery is a <b>Premium feature</b>. An active Premium subscription is required.";
+      $("galleryUploadBox").style.display="none";
+    }else{
+      $("galleryLocked").innerHTML="✅ Premium Gallery access is active.";
+      $("galleryUploadBox").style.display="block";
     }
+  }
+  renderGalleryList();
+}
+function validateMediaFile(file){
+  if(!file)return "Choose an image first.";
+  if(!file.type.startsWith("image/"))return "Only image files are allowed.";
+  const mb=Math.min(1,Number(mediaRules.max_mb||1));
+  if(file.size>mb*1024*1024)return `Image must be ${mb} MB or smaller.`;
+  return "";
+}
+async function uploadMediaFile(kind){
+  const enabled=kind==="logo"?mediaRules.logo_enabled:mediaRules.banner_enabled;
+  if(!enabled)return toast(`${kind==="logo"?"Logo":"Banner"} upload is disabled by Super Admin.`);
+  const file=kind==="logo"?$("logoFile").files[0]:$("bannerMediaFile").files[0];
+  const bad=validateMediaFile(file);if(bad)return toast(bad);
+  const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"");
+  const path=`${kind}_${currentRestaurantId}.${ext}`;
+  const btn=kind==="logo"?$("uploadLogo"):$("uploadBannerMedia");
+  if(btn){btn.disabled=true;btn.textContent="Uploading...";}
+  const {error}=await supabaseClient.storage.from("restaurant-logos").upload(path,file,{cacheControl:"3600",upsert:true,contentType:file.type});
+  if(btn){btn.disabled=false;btn.textContent="Upload";}
+  if(error)return toast("Upload failed: "+error.message);
+  const {data}=supabaseClient.storage.from("restaurant-logos").getPublicUrl(path);
+  if(kind==="logo"){ $("fLogo").value=data.publicUrl; $("fLogoMedia").value=data.publicUrl; }
+  else $("fBannerMedia").value=data.publicUrl;
+  toast(`${kind==="logo"?"Logo":"Banner"} uploaded — click Save`);
+}
+$("chooseLogoMedia").onclick=()=>$("logoMediaFile").click();
+$("logoMediaFile").onchange=()=>{$("chooseLogoMedia").textContent=$("logoMediaFile").files[0]?.name?.slice(0,18)||"Choose"};
+$("uploadLogoMedia").onclick=()=>uploadMediaFile("logo");
 
-    $("menu-search").addEventListener("input", (event) => {
-      searchText = event.target.value || "";
-      renderMenu();
-    });
+$("chooseBannerMedia").onclick=()=>$("bannerMediaFile").click();
+$("bannerMediaFile").onchange=()=>{$("chooseBannerMedia").textContent=$("bannerMediaFile").files[0]?.name?.slice(0,18)||"Choose"};
+$("uploadBannerMedia").onclick=()=>uploadMediaFile("banner");
 
-    $("category-chips").addEventListener("click", (event) => {
-      const btn = event.target.closest(".cat-chip");
-      if (!btn) return;
+$("chooseGalleryMedia").onclick=()=>$("galleryMediaFile").click();
+$("galleryMediaFile").onchange=()=>{$("chooseGalleryMedia").textContent=$("galleryMediaFile").files[0]?.name?.slice(0,18)||"Choose"};
+$("uploadGalleryMedia").onclick=async()=>{
+  if(!mediaRules.gallery_paid_enabled)return toast("Gallery is disabled by Super Admin.");
+  if(!isPremiumRestaurant)return toast("Upgrade to Premium to use the Gallery.");
+  const file=$("galleryMediaFile").files[0],bad=validateMediaFile(file);if(bad)return toast(bad);
+  const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"");
+  const path=`gallery/${currentRestaurantId}/${Date.now()}.${ext}`;
+  $("uploadGalleryMedia").disabled=true;$("uploadGalleryMedia").textContent="Uploading...";
+  const {error}=await supabaseClient.storage.from("restaurant-logos").upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type});
+  $("uploadGalleryMedia").disabled=false;$("uploadGalleryMedia").textContent="Upload to Gallery";
+  if(error)return toast("Gallery upload failed: "+error.message);
+  const {data}=supabaseClient.storage.from("restaurant-logos").getPublicUrl(path);
+  const gallery=Array.isArray(currentRestaurant.gallery)?[...currentRestaurant.gallery]:[];
+  gallery.push(data.publicUrl);
+  const {data:updated,error:updateError}=await supabaseClient.from("restaurants").update({gallery}).eq("id",currentRestaurantId).select("*").single();
+  if(updateError)return toast("Gallery save failed: "+updateError.message);
+  currentRestaurant=updated;fillProfile();renderGalleryList();toast("Gallery image added");
+};
+function renderGalleryList(){
+  const el=$("galleryList");if(!el)return;
+  const g=Array.isArray(currentRestaurant?.gallery)?currentRestaurant.gallery:[];
+  el.innerHTML=g.length?g.map((u,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)"><img src="${esc(u)}" style="width:48px;height:38px;object-fit:cover;border-radius:7px"><span style="flex:1;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(u)}</span><button class="btn sm" type="button" onclick="removeGalleryImage(${i})">Remove</button></div>`).join(""):'<div class="muted" style="font-size:10px">No gallery images yet.</div>';
+}
+async function removeGalleryImage(i){
+  if(!mediaRules.gallery_paid_enabled||!isPremiumRestaurant)return toast("Gallery access is not available.");
+  const g=Array.isArray(currentRestaurant?.gallery)?[...currentRestaurant.gallery]:[];
+  g.splice(i,1);
+  const {data,error}=await supabaseClient.from("restaurants").update({gallery:g}).eq("id",currentRestaurantId).select("*").single();
+  if(error)return toast(error.message);
+  currentRestaurant=data;fillProfile();renderGalleryList();toast("Gallery image removed");
+}
+$("saveMedia").onclick=async()=>{
+  const payload={logo_url:$("fLogoMedia").value.trim(),banner_url:$("fBannerMedia").value.trim()};
+  $("saveMedia").disabled=true;
+  const {data,error}=await supabaseClient.from("restaurants").update(payload).eq("id",currentRestaurantId).select("*").single();
+  $("saveMedia").disabled=false;
+  if(error)return toast("Media save failed: "+error.message);
+  currentRestaurant=data;fillProfile();toast("Image settings saved");
+};
 
-      currentCategory = btn.dataset.category || "all";
-      renderCategoryChips();
-      renderMenu();
+/* ---------- Logout ---------- */
+async function logout(){await supabaseClient.auth.signOut();showAuthChoice()}
+$("logoutBtn").onclick=logout;$("logout2").onclick=logout;
 
-      window.scrollTo({
-        top: document.querySelector(".sticky-panel").offsetTop,
-        behavior: "smooth"
-      });
-    });
+/* ---------- Modal close ---------- */
+document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>$(b.dataset.close).classList.remove("show"));
+document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if(e.target===m)m.classList.remove("show")}));
 
-    window.addEventListener("load", loadPublicMenu);
-  </script>
+/* ---------- Misc ---------- */
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{showSection(b.dataset.go==="restaurantEdit"?"restaurant":b.dataset.go==="galleryEdit"?"gallery":"dashboard")});
+supabaseClient.auth.onAuthStateChange((event, newSession)=>{
+  if(event==="SIGNED_OUT"){
+    currentRestaurant=null; currentRestaurantId=null; items=[];
+    showOwnerLogin();
+  }
+});
+window.addEventListener("load",()=>{
+  try{ showAuthChoice(); }catch(e){ console.error(e); }
+  /* Never auto-open dashboard from a saved Supabase session. */
+  return;
+  Promise.resolve(init()).catch(err=>{
+    console.error("Owner init failed:",err);
+    $("loader").innerHTML=`<div style="text-align:center;padding:25px">
+      <i class="fa-solid fa-circle-exclamation" style="font-size:38px;color:#c33"></i>
+      <h3>Unable to open Owner Panel</h3>
+      <p>${esc(err?.message||"Unexpected error while loading the owner dashboard.")}</p>
+      <button class="btn" onclick="location.reload()">Retry</button>
+    </div>`;
+  });
+});
+</script>
+
+<script>
+/* Direct links from Index:
+   owner.html?auth=login  -> Login form
+   owner.html?auth=signup -> Sign Up form
+*/
+window.addEventListener("load",function(){
+  const mode=new URLSearchParams(location.search).get("auth");
+  if(!mode) return;
+  setTimeout(()=>{
+    if(mode==="login") showLoginForm();
+    if(mode==="signup") showSignupForm();
+  },150);
+});
+</script>
 
 </body>
 </html>
