@@ -741,57 +741,31 @@
 </style>
 
 
-<style id="freemenu-price-buttons-polish">
-.categoryHeadWithPrices{
-  display:flex!important;
-  align-items:center!important;
-  justify-content:space-between!important;
-  gap:14px!important;
-  padding:8px 2px 10px!important;
-}
-.categoryPriceSwitch{
-  display:inline-flex!important;
-  align-items:center!important;
-  gap:4px!important;
-  padding:3px!important;
-  background:#f6f3ef!important;
-  border:1px solid #e2d8cd!important;
-  border-radius:10px!important;
+
+
+
+
+
+<style id="freemenu-dynamic-price-columns">
+.categoryPriceSwitch,.three-price-area{
+  display:grid!important;
+  gap:8px!important;
+  margin-left:auto!important;
   flex-shrink:0!important;
+  text-align:center!important;
 }
-.categoryPriceSwitch button{
-  appearance:none!important;
-  border:0!important;
-  background:transparent!important;
-  color:#665c55!important;
-  border-radius:7px!important;
-  min-width:48px!important;
-  height:30px!important;
-  padding:0 10px!important;
-  font:700 11px/30px Arial,sans-serif!important;
-  cursor:pointer!important;
-  transition:all .15s ease!important;
-}
-.categoryPriceSwitch button:hover{
-  background:#fff!important;
-  color:var(--primary)!important;
-}
-.categoryPriceSwitch button.active{
-  background:var(--primary)!important;
-  color:#fff!important;
-  box-shadow:0 2px 6px rgba(0,0,0,.12)!important;
-}
+.categoryPriceSwitch{grid-template-columns:repeat(3,58px)!important}
+.three-price-area.price-cols-1{grid-template-columns:58px!important}
+.three-price-area.price-cols-2{grid-template-columns:repeat(2,58px)!important}
+.three-price-area.price-cols-3{grid-template-columns:repeat(3,58px)!important}
+.categoryPriceSwitch span{font:700 10px/1.2 Arial,sans-serif!important;color:#6f655e!important}
+.three-price-cell{font:800 11px/1.2 Arial,sans-serif!important;color:#241719!important;text-align:center!important}
 @media(max-width:600px){
-  .site-brand-mark{width:38px!important;height:38px!important}
-  .categoryHeadWithPrices{gap:8px!important}
-  .categoryPriceSwitch{gap:2px!important;padding:2px!important}
-  .categoryPriceSwitch button{
-    min-width:43px!important;
-    height:28px!important;
-    padding:0 7px!important;
-    font-size:10px!important;
-    line-height:28px!important;
-  }
+ .categoryPriceSwitch{gap:4px!important}
+ .categoryPriceSwitch span{font-size:9px!important}
+ .three-price-area.price-cols-1{grid-template-columns:48px!important}
+ .three-price-area.price-cols-2{grid-template-columns:repeat(2,48px)!important}
+ .three-price-area.price-cols-3{grid-template-columns:repeat(3,48px)!important}
 }
 </style>
 
@@ -1003,19 +977,19 @@
     }
 
     function renderPrice(item, category) {
-      const mode = (window.fmCategoryPriceMode && window.fmCategoryPriceMode[category]) || "full";
-      const values = {
-        quarter: item.price_quarter,
-        half: item.price_half,
-        full: item.price_full || item.price
-      };
-      let value = values[mode];
-      if (value === null || value === undefined || value === "") {
-        value = values.full ?? values.half ?? values.quarter;
-      }
-      return value !== null && value !== undefined && value !== ""
-        ? `<div class="single-price-area"><div class="single-price">₹${escapeHTML(value)}</div></div>`
-        : "";
+      const catItems = (allItems || []).filter(x => categoryKey(x.category) === category);
+      const hasQuarter = catItems.some(x => x.price_quarter !== null && x.price_quarter !== undefined && x.price_quarter !== "");
+      const hasHalf = catItems.some(x => x.price_half !== null && x.price_half !== undefined && x.price_half !== "");
+      const hasFull = catItems.some(x => (x.price_full || x.price) !== null && (x.price_full || x.price) !== undefined && (x.price_full || x.price) !== "");
+      const cols = [];
+      if (hasQuarter) cols.push(["quarter", item.price_quarter]);
+      if (hasHalf) cols.push(["half", item.price_half]);
+      if (hasFull) cols.push(["full", item.price_full || item.price]);
+      return `<div class="three-price-area price-cols-${cols.length}">` +
+        cols.map(([mode, value]) =>
+          `<div class="three-price-cell">${value !== null && value !== undefined && value !== "" ? "₹"+escapeHTML(value) : "—"}</div>`
+        ).join("") +
+        `</div>`;
     }
 
     function renderTags(item) {
@@ -1147,11 +1121,15 @@ function getSavedCategoryOrder(rest, items) {
               <h2 class="category-title">${escapeHTML(category)}</h2>
               <span class="item-count">${items.length} item${items.length === 1 ? "" : "s"}</span>
             </div>
-            <div class="categoryPriceSwitch" aria-label="Price size">
-              <button type="button" class="${((window.fmCategoryPriceMode||{})[category]||"full")==="quarter"?"active":""}" onclick='fmSetCategoryPriceMode(${JSON.stringify(category)},"quarter")'>Quarter</button>
-              <button type="button" class="${((window.fmCategoryPriceMode||{})[category]||"full")==="half"?"active":""}" onclick='fmSetCategoryPriceMode(${JSON.stringify(category)},"half")'>Half</button>
-              <button type="button" class="${((window.fmCategoryPriceMode||{})[category]||"full")==="full"?"active":""}" onclick='fmSetCategoryPriceMode(${JSON.stringify(category)},"full")'>Full</button>
-            </div>
+            <div class="categoryPriceSwitch" aria-label="Prices">
+  ${(() => {
+    const catItems = items || [];
+    const q = catItems.some(x => x.price_quarter !== null && x.price_quarter !== undefined && x.price_quarter !== "");
+    const h = catItems.some(x => x.price_half !== null && x.price_half !== undefined && x.price_half !== "");
+    const f = catItems.some(x => (x.price_full || x.price) !== null && (x.price_full || x.price) !== undefined && (x.price_full || x.price) !== "");
+    return [q ? "<span>Quarter</span>" : "", h ? "<span>Half</span>" : "", f ? "<span>Full</span>" : ""].join("");
+  })()}
+</div>
           </div>
           <div class="items-list">
             ${items.map(renderItem).join("")}
@@ -1327,12 +1305,6 @@ function getSavedCategoryOrder(rest, items) {
 
     window.addEventListener("load", loadPublicMenu);
   </script>
-<script id="freemenu-category-price-mode">
-window.fmCategoryPriceMode = window.fmCategoryPriceMode || {};
-window.fmSetCategoryPriceMode = function(category, mode){
-  window.fmCategoryPriceMode[category] = mode;
-  renderMenu();
-};
-</script>
+
 </body>
 </html>
