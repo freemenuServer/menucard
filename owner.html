@@ -1271,11 +1271,20 @@ supabaseClient.auth.onAuthStateChange((event, newSession)=>{
     showOwnerLogin();
   }
 });
-window.addEventListener("load",()=>{
+window.addEventListener("load",async()=>{
   try{
     if(!window.supabase){
       throw new Error("Supabase library could not be loaded. Check your internet connection.");
     }
+
+    // Super Admin direct access: reuse the already authenticated Super Admin
+    // session and open the selected restaurant without asking for the owner's password.
+    const adminRestaurantId=new URLSearchParams(location.search).get("admin_restaurant");
+    if(adminRestaurantId){
+      await init(false);
+      return;
+    }
+
     showAuthChoice();
   }catch(e){
     console.error("Owner page startup failed:",e);
