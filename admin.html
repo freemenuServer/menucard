@@ -399,20 +399,20 @@ async function renderPrintQR(items,title){
 *{box-sizing:border-box}
 body{font-family:Arial,Helvetica,sans-serif;margin:8mm;color:#111;background:#fff}
 .head{text-align:center;margin-bottom:7mm}.head h2{margin:0 0 2mm;font-size:21px}.head p{margin:0;color:#666;font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7mm}
-.qr-card{display:flex;justify-content:center;break-inside:avoid}
-.badge{width:210px;height:210px;border-radius:50%;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 42%,#171717 0 62%,#080808 63% 100%);border:5px solid #d9a928;box-shadow:inset 0 0 0 3px #2a2a2a,0 2px 0 #8b6414;text-align:center;color:#fff}
-.badge:before{content:"";position:absolute;inset:5px;border:2px solid #f4c94f;border-radius:50%;pointer-events:none}
-.scan{position:absolute;top:13px;left:0;right:0;z-index:3;text-align:center;line-height:1}
-.scan span{display:block;font-size:13px;font-weight:800;letter-spacing:.8px;color:#fff}
-.scan strong{display:block;margin-top:3px;font-size:27px;letter-spacing:.8px;color:#f5c642;text-shadow:0 1px 0 #8b6414}
-.qr-circle{position:absolute;left:50%;top:70px;transform:translateX(-50%);width:112px;height:112px;border-radius:50%;background:#fff;border:4px solid #d9a928;display:grid;place-items:center;z-index:2}
-.qrbox{width:98px;height:98px;display:grid;place-items:center}.qrbox svg{display:block!important;width:98px!important;height:98px!important}
-.brand{position:absolute;left:50%;bottom:19px;transform:translateX(-50%);z-index:4;white-space:nowrap;font-size:18px;font-weight:900;letter-spacing:-.6px;text-shadow:0 1px 0 #111}
-.brand:before{content:"";position:absolute;left:50%;top:-5px;transform:translateX(-50%);width:132px;height:25px;border-radius:7px;background:#f2c33e;z-index:-1;box-shadow:0 1px 0 #8b6414}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9mm 7mm}
+.qr-card{display:flex;justify-content:center;break-inside:avoid;padding:2mm}
+.badge{width:250px;height:250px;border-radius:50%;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 43%,#171717 0 62%,#080808 63% 100%);border:5px solid #d9a928;box-shadow:inset 0 0 0 3px #2a2a2a,0 2px 0 #8b6414;text-align:center;color:#fff}
+.badge:before{content:"";position:absolute;inset:6px;border:2px solid #f4c94f;border-radius:50%;pointer-events:none}
+.scan{position:absolute;top:15px;left:0;right:0;z-index:3;text-align:center;line-height:1}
+.scan span{display:block;font-size:15px;font-weight:800;letter-spacing:1px;color:#fff}
+.scan strong{display:block;margin-top:4px;font-size:31px;letter-spacing:1px;color:#f5c642;text-shadow:0 1px 0 #8b6414}
+.qr-circle{position:absolute;left:50%;top:73px;transform:translateX(-50%);width:139px;height:139px;border-radius:50%;background:#fff;border:5px solid #d9a928;display:grid;place-items:center;z-index:2}
+.qrbox{width:121px;height:121px;display:grid;place-items:center}.qrbox svg{display:block!important;width:121px!important;height:121px!important}
+.brand{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:4;white-space:nowrap;font-size:21px;font-weight:900;letter-spacing:-.6px}
+.brand:before{content:"";position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:158px;height:30px;border-radius:8px;background:#f2c33e;z-index:-1;box-shadow:0 1px 0 #8b6414}
 .brand span{color:#111}.brand b{color:#111}.brand i{font-style:normal;color:#fff}
-.food-icon{position:absolute;color:#f2c33e;font-size:31px;z-index:1;top:83px;font-weight:700}.food-icon.left{left:19px;transform:rotate(90deg)}.food-icon.right{right:20px;transform:rotate(-25deg)}
-@media print{body{margin:6mm}.grid{gap:5mm}.badge{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+.food-icon{position:absolute;color:#f2c33e;font-size:36px;z-index:1;top:91px;font-weight:700}.food-icon.left{left:22px;transform:rotate(90deg)}.food-icon.right{right:22px;transform:rotate(-25deg)}
+@media print{body{margin:6mm}.grid{gap:6mm 5mm}.badge{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
 </style></head><body>
 <div class="head"><h2>${title}</h2><p>${payload.length} QR code${payload.length===1?'':'s'}</p></div>
 <div class="grid">${cards}</div>
