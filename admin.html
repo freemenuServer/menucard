@@ -109,7 +109,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
   </div>
 </div>
 
-<div id="restaurants" class="page"><div class="subpage-head"><div><h2>Restaurants</h2><p style="color:#667085">Manage all registered restaurants.</p></div><button class="primary" onclick="openRestaurantModal()">+ Add Restaurant</button></div><div class="card"><div class="toolbar"><input class="input" id="restaurantSearch" placeholder="Search restaurant, phone, city..."><select class="input" id="restaurantStatus"><option value="">All Status</option><option>active</option><option>pending</option><option>blocked</option></select></div><div id="restaurantPageTable" class="tablewrap" style="margin-top:12px"></div></div></div>
+<div id="restaurants" class="page"><div class="subpage-head"><div><h2>Restaurants</h2><p style="color:#667085">Manage all registered restaurants.</p></div><div style="display:flex;gap:8px"><button class="iconbtn" onclick="loadAll()" title="Refresh data">↻ Refresh</button><button class="primary" onclick="openRestaurantModal()">+ Add Restaurant</button></div></div><div class="card"><div class="toolbar"><input class="input" id="restaurantSearch" placeholder="Search restaurant, phone, city..."><select class="input" id="restaurantStatus"><option value="">All Status</option><option>active</option><option>pending</option><option>blocked</option></select></div><div id="restaurantPageTable" class="tablewrap" style="margin-top:12px"></div></div></div>
 
 <div id="owners" class="page"><div class="subpage-head"><h2>Restaurant Owners</h2></div><div class="card"><div class="toolbar"><input class="input" id="ownerSearch" placeholder="Search owner email/name..."></div><div id="ownersTable" class="tablewrap" style="margin-top:12px"></div></div></div>
 
@@ -169,7 +169,7 @@ document.querySelectorAll('.nav button[data-page]').forEach(b=>b.addEventListene
 function closeModal(){$('modal').classList.remove('show')}
 $('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeModal()});
 function modal(title,body){$('modalBox').innerHTML=`<div class="card-head"><h3>${title}</h3><button class="iconbtn" onclick="closeModal()">✕</button></div>${body}`;$('modal').classList.add('show')}
-async function q(table,select='*'){const r=await db.from(table).select(select);if(r.error){console.warn(table,r.error.message);return null}return r.data||[]}
+async function q(table,select='*'){const r=await db.from(table).select(select);if(r.error){console.error('Supabase '+table+' error:',r.error);toast(table+' load failed: '+r.error.message);return []}return r.data||[]}
 async function adminLogin(){
  const email=$('loginEmail').value.trim(),password=$('loginPassword').value;
  $('loginError').textContent='';
@@ -194,11 +194,13 @@ async function adminCheck(){
  $('securityUser').textContent=session.user.email||session.user.id;return true
 }
 async function loadAll(){
- restaurants=await q('restaurants')||[];
- menuItems=await q('menu_items')||[];
- profiles=await q('profiles')||[];
- subscriptions=await q('subscriptions')||[];
- updateStats();renderDashboardTable();renderCities();renderPopularCats();renderActivity();populateRestaurantFilters();renderRestaurantPage();renderMenu();renderCategories();renderApprovals();renderSubscriptions();renderOwners();renderAdmins();renderLogs();renderAnalytics();loadSettings();loadAdSettings();loadMediaRules();
+ try{
+  restaurants=await q('restaurants');
+  menuItems=await q('menu_items');
+  profiles=await q('profiles');
+  subscriptions=await q('subscriptions');
+  updateStats();renderDashboardTable();renderCities();renderPopularCats();await renderActivity();populateRestaurantFilters();renderRestaurantPage();renderMenu();renderCategories();renderApprovals();renderSubscriptions();renderOwners();renderAdmins();await renderLogs();renderAnalytics();await loadSettings();await loadAdSettings();await loadMediaRules();
+ }catch(e){console.error('loadAll failed',e);toast('Dashboard refresh failed: '+(e?.message||e));}
 }
 function statusOf(r){return String(r.status|| (r.is_active===false?'blocked':r.is_active===true?'active':'active')).toLowerCase()}
 function updateStats(){
@@ -210,10 +212,11 @@ function updateStats(){
  if(charts.status){charts.status.data.datasets[0].data=[active,pending,blocked];charts.status.update()}
 }
 function renderDashboardTable(list=restaurants.slice(-5).reverse()){
+ list=list||[];
  $('dashTable').innerHTML=`<table class="table"><thead><tr><th>#</th><th>Logo</th><th>Restaurant</th><th>Owner</th><th>Location</th><th>Items</th><th>Status</th><th>Action</th></tr></thead><tbody>${list.map((r,i)=>{const owner=profiles.find(p=>p.id===r.owner_id);const cnt=menuItems.filter(m=>m.restaurant_id===r.id).length;return `<tr><td>${i+1}</td><td>${r.logo_url?`<img src="${esc(r.logo_url)}" style="width:30px;height:30px;border-radius:50%;object-fit:cover">`:'🍽️'}</td><td><b>${esc(r.name)}</b><br><small>${esc(r.phone||'')}</small></td><td>${esc(owner?.name||owner?.full_name||owner?.email||'—')}</td><td>${esc(r.address||'—')}</td><td>${cnt}</td><td>${pill(statusOf(r))}</td><td>${actionBtns(r)}</td></tr>`}).join('')}</tbody></table>`}
 function pill(s){return `<span class="pill ${s==='active'?'green':s==='pending'?'orange':'red'}">● ${esc(s)}</span>`}
-function actionBtns(r){return `<div class="actions"><button class="iconbtn" title="Open Owner Panel" onclick="openOwnerPanel('${r.id}')">🔑</button><button class="iconbtn" title="Public Menu" onclick="openPublic('${esc(r.slug)}')">👁</button><button class="iconbtn" onclick="openRestaurantModal('${r.id}')">✎</button><button class="iconbtn" onclick="setRestaurantStatus('${r.id}','${statusOf(r)==='blocked'?'active':'blocked'}')">${statusOf(r)==='blocked'?'✓':'⊘'}</button><button class="iconbtn" onclick="deleteRestaurant('${r.id}')">⋯</button></div>`}
-function openOwnerPanel(id){window.open(`owner.html?admin_restaurant=${encodeURIComponent(id)}`,'_blank','noopener')}
+function actionBtns(r){return `<div class="actions"><button class="iconbtn" title="Open Owner Panel (Super Admin)" aria-label="Open Owner Panel" onclick="openOwnerPanel('${r.id}')">🔑</button><button class="iconbtn" title="Public Menu" onclick="openPublic('${esc(r.slug)}')">👁</button><button class="iconbtn" onclick="openRestaurantModal('${r.id}')">✎</button><button class="iconbtn" onclick="setRestaurantStatus('${r.id}','${statusOf(r)==='blocked'?'active':'blocked'}')">${statusOf(r)==='blocked'?'✓':'⊘'}</button><button class="iconbtn" onclick="deleteRestaurant('${r.id}')">⋯</button></div>`}
+function openOwnerPanel(id){if(!session?.user?.id)return toast('Super Admin session expired. Please login again.');const url=`owner.html?admin_restaurant=${encodeURIComponent(id)}&admin=1`;window.open(url,'_blank','noopener,noreferrer')}
 function openPublic(slug){window.open(`menu.html?r=${encodeURIComponent(slug)}`,'_blank')}
 function renderCities(){
  const counts={};restaurants.forEach(r=>{const a=(r.address||'Unknown').split(',')[0].trim()||'Unknown';counts[a]=(counts[a]||0)+1});const arr=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5),max=arr[0]?.[1]||1;
@@ -288,7 +291,8 @@ function buildCharts(){
 }
 function monthLabels(){return Array.from({length:9},(_,i)=>new Date(new Date().getFullYear(),new Date().getMonth()-8+i,1).toLocaleString('en',{month:'short'}))}
 function growthData(){const now=new Date();return Array.from({length:9},(_,i)=>restaurants.filter(r=>{const d=new Date(r.created_at||0);const target=new Date(now.getFullYear(),now.getMonth()-8+i+1,1);const start=new Date(now.getFullYear(),now.getMonth()-8+i,1);return d>=start&&d<target}).length)}
-function renderAnalytics(){if(!charts.analytics){charts.analytics=new Chart($('analyticsChart'),{type:'line',data:{labels:monthLabels(),datasets:[{label:'Menu Items Added',data:growthData()}]},options:{responsive:true,maintainAspectRatio:false}})}}
+function menuGrowthData(){const now=new Date();return Array.from({length:9},(_,i)=>menuItems.filter(m=>{const d=new Date(m.created_at||0);const start=new Date(now.getFullYear(),now.getMonth()-8+i,1);const end=new Date(now.getFullYear(),now.getMonth()-8+i+1,1);return d>=start&&d<end}).length)}
+function renderAnalytics(){if(!charts.analytics){charts.analytics=new Chart($('analyticsChart'),{type:'line',data:{labels:monthLabels(),datasets:[{label:'Menu Items Added',data:menuGrowthData()}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}})}}
 async function loadSettings(){const rows=await q('platform_settings');if(!rows?.length)return;const m=Object.fromEntries(rows.map(x=>[x.key,x.value]));$('setName').value=m.platform_name||'FreeMenu.in';$('setEmail').value=m.support_email||'';$('setPublic').value=String(m.public_menus_enabled??true);$('setApproval').value=String(m.approval_required??true)}
 async function savePlatformSettings(){const vals={platform_name:$('setName').value,support_email:$('setEmail').value,public_menus_enabled:$('setPublic').value,approval_required:$('setApproval').value};for(const [key,value] of Object.entries(vals)){const r=await db.from('platform_settings').upsert({key,value,updated_by:session.user.id},{onConflict:'key'});if(r.error)return toast(r.error.message)}await logAction('Updated platform settings');toast('Settings saved')}
 async function loadAdSettings(){const rows=await q('platform_settings');if(!rows)return;const m=Object.fromEntries(rows.map(x=>[x.key,x.value]));$('adsClient').value=m.adsense_client_id||'';$('adsSlot').value=m.ads_default_slot||'';$('adsFree').value=String(m.free_plan_ads??true);$('adsPremium').value=String(m.premium_plan_ads??false);if($('adsPosition'))$('adsPosition').value=m.ads_position||'after_2_categories'}
