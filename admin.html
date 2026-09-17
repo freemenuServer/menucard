@@ -370,13 +370,13 @@ function qrTargetURL(code){return new URL('/qr.html?code='+encodeURIComponent(co
 function printSingleQR(id){
   const x=qrCodes.find(q=>q.id===id);
   if(!x)return toast('QR code not found.');
-  renderPrintQR([x],'FreeMenu QR Code');
+  renderPrintQR([x], 'FreeMenu QR Code');
 }
 
 async function printAvailableQRs(){
   const available=qrCodes.filter(x=>String(x.status||'available').toLowerCase()==='available');
   if(!available.length)return toast('No available QR codes. Generate the next 100 first.');
-  await renderPrintQR(available,'FreeMenu — Available QR Codes');
+  await renderPrintQR(available,'FreeMenu QR Codes');
 }
 
 async function renderPrintQR(items,title){
@@ -385,18 +385,34 @@ async function renderPrintQR(items,title){
   const payload=items.map(x=>({id:x.id,code:x.code,url:qrTargetURL(x.code)}));
   const cards=payload.map(x=>`
     <div class="qr-card">
-      <div class="qrbox" id="qr-${x.id}"></div>
-      <div class="brand">FreeMenu.in</div>
+      <div class="badge">
+        <div class="scan"><span>SCAN FOR</span><strong>MENU</strong></div>
+        <div class="food-icon left">♜</div>
+        <div class="food-icon right">◖</div>
+        <div class="qr-circle"><div class="qrbox" id="qr-${x.id}"></div></div>
+        <div class="brand"><span>Free</span><b>Menu</b><i>.in</i></div>
+      </div>
     </div>`).join('');
 
-  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${title}</title>
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title>
 <style>
-*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;margin:10mm;color:#111;background:#fff}
-.head{text-align:center;margin-bottom:8mm}.head h2{margin:0 0 3mm;font-size:22px}.head p{margin:0;color:#666;font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8mm}.qr-card{text-align:center;break-inside:avoid;padding:4mm 3mm 5mm}
-.qrbox{width:150px;height:150px;margin:0 auto;display:grid;place-items:center}.qrbox svg,.qrbox canvas{display:block!important;width:150px!important;height:150px!important}
-.brand{margin-top:4mm;font-size:17px;font-weight:800;letter-spacing:-.3px}
-@media print{body{margin:7mm}.grid{gap:5mm}}
+*{box-sizing:border-box}
+body{font-family:Arial,Helvetica,sans-serif;margin:8mm;color:#111;background:#fff}
+.head{text-align:center;margin-bottom:7mm}.head h2{margin:0 0 2mm;font-size:21px}.head p{margin:0;color:#666;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7mm}
+.qr-card{display:flex;justify-content:center;break-inside:avoid}
+.badge{width:210px;height:210px;border-radius:50%;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 42%,#171717 0 62%,#080808 63% 100%);border:5px solid #d9a928;box-shadow:inset 0 0 0 3px #2a2a2a,0 2px 0 #8b6414;text-align:center;color:#fff}
+.badge:before{content:"";position:absolute;inset:5px;border:2px solid #f4c94f;border-radius:50%;pointer-events:none}
+.scan{position:absolute;top:13px;left:0;right:0;z-index:3;text-align:center;line-height:1}
+.scan span{display:block;font-size:13px;font-weight:800;letter-spacing:.8px;color:#fff}
+.scan strong{display:block;margin-top:3px;font-size:27px;letter-spacing:.8px;color:#f5c642;text-shadow:0 1px 0 #8b6414}
+.qr-circle{position:absolute;left:50%;top:70px;transform:translateX(-50%);width:112px;height:112px;border-radius:50%;background:#fff;border:4px solid #d9a928;display:grid;place-items:center;z-index:2}
+.qrbox{width:98px;height:98px;display:grid;place-items:center}.qrbox svg{display:block!important;width:98px!important;height:98px!important}
+.brand{position:absolute;left:50%;bottom:19px;transform:translateX(-50%);z-index:4;white-space:nowrap;font-size:18px;font-weight:900;letter-spacing:-.6px;text-shadow:0 1px 0 #111}
+.brand:before{content:"";position:absolute;left:50%;top:-5px;transform:translateX(-50%);width:132px;height:25px;border-radius:7px;background:#f2c33e;z-index:-1;box-shadow:0 1px 0 #8b6414}
+.brand span{color:#111}.brand b{color:#111}.brand i{font-style:normal;color:#fff}
+.food-icon{position:absolute;color:#f2c33e;font-size:31px;z-index:1;top:83px;font-weight:700}.food-icon.left{left:19px;transform:rotate(90deg)}.food-icon.right{right:20px;transform:rotate(-25deg)}
+@media print{body{margin:6mm}.grid{gap:5mm}.badge{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
 </style></head><body>
 <div class="head"><h2>${title}</h2><p>${payload.length} QR code${payload.length===1?'':'s'}</p></div>
 <div class="grid">${cards}</div>
@@ -404,18 +420,11 @@ async function renderPrintQR(items,title){
 <script>
 const data=${JSON.stringify(payload)};
 window.onload=()=>{
-  data.forEach(x=>{
-    const q=new QRCodeStyling({
-      width:150,height:150,type:"svg",data:x.url,margin:2,
-      qrOptions:{errorCorrectionLevel:"H"},
-      dotsOptions:{type:"dots",color:"#000000"},
-      cornersSquareOptions:{type:"dot",color:"#000000"},
-      cornersDotOptions:{type:"dot",color:"#000000"},
-      backgroundOptions:{color:"#ffffff"}
-    });
-    q.append(document.getElementById('qr-'+x.id));
-  });
-  setTimeout(()=>window.print(),1000);
+ data.forEach(x=>{
+  const q=new QRCodeStyling({width:98,height:98,type:'svg',data:x.url,margin:0,qrOptions:{errorCorrectionLevel:'H'},dotsOptions:{type:'dots',color:'#000000'},cornersSquareOptions:{type:'dot',color:'#000000'},cornersDotOptions:{type:'dot',color:'#000000'},backgroundOptions:{color:'#ffffff'}});
+  q.append(document.getElementById('qr-'+x.id));
+ });
+ setTimeout(()=>window.print(),1200);
 };
 <\/script></body></html>`);
   w.document.close();
