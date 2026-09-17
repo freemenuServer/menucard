@@ -823,22 +823,34 @@ async function init(afterLogin=false){
       return;
     }
 
+    const adminRestaurantId=new URLSearchParams(location.search).get("admin_restaurant");
+    let superAdminMode=false;
+    if(adminRestaurantId){
+      const pr=await supabaseClient.from("profiles").select("role").eq("id",session.user.id).maybeSingle();
+      if(pr.error) return fail("Super Admin verification failed: "+pr.error.message);
+      superAdminMode=pr.data?.role==="admin";
+      if(!superAdminMode) return fail("Direct restaurant access is available only to Super Admin.");
+    }
+
     if($("accountEmail")) $("accountEmail").value=session.user.email||"";
     if($("ownerName")) $("ownerName").textContent=session.user.user_metadata?.full_name||session.user.email?.split("@")[0]||"Owner";
     if($("avatar")) $("avatar").textContent=initials($("ownerName")?.textContent);
 
-    // Primary lookup: secure owner_id relationship.
-    let {data,error}=await supabaseClient
-      .from("restaurants")
-      .select("*")
-      .eq("owner_id",session.user.id)
-      .limit(1);
+    // Super Admin can open any restaurant by ID. Normal owners remain
+    // restricted to their own owner_id relationship.
+    let data,error;
+    if(superAdminMode){
+      const res=await supabaseClient.from("restaurants").select("*").eq("id",adminRestaurantId).limit(1);
+      data=res.data; error=res.error;
+    }else{
+      const res=await supabaseClient.from("restaurants").select("*").eq("owner_id",session.user.id).limit(1);
+      data=res.data; error=res.error;
+    }
 
-    if(error) return fail("Could not load your restaurant profile: "+error.message);
+    if(error) return fail("Could not load restaurant profile: "+error.message);
 
-    // Backward compatibility for older owner accounts: only use the slug
-    // stored on this authenticated user's own metadata.
-    if(!data?.length){
+    // Backward compatibility for older owner accounts.
+    if(!data?.length && !superAdminMode){
       const meta=session.user.user_metadata||{};
       const rs=String(meta.restaurant_slug||"").trim().toLowerCase();
       if(rs){
@@ -854,6 +866,12 @@ async function init(afterLogin=false){
 
     currentRestaurant=data[0];
     currentRestaurantId=currentRestaurant.id;
+    if(superAdminMode){
+      const sub=document.querySelector(".sideSub");
+      if(sub) sub.textContent="SUPER ADMIN • DIRECT ACCESS";
+      const roleLabel=document.querySelector(".profile .profileName div");
+      if(roleLabel) roleLabel.textContent="Super Admin Access";
+    }
     fillProfile();
     await loadItems();
     await loadMediaRules();
