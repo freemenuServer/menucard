@@ -660,7 +660,7 @@ async function ownerSignup(){
 
   const {data,error}=await supabaseClient.auth.signUp({
     email,password,
-    options:{data:{full_name:name,phone,role:"owner"}}
+    options:{data:{full_name:name,phone,role:"owner",restaurant_name:restaurant,restaurant_address:address,restaurant_slug:slug}}
   });
   if(error){
     setAuthMsg("signupErrorNew",error.message);
@@ -754,7 +754,24 @@ async function init(){
   else q=q.eq("owner_id",session.user.id);
   const {data,error}=await q.limit(1);
   if(error) return fail(error.message);
-  if(!data?.length) return fail("Restaurant profile not found for this owner.");
+
+  // Email-confirmed signups may have an Auth user before their restaurant row exists.
+  if(!data?.length && !urlSlug){
+    const meta=session.user.user_metadata||{};
+    const rs=String(meta.restaurant_slug||"").trim().toLowerCase();
+    const rn=String(meta.restaurant_name||"").trim();
+    const ra=String(meta.restaurant_address||"").trim();
+    const rp=String(meta.phone||"").replace(/\D/g,"");
+    if(rs && rn){
+      const {data:existingBySlug,error:slugError}=await supabaseClient.from("restaurants").select("id").eq("slug",rs).maybeSingle();
+      if(slugError) return fail(slugError.message);
+      if(existingBySlug) return fail("This account has no linked restaurant. The Menu Slug is already in use; Super Admin must link the restaurant to this Auth account.");
+      const {data:newRestaurant,error:createError}=await supabaseClient.from("restaurants").insert({owner_id:session.user.id,name:rn,slug:rs,phone:rp,address:ra,status:"pending",plan:"free",subscription_status:"inactive"}).select("*").single();
+      if(createError) return fail("Restaurant profile could not be created: "+createError.message);
+      data=[newRestaurant];
+    }
+  }
+  if(!data?.length) return fail("Restaurant profile not found for this owner. If this is an older account, the restaurant needs to be linked to your Auth user.");
   currentRestaurant=data[0];currentRestaurantId=currentRestaurant.id;
   fillProfile();
   await loadItems();
