@@ -1,99 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#111111">
-  <title>FreeMenu — Opening Menu</title>
-  <style>
-    *{box-sizing:border-box}html,body{width:100%;min-height:100%;margin:0}body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#fff;color:#171717;font-family:Inter,Arial,Helvetica,sans-serif}.box{width:min(92vw,420px);text-align:center}.logo{width:58px;height:58px;margin:0 auto 22px;border-radius:16px;display:grid;place-items:center;background:#111;color:#fff;font-size:25px;font-weight:800;box-shadow:0 10px 30px rgba(0,0,0,.12)}.spinner{width:30px;height:30px;margin:0 auto 18px;border:3px solid #e5e5e5;border-top-color:#111;border-radius:50%;animation:spin .8s linear infinite}h1{margin:0 0 9px;font-size:24px;line-height:1.2;letter-spacing:-.4px}p{margin:0;color:#737373;font-size:15px;line-height:1.55}.error{display:none}.error .icon{width:58px;height:58px;margin:0 auto 18px;border-radius:50%;display:grid;place-items:center;background:#f5f5f5;color:#111;font-size:25px;font-weight:800}.retry{display:inline-block;margin-top:20px;padding:11px 18px;border:0;border-radius:10px;background:#111;color:#fff;text-decoration:none;font-size:14px;font-weight:700;cursor:pointer}.small{margin-top:14px;font-size:12px;color:#a0a0a0;word-break:break-word}@keyframes spin{to{transform:rotate(360deg)}}
-  </style>
-</head>
-<body>
-  <main class="box">
-    <section id="loading">
-      <div class="logo">FM</div>
-      <div class="spinner"></div>
-      <h1>Opening menu…</h1>
-      <p>Please wait while we open the restaurant menu.</p>
-    </section>
-    <section id="error" class="error">
-      <div class="icon">!</div>
-      <h1>Menu unavailable</h1>
-      <p id="errorText">We could not open this restaurant menu.</p>
-      <a class="retry" href="javascript:location.reload()">Try Again</a>
-      <p class="small">FreeMenu QR</p>
-    </section>
-  </main>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL='https://pfsrpowopbrevocwsuii.supabase.co';
-    const SUPABASE_ANON_KEY='sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
-    const loadingBox=document.getElementById('loading');
-    const errorBox=document.getElementById('error');
-    const errorText=document.getElementById('errorText');
-
-    function showError(message){
-      loadingBox.style.display='none';
-      errorBox.style.display='block';
-      errorText.textContent=message||'We could not open this restaurant menu.';
-    }
-
-    function cleanCode(value){return String(value||'').trim();}
-
-    function getMenuUrl(slug){
-      return new URL('/menu.html?r='+encodeURIComponent(slug),window.location.origin).href;
-    }
-
-    async function openRestaurantMenu(){
-      try{
-        if(!window.supabase) throw new Error('Menu service could not load. Please try again.');
-
-        const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-        const params=new URLSearchParams(window.location.search);
-        const code=cleanCode(params.get('code'));
-
-        if(!code) throw new Error('QR code is missing.');
-
-        // Step 1: find the QR record.
-        const qrResult=await db
-          .from('qr_codes')
-          .select('restaurant_id,status')
-          .eq('code',code)
-          .maybeSingle();
-
-        if(qrResult.error) throw new Error(qrResult.error.message);
-        const qr=qrResult.data;
-
-        if(!qr) throw new Error('QR code not found.');
-        if(String(qr.status||'').toLowerCase()!=='assigned'){
-          throw new Error('This QR is not assigned to a restaurant yet.');
-        }
-        if(!qr.restaurant_id) throw new Error('This QR has no restaurant assigned.');
-
-        // Step 2: ONLY request slug from restaurants.
-        // No is_active/status column is used here.
-        const restaurantResult=await db
-          .from('restaurants')
-          .select('slug')
-          .eq('id',qr.restaurant_id)
-          .maybeSingle();
-
-        if(restaurantResult.error) throw new Error(restaurantResult.error.message);
-        const restaurant=restaurantResult.data;
-
-        if(!restaurant||!restaurant.slug) throw new Error('Restaurant menu is not available.');
-
-        // Step 3: open the public menu at the website root.
-        window.location.replace(getMenuUrl(restaurant.slug));
-      }catch(error){
-        console.error('FreeMenu QR Error:',error);
-        showError(error&&error.message?error.message:'Unable to open the restaurant menu.');
-      }
-    }
-
-    openRestaurantMenu();
-  </script>
-</body>
-</html>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#111111"><title>FreeMenu QR</title>
+<style>
+*{box-sizing:border-box}html,body{width:100%;min-height:100%;margin:0}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#fff;color:#171717;font-family:Inter,Arial,Helvetica,sans-serif}
+.box{width:min(92vw,440px);text-align:center}.brand{font-size:28px;font-weight:900;letter-spacing:-1px;margin-bottom:20px}.brand span{font-weight:500}
+.spinner{width:30px;height:30px;margin:0 auto 18px;border:3px solid #e5e5e5;border-top-color:#111;border-radius:50%;animation:spin .8s linear infinite}
+h1{margin:0 0 9px;font-size:24px;line-height:1.2;letter-spacing:-.4px}p{margin:0;color:#737373;font-size:15px;line-height:1.55}
+.error{display:none}.icon{width:58px;height:58px;margin:0 auto 18px;border-radius:50%;display:grid;place-items:center;background:#f5f5f5;color:#111;font-size:25px;font-weight:800}
+.qr-number{display:inline-block;margin:7px 0 14px;padding:10px 16px;border-radius:12px;background:#f5f5f5;font-size:22px;font-weight:900;letter-spacing:.7px}
+.notice{margin-top:14px;padding:13px 15px;border:1px solid #e5e5e5;border-radius:12px;background:#fafafa;color:#666;font-size:13px;line-height:1.5}
+.retry{display:inline-block;margin-top:20px;padding:11px 18px;border:0;border-radius:10px;background:#111;color:#fff;text-decoration:none;font-size:14px;font-weight:700;cursor:pointer}
+.small{margin-top:15px;font-size:12px;color:#aaa}@keyframes spin{to{transform:rotate(360deg)}}
+</style></head>
+<body><main class="box">
+<section id="loading"><div class="brand">FreeMenu<span>.in</span></div><div class="spinner"></div><h1>Opening menu…</h1><p>Please wait while we check this QR code.</p></section>
+<section id="unassigned" style="display:none"><div class="brand">FreeMenu<span>.in</span></div><div class="icon">✓</div><h1>QR Code Not Assigned</h1><div class="qr-number" id="qrNumber">FM-0001</div><p>This QR code is available and has not been assigned to a restaurant yet.</p><div class="notice">Give this QR number to the Super Admin when assigning it to a restaurant.</div><p class="small">FreeMenu.in QR Management</p></section>
+<section id="error" class="error"><div class="brand">FreeMenu<span>.in</span></div><div class="icon">!</div><h1>QR Code Error</h1><p id="errorText">We could not process this QR code.</p><a class="retry" href="javascript:location.reload()">Try Again</a><p class="small">FreeMenu.in QR</p></section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL='https://pfsrpowopbrevocwsuii.supabase.co';
+const SUPABASE_ANON_KEY='sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
+const loadingBox=document.getElementById('loading'),unassignedBox=document.getElementById('unassigned'),errorBox=document.getElementById('error'),errorText=document.getElementById('errorText'),qrNumber=document.getElementById('qrNumber');
+function showUnassigned(code){loadingBox.style.display='none';errorBox.style.display='none';unassignedBox.style.display='block';qrNumber.textContent=code}
+function showError(message){loadingBox.style.display='none';unassignedBox.style.display='none';errorBox.style.display='block';errorText.textContent=message||'We could not process this QR code.'}
+function cleanCode(value){return String(value||'').trim()}
+function getMenuUrl(slug){return new URL('/menu.html?r='+encodeURIComponent(slug),window.location.origin).href}
+async function openRestaurantMenu(){
+ try{
+  if(!window.supabase)throw new Error('Menu service could not load. Please try again.');
+  const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  const code=cleanCode(new URLSearchParams(window.location.search).get('code'));
+  if(!code)throw new Error('QR code is missing.');
+  const qrResult=await db.from('qr_codes').select('restaurant_id,status').eq('code',code).maybeSingle();
+  if(qrResult.error)throw new Error(qrResult.error.message);
+  const qr=qrResult.data;
+  if(!qr)throw new Error('QR code '+code+' was not found.');
+  const status=String(qr.status||'available').toLowerCase();
+  if(status!=='assigned'||!qr.restaurant_id){showUnassigned(code);return}
+  const restaurantResult=await db.from('restaurants').select('slug').eq('id',qr.restaurant_id).maybeSingle();
+  if(restaurantResult.error)throw new Error(restaurantResult.error.message);
+  const restaurant=restaurantResult.data;
+  if(!restaurant||!restaurant.slug)throw new Error('Restaurant menu is not available.');
+  window.location.replace(getMenuUrl(restaurant.slug));
+ }catch(error){console.error('FreeMenu QR Error:',error);showError(error&&error.message?error.message:'Unable to process this QR code.')}
+}
+openRestaurantMenu();
+</script></body></html>
