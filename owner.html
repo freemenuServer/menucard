@@ -1043,7 +1043,7 @@ $("saveProfile").onclick=async()=>{
  if(error){toast("Profile save failed: "+error.message);return}
  currentRestaurant=data;fillProfile();toast("Restaurant details saved");
 };
-$("chooseLogo").onclick=()=>$("logoFile").click();
+$("chooseLogo").onclick=()=>$("logoMediaFile").click();
 $("logoFile").onchange=()=>{$("chooseLogo").textContent=$("logoFile").files[0]?.name?.slice(0,18)||"Choose"};
 $("uploadLogo").onclick=()=>uploadMediaFile("logo");
 
@@ -1189,49 +1189,65 @@ function validateMediaFile(file){
   if(file.size>mb*1024*1024)return `Image must be ${mb} MB or smaller.`;
   return "";
 }
+async function uploadToR2(file, folder){
+  if(!file) throw new Error("Choose an image first.");
+  const bad=validateMediaFile(file);
+  if(bad) throw new Error(bad);
+  const {data:{session:activeSession},error:sessionError}=await supabaseClient.auth.getSession();
+  if(sessionError || !activeSession?.access_token) throw new Error("Please login again.");
+  const fd=new FormData();
+  fd.append("file",file);
+  fd.append("restaurant_id",currentRestaurantId);
+  fd.append("folder",folder);
+  const response=await fetch(`${SUPABASE_URL}/functions/v1/r2-upload`,{
+    method:"POST",
+    headers:{Authorization:`Bearer ${activeSession.access_token}`,apikey:SUPABASE_ANON_KEY},
+    body:fd
+  });
+  let result={}; try{result=await response.json()}catch(e){}
+  if(!response.ok) throw new Error(result?.error || `R2 upload failed (${response.status})`);
+  if(!result?.url) throw new Error("R2 did not return an image URL.");
+  return result.url;
+}
 async function uploadMediaFile(kind){
   const enabled=kind==="logo"?mediaRules.logo_enabled:mediaRules.banner_enabled;
   if(!enabled)return toast(`${kind==="logo"?"Logo":"Banner"} upload is disabled by Super Admin.`);
-  const file=kind==="logo"?$("logoFile").files[0]:$("bannerMediaFile").files[0];
+  const file=kind==="logo"?$("logoMediaFile").files[0]:$("bannerMediaFile").files[0];
   const bad=validateMediaFile(file);if(bad)return toast(bad);
-  const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"");
-  const path=`${kind}_${currentRestaurantId}.${ext}`;
-  const btn=kind==="logo"?$("uploadLogo"):$("uploadBannerMedia");
+  const btn=kind==="logo"?$("uploadLogoMedia"):$("uploadBannerMedia");
   if(btn){btn.disabled=true;btn.textContent="Uploading...";}
-  const {error}=await supabaseClient.storage.from("restaurant-logos").upload(path,file,{cacheControl:"3600",upsert:true,contentType:file.type});
-  if(btn){btn.disabled=false;btn.textContent="Upload";}
-  if(error)return toast("Upload failed: "+error.message);
-  const {data}=supabaseClient.storage.from("restaurant-logos").getPublicUrl(path);
-  if(kind==="logo"){ $("fLogo").value=data.publicUrl; $("fLogoMedia").value=data.publicUrl; }
-  else $("fBannerMedia").value=data.publicUrl;
-  toast(`${kind==="logo"?"Logo":"Banner"} uploaded — click Save`);
+  try{
+    const url=await uploadToR2(file,kind==="logo"?"logo":"banner");
+    if(kind==="logo"){$("fLogo").value=url;$("fLogoMedia").value=url;}
+    else $("fBannerMedia").value=url;
+    toast(`${kind==="logo"?"Logo":"Banner"} uploaded to Cloudflare R2 — click Save`);
+  }catch(error){console.error("R2 upload error:",error);toast("Upload failed: "+(error?.message||"Unknown error"))}
+  finally{if(btn){btn.disabled=!mediaRules[`${kind}_enabled`];btn.textContent="Upload";}}
 }
 $("chooseLogoMedia").onclick=()=>$("logoMediaFile").click();
 $("logoMediaFile").onchange=()=>{$("chooseLogoMedia").textContent=$("logoMediaFile").files[0]?.name?.slice(0,18)||"Choose"};
 $("uploadLogoMedia").onclick=()=>uploadMediaFile("logo");
-
 $("chooseBannerMedia").onclick=()=>$("bannerMediaFile").click();
 $("bannerMediaFile").onchange=()=>{$("chooseBannerMedia").textContent=$("bannerMediaFile").files[0]?.name?.slice(0,18)||"Choose"};
 $("uploadBannerMedia").onclick=()=>uploadMediaFile("banner");
-
 $("chooseGalleryMedia").onclick=()=>$("galleryMediaFile").click();
 $("galleryMediaFile").onchange=()=>{$("chooseGalleryMedia").textContent=$("galleryMediaFile").files[0]?.name?.slice(0,18)||"Choose"};
 $("uploadGalleryMedia").onclick=async()=>{
   if(!mediaRules.gallery_paid_enabled)return toast("Gallery is disabled by Super Admin.");
   if(!isPremiumRestaurant)return toast("Upgrade to Premium to use the Gallery.");
   const file=$("galleryMediaFile").files[0],bad=validateMediaFile(file);if(bad)return toast(bad);
-  const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"");
-  const path=`gallery/${currentRestaurantId}/${Date.now()}.${ext}`;
   $("uploadGalleryMedia").disabled=true;$("uploadGalleryMedia").textContent="Uploading...";
-  const {error}=await supabaseClient.storage.from("restaurant-logos").upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type});
-  $("uploadGalleryMedia").disabled=false;$("uploadGalleryMedia").textContent="Upload to Gallery";
-  if(error)return toast("Gallery upload failed: "+error.message);
-  const {data}=supabaseClient.storage.from("restaurant-logos").getPublicUrl(path);
-  const gallery=Array.isArray(currentRestaurant.gallery)?[...currentRestaurant.gallery]:[];
-  gallery.push(data.publicUrl);
-  const {data:updated,error:updateError}=await supabaseClient.from("restaurants").update({gallery}).eq("id",currentRestaurantId).select("*").single();
-  if(updateError)return toast("Gallery save failed: "+updateError.message);
-  currentRestaurant=updated;fillProfile();renderGalleryList();toast("Gallery image added");
+  try{
+    const url=await uploadToR2(file,"gallery");
+    const gallery=Array.isArray(currentRestaurant.gallery)?[...currentRestaurant.gallery]:[];
+    gallery.push(url);
+    const {data:updated,error:updateError}=await supabaseClient.from("restaurants").update({gallery}).eq("id",currentRestaurantId).select("*").single();
+    if(updateError)throw new Error(updateError.message);
+    currentRestaurant=updated;fillProfile();renderGalleryList();
+    $("galleryMediaFile").value="";$("chooseGalleryMedia").textContent="Choose Gallery Image";
+    toast("Gallery image uploaded to Cloudflare R2");
+  }catch(error){console.error("R2 gallery upload error:",error);toast("Gallery upload failed: "+(error?.message||"Unknown error"))}
+  finally{$("uploadGalleryMedia").disabled=false;$("uploadGalleryMedia").textContent="Upload to Gallery";}
 };
 function renderGalleryList(){
   const el=$("galleryList");if(!el)return;
