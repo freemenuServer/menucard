@@ -27,6 +27,10 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
 .ai-file{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid #eaecf0;border-radius:9px;background:#f9fafb;margin-top:7px;font-size:12px}
 
 
+
+.restaurant-direct-link{color:inherit;text-decoration:none;cursor:pointer}
+.restaurant-direct-link b{transition:opacity .15s}
+.restaurant-direct-link:hover b{opacity:.72;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -213,7 +217,7 @@ function updateStats(){
 }
 function renderDashboardTable(list=restaurants.slice(-5).reverse()){
  list=list||[];
- $('dashTable').innerHTML=`<table class="table"><thead><tr><th>#</th><th>Logo</th><th>Restaurant</th><th>Owner</th><th>Location</th><th>Items</th><th>Status</th><th>Action</th></tr></thead><tbody>${list.map((r,i)=>{const owner=profiles.find(p=>p.id===r.owner_id);const cnt=menuItems.filter(m=>m.restaurant_id===r.id).length;return `<tr><td>${i+1}</td><td>${r.logo_url?`<img src="${esc(r.logo_url)}" style="width:30px;height:30px;border-radius:50%;object-fit:cover">`:'🍽️'}</td><td><b>${esc(r.name)}</b><br><small>${esc(r.phone||'')}</small></td><td>${esc(owner?.name||owner?.full_name||owner?.email||'—')}</td><td>${esc(r.address||'—')}</td><td>${cnt}</td><td>${pill(statusOf(r))}</td><td>${actionBtns(r)}</td></tr>`}).join('')}</tbody></table>`}
+ $('dashTable').innerHTML=`<table class="table"><thead><tr><th>#</th><th>Logo</th><th>Restaurant</th><th>Owner</th><th>Location</th><th>Items</th><th>Status</th><th>Action</th></tr></thead><tbody>${list.map((r,i)=>{const owner=profiles.find(p=>p.id===r.owner_id);const cnt=menuItems.filter(m=>m.restaurant_id===r.id).length;return `<tr><td>${i+1}</td><td>${r.logo_url?`<img src="${esc(r.logo_url)}" style="width:30px;height:30px;border-radius:50%;object-fit:cover">`:'🍽️'}</td><td><a href="javascript:void(0)" class="restaurant-direct-link" title="Open Owner Panel" onclick="openOwnerPanel('${r.id}')"><b>${esc(r.name)}</b></a><br><small>${esc(r.phone||'')}</small></td><td>${esc(owner?.name||owner?.full_name||owner?.email||'—')}</td><td>${esc(r.address||'—')}</td><td>${cnt}</td><td>${pill(statusOf(r))}</td><td>${actionBtns(r)}</td></tr>`}).join('')}</tbody></table>`}
 function pill(s){return `<span class="pill ${s==='active'?'green':s==='pending'?'orange':'red'}">● ${esc(s)}</span>`}
 function actionBtns(r){return `<div class="actions"><button class="iconbtn" title="Open Owner Panel (Super Admin)" aria-label="Open Owner Panel" onclick="openOwnerPanel('${r.id}')">🔑</button><button class="iconbtn" title="Public Menu" onclick="openPublic('${esc(r.slug)}')">👁</button><button class="iconbtn" onclick="openRestaurantModal('${r.id}')">✎</button><button class="iconbtn" onclick="setRestaurantStatus('${r.id}','${statusOf(r)==='blocked'?'active':'blocked'}')">${statusOf(r)==='blocked'?'✓':'⊘'}</button><button class="iconbtn" onclick="deleteRestaurant('${r.id}')">⋯</button></div>`}
 function openOwnerPanel(id){if(!session?.user?.id)return toast('Super Admin session expired. Please login again.');const url=`owner.html?admin_restaurant=${encodeURIComponent(id)}&admin=1`;window.open(url,'_blank','noopener,noreferrer')}
@@ -232,7 +236,7 @@ async function renderActivity(){
 function renderRestaurantPage(){
  const search=($('restaurantSearch')?.value||'').toLowerCase(),st=$('restaurantStatus')?.value||'';
  const list=restaurants.filter(r=>(!st||statusOf(r)===st)&&(`${r.name} ${r.phone} ${r.address} ${r.slug}`.toLowerCase().includes(search)));
- $('restaurantPageTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Owner</th><th>Slug</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead><tbody>${list.map(r=>{const o=profiles.find(p=>p.id===r.owner_id);return `<tr><td><b>${esc(r.name)}</b><br><small>${esc(r.phone||'')}</small></td><td>${esc(o?.name||o?.full_name||o?.email||'—')}</td><td>${esc(r.slug)}</td><td>${menuItems.filter(m=>m.restaurant_id===r.id).length}</td><td>${pill(statusOf(r))}</td><td>${actionBtns(r)}</td></tr>`}).join('')||'<tr><td colspan="6"><div class="empty">No restaurants found.</div></td></tr>'}</tbody></table>`
+ $('restaurantPageTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Owner</th><th>Slug</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead><tbody>${list.map(r=>{const o=profiles.find(p=>p.id===r.owner_id);return `<tr><td><a href="javascript:void(0)" class="restaurant-direct-link" title="Open Owner Panel" onclick="openOwnerPanel('${r.id}')"><b>${esc(r.name)}</b></a><br><small>${esc(r.phone||'')}</small></td><td>${esc(o?.name||o?.full_name||o?.email||'—')}</td><td>${esc(r.slug)}</td><td>${menuItems.filter(m=>m.restaurant_id===r.id).length}</td><td>${pill(statusOf(r))}</td><td>${actionBtns(r)}</td></tr>`}).join('')||'<tr><td colspan="6"><div class="empty">No restaurants found.</div></td></tr>'}</tbody></table>`
 }
 $('restaurantSearch')?.addEventListener('input',renderRestaurantPage);$('restaurantStatus')?.addEventListener('change',renderRestaurantPage);
 function openRestaurantModal(id){
