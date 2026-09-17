@@ -115,7 +115,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
 
 <div id="restaurants" class="page"><div class="subpage-head"><div><h2>Restaurants</h2><p style="color:#667085">Manage all registered restaurants.</p></div><div style="display:flex;gap:8px"><button class="iconbtn" onclick="loadAll()" title="Refresh data">↻ Refresh</button><button class="primary" onclick="openRestaurantModal()">+ Add Restaurant</button></div></div><div class="card"><div class="toolbar"><input class="input" id="restaurantSearch" placeholder="Search restaurant, phone, city..."><select class="input" id="restaurantStatus"><option value="">All Status</option><option>active</option><option>pending</option><option>blocked</option></select></div><div id="restaurantPageTable" class="tablewrap" style="margin-top:12px"></div></div></div>
 
-<div id="qrManagement" class="page"><div class="subpage-head"><div><h2>QR Management</h2><p style="color:#667085">Generate QR codes in lots of 100 and assign up to 10 QR codes to each restaurant.</p></div><div class="toolbar"><button class="iconbtn" onclick="loadQRs()">↻ Refresh</button><button class="primary" onclick="generateQRBatch(100)">＋ Generate Next 100</button><button class="primary" onclick="printAvailableQRs()">🖨 Print Available</button></div></div><div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:12px"><div class="stat"><div class="stat-top"><div class="ico blue">📱</div><div><h2 id="qrTotal">0</h2><p>Total QR Codes</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico green">✓</div><div><h2 id="qrAvailable">0</h2><p>Available</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico orange">↗</div><div><h2 id="qrAssigned">0</h2><p>Assigned</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico purple">10</div><div><h2>10</h2><p>Max per Restaurant</p></div></div></div></div><div class="card"><div class="toolbar"><input class="input" id="qrSearch" placeholder="Search QR ID, restaurant, label..."><select class="input" id="qrStatus"><option value="">All Status</option><option value="available">Available</option><option value="assigned">Assigned</option></select><select class="input" id="qrRestaurantFilter"><option value="">All Restaurants</option></select></div><div id="qrTable" class="tablewrap" style="margin-top:12px"></div></div></div><div id="owners" class="page"><div class="subpage-head"><h2>Restaurant Owners</h2></div><div class="card"><div class="toolbar"><input class="input" id="ownerSearch" placeholder="Search owner email/name..."></div><div id="ownersTable" class="tablewrap" style="margin-top:12px"></div></div></div>
+<div id="qrManagement" class="page"><div class="subpage-head"><div><h2>QR Management</h2><p style="color:#667085">Generate QR codes in lots of 100, identify each QR by its printed number, assign up to 10 QR codes to each restaurant, and print any individual QR.</p></div><div class="toolbar"><button class="iconbtn" onclick="loadQRs()">↻ Refresh</button><button class="primary" onclick="generateQRBatch(100)">＋ Generate Next 100</button><button class="primary" onclick="printAvailableQRs()">🖨 Print Available</button></div></div><div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:12px"><div class="stat"><div class="stat-top"><div class="ico blue">📱</div><div><h2 id="qrTotal">0</h2><p>Total QR Codes</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico green">✓</div><div><h2 id="qrAvailable">0</h2><p>Available</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico orange">↗</div><div><h2 id="qrAssigned">0</h2><p>Assigned</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico purple">10</div><div><h2>10</h2><p>Max per Restaurant</p></div></div></div></div><div class="card"><div class="toolbar"><input class="input" id="qrSearch" placeholder="Search QR ID, restaurant, label..."><select class="input" id="qrStatus"><option value="">All Status</option><option value="available">Available</option><option value="assigned">Assigned</option></select><select class="input" id="qrRestaurantFilter"><option value="">All Restaurants</option></select></div><div id="qrTable" class="tablewrap" style="margin-top:12px"></div></div></div><div id="owners" class="page"><div class="subpage-head"><h2>Restaurant Owners</h2></div><div class="card"><div class="toolbar"><input class="input" id="ownerSearch" placeholder="Search owner email/name..."></div><div id="ownersTable" class="tablewrap" style="margin-top:12px"></div></div></div>
 
 <div id="menu" class="page"><div class="subpage-head"><h2>Menu Management</h2></div><div class="card"><div class="toolbar"><select class="input" id="menuRestaurantFilter"><option value="">All Restaurants</option></select><input class="input" id="menuSearch" placeholder="Search item/category..."><button class="primary" onclick="openMenuModal()">+ Add Menu Item</button></div><div id="menuTable" class="tablewrap" style="margin-top:12px"></div></div></div>
 
@@ -346,7 +346,7 @@ function renderQRs(){
   const list=qrCodes.filter(x=>{const r=restaurants.find(y=>y.id===x.restaurant_id);const hay=`${x.code} ${x.label||''} ${r?.name||''}`.toLowerCase();return (!q||hay.includes(q))&&(!st||x.status===st)&&(!rid||x.restaurant_id===rid)});
   $('qrTotal').textContent=qrCodes.length;$('qrAvailable').textContent=qrCodes.filter(x=>x.status==='available').length;$('qrAssigned').textContent=qrCodes.filter(x=>x.status==='assigned').length;
   $('qrRestaurantFilter').innerHTML='<option value="">All Restaurants</option>'+restaurants.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}</option>`).join('');
-  $('qrTable').innerHTML=`<table class="table"><thead><tr><th>QR ID</th><th>Status</th><th>Restaurant</th><th>Label</th><th>Action</th></tr></thead><tbody>${list.map(x=>{const r=restaurants.find(y=>y.id===x.restaurant_id);return `<tr><td><b>${esc(x.code)}</b></td><td>${pill(x.status||'available')}</td><td>${esc(r?.name||'—')}</td><td>${esc(x.label||'—')}</td><td>${x.status==='assigned'?`<button class="iconbtn" onclick="unassignQR('${x.id}')">Unassign</button>`:`<button class="iconbtn" onclick="openAssignQR('${x.id}')">Assign</button>`}</td></tr>`}).join('')||'<tr><td colspan="5"><div class="empty">No QR codes found.</div></td></tr>'}</tbody></table>`;
+  $('qrTable').innerHTML=`<table class="table"><thead><tr><th>QR ID</th><th>Status</th><th>Restaurant</th><th>Label</th><th>Action</th></tr></thead><tbody>${list.map(x=>{const r=restaurants.find(y=>y.id===x.restaurant_id);return `<tr><td><b>${esc(x.code)}</b></td><td>${pill(x.status||'available')}</td><td>${esc(r?.name||'—')}</td><td>${esc(x.label||'—')}</td><td><div style="display:flex;gap:6px;flex-wrap:wrap">${x.status==='assigned'?`<button class="iconbtn" onclick="unassignQR('${x.id}')">Unassign</button>`:`<button class="iconbtn" onclick="openAssignQR('${x.id}')">Assign</button>`}<button class="iconbtn" onclick="printSingleQR('${x.id}')">🖨 Print QR</button></div></td></tr>`}).join('')||'<tr><td colspan="5"><div class="empty">No QR codes found.</div></td></tr>'}</tbody></table>`;
 }
 async function generateQRBatch(n=100){
   if(!confirm(`Generate the next ${n} QR codes?`))return;
@@ -366,15 +366,52 @@ async function assignQR(id){
 }
 async function unassignQR(id){if(!confirm('Unassign this QR? It will become available again.'))return;const x=qrCodes.find(q=>q.id===id);const r=await db.from('qr_codes').update({restaurant_id:null,label:null,status:'available',assigned_at:null,assigned_by:null}).eq('id',id);if(r.error)return toast(r.error.message);await logAction('Unassigned QR '+(x?.code||''));await loadQRs();toast('QR is available again')}
 function qrTargetURL(code){return new URL('/qr.html?code='+encodeURIComponent(code),location.origin).href}
+
+function printSingleQR(id){
+  const x=qrCodes.find(q=>q.id===id);
+  if(!x)return toast('QR code not found.');
+  renderPrintQR([x], 'FreeMenu QR Code');
+}
+
 async function printAvailableQRs(){
-  const available=qrCodes.filter(x=>x.status==='available').slice(0,100);
+  const available=qrCodes.filter(x=>String(x.status||'available').toLowerCase()==='available');
   if(!available.length)return toast('No available QR codes. Generate the next 100 first.');
-  await renderPrintQR(available,'Available QR Codes');
+  await renderPrintQR(available,'FreeMenu — Available QR Codes');
 }
+
 async function renderPrintQR(items,title){
-  const w=window.open('','_blank'); if(!w)return toast('Please allow pop-ups for printing QR codes.');
-  w.document.write(`<!doctype html><html><head><title>${title}</title><style>body{font-family:Arial,sans-serif;margin:12mm;color:#111}.head{text-align:center;margin-bottom:8mm}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8mm}.qr{border:1px solid #ddd;border-radius:6px;padding:5mm;text-align:center;break-inside:avoid}.code{font-weight:700;font-size:12px;margin-top:3mm}.hint{font-size:9px;color:#666;margin-top:1mm}@media print{.grid{gap:6mm}.qr{padding:4mm}}</style></head><body><div class="head"><h2>${title}</h2><div>${items.length} QR codes • FreeMenu</div></div><div class="grid">${items.map(x=>`<div class="qr"><div id="qr-${x.id}"></div><div class="code">${x.code}</div><div class="hint">Scan to View Menu</div></div>`).join('')}</div><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script><script>const data=${JSON.stringify(items.map(x=>({id:x.id,code:x.code,url:qrTargetURL(x.code)})))};window.onload=()=>{data.forEach(x=>new QRCode(document.getElementById('qr-'+x.id),{text:x.url,width:130,height:130,correctLevel:QRCode.CorrectLevel.M}));setTimeout(()=>window.print(),700)}<\/script></body></html>`);w.document.close();
+  const w=window.open('','_blank');
+  if(!w)return toast('Please allow pop-ups for printing QR codes.');
+
+  const payload=items.map(x=>({id:x.id,code:x.code,url:qrTargetURL(x.code),label:x.label||''}));
+  const cards=payload.map(x=>`
+    <div class="qr-card">
+      <div class="qrbox" id="qr-${x.id}"></div>
+      <div class="brand">FreeMenu.in</div>
+      <div class="code">${esc(x.code)}</div>
+      ${x.label?`<div class="label">${esc(x.label)}</div>`:''}
+      <div class="hint">Scan to View Menu</div>
+    </div>
+  `).join('');
+
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${title}</title>
+<style>
+*{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;margin:10mm;color:#111;background:#fff}
+.head{text-align:center;margin-bottom:8mm}.head h2{margin:0 0 3mm;font-size:22px}.head p{margin:0;color:#666;font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8mm}.qr-card{border:1px solid #d9d9d9;border-radius:10px;padding:5mm;text-align:center;break-inside:avoid;background:#fff}
+.brand{font-size:18px;font-weight:800;letter-spacing:-.3px;margin-bottom:4mm}.qrbox{width:140px;height:140px;margin:0 auto}
+.qrbox img,.qrbox canvas{display:block!important;width:140px!important;height:140px!important;margin:0 auto}
+.label{font-size:11px;color:#555;margin-top:1.5mm}.hint{font-size:10px;color:#777;margin-top:2mm}
+@media print{body{margin:7mm}.grid{gap:5mm}.qr-card{padding:4mm}}
+</style></head><body>
+<div class="head"><h2>${title}</h2><p>${payload.length} QR code${payload.length===1?'':'s'} • FreeMenu.in</p></div>
+<div class="grid">${cards}</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+<script>const data=${JSON.stringify(payload)};window.onload=()=>{data.forEach(x=>new QRCode(document.getElementById('qr-'+x.id),{text:x.url,width:140,height:140,correctLevel:QRCode.CorrectLevel.M}));setTimeout(()=>window.print(),800)}<\/script>
+</body></html>`);
+  w.document.close();
 }
+
 $('qrSearch')?.addEventListener('input',renderQRs);$('qrStatus')?.addEventListener('change',renderQRs);$('qrRestaurantFilter')?.addEventListener('change',renderQRs);
 function exportRestaurantsCSV(){const rows=[['id','name','slug','phone','address','status'],...restaurants.map(r=>[r.id,r.name,r.slug,r.phone,r.address,statusOf(r)])];const csv=rows.map(row=>row.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='freemenu-restaurants.csv';a.click()}
 async function logout(){await db.auth.signOut();location.reload()}
