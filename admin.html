@@ -365,7 +365,7 @@ async function assignQR(id){
   if(r.error)return toast(r.error.message);await logAction('Assigned QR '+(qrCodes.find(x=>x.id===id)?.code||''),rid);closeModal();await loadQRs();toast('QR assigned');
 }
 async function unassignQR(id){if(!confirm('Unassign this QR? It will become available again.'))return;const x=qrCodes.find(q=>q.id===id);const r=await db.from('qr_codes').update({restaurant_id:null,label:null,status:'available',assigned_at:null,assigned_by:null}).eq('id',id);if(r.error)return toast(r.error.message);await logAction('Unassigned QR '+(x?.code||''));await loadQRs();toast('QR is available again')}
-function qrTargetURL(code){return new URL(`qr.html?code=${encodeURIComponent(code)}`,location.href).href}
+function qrTargetURL(code){return new URL('/qr.html?code='+encodeURIComponent(code),location.origin).href}
 async function printAvailableQRs(){
   const available=qrCodes.filter(x=>x.status==='available').slice(0,100);
   if(!available.length)return toast('No available QR codes. Generate the next 100 first.');
