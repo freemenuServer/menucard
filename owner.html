@@ -816,14 +816,15 @@ async function init(afterLogin=false){
       return;
     }
 
-    // Fresh page load must always show the login/signup screen.
-    // The dashboard is opened only after an explicit successful login.
-    if(!afterLogin){
+    const adminRestaurantId=new URLSearchParams(location.search).get("admin_restaurant");
+
+    // Normal owner page: fresh loads still require an explicit owner login.
+    // Super Admin direct-access links are the exception: the existing authenticated
+    // Super Admin session is verified below and may open the selected restaurant.
+    if(!afterLogin && !adminRestaurantId){
       showAuthChoice();
       return;
     }
-
-    const adminRestaurantId=new URLSearchParams(location.search).get("admin_restaurant");
     let superAdminMode=false;
     if(adminRestaurantId){
       const pr=await supabaseClient.from("profiles").select("role").eq("id",session.user.id).maybeSingle();
@@ -867,6 +868,8 @@ async function init(afterLogin=false){
     currentRestaurant=data[0];
     currentRestaurantId=currentRestaurant.id;
     if(superAdminMode){
+      if($("ownerName")) $("ownerName").textContent="Super Admin";
+      if($("avatar")) $("avatar").textContent="SA";
       const sub=document.querySelector(".sideSub");
       if(sub) sub.textContent="SUPER ADMIN • DIRECT ACCESS";
       const roleLabel=document.querySelector(".profile .profileName div");
