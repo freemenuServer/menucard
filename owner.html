@@ -567,7 +567,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
    <input class="input" type="number" id="mFull" placeholder="Full ₹" min="0">
   </div>
   <div class="formGroup" style="margin-top:16px"><label>Menu Item Status</label><button type="button" class="menuStatusBtn on" id="mAvailableSwitch"><span class="dot"></span><span id="mAvailableText">ON • Visible</span></button></div>
-  <div style="margin-top:18px;display:flex;justify-content:flex-end;gap:8px><button class="btn" data-close="itemModal">Cancel</button><button class="btn primary" id="saveItem"><i class="fa-solid fa-floppy-disk"></i> Save Item</button></div>
+  <div style="margin-top:18px;display:flex;justify-content:flex-end;gap:8px"><button class="btn" data-close="itemModal">Cancel</button><button class="btn primary" id="saveItem"><i class="fa-solid fa-floppy-disk"></i> Save Item</button></div>
  </div>
 </div>
 
@@ -1209,20 +1209,28 @@ async function uploadToR2(file, folder){
   if(!result?.url) throw new Error("R2 did not return an image URL.");
   return result.url;
 }
+let r2UploadInProgress={logo:false,banner:false,gallery:false};
 async function uploadMediaFile(kind){
   const enabled=kind==="logo"?mediaRules.logo_enabled:mediaRules.banner_enabled;
+  if(r2UploadInProgress[kind])return toast("Upload already in progress. Please wait.");
   if(!enabled)return toast(`${kind==="logo"?"Logo":"Banner"} upload is disabled by Super Admin.`);
   const file=kind==="logo"?$("logoMediaFile").files[0]:$("bannerMediaFile").files[0];
   const bad=validateMediaFile(file);if(bad)return toast(bad);
   const btn=kind==="logo"?$("uploadLogoMedia"):$("uploadBannerMedia");
   if(btn){btn.disabled=true;btn.textContent="Uploading...";}
+  r2UploadInProgress[kind]=true;
   try{
     const url=await uploadToR2(file,kind==="logo"?"logo":"banner");
     if(kind==="logo"){$("fLogo").value=url;$("fLogoMedia").value=url;}
     else $("fBannerMedia").value=url;
     toast(`${kind==="logo"?"Logo":"Banner"} uploaded to Cloudflare R2 — click Save`);
   }catch(error){console.error("R2 upload error:",error);toast("Upload failed: "+(error?.message||"Unknown error"))}
-  finally{if(btn){btn.disabled=!mediaRules[`${kind}_enabled`];btn.textContent="Upload";}}
+  finally{
+    r2UploadInProgress[kind]=false;
+    if(btn){btn.disabled=!mediaRules[`${kind}_enabled`];btn.textContent="Upload";}
+    if(kind==="logo"){$("logoMediaFile").value="";$("chooseLogoMedia").textContent="Choose";}
+    if(kind==="banner"){$("bannerMediaFile").value="";$("chooseBannerMedia").textContent="Choose";}
+  }
 }
 $("chooseLogoMedia").onclick=()=>$("logoMediaFile").click();
 $("logoMediaFile").onchange=()=>{$("chooseLogoMedia").textContent=$("logoMediaFile").files[0]?.name?.slice(0,18)||"Choose"};
