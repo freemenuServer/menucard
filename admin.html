@@ -370,49 +370,81 @@ function qrTargetURL(code){return new URL('/qr.html?code='+encodeURIComponent(co
 function printSingleQR(id){
   const x=qrCodes.find(q=>q.id===id);
   if(!x)return toast('QR code not found.');
-  renderPrintQR([x], 'FreeMenu QR Code');
+  renderPrintQR([x],'FreeMenu QR Code');
 }
 
 async function printAvailableQRs(){
   const available=qrCodes.filter(x=>String(x.status||'available').toLowerCase()==='available');
   if(!available.length)return toast('No available QR codes. Generate the next 100 first.');
-  await renderPrintQR(available,'FreeMenu QR Codes');
+  await renderPrintQR(available,'FreeMenu — Available QR Codes');
 }
 
 async function renderPrintQR(items,title){
   const w=window.open('','_blank');
   if(!w)return toast('Please allow pop-ups for printing QR codes.');
+
   const payload=items.map(x=>({id:x.id,code:x.code,url:qrTargetURL(x.code)}));
+
   const cards=payload.map(x=>`
     <div class="qr-card">
-      <div class="badge">
-        <div class="scan"><span>SCAN FOR</span><strong>MENU</strong></div>
-        <div class="food-icon left">♜</div>
-        <div class="food-icon right">◖</div>
-        <div class="qr-circle"><div class="qrbox" id="qr-${x.id}"></div></div>
-        <div class="brand"><span>Free</span><b>Menu</b><i>.in</i></div>
+      <div class="scan-title"><span>SCAN FOR</span><strong>MENU</strong></div>
+      <div class="qr-wrap">
+        <div class="corner tl"></div><div class="corner tr"></div>
+        <div class="corner bl"></div><div class="corner br"></div>
+        <div class="side-mark left-top"></div><div class="side-mark left-bottom"></div>
+        <div class="side-mark right-top"></div><div class="side-mark right-bottom"></div>
+        <div class="qrbox" id="qr-${x.id}"></div>
       </div>
-    </div>`).join('');
+      <div class="brand">FreeMenu.in</div>
+      <div class="steps">
+        <div><span class="phone-icon">▯</span><b>Open<br>Camera</b></div>
+        <i></i>
+        <div><span class="scan-icon">⌗</span><b>Scan<br>QR</b></div>
+        <i></i>
+        <div><span class="menu-icon">▤</span><b>View<br>Menu</b></div>
+      </div>
+    </div>
+  `).join('');
 
-  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title>
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${title}</title>
 <style>
 *{box-sizing:border-box}
-body{font-family:Arial,Helvetica,sans-serif;margin:8mm;color:#111;background:#fff}
+body{font-family:Arial,Helvetica,sans-serif;margin:8mm;background:#fff;color:#111}
 .head{text-align:center;margin-bottom:7mm}.head h2{margin:0 0 2mm;font-size:21px}.head p{margin:0;color:#666;font-size:12px}
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9mm 7mm}
-.qr-card{display:flex;justify-content:center;break-inside:avoid;padding:2mm}
-.badge{width:250px;height:250px;border-radius:50%;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 43%,#171717 0 62%,#080808 63% 100%);border:5px solid #d9a928;box-shadow:inset 0 0 0 3px #2a2a2a,0 2px 0 #8b6414;text-align:center;color:#fff}
-.badge:before{content:"";position:absolute;inset:6px;border:2px solid #f4c94f;border-radius:50%;pointer-events:none}
-.scan{position:absolute;top:15px;left:0;right:0;z-index:3;text-align:center;line-height:1}
-.scan span{display:block;font-size:15px;font-weight:800;letter-spacing:1px;color:#fff}
-.scan strong{display:block;margin-top:4px;font-size:31px;letter-spacing:1px;color:#f5c642;text-shadow:0 1px 0 #8b6414}
-.qr-circle{position:absolute;left:50%;top:73px;transform:translateX(-50%);width:139px;height:139px;border-radius:50%;background:#fff;border:5px solid #d9a928;display:grid;place-items:center;z-index:2}
-.qrbox{width:121px;height:121px;display:grid;place-items:center}.qrbox svg{display:block!important;width:121px!important;height:121px!important}
-.brand{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:4;white-space:nowrap;font-size:21px;font-weight:900;letter-spacing:-.6px}
-.brand:before{content:"";position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:158px;height:30px;border-radius:8px;background:#f2c33e;z-index:-1;box-shadow:0 1px 0 #8b6414}
-.brand span{color:#111}.brand b{color:#111}.brand i{font-style:normal;color:#fff}
-.food-icon{position:absolute;color:#f2c33e;z-index:1;top:89px;width:38px;height:72px}.food-icon svg{display:block;width:100%;height:100%}.food-icon.left{left:20px;transform:rotate(0deg)}.food-icon.right{right:20px;transform:rotate(0deg)}
-@media print{body{margin:6mm}.grid{gap:6mm 5mm}.badge{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+.qr-card{
+  width:300px;height:390px;margin:auto;background:#fff;border-radius:19px;
+  box-shadow:0 3px 18px rgba(0,0,0,.09);border:1px solid #eee;
+  text-align:center;break-inside:avoid;position:relative;overflow:hidden;padding:13px 12px 9px
+}
+.scan-title{line-height:.9;margin-top:0}.scan-title span{display:block;font-size:27px;font-weight:900;letter-spacing:-1px;color:#080808}
+.scan-title strong{display:block;margin-top:5px;font-size:47px;line-height:.9;font-weight:950;letter-spacing:-1px;color:#ed1825}
+.qr-wrap{width:224px;height:194px;margin:17px auto 0;position:relative;display:grid;place-items:center}
+.qrbox{width:174px;height:174px;display:grid;place-items:center;background:#fff}
+.qrbox svg{display:block!important;width:174px!important;height:174px!important}
+.corner{position:absolute;width:35px;height:35px;border-color:#ed1825;border-style:solid;border-width:0}
+.corner.tl{left:0;top:0;border-top-width:7px;border-left-width:7px;border-radius:11px 0 0 0}
+.corner.tr{right:0;top:0;border-top-width:7px;border-right-width:7px;border-radius:0 11px 0 0}
+.corner.bl{left:0;bottom:0;border-bottom-width:7px;border-left-width:7px;border-radius:0 0 0 11px}
+.corner.br{right:0;bottom:0;border-bottom-width:7px;border-right-width:7px;border-radius:0 0 11px 0}
+.side-mark{position:absolute;width:25px;height:6px;background:#ed1825;border-radius:8px}
+.left-top{left:2px;top:67px;transform:rotate(25deg)}.left-bottom{left:2px;top:108px;transform:rotate(-25deg)}
+.right-top{right:2px;top:67px;transform:rotate(-25deg)}.right-bottom{right:2px;top:108px;transform:rotate(25deg)}
+.brand{
+  display:inline-block;margin-top:8px;padding:7px 25px 8px;border-radius:30px;
+  background:#ed1825;color:#fff;font-size:26px;font-weight:900;letter-spacing:-.8px
+}
+.steps{height:62px;margin-top:9px;display:flex;align-items:center;justify-content:center;gap:14px}
+.steps>div{width:67px;text-align:center;font-size:11px;line-height:1.05}
+.steps b{display:block;margin-top:2px;font-size:11px}.steps i{height:48px;width:1px;background:#bdbdbd;display:block}
+.phone-icon,.scan-icon,.menu-icon{display:block;height:27px;font-size:28px;line-height:24px;font-weight:700}
+.phone-icon{font-size:34px}.scan-icon{font-size:32px}.menu-icon{font-size:30px}
+@media print{
+  body{margin:5mm}.grid{gap:6mm 5mm}.qr-card{
+    box-shadow:none;print-color-adjust:exact;-webkit-print-color-adjust:exact
+  }
+}
 </style></head><body>
 <div class="head"><h2>${title}</h2><p>${payload.length} QR code${payload.length===1?'':'s'}</p></div>
 <div class="grid">${cards}</div>
@@ -420,11 +452,18 @@ body{font-family:Arial,Helvetica,sans-serif;margin:8mm;color:#111;background:#ff
 <script>
 const data=${JSON.stringify(payload)};
 window.onload=()=>{
- data.forEach(x=>{
-  const q=new QRCodeStyling({width:98,height:98,type:'svg',data:x.url,margin:0,qrOptions:{errorCorrectionLevel:'H'},dotsOptions:{type:'dots',color:'#000000'},cornersSquareOptions:{type:'dot',color:'#000000'},cornersDotOptions:{type:'dot',color:'#000000'},backgroundOptions:{color:'#ffffff'}});
-  q.append(document.getElementById('qr-'+x.id));
- });
- setTimeout(()=>window.print(),1200);
+  data.forEach(x=>{
+    const q=new QRCodeStyling({
+      width:174,height:174,type:"svg",data:x.url,margin:3,
+      qrOptions:{errorCorrectionLevel:"H"},
+      dotsOptions:{type:"dots",color:"#111111"},
+      cornersSquareOptions:{type:"dot",color:"#111111"},
+      cornersDotOptions:{type:"dot",color:"#111111"},
+      backgroundOptions:{color:"#ffffff"}
+    });
+    q.append(document.getElementById('qr-'+x.id));
+  });
+  setTimeout(()=>window.print(),1200);
 };
 <\/script></body></html>`);
   w.document.close();
