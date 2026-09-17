@@ -370,7 +370,7 @@ function qrTargetURL(code){return new URL('/qr.html?code='+encodeURIComponent(co
 function printSingleQR(id){
   const x=qrCodes.find(q=>q.id===id);
   if(!x)return toast('QR code not found.');
-  renderPrintQR([x], 'FreeMenu QR Code');
+  renderPrintQR([x],'FreeMenu QR Code');
 }
 
 async function printAvailableQRs(){
@@ -382,33 +382,42 @@ async function printAvailableQRs(){
 async function renderPrintQR(items,title){
   const w=window.open('','_blank');
   if(!w)return toast('Please allow pop-ups for printing QR codes.');
-
-  const payload=items.map(x=>({id:x.id,code:x.code,url:qrTargetURL(x.code),label:x.label||''}));
+  const payload=items.map(x=>({id:x.id,code:x.code,url:qrTargetURL(x.code)}));
   const cards=payload.map(x=>`
     <div class="qr-card">
       <div class="qrbox" id="qr-${x.id}"></div>
       <div class="brand">FreeMenu.in</div>
-      <div class="code">${esc(x.code)}</div>
-      ${x.label?`<div class="label">${esc(x.label)}</div>`:''}
-      <div class="hint">Scan to View Menu</div>
-    </div>
-  `).join('');
+    </div>`).join('');
 
   w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${title}</title>
 <style>
 *{box-sizing:border-box}body{font-family:Arial,Helvetica,sans-serif;margin:10mm;color:#111;background:#fff}
 .head{text-align:center;margin-bottom:8mm}.head h2{margin:0 0 3mm;font-size:22px}.head p{margin:0;color:#666;font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8mm}.qr-card{border:1px solid #d9d9d9;border-radius:10px;padding:5mm;text-align:center;break-inside:avoid;background:#fff}
-.brand{font-size:18px;font-weight:800;letter-spacing:-.3px;margin-bottom:4mm}.qrbox{width:140px;height:140px;margin:0 auto}
-.qrbox img,.qrbox canvas{display:block!important;width:140px!important;height:140px!important;margin:0 auto}
-.label{font-size:11px;color:#555;margin-top:1.5mm}.hint{font-size:10px;color:#777;margin-top:2mm}
-@media print{body{margin:7mm}.grid{gap:5mm}.qr-card{padding:4mm}}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8mm}.qr-card{text-align:center;break-inside:avoid;padding:4mm 3mm 5mm}
+.qrbox{width:150px;height:150px;margin:0 auto;display:grid;place-items:center}.qrbox svg,.qrbox canvas{display:block!important;width:150px!important;height:150px!important}
+.brand{margin-top:4mm;font-size:17px;font-weight:800;letter-spacing:-.3px}
+@media print{body{margin:7mm}.grid{gap:5mm}}
 </style></head><body>
-<div class="head"><h2>${title}</h2><p>${payload.length} QR code${payload.length===1?'':'s'} • FreeMenu.in</p></div>
+<div class="head"><h2>${title}</h2><p>${payload.length} QR code${payload.length===1?'':'s'}</p></div>
 <div class="grid">${cards}</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
-<script>const data=${JSON.stringify(payload)};window.onload=()=>{data.forEach(x=>new QRCode(document.getElementById('qr-'+x.id),{text:x.url,width:140,height:140,correctLevel:QRCode.CorrectLevel.M}));setTimeout(()=>window.print(),800)}<\/script>
-</body></html>`);
+<script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.9.2/lib/qr-code-styling.js"><\/script>
+<script>
+const data=${JSON.stringify(payload)};
+window.onload=()=>{
+  data.forEach(x=>{
+    const q=new QRCodeStyling({
+      width:150,height:150,type:"svg",data:x.url,margin:2,
+      qrOptions:{errorCorrectionLevel:"H"},
+      dotsOptions:{type:"dots",color:"#000000"},
+      cornersSquareOptions:{type:"dot",color:"#000000"},
+      cornersDotOptions:{type:"dot",color:"#000000"},
+      backgroundOptions:{color:"#ffffff"}
+    });
+    q.append(document.getElementById('qr-'+x.id));
+  });
+  setTimeout(()=>window.print(),1000);
+};
+<\/script></body></html>`);
   w.document.close();
 }
 
