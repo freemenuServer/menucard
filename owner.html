@@ -749,11 +749,38 @@ async function init(){
   $("avatar").textContent=initials($("ownerName").textContent);
 
   const urlSlug=new URLSearchParams(location.search).get("r");
-  let q=supabaseClient.from("restaurants").select("*");
-  if(urlSlug) q=q.eq("slug",urlSlug.toLowerCase());
-  else q=q.eq("owner_id",session.user.id);
-  const {data,error}=await q.limit(1);
+  let data=null,error=null;
+
+  // First try the normal owner_id relationship.
+  if(urlSlug){
+    const res=await supabaseClient.from("restaurants").select("*").eq("slug",urlSlug.toLowerCase()).limit(1);
+    data=res.data; error=res.error;
+  }else{
+    const res=await supabaseClient.from("restaurants").select("*").eq("owner_id",session.user.id).limit(1);
+    data=res.data; error=res.error;
+  }
   if(error) return fail(error.message);
+
+  // Compatibility fallback for older accounts: use the restaurant slug stored
+  // in Auth metadata. This lets an existing owner open the panel even if the
+  // owner_id link was lost during an earlier schema change.
+  if(!data?.length && !urlSlug){
+    const meta=session.user.user_metadata||{};
+    const rs=String(meta.restaurant_slug||"").trim().toLowerCase();
+    if(rs){
+      const bySlug=await supabaseClient.from("restaurants").select("*").eq("slug",rs).limit(1);
+      if(bySlug.error) return fail(bySlug.error.message);
+      if(bySlug.data?.length){
+        data=bySlug.data;
+        // Try to repair the relationship automatically. If RLS blocks the
+        // update, the panel still opens using the matched restaurant row.
+        if(String(data[0].owner_id||"")!==String(session.user.id)){
+          const repaired=await supabaseClient.from("restaurants").update({owner_id:session.user.id}).eq("id",data[0].id).select("*").single();
+          if(!repaired.error && repaired.data) data=[repaired.data];
+        }
+      }
+    }
+  }
 
   // Email-confirmed signups may have an Auth user before their restaurant row exists.
   if(!data?.length && !urlSlug){
@@ -765,13 +792,14 @@ async function init(){
     if(rs && rn){
       const {data:existingBySlug,error:slugError}=await supabaseClient.from("restaurants").select("id").eq("slug",rs).maybeSingle();
       if(slugError) return fail(slugError.message);
-      if(existingBySlug) return fail("This account has no linked restaurant. The Menu Slug is already in use; Super Admin must link the restaurant to this Auth account.");
-      const {data:newRestaurant,error:createError}=await supabaseClient.from("restaurants").insert({owner_id:session.user.id,name:rn,slug:rs,phone:rp,address:ra,status:"pending",plan:"free",subscription_status:"inactive"}).select("*").single();
-      if(createError) return fail("Restaurant profile could not be created: "+createError.message);
-      data=[newRestaurant];
+      if(!existingBySlug){
+        const {data:newRestaurant,error:createError}=await supabaseClient.from("restaurants").insert({owner_id:session.user.id,name:rn,slug:rs,phone:rp,address:ra,status:"pending",plan:"free",subscription_status:"inactive"}).select("*").single();
+        if(createError) return fail("Restaurant profile could not be created: "+createError.message);
+        data=[newRestaurant];
+      }
     }
   }
-  if(!data?.length) return fail("Restaurant profile not found for this owner. If this is an older account, the restaurant needs to be linked to your Auth user.");
+  if(!data?.length) return fail("Restaurant profile not found for this owner. Please check that this Auth account is linked to the restaurant.");
   currentRestaurant=data[0];currentRestaurantId=currentRestaurant.id;
   fillProfile();
   await loadItems();
