@@ -1,84 +1,1229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="theme-color" content="#111111"><title>FreeMenu QR</title>
-<style>
-*{box-sizing:border-box}html,body{width:100%;min-height:100%;margin:0}
-body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#fff;color:#171717;font-family:Inter,Arial,Helvetica,sans-serif}
-.box{width:min(92vw,440px);text-align:center}.brand{font-size:28px;font-weight:900;letter-spacing:-1px;margin-bottom:20px}.brand span{font-weight:500}
-.spinner{width:30px;height:30px;margin:0 auto 18px;border:3px solid #e5e5e5;border-top-color:#111;border-radius:50%;animation:spin .8s linear infinite}
-h1{margin:0 0 9px;font-size:24px;line-height:1.2;letter-spacing:-.4px}p{margin:0;color:#737373;font-size:15px;line-height:1.55}
-.error{display:none}.icon{width:58px;height:58px;margin:0 auto 18px;border-radius:50%;display:grid;place-items:center;background:#f5f5f5;color:#111;font-size:25px;font-weight:800}
-.qr-number{display:inline-block;margin:7px 0 14px;padding:10px 16px;border-radius:12px;background:#f5f5f5;font-size:22px;font-weight:900;letter-spacing:.7px}
-.notice{margin-top:14px;padding:13px 15px;border:1px solid #e5e5e5;border-radius:12px;background:#fafafa;color:#666;font-size:13px;line-height:1.5}
-.retry{display:inline-block;margin-top:20px;padding:11px 18px;border:0;border-radius:10px;background:#111;color:#fff;text-decoration:none;font-size:14px;font-weight:700;cursor:pointer}
-.small{margin-top:15px;font-size:12px;color:#aaa}@keyframes spin{to{transform:rotate(360deg)}}
-</style></head>
-<body><main class="box">
-<section id="loading"><div class="brand">FreeMenu<span>.in</span></div><div class="spinner"></div><h1>Opening menu…</h1><p>Please wait while we check this QR code.</p></section>
-<section id="unassigned" style="display:none"><div class="brand">FreeMenu<span>.in</span></div><div class="icon">✓</div><h1>QR Code Not Assigned</h1><div class="qr-number" id="qrNumber">FM-0001</div><p>This QR code is available and has not been assigned to a restaurant yet.</p><div class="notice">Give this QR number to the Super Admin when assigning it to a restaurant.</div><p class="small">FreeMenu.in QR Management</p></section>
-<section id="error" class="error"><div class="brand">FreeMenu<span>.in</span></div><div class="icon">!</div><h1>QR Code Error</h1><p id="errorText">We could not process this QR code.</p><a class="retry" href="javascript:location.reload()">Try Again</a><p class="small">FreeMenu.in QR</p></section>
-</main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL='https://pfsrpowopbrevocwsuii.supabase.co';
-const SUPABASE_ANON_KEY='sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
-const loadingBox=document.getElementById('loading'),unassignedBox=document.getElementById('unassigned'),errorBox=document.getElementById('error'),errorText=document.getElementById('errorText'),qrNumber=document.getElementById('qrNumber');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>FreeMenu QR</title>
 
-function showUnassigned(code){
- loadingBox.style.display='none';
- errorBox.style.display='none';
- unassignedBox.style.display='block';
- qrNumber.textContent=code
+<style>
+*{
+  box-sizing:border-box;
 }
+
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  min-height:100%;
+}
+
+body{
+  min-height:100vh;
+  background:#f4f5f7;
+  color:#171a21;
+  font-family:Inter,Arial,Helvetica,sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:24px;
+}
+
+/* =========================
+   MAIN WRAPPER
+========================= */
+
+.page{
+  width:100%;
+  max-width:720px;
+}
+
+/* =========================
+   TOP ACTIONS
+========================= */
+
+.actions{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:18px;
+}
+
+.action-btn{
+  border:0;
+  padding:12px 18px;
+  border-radius:12px;
+  font-size:14px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.2s ease;
+}
+
+.action-btn:hover{
+  transform:translateY(-1px);
+}
+
+.print-btn{
+  background:#171a21;
+  color:#fff;
+}
+
+.download-btn{
+  background:#fff;
+  color:#171a21;
+  border:1px solid #dedede;
+}
+
+/* =========================
+   QR POSTER
+========================= */
+
+.poster{
+  position:relative;
+  overflow:hidden;
+  width:100%;
+  background:#fff;
+  border-radius:32px;
+  box-shadow:
+    0 25px 70px rgba(0,0,0,.12),
+    0 4px 15px rgba(0,0,0,.05);
+  padding:42px 42px 34px;
+}
+
+/* Decorative shapes */
+
+.blob{
+  position:absolute;
+  pointer-events:none;
+  z-index:0;
+}
+
+.blob.orange{
+  width:230px;
+  height:230px;
+  top:-130px;
+  left:-100px;
+  background:#ffb52e;
+  border-radius:48% 52% 65% 35%;
+}
+
+.blob.green{
+  width:220px;
+  height:220px;
+  bottom:-145px;
+  left:-95px;
+  background:#50b848;
+  border-radius:60% 40% 20% 80%;
+}
+
+.blob.red{
+  width:220px;
+  height:220px;
+  right:-105px;
+  bottom:-120px;
+  background:#ff5258;
+  border-radius:40% 60% 75% 25%;
+}
+
+.decor{
+  position:absolute;
+  z-index:1;
+  font-size:35px;
+  opacity:.16;
+  user-select:none;
+}
+
+.decor.one{
+  top:60px;
+  left:28px;
+  transform:rotate(-18deg);
+}
+
+.decor.two{
+  top:48px;
+  right:30px;
+  transform:rotate(15deg);
+}
+
+.decor.three{
+  bottom:175px;
+  left:26px;
+  transform:rotate(-12deg);
+}
+
+.decor.four{
+  bottom:165px;
+  right:25px;
+  transform:rotate(12deg);
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.content{
+  position:relative;
+  z-index:3;
+  text-align:center;
+}
+
+.mini-note{
+  font-size:14px;
+  font-weight:700;
+  font-style:italic;
+  color:#777;
+  margin-bottom:5px;
+}
+
+.title-small{
+  font-size:34px;
+  line-height:1;
+  font-weight:800;
+  letter-spacing:-1.5px;
+  margin-top:12px;
+}
+
+.title-big{
+  font-size:74px;
+  line-height:.95;
+  font-weight:950;
+  letter-spacing:-4px;
+  margin:0;
+}
+
+.title-lines{
+  display:flex;
+  justify-content:center;
+  gap:6px;
+  margin:16px 0 22px;
+}
+
+.title-lines span{
+  width:92px;
+  height:7px;
+  border-radius:20px;
+}
+
+.line-green{
+  background:#43aa4a;
+}
+
+.line-orange{
+  background:#ffb21d;
+}
+
+.line-red{
+  background:#f25459;
+}
+
+/* =========================
+   RESTAURANT
+========================= */
+
+.restaurant-name{
+  min-height:25px;
+  font-size:21px;
+  font-weight:850;
+  color:#222631;
+  margin-bottom:12px;
+}
+
+.qr-label{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:7px 13px;
+  border-radius:999px;
+  background:#f5f5f5;
+  color:#666;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.6px;
+  margin-bottom:15px;
+}
+
+/* =========================
+   QR BOX
+========================= */
+
+.qr-wrap{
+  width:min(100%,440px);
+  margin:0 auto;
+  background:#fff;
+  border-radius:28px;
+  padding:24px;
+  box-shadow:
+    0 12px 35px rgba(0,0,0,.10),
+    0 1px 4px rgba(0,0,0,.05);
+  border:1px solid #eeeeee;
+}
+
+#qrcode{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#qrcode canvas,
+#qrcode svg{
+  display:block;
+  width:100% !important;
+  height:auto !important;
+  max-width:390px;
+  border-radius:5px;
+}
+
+.scan-text{
+  margin-top:17px;
+  font-size:14px;
+  font-weight:800;
+  color:#555;
+}
+
+/* =========================
+   BRANDING
+========================= */
+
+.brand-area{
+  margin-top:28px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+}
+
+.brand-leaf{
+  font-size:27px;
+  line-height:1;
+}
+
+.brand-name{
+  font-size:39px;
+  line-height:1;
+  font-weight:950;
+  letter-spacing:-2px;
+}
+
+.brand-name span{
+  font-weight:500;
+}
+
+.brand-tag{
+  margin-top:8px;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:4px;
+  color:#656565;
+}
+
+.brand-lines{
+  display:flex;
+  justify-content:center;
+  gap:5px;
+  margin-top:13px;
+}
+
+.brand-lines span{
+  width:30px;
+  height:4px;
+  border-radius:10px;
+}
+
+/* =========================
+   FEATURES
+========================= */
+
+.features{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  margin-top:27px;
+  border-top:1px solid #ededed;
+  padding-top:20px;
+}
+
+.feature{
+  padding:0 12px;
+  border-right:1px solid #e4e4e4;
+}
+
+.feature:last-child{
+  border-right:0;
+}
+
+.feature-icon{
+  font-size:22px;
+  margin-bottom:5px;
+}
+
+.feature-title{
+  font-size:14px;
+  font-weight:900;
+}
+
+.feature-sub{
+  margin-top:3px;
+  font-size:11px;
+  color:#777;
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+.footer{
+  margin-top:24px;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:2px;
+  color:#888;
+}
+
+.footer-accent{
+  margin-top:7px;
+  font-size:13px;
+  font-weight:700;
+  color:#444;
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.loading{
+  padding:70px 20px;
+  text-align:center;
+}
+
+.spinner{
+  width:38px;
+  height:38px;
+  margin:0 auto 18px;
+  border:4px solid #e8e8e8;
+  border-top-color:#111;
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+/* =========================
+   ERROR
+========================= */
+
+.error-box{
+  display:none;
+  text-align:center;
+  padding:50px 20px;
+}
+
+.error-icon{
+  width:60px;
+  height:60px;
+  margin:0 auto 18px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:#fff0f0;
+  color:#e53935;
+  font-size:28px;
+  font-weight:900;
+}
+
+.error-title{
+  font-size:24px;
+  font-weight:900;
+  margin-bottom:8px;
+}
+
+.error-text{
+  color:#777;
+  line-height:1.5;
+}
+
+/* =========================
+   UNASSIGNED
+========================= */
+
+.unassigned{
+  display:none;
+  text-align:center;
+  padding:55px 25px;
+}
+
+.unassigned-icon{
+  width:70px;
+  height:70px;
+  margin:0 auto 18px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  background:#f4f4f4;
+  font-size:30px;
+}
+
+.unassigned h2{
+  margin:0 0 12px;
+  font-size:25px;
+}
+
+.code-badge{
+  display:inline-block;
+  padding:10px 18px;
+  border-radius:12px;
+  background:#f4f4f4;
+  font-size:21px;
+  font-weight:900;
+  letter-spacing:1px;
+  margin-bottom:15px;
+}
+
+.unassigned p{
+  color:#777;
+  line-height:1.55;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:600px){
+
+  body{
+    padding:12px;
+  }
+
+  .poster{
+    padding:30px 17px 27px;
+    border-radius:24px;
+  }
+
+  .title-small{
+    font-size:27px;
+  }
+
+  .title-big{
+    font-size:57px;
+    letter-spacing:-3px;
+  }
+
+  .title-lines span{
+    width:65px;
+    height:6px;
+  }
+
+  .qr-wrap{
+    padding:15px;
+    border-radius:21px;
+  }
+
+  .brand-name{
+    font-size:32px;
+  }
+
+  .brand-tag{
+    font-size:9px;
+    letter-spacing:3px;
+  }
+
+  .features{
+    margin-top:22px;
+  }
+
+  .feature{
+    padding:0 5px;
+  }
+
+  .feature-title{
+    font-size:11px;
+  }
+
+  .feature-sub{
+    font-size:9px;
+  }
+
+  .actions{
+    margin-bottom:12px;
+  }
+
+  .action-btn{
+    padding:10px 14px;
+    font-size:13px;
+  }
+}
+
+/* =========================
+   PRINT
+========================= */
+
+@media print{
+
+  @page{
+    size:A4;
+    margin:0;
+  }
+
+  html,body{
+    width:100%;
+    min-height:100%;
+    background:#fff !important;
+  }
+
+  body{
+    padding:0;
+    display:block;
+  }
+
+  .page{
+    width:100%;
+    max-width:none;
+  }
+
+  .actions{
+    display:none !important;
+  }
+
+  .poster{
+    width:100%;
+    min-height:100vh;
+    border-radius:0;
+    box-shadow:none;
+    padding:45px 55px 35px;
+  }
+
+  .qr-wrap{
+    box-shadow:none;
+    border:1px solid #eee;
+  }
+
+  .blob{
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+
+  *{
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+  <!-- ACTION BUTTONS -->
+  <div class="actions">
+    <button class="action-btn print-btn" onclick="window.print()">
+      🖨 Print QR
+    </button>
+
+    <button class="action-btn download-btn" onclick="downloadQR()">
+      ↓ Download QR
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading" class="poster">
+    <div class="loading">
+      <div class="spinner"></div>
+      <h2>Preparing QR Code...</h2>
+      <p>Please wait.</p>
+    </div>
+  </div>
+
+  <!-- MAIN QR POSTER -->
+  <div id="poster" class="poster" style="display:none;">
+
+    <!-- Decorative background -->
+    <div class="blob orange"></div>
+    <div class="blob green"></div>
+    <div class="blob red"></div>
+
+    <div class="decor one">🥬</div>
+    <div class="decor two">🍽️</div>
+    <div class="decor three">🍕</div>
+    <div class="decor four">🥤</div>
+
+    <div class="content">
+
+      <div class="mini-note">
+        Tasty Moments Here
+      </div>
+
+      <div class="title-small">
+        Scan for
+      </div>
+
+      <div class="title-big">
+        Menu
+      </div>
+
+      <div class="title-lines">
+        <span class="line-green"></span>
+        <span class="line-orange"></span>
+        <span class="line-red"></span>
+      </div>
+
+      <!-- Restaurant -->
+      <div id="restaurantName" class="restaurant-name">
+        Restaurant Menu
+      </div>
+
+      <div id="qrLabel" class="qr-label">
+        QR CODE
+      </div>
+
+      <!-- QR -->
+      <div class="qr-wrap">
+
+        <div id="qrcode"></div>
+
+        <div class="scan-text">
+          📱 Scan with your phone camera
+        </div>
+
+      </div>
+
+      <!-- Branding -->
+      <div class="brand-area">
+
+        <div class="brand">
+          <div class="brand-leaf">🌿</div>
+
+          <div class="brand-name">
+            FreeMenu<span>.in</span>
+          </div>
+        </div>
+
+        <div class="brand-tag">
+          GOOD FOOD CLOSER TO YOU
+        </div>
+
+        <div class="brand-lines">
+          <span class="line-green"></span>
+          <span class="line-orange"></span>
+          <span class="line-red"></span>
+        </div>
+
+      </div>
+
+      <!-- Features -->
+      <div class="features">
+
+        <div class="feature">
+          <div class="feature-icon">🌿</div>
+          <div class="feature-title">
+            Digital Menu
+          </div>
+          <div class="feature-sub">
+            Eco Friendly
+          </div>
+        </div>
+
+        <div class="feature">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-title">
+            Quick Access
+          </div>
+          <div class="feature-sub">
+            No App Needed
+          </div>
+        </div>
+
+        <div class="feature">
+          <div class="feature-icon">♡</div>
+          <div class="feature-title">
+            Easy Ordering
+          </div>
+          <div class="feature-sub">
+            Simple & Fast
+          </div>
+        </div>
+
+      </div>
+
+      <div class="footer">
+        FREEMENU.IN
+      </div>
+
+      <div class="footer-accent">
+        Eat • Explore • Enjoy
+      </div>
+
+    </div>
+  </div>
+
+  <!-- UNASSIGNED -->
+  <div id="unassigned" class="poster">
+    <div class="unassigned">
+
+      <div class="unassigned-icon">
+        ✓
+      </div>
+
+      <h2>
+        QR Code Not Assigned
+      </h2>
+
+      <div id="unassignedCode" class="code-badge">
+        FM-0001
+      </div>
+
+      <p>
+        This QR code is available and has not been assigned
+        to a restaurant yet.
+      </p>
+
+      <p>
+        Assign this QR code from the Super Admin panel.
+      </p>
+
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <div id="error" class="poster">
+    <div class="error-box">
+
+      <div class="error-icon">
+        !
+      </div>
+
+      <div class="error-title">
+        QR Code Error
+      </div>
+
+      <div id="errorText" class="error-text">
+        We could not process this QR code.
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+
+<!-- QR CODE LIBRARY -->
+<script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.9.2/lib/qr-code-styling.js"></script>
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+/* ==========================================
+   SUPABASE
+========================================== */
+
+const SUPABASE_URL =
+'https://pfsrpowopbrevocwsuii.supabase.co';
+
+const SUPABASE_ANON_KEY =
+'sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
+
+const db =
+window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+
+/* ==========================================
+   ELEMENTS
+========================================== */
+
+const loading =
+document.getElementById('loading');
+
+const poster =
+document.getElementById('poster');
+
+const unassigned =
+document.getElementById('unassigned');
+
+const errorBox =
+document.getElementById('error');
+
+const errorText =
+document.getElementById('errorText');
+
+const restaurantName =
+document.getElementById('restaurantName');
+
+const qrLabel =
+document.getElementById('qrLabel');
+
+const unassignedCode =
+document.getElementById('unassignedCode');
+
+const qrContainer =
+document.getElementById('qrcode');
+
+
+let currentCode = '';
+let currentSlug = '';
+let qrInstance = null;
+
+
+/* ==========================================
+   QR URL
+========================================== */
+
+function getQRScanURL(code){
+
+  return new URL(
+    '/qr.html?code=' +
+    encodeURIComponent(code),
+    window.location.origin
+  ).href;
+
+}
+
+
+/* ==========================================
+   NEW CLEAN MENU URL
+========================================== */
+
+function getMenuUrl(slug){
+
+  return new URL(
+    '/menu/' +
+    encodeURIComponent(slug),
+    window.location.origin
+  ).href;
+
+}
+
+
+/* ==========================================
+   SHOW ERROR
+========================================== */
 
 function showError(message){
- loadingBox.style.display='none';
- unassignedBox.style.display='none';
- errorBox.style.display='block';
- errorText.textContent=message||'We could not process this QR code.'
+
+  loading.style.display='none';
+  poster.style.display='none';
+  unassigned.style.display='none';
+
+  errorBox.style.display='block';
+
+  errorText.textContent =
+    message ||
+    'We could not process this QR code.';
+
 }
 
-function cleanCode(value){
- return String(value||'').trim()
+
+/* ==========================================
+   SHOW UNASSIGNED
+========================================== */
+
+function showUnassigned(code){
+
+  loading.style.display='none';
+  poster.style.display='none';
+  errorBox.style.display='none';
+
+  unassigned.style.display='block';
+
+  unassignedCode.textContent =
+    code;
+
 }
 
-/* NEW CLEAN MENU PATH */
-function getMenuUrl(slug){
- return new URL('/menu/'+encodeURIComponent(slug),window.location.origin).href
+
+/* ==========================================
+   CREATE STYLED QR
+========================================== */
+
+function createQR(code){
+
+  qrContainer.innerHTML='';
+
+  const scanURL =
+    getQRScanURL(code);
+
+  qrInstance =
+    new QRCodeStyling({
+
+      width:390,
+      height:390,
+
+      type:'canvas',
+
+      data:scanURL,
+
+      margin:4,
+
+      qrOptions:{
+        typeNumber:0,
+        mode:'Byte',
+        errorCorrectionLevel:'H'
+      },
+
+      dotsOptions:{
+        type:'dots',
+        color:'#151820'
+      },
+
+      cornersSquareOptions:{
+        type:'extra-rounded',
+        color:'#f59e0b'
+      },
+
+      cornersDotOptions:{
+        type:'dot',
+        color:'#151820'
+      },
+
+      backgroundOptions:{
+        color:'#ffffff'
+      }
+
+    });
+
+  qrInstance.append(qrContainer);
+
 }
 
-async function openRestaurantMenu(){
- try{
-  if(!window.supabase)throw new Error('Menu service could not load. Please try again.');
-  const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-  const code=cleanCode(new URLSearchParams(window.location.search).get('code'));
-  if(!code)throw new Error('QR code is missing.');
-  const qrResult=await db.from('qr_codes').select('restaurant_id,status').eq('code',code).maybeSingle();
-  if(qrResult.error)throw new Error(qrResult.error.message);
-  const qr=qrResult.data;
-  if(!qr)throw new Error('QR code '+code+' was not found.');
-  const status=String(qr.status||'available').toLowerCase();
-  if(status!=='assigned'||!qr.restaurant_id){
-   showUnassigned(code);
-   return
+
+/* ==========================================
+   DOWNLOAD QR
+========================================== */
+
+function downloadQR(){
+
+  if(!qrInstance){
+
+    alert('QR is not ready yet.');
+
+    return;
+
   }
-  const restaurantResult=await db.from('restaurants').select('slug').eq('id',qr.restaurant_id).maybeSingle();
-  if(restaurantResult.error)throw new Error(restaurantResult.error.message);
-  const restaurant=restaurantResult.data;
-  if(!restaurant||!restaurant.slug)throw new Error('Restaurant menu is not available.');
-  
-  /* REDIRECT TO CLEAN URL */
-  window.location.replace(getMenuUrl(restaurant.slug));
-  
- }catch(error){
-  console.error('FreeMenu QR Error:',error);
-  showError(error&&error.message?error.message:'Unable to process this QR code.')
- }
+
+  qrInstance.download({
+
+    name:
+      'FreeMenu-' +
+      (currentCode || 'QR'),
+
+    extension:'png'
+
+  });
+
 }
 
-openRestaurantMenu();
+
+/* ==========================================
+   LOAD QR
+========================================== */
+
+async function openQR(){
+
+  try{
+
+    if(!window.supabase){
+
+      throw new Error(
+        'Menu service could not load.'
+      );
+
+    }
+
+    const params =
+      new URLSearchParams(
+        window.location.search
+      );
+
+    const code =
+      String(
+        params.get('code') || ''
+      ).trim();
+
+    if(!code){
+
+      throw new Error(
+        'QR code is missing.'
+      );
+
+    }
+
+    currentCode=code;
+
+    /* --------------------------------------
+       FIND QR
+    -------------------------------------- */
+
+    const qrResult =
+      await db
+      .from('qr_codes')
+      .select(
+        'restaurant_id,status,code'
+      )
+      .eq('code',code)
+      .maybeSingle();
+
+
+    if(qrResult.error){
+
+      throw new Error(
+        qrResult.error.message
+      );
+
+    }
+
+
+    const qr =
+      qrResult.data;
+
+
+    if(!qr){
+
+      throw new Error(
+        'QR code ' +
+        code +
+        ' was not found.'
+      );
+
+    }
+
+
+    const status =
+      String(
+        qr.status || 'available'
+      ).toLowerCase();
+
+
+    /* --------------------------------------
+       UNASSIGNED
+    -------------------------------------- */
+
+    if(
+      status !== 'assigned' ||
+      !qr.restaurant_id
+    ){
+
+      showUnassigned(code);
+
+      return;
+
+    }
+
+
+    /* --------------------------------------
+       RESTAURANT
+    -------------------------------------- */
+
+    const restaurantResult =
+      await db
+      .from('restaurants')
+      .select(
+        'name,slug'
+      )
+      .eq(
+        'id',
+        qr.restaurant_id
+      )
+      .maybeSingle();
+
+
+    if(restaurantResult.error){
+
+      throw new Error(
+        restaurantResult.error.message
+      );
+
+    }
+
+
+    const restaurant =
+      restaurantResult.data;
+
+
+    if(
+      !restaurant ||
+      !restaurant.slug
+    ){
+
+      throw new Error(
+        'Restaurant menu is not available.'
+      );
+
+    }
+
+
+    currentSlug =
+      restaurant.slug;
+
+
+    /* --------------------------------------
+       SET INFORMATION
+    -------------------------------------- */
+
+    restaurantName.textContent =
+      restaurant.name ||
+      'Restaurant Menu';
+
+
+    qrLabel.textContent =
+      'QR • ' + code;
+
+
+    /* --------------------------------------
+       CREATE QR
+    -------------------------------------- */
+
+    createQR(code);
+
+
+    /* --------------------------------------
+       SHOW POSTER
+    -------------------------------------- */
+
+    loading.style.display='none';
+
+    poster.style.display='block';
+
+    unassigned.style.display='none';
+
+    errorBox.style.display='none';
+
+
+  }catch(error){
+
+    console.error(
+      'FreeMenu QR Error:',
+      error
+    );
+
+    showError(
+      error &&
+      error.message
+        ? error.message
+        : 'Unable to process this QR code.'
+    );
+
+  }
+
+}
+
+
+/* ==========================================
+   START
+========================================== */
+
+openQR();
+
 </script>
+
 </body>
 </html>
