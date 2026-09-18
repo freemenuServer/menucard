@@ -269,11 +269,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     <a class="navItem" href="#analytics" data-section="analytics"><i class="fa-solid fa-chart-column"></i> Analytics</a>
     <a class="navItem" href="#settings" data-section="settings"><i class="fa-solid fa-gear"></i> Settings</a>
     <a class="navItem" href="#support" data-section="support"><i class="fa-regular fa-circle-question"></i> Help & Support</a>
+    <a class="navItem" href="/owner/plans.html" id="plansNavLink"><i class="fa-solid fa-crown"></i> Plans & Pricing</a>
   </nav>
   <div class="sidePromo">
     <i class="fa-solid fa-crown"></i><strong>Grow Your Business</strong>
     <p>Delicious Food<br>Happier Customers</p>
     <button class="btn-pink" id="sidePublicBtn">View Public Menu</button>
+    <button class="btn-pink" id="sidePlansBtn" style="margin-top:8px;background:linear-gradient(135deg,#d8ad62,#b9822f);color:#1a1010"><i class="fa-solid fa-crown"></i> Plans & Pricing</button>
   </div>
 </aside>
 
@@ -544,7 +546,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
 <!-- SUPPORT / ORDERS -->
 <section id="section-orders" class="hidden"><div class="card"><div class="cardTitle">Orders <small>Preview</small></div><div style="text-align:center;padding:60px 10px;color:var(--muted)"><i class="fa-solid fa-cart-shopping" style="font-size:38px;margin-bottom:12px"></i><h3 style="color:var(--text)">Ordering system is ready for a future phase</h3><p style="font-size:12px">The supplied Supabase schema contains menu_items and restaurants, but no orders table.</p></div></div></section>
-<section id="section-support" class="hidden"><div class="card"><div class="cardTitle">Help & Support</div><p class="muted" style="font-size:13px;line-height:1.7">For the current build, the owner panel is connected to your existing Supabase Auth, restaurants, menu_items table and restaurant-logos storage bucket. Additional analytics, ordering and theme persistence require database fields/tables.</p></div></section>
+<section id="section-support" class="hidden"><div class="card"><div class="cardTitle">Help & Support</div><p class="muted" style="font-size:13px;line-height:1.7">For the current build, the owner panel is connected to your existing Supabase Auth, restaurants and menu_items tables, with restaurant images handled through the configured image upload system. Additional analytics, ordering and theme persistence require database fields/tables.</p></div></section>
 
 </div></div>
 
@@ -615,7 +617,12 @@ function showSection(name){
   if(activeSection==="preview") $("previewFrame").src=publicUrl();
   if(activeSection==="qr") renderQR();
 }
-document.querySelectorAll(".navItem").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();history.replaceState(null,"","#"+a.dataset.section);showSection(a.dataset.section)}));
+document.querySelectorAll(".navItem").forEach(a=>a.addEventListener("click",e=>{
+  if(a.id==="plansNavLink") return;
+  e.preventDefault();
+  history.replaceState(null,"","#"+a.dataset.section);
+  showSection(a.dataset.section);
+}));
 window.addEventListener("hashchange",()=>showSection(location.hash.slice(1)||"dashboard"));
 $("mobileMenu").onclick=()=>$("sidebar").classList.toggle("open");
 
@@ -1098,6 +1105,7 @@ $("downloadQR").onclick=()=>{const a=document.createElement("a");a.href=$("qrBox
 /* ---------- Public menu ---------- */
 function openPublic(){window.open(publicUrl(),"_blank","noopener")}
 ["publicTop","sidePublicBtn","quickPreview","openPublic2"].forEach(id=>$(id).onclick=openPublic);
+$("sidePlansBtn").onclick=()=>{window.location.href="/owner/plans.html"};
 
 /* ---------- Theme preview ---------- */
 function updateTheme(){
