@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscription & Upgrade Plans - FreeMenu</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --accent: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      padding: 24px 16px 60px;
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    /* Navigation Bar */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      color: var(--text-main);
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-back:hover {
+      background: #f1f5f9;
+    }
+
+    /* Page Header */
+    .header-section {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .header-section h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .header-section p {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    /* Pricing Cards Grid */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .plan-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .plan-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+    }
+
+    .plan-card.popular {
+      border: 2px solid var(--primary);
+    }
+
+    .popular-badge {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .plan-name {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    /* Price Displays */
+    .price-block {
+      margin-bottom: 14px;
+    }
+
+    .monthly-rate {
+      font-size: 32px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .monthly-rate span {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .setup-rate {
+      display: inline-block;
+      margin-top: 8px;
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .setup-rate.highlight {
+      background: #eff6ff;
+      color: var(--primary);
+    }
+
+    /* Feature List */
+    .feature-list {
+      list-style: none;
+      margin: 20px 0 24px;
+      font-size: 13.5px;
+      color: #334155;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.4;
+    }
+
+    .feature-list li::before {
+      content: "✓";
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .qr-pill {
+      background: #e0f2fe;
+      color: #0369a1;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+
+    /* Action Buttons */
+    .btn-action {
+      display: block;
+      width: 100%;
+      text-align: center;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-current {
+      background: #f1f5f9;
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+      cursor: default;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+      border: 1px solid var(--primary);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .btn-outline:hover {
+      background: #eff6ff;
+    }
+
+    .note-box {
+      margin-top: 40px;
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px 20px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Top Navigation -->
+    <div class="top-nav">
+      <a href="dashboard.html" class="btn-back">← Back to Dashboard</a>
+      <span style="font-size: 13px; color: var(--text-muted); font-weight: 600;">FreeMenu.in Partner</span>
+    </div>
+
+    <!-- Page Title -->
+    <div class="header-section">
+      <h1>Select Your Restaurant Plan</h1>
+      <p>Fixed table limits, zero hidden costs, and physical QR delivery included.</p>
+    </div>
+
+    <!-- Pricing Grid -->
+    <div class="pricing-grid">
+      
+      <!-- 1. Free Starter -->
+      <div class="plan-card">
+        <div>
+          <h3 class="plan-name">Free Starter</h3>
+          <div class="price-block">
+            <div class="monthly-rate">₹0 <span>/ month</span></div>
+            <div class="setup-rate">Setup Fee: ₹0 (Free)</div>
+          </div>
+          <ul class="feature-list">
+            <li><span class="qr-pill">2 QR Stickers</span> (Fixed)</li>
+            <li>Complete Text Menu & Rates</li>
+            <li>Restaurant Logo & Banner</li>
+            <li>Instant Mobile Edit Dashboard</li>
+          </ul>
+        </div>
+        <div class="btn-action btn-current">Current Active Plan</div>
+      </div>
+
+      <!-- 2. Growth Plan -->
+      <div class="plan-card">
+        <div>
+          <h3 class="plan-name">Growth (Photos)</h3>
+          <div class="price-block">
+            <div class="monthly-rate">₹99 <span>/ month</span></div>
+            <div class="setup-rate">Setup Fee: ₹999 (One-Time)</div>
+          </div>
+          <ul class="feature-list">
+            <li><span class="qr-pill">5 QR Stickers</span></li>
+            <li>Full HD Photos for all items</li>
+            <li>Veg / Non-Veg / Egg Tags</li>
+            <li>Bestseller & Chef Special Badges</li>
+            <li>WhatsApp Menu Sharing</li>
+          </ul>
+        </div>
+        <a href="https://wa.me/919999999999?text=Hello%20FreeMenu%20Team%2C%20I%20want%20to%20upgrade%20my%20restaurant%20to%20the%20Growth%20Photo%20Plan%20(%E2%82%B999%2Fmo)." 
+           target="_blank" 
+           class="btn-action btn-outline">
+          Upgrade to Growth
+        </a>
+      </div>
+
+      <!-- 3. Signature 3D (Popular) -->
+      <div class="plan-card popular">
+        <div class="popular-badge">RECOMMENDED</div>
+        <div>
+          <h3 class="plan-name">Signature 3D</h3>
+          <div class="price-block">
+            <div class="monthly-rate">₹199 <span>/ month</span></div>
+            <div class="setup-rate highlight">Setup Fee: ₹2,499 (One-Time)</div>
+          </div>
+          <ul class="feature-list">
+            <li><span class="qr-pill">10 QR Stickers (Max)</span></li>
+            <li><strong>5 Signature Dishes in 3D AR</strong></li>
+            <li>Interactive 360° & Room Placement</li>
+            <li>HD Photos on remaining items</li>
+            <li>Physical Setup & Scan Optimization</li>
+          </ul>
+        </div>
+        <a href="https://wa.me/919999999999?text=Hello%20FreeMenu%20Team%2C%20I%20want%20to%20upgrade%20my%20restaurant%20to%20the%20Signature%203D%20Plan%20(%E2%82%B9199%2Fmo)." 
+           target="_blank" 
+           class="btn-action btn-primary">
+          ⚡ Upgrade to Signature 3D
+        </a>
+      </div>
+
+      <!-- 4. Full 3D AR -->
+      <div class="plan-card">
+        <div>
+          <h3 class="plan-name">Full 3D Experience</h3>
+          <div class="price-block">
+            <div class="monthly-rate">₹399 <span>/ month</span></div>
+            <div class="setup-rate">Setup Fee: ₹4,499 (One-Time)</div>
+          </div>
+          <ul class="feature-list">
+            <li><span class="qr-pill">10 QR Stickers (Max)</span></li>
+            <li><strong>15 Signature Dishes in 3D AR</strong></li>
+            <li>Ultra-Fast Cloudflare 3D CDN</li>
+            <li>Priority 24/7 WhatsApp Support</li>
+            <li>Full Menu Redesign Assistance</li>
+          </ul>
+        </div>
+        <a href="https://wa.me/919999999999?text=Hello%20FreeMenu%20Team%2C%20I%20want%20to%20upgrade%20my%20restaurant%20to%20the%20Full%203D%20AR%20Plan%20(%E2%82%B9399%2Fmo)." 
+           target="_blank" 
+           class="btn-action btn-outline">
+          Get Full 3D
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Operational Transparency Note -->
+    <div class="note-box">
+      📦 <strong>Operational Policy:</strong> To maintain premium print durability and table service speed, each account is provided with up to 10 high-grade waterproof vinyl QR stickers. Additional replacement stickers are available on request at ₹50/unit.
+    </div>
+  </div>
+
+</body>
+</html>
