@@ -25,10 +25,30 @@ h1{margin:0 0 9px;font-size:24px;line-height:1.2;letter-spacing:-.4px}p{margin:0
 const SUPABASE_URL='https://pfsrpowopbrevocwsuii.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
 const loadingBox=document.getElementById('loading'),unassignedBox=document.getElementById('unassigned'),errorBox=document.getElementById('error'),errorText=document.getElementById('errorText'),qrNumber=document.getElementById('qrNumber');
-function showUnassigned(code){loadingBox.style.display='none';errorBox.style.display='none';unassignedBox.style.display='block';qrNumber.textContent=code}
-function showError(message){loadingBox.style.display='none';unassignedBox.style.display='none';errorBox.style.display='block';errorText.textContent=message||'We could not process this QR code.'}
-function cleanCode(value){return String(value||'').trim()}
-function getMenuUrl(slug){return new URL('/menu.html?r='+encodeURIComponent(slug),window.location.origin).href}
+
+function showUnassigned(code){
+ loadingBox.style.display='none';
+ errorBox.style.display='none';
+ unassignedBox.style.display='block';
+ qrNumber.textContent=code
+}
+
+function showError(message){
+ loadingBox.style.display='none';
+ unassignedBox.style.display='none';
+ errorBox.style.display='block';
+ errorText.textContent=message||'We could not process this QR code.'
+}
+
+function cleanCode(value){
+ return String(value||'').trim()
+}
+
+/* NEW CLEAN MENU PATH */
+function getMenuUrl(slug){
+ return new URL('/menu/'+encodeURIComponent(slug),window.location.origin).href
+}
+
 async function openRestaurantMenu(){
  try{
   if(!window.supabase)throw new Error('Menu service could not load. Please try again.');
@@ -40,13 +60,25 @@ async function openRestaurantMenu(){
   const qr=qrResult.data;
   if(!qr)throw new Error('QR code '+code+' was not found.');
   const status=String(qr.status||'available').toLowerCase();
-  if(status!=='assigned'||!qr.restaurant_id){showUnassigned(code);return}
+  if(status!=='assigned'||!qr.restaurant_id){
+   showUnassigned(code);
+   return
+  }
   const restaurantResult=await db.from('restaurants').select('slug').eq('id',qr.restaurant_id).maybeSingle();
   if(restaurantResult.error)throw new Error(restaurantResult.error.message);
   const restaurant=restaurantResult.data;
   if(!restaurant||!restaurant.slug)throw new Error('Restaurant menu is not available.');
+  
+  /* REDIRECT TO CLEAN URL */
   window.location.replace(getMenuUrl(restaurant.slug));
- }catch(error){console.error('FreeMenu QR Error:',error);showError(error&&error.message?error.message:'Unable to process this QR code.')}
+  
+ }catch(error){
+  console.error('FreeMenu QR Error:',error);
+  showError(error&&error.message?error.message:'Unable to process this QR code.')
+ }
 }
+
 openRestaurantMenu();
-</script></body></html>
+</script>
+</body>
+</html>
