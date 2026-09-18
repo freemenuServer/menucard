@@ -1,1 +1,6 @@
-/menu/:slug  /menu.html?slug=:slug  200
+# FreeMenu clean restaurant menu URLs
+# Example: /menu/urban -> /menu/menu1.html?r=urban
+/menu/:slug    /menu/menu1.html?r=:slug    200
+
+# Keep the old menu URL working
+/menu.html     /menu/menu1.html     200
