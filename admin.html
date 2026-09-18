@@ -59,7 +59,6 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
     <button data-page="approvals"><i data-lucide="clock-3"></i>Pending Approvals <b class="badge" id="approvalBadge">0</b></button>
     <button data-page="ads"><i data-lucide="badge-dollar-sign"></i>Advertisements</button><button data-page="mediaRules"><i data-lucide="image"></i>Media Upload Rules</button>
     <button data-page="subscriptions"><i data-lucide="crown"></i>Subscriptions</button>
-    <button data-page="plans"><i data-lucide="badge-indian-rupee"></i>Plans & Pricing</button>
     <button data-page="analytics"><i data-lucide="bar-chart-3"></i>Analytics</button>
     <button data-page="reports"><i data-lucide="file-text"></i>Reports</button>
     <button data-page="customers"><i data-lucide="user-round"></i>Customers</button>
@@ -116,7 +115,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
 
 <div id="restaurants" class="page"><div class="subpage-head"><div><h2>Restaurants</h2><p style="color:#667085">Manage all registered restaurants.</p></div><div style="display:flex;gap:8px"><button class="iconbtn" onclick="loadAll()" title="Refresh data">↻ Refresh</button><button class="primary" onclick="openRestaurantModal()">+ Add Restaurant</button></div></div><div class="card"><div class="toolbar"><input class="input" id="restaurantSearch" placeholder="Search restaurant, phone, city..."><select class="input" id="restaurantStatus"><option value="">All Status</option><option>active</option><option>pending</option><option>blocked</option></select></div><div id="restaurantPageTable" class="tablewrap" style="margin-top:12px"></div></div></div>
 
-<div id="qrManagement" class="page"><div class="subpage-head"><div><h2>QR Management</h2><p style="color:#667085">Generate QR codes in lots of 100, identify each QR by its printed number, assign up to 10 QR codes to each restaurant, and print any individual QR.</p></div><div class="toolbar"><button class="iconbtn" onclick="loadQRs()">↻ Refresh</button><button class="primary" onclick="generateQRBatch(100)">＋ Generate Next 100</button><button class="primary" onclick="printAvailableQRs()">🖨 Print Available</button></div></div><div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:12px"><div class="stat"><div class="stat-top"><div class="ico blue">📱</div><div><h2 id="qrTotal">0</h2><p>Total QR Codes</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico green">✓</div><div><h2 id="qrAvailable">0</h2><p>Available</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico orange">↗</div><div><h2 id="qrAssigned">0</h2><p>Assigned</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico purple">10</div><div><h2>10</h2><p>Max per Restaurant</p></div></div></div></div><div class="card"><div class="toolbar"><input class="input" id="qrSearch" placeholder="Search QR ID, restaurant, label..."><select class="input" id="qrStatus"><option value="">All Status</option><option value="available">Available</option><option value="assigned">Assigned</option></select><select class="input" id="qrRestaurantFilter"><option value="">All Restaurants</option></select></div><div id="qrTable" class="tablewrap" style="margin-top:12px"></div></div></div><div id="owners" class="page"><div class="subpage-head"><h2>Restaurant Owners</h2></div><div class="card"><div class="toolbar"><input class="input" id="ownerSearch" placeholder="Search owner email/name..."></div><div id="ownersTable" class="tablewrap" style="margin-top:12px"></div></div></div>
+<div id="qrManagement" class="page"><div class="subpage-head"><div><h2>QR Management</h2><p style="color:#667085">Generate QR codes in lots of 100 and assign up to 10 QR codes to each restaurant.</p></div><div class="toolbar"><button class="iconbtn" onclick="loadQRs()">↻ Refresh</button><button class="primary" onclick="generateQRBatch(100)">＋ Generate Next 100</button></div></div><div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:12px"><div class="stat"><div class="stat-top"><div class="ico blue">📱</div><div><h2 id="qrTotal">0</h2><p>Total QR Codes</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico green">✓</div><div><h2 id="qrAvailable">0</h2><p>Available</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico orange">↗</div><div><h2 id="qrAssigned">0</h2><p>Assigned</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico purple">10</div><div><h2>10</h2><p>Max per Restaurant</p></div></div></div></div><div class="card"><div class="toolbar"><input class="input" id="qrSearch" placeholder="Search QR ID, restaurant, label..."><select class="input" id="qrStatus"><option value="">All Status</option><option value="available">Available</option><option value="assigned">Assigned</option></select><select class="input" id="qrRestaurantFilter"><option value="">All Restaurants</option></select></div><div id="qrTable" class="tablewrap" style="margin-top:12px"></div></div></div><div id="owners" class="page"><div class="subpage-head"><h2>Restaurant Owners</h2></div><div class="card"><div class="toolbar"><input class="input" id="ownerSearch" placeholder="Search owner email/name..."></div><div id="ownersTable" class="tablewrap" style="margin-top:12px"></div></div></div>
 
 <div id="menu" class="page"><div class="subpage-head"><h2>Menu Management</h2></div><div class="card"><div class="toolbar"><select class="input" id="menuRestaurantFilter"><option value="">All Restaurants</option></select><input class="input" id="menuSearch" placeholder="Search item/category..."><button class="primary" onclick="openMenuModal()">+ Add Menu Item</button></div><div id="menuTable" class="tablewrap" style="margin-top:12px"></div></div></div>
 
@@ -143,34 +142,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
 </div>
 
 
-<div id="plans" class="page">
-  <div class="subpage-head">
-    <div><h2>Plans & Pricing</h2><p style="color:#667085;margin:4px 0 0">Control every plan shown on <b>/owner/plans.html</b>. Changes are stored in Supabase and do not require editing the pricing page code.</p></div>
-    <div class="toolbar"><button class="iconbtn" onclick="loadPlans()">↻ Refresh</button><button class="primary" onclick="openPlanModal()">+ Add Plan</button></div>
-  </div>
-  <div class="notice">These are the four plans currently configured for the pricing page: Free Starter ₹0, Growth (Photos) ₹99, Signature 3D ₹199, and Full 3D Experience ₹399. Setup fees, limits, feature text, badges, buttons, recommendation status, active status and display order are all controlled here.</div>
-  <div class="card"><div id="plansTable" class="tablewrap"></div></div>
-  <div class="card" style="margin-top:12px"><div class="card-head"><h3>Plan Control Rules</h3></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:11px;color:#475467"><div><b>Pricing</b><br>Monthly price + one-time setup fee</div><div><b>Limits</b><br>QR stickers + 3D signature dishes</div><div><b>Display</b><br>Active, recommended, order, badge, button</div></div></div>
-</div>
-<div id="subscriptions" class="page">
-  <div class="subpage-head">
-    <div><h2>Subscriptions & Plan Assignment</h2><p style="color:#667085;margin:4px 0 0">Manually assign a plan to any restaurant, just like QR assignment.</p></div>
-    <div class="toolbar"><button class="iconbtn" onclick="loadAll()">↻ Refresh</button></div>
-  </div>
-  <div class="notice"><b>Manual assignment:</b> Select a restaurant, choose an active plan from the dropdown, and save. The selected plan is stored directly on that restaurant.</div>
-  <div class="card" style="margin-bottom:12px">
-    <div class="card-head"><h3>Assign Restaurant Plan</h3></div>
-    <div class="formgrid">
-      <div class="field"><label>Restaurant</label><select id="assignPlanRestaurant"></select></div>
-      <div class="field"><label>Plan</label><select id="assignPlanSelect"></select></div>
-    </div>
-    <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="primary" onclick="assignRestaurantPlan()">Assign Plan</button></div>
-  </div>
-  <div class="card">
-    <div class="card-head"><h3>Restaurant Plan Assignments</h3><input class="input" id="planAssignmentSearch" placeholder="Search restaurant..." oninput="renderSubscriptions()"></div>
-    <div id="subsTable" class="tablewrap"></div>
-  </div>
-</div>
+<div id="subscriptions" class="page"><div class="subpage-head"><h2>Subscriptions</h2></div><div class="card"><div id="subsTable" class="tablewrap"></div></div></div>
 <div id="analytics" class="page"><div class="subpage-head"><h2>Analytics</h2></div><div class="grid3"><div class="card"><h3>Total Menu Views</h3><h1 id="anViews">0</h1></div><div class="card"><h3>Premium Restaurants</h3><h1 id="anPremium">0</h1></div><div class="card"><h3>Active Restaurants</h3><h1 id="anActive">0</h1></div></div><div class="card" style="margin-top:12px"><div class="charts"><canvas id="analyticsChart"></canvas></div></div></div>
 <div id="reports" class="page"><div class="subpage-head"><h2>Reports</h2><button class="primary" onclick="exportRestaurantsCSV()">Export Restaurants CSV</button></div><div class="card"><div class="empty">Use the export button to download the current restaurant dataset. More report modules can be added without changing the public menu.</div></div></div>
 <div id="customers" class="page"><div class="subpage-head"><h2>Customers</h2></div><div class="card"><div class="empty">Customer data is shown here when a customer/analytics table is configured.</div></div></div>
@@ -191,12 +163,12 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
 const SUPABASE_URL='https://pfsrpowopbrevocwsuii.supabase.co';
 const SUPABASE_KEY='sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let session=null, restaurants=[], menuItems=[], profiles=[], subscriptions=[], plans=[], charts={};
+let session=null, restaurants=[], menuItems=[], profiles=[], subscriptions=[], charts={};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 function toast(m){$('toast').textContent=m;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2400)}
 function toggleSidebar(){$('sidebar').classList.toggle('open')}
-function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$(id)?.classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(innerWidth<800)$('sidebar').classList.remove('open');if(id==='restaurants')renderRestaurantPage();if(id==='owners')renderOwners();if(id==='menu')renderMenu();if(id==='categories')renderCategories();if(id==='approvals')renderApprovals();if(id==='subscriptions')renderSubscriptions();if(id==='plans')renderPlans();if(id==='admins')renderAdmins();if(id==='logs')renderLogs();if(id==='analytics')renderAnalytics();if(id==='qrManagement')loadQRs()}
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$(id)?.classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(innerWidth<800)$('sidebar').classList.remove('open');if(id==='restaurants')renderRestaurantPage();if(id==='owners')renderOwners();if(id==='menu')renderMenu();if(id==='categories')renderCategories();if(id==='approvals')renderApprovals();if(id==='subscriptions')renderSubscriptions();if(id==='admins')renderAdmins();if(id==='logs')renderLogs();if(id==='analytics')renderAnalytics();if(id==='qrManagement')loadQRs()}
 document.querySelectorAll('.nav button[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
 function closeModal(){$('modal').classList.remove('show')}
 $('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeModal()});
@@ -231,7 +203,6 @@ async function loadAll(){
   menuItems=await q('menu_items');
   profiles=await q('profiles');
   subscriptions=await q('subscriptions');
-  await loadPlans();
   updateStats();renderDashboardTable();renderCities();renderPopularCats();await renderActivity();populateRestaurantFilters();renderRestaurantPage();renderMenu();renderCategories();renderApprovals();renderSubscriptions();renderOwners();renderAdmins();await renderLogs();renderAnalytics();await loadSettings();await loadAdSettings();await loadMediaRules();await loadQRs();
  }catch(e){console.error('loadAll failed',e);toast('Dashboard refresh failed: '+(e?.message||e));}
 }
@@ -250,7 +221,7 @@ function renderDashboardTable(list=restaurants.slice(-5).reverse()){
 function pill(s){return `<span class="pill ${s==='active'?'green':s==='pending'?'orange':'red'}">● ${esc(s)}</span>`}
 function actionBtns(r){return `<div class="actions"><button class="iconbtn" title="Open Owner Panel (Super Admin)" aria-label="Open Owner Panel" onclick="openOwnerPanel('${r.id}')">🔑</button><button class="iconbtn" title="Public Menu" onclick="openPublic('${esc(r.slug)}')">👁</button><button class="iconbtn" onclick="openRestaurantModal('${r.id}')">✎</button><button class="iconbtn" onclick="setRestaurantStatus('${r.id}','${statusOf(r)==='blocked'?'active':'blocked'}')">${statusOf(r)==='blocked'?'✓':'⊘'}</button><button class="iconbtn" onclick="deleteRestaurant('${r.id}')">⋯</button></div>`}
 function openOwnerPanel(id){if(!session?.user?.id)return toast('Super Admin session expired. Please login again.');const url=`owner.html?admin_restaurant=${encodeURIComponent(id)}&admin=1`;window.open(url,'_blank','noopener,noreferrer')}
-function openPublic(slug){window.open(`menu.html?r=${encodeURIComponent(slug)}`,'_blank')}
+function openPublic(slug){window.open(`/menu/${encodeURIComponent(slug)}`,'_blank')}
 function renderCities(){
  const counts={};restaurants.forEach(r=>{const a=(r.address||'Unknown').split(',')[0].trim()||'Unknown';counts[a]=(counts[a]||0)+1});const arr=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5),max=arr[0]?.[1]||1;
  $('cities').innerHTML=arr.map(([n,v])=>`<div class="bar"><span style="width:72px">${esc(n)}</span><div class="barbg"><div class="barfg" style="width:${v/max*100}%"></div></div><b>${v}</b></div>`).join('')||'<div class="empty">No data</div>'
@@ -311,101 +282,7 @@ async function saveCategory(){const rid=$('cf_rest').value,n=$('cf_name').value.
 function renderApprovals(){const list=restaurants.filter(r=>statusOf(r)==='pending');$('approvalsTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Phone</th><th>Address</th><th>Action</th></tr></thead><tbody>${list.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.phone||'—')}</td><td>${esc(r.address||'—')}</td><td><button class="primary" onclick="setRestaurantStatus('${r.id}','active')">Approve</button> <button class="danger" onclick="setRestaurantStatus('${r.id}','blocked')">Reject</button></td></tr>`).join('')||'<tr><td colspan="4"><div class="empty">No pending approvals.</div></td></tr>'}</tbody></table>`}
 function renderOwners(){let list=profiles.filter(p=>p.role==='owner'||p.role==='restaurant_owner');const s=($('ownerSearch')?.value||'').toLowerCase();list=list.filter(p=>`${p.name} ${p.full_name} ${p.email}`.toLowerCase().includes(s));$('ownersTable').innerHTML=`<table class="table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Restaurants</th></tr></thead><tbody>${list.map(p=>`<tr><td>${esc(p.name||p.full_name||'—')}</td><td>${esc(p.email||'—')}</td><td>${esc(p.role)}</td><td>${restaurants.filter(r=>r.owner_id===p.id).length}</td></tr>`).join('')||'<tr><td colspan="4"><div class="empty">No owner profiles found or RLS is restricting profile rows.</div></td></tr>'}</tbody></table>`}
 $('ownerSearch')?.addEventListener('input',renderOwners);
-let editingPlanId=null;
-async function loadPlans(){
-  const r=await db.from('plans').select('*').order('sort_order',{ascending:true}).order('monthly_price',{ascending:true});
-  if(r.error){console.warn('plans load:',r.error.message);plans=[];if($('plansTable'))$('plansTable').innerHTML='<div class="empty">Plans table is not installed yet. Run the supplied freemenu-plans.sql file.</div>';return;}
-  plans=r.data||[];renderPlans();
-}
-function planFeaturesText(features){
-  if(!Array.isArray(features)) return '';
-  return features.map(x=>typeof x==='string'?x:(x?.text||'')).filter(Boolean).join('\n');
-}
-function renderPlans(){
-  if(!$('plansTable'))return;
-  $('plansTable').innerHTML=`<table class="table"><thead><tr><th>Order</th><th>Plan</th><th>Monthly</th><th>Setup Fee</th><th>QR Max</th><th>3D Dishes</th><th>Display</th><th>Actions</th></tr></thead><tbody>${plans.map(p=>`<tr><td><b>${esc(p.sort_order??0)}</b></td><td><b>${esc(p.name)}</b><br><small>${esc(p.slug)}</small>${p.badge_text?`<br><span class="pill blue" style="background:#eaf2ff;color:#175cd3">${esc(p.badge_text)}</span>`:''}</td><td><b>₹${Number(p.monthly_price||0).toLocaleString('en-IN')}</b></td><td>₹${Number(p.setup_fee||0).toLocaleString('en-IN')}</td><td>${p.qr_stickers_max==null?'—':esc(p.qr_stickers_max)}</td><td>${p.signature_3d_dishes_max==null?'—':esc(p.signature_3d_dishes_max)}</td><td>${p.is_active?pill('active'):`<span class="pill red">● inactive</span>`}${p.is_recommended?'<br><span class="pill" style="margin-top:4px;background:#eaf2ff;color:#175cd3">★ Recommended</span>':''}</td><td><div class="actions"><button class="iconbtn" onclick="openPlanModal('${p.id}')">✎ Edit</button><button class="iconbtn" onclick="togglePlanActive('${p.id}',${!p.is_active})">${p.is_active?'Disable':'Enable'}</button><button class="danger" onclick="deletePlan('${p.id}')">Delete</button></div></td></tr>`).join('')||'<tr><td colspan="8"><div class="empty">No plans configured.</div></td></tr>'}</tbody></table>`;
-}
-function openPlanModal(id=null){
-  editingPlanId=id||null; const p=id?plans.find(x=>x.id===id):null;
-  const features=planFeaturesText(p?.features);
-  modal(id?'Edit Plan':'Add Plan',`<div class="formgrid">
-    <div class="field"><label>Plan Name *</label><input id="pf_name" value="${esc(p?.name||'')}" placeholder="Growth (Photos)"></div>
-    <div class="field"><label>Plan Slug *</label><input id="pf_slug" value="${esc(p?.slug||'')}" placeholder="growth-photos"></div>
-    <div class="field"><label>Monthly Price (₹)</label><input id="pf_monthly" type="number" min="0" step="1" value="${Number(p?.monthly_price||0)}"></div>
-    <div class="field"><label>One-Time Setup Fee (₹)</label><input id="pf_setup" type="number" min="0" step="1" value="${Number(p?.setup_fee||0)}"></div>
-    <div class="field"><label>QR Stickers Maximum</label><input id="pf_qr" type="number" min="0" value="${p?.qr_stickers_max??''}" placeholder="10"></div>
-    <div class="field"><label>Signature 3D Dishes Maximum</label><input id="pf_3d" type="number" min="0" value="${p?.signature_3d_dishes_max??''}" placeholder="5"></div>
-    <div class="field"><label>Setup Fee Label</label><input id="pf_setup_label" value="${esc(p?.setup_fee_label||'One-Time')}" placeholder="One-Time"></div>
-    <div class="field"><label>Price Period Label</label><input id="pf_period" value="${esc(p?.period_label||'/ month')}" placeholder="/ month"></div>
-    <div class="field"><label>Badge / Ribbon Text</label><input id="pf_badge" value="${esc(p?.badge_text||'')}" placeholder="RECOMMENDED"></div>
-    <div class="field"><label>Button Text</label><input id="pf_button" value="${esc(p?.button_text||'')}" placeholder="Upgrade to Growth"></div>
-    <div class="field"><label>Display Order</label><input id="pf_order" type="number" value="${Number(p?.sort_order||0)}"></div>
-    <div class="field"><label>Plan Type</label><select id="pf_type"><option value="free" ${p?.plan_type==='free'?'selected':''}>Free</option><option value="paid" ${p?.plan_type!=='free'?'selected':''}>Paid</option></select></div>
-    <div class="field"><label>Active</label><select id="pf_active"><option value="true" ${p?.is_active!==false?'selected':''}>Visible / Active</option><option value="false" ${p?.is_active===false?'selected':''}>Hidden / Inactive</option></select></div>
-    <div class="field"><label>Recommended</label><select id="pf_recommended"><option value="false" ${!p?.is_recommended?'selected':''}>No</option><option value="true" ${p?.is_recommended?'selected':''}>Yes</option></select></div>
-    <div class="field full"><label>Short Description</label><input id="pf_desc" value="${esc(p?.description||'')}" placeholder="Best for restaurants that want photo menus"></div>
-    <div class="field full"><label>Features — one feature per line</label><textarea id="pf_features" style="min-height:150px" placeholder="5 QR Stickers\nFull HD Photos for all items\nVeg / Non-Veg / Egg Tags\nBestseller & Chef Special Badges\nWhatsApp Menu Sharing">${esc(features)}</textarea><small style="color:#667085">Use exactly the text you want customers to see on plans.html. Prefixing is not required; the pricing page can render each line as a check item.</small></div>
-  </div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="savePlan()">Save Plan</button></div>`);
-}
-async function savePlan(){
-  const name=$('pf_name').value.trim(),slug=$('pf_slug').value.trim().toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-+|-+$/g,'');
-  if(!name||!slug)return toast('Plan name and slug are required.');
-  const features=$('pf_features').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(text=>({text,enabled:true}));
-  const payload={name,slug,monthly_price:Number($('pf_monthly').value||0),setup_fee:Number($('pf_setup').value||0),qr_stickers_max:$('pf_qr').value===''?null:Number($('pf_qr').value),signature_3d_dishes_max:$('pf_3d').value===''?null:Number($('pf_3d').value),setup_fee_label:$('pf_setup_label').value.trim()||'One-Time',period_label:$('pf_period').value.trim()||'/ month',badge_text:$('pf_badge').value.trim()||null,button_text:$('pf_button').value.trim()||null,sort_order:Number($('pf_order').value||0),plan_type:$('pf_type').value,is_active:$('pf_active').value==='true',is_recommended:$('pf_recommended').value==='true',description:$('pf_desc').value.trim()||null,features,updated_at:new Date().toISOString(),updated_by:session.user.id};
-  const r=editingPlanId?await db.from('plans').update(payload).eq('id',editingPlanId):await db.from('plans').insert(payload);
-  if(r.error)return toast('Plan save failed: '+r.error.message);
-  await logAction(`${editingPlanId?'Updated':'Created'} plan ${name}`);closeModal();await loadPlans();toast('Plan saved');
-}
-async function togglePlanActive(id,next){const p=plans.find(x=>x.id===id);const r=await db.from('plans').update({is_active:next,updated_at:new Date().toISOString(),updated_by:session.user.id}).eq('id',id);if(r.error)return toast(r.error.message);await logAction(`${next?'Enabled':'Disabled'} plan ${p?.name||id}`);await loadPlans();toast(next?'Plan enabled':'Plan disabled')}
-async function deletePlan(id){const p=plans.find(x=>x.id===id);if(!confirm(`Delete ${p?.name||'this plan'}?`))return;const r=await db.from('plans').delete().eq('id',id);if(r.error)return toast('Delete failed: '+r.error.message);await logAction(`Deleted plan ${p?.name||id}`);await loadPlans();toast('Plan deleted')}
-
-function renderSubscriptions(){
-  if(!$('subsTable'))return;
-  const search=($('planAssignmentSearch')?.value||'').toLowerCase().trim();
-  const activePlans=plans.filter(p=>p.is_active);
-  if($('assignPlanRestaurant')){
-    const current=$('assignPlanRestaurant').value;
-    $('assignPlanRestaurant').innerHTML='<option value="">Select restaurant...</option>'+restaurants.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}${r.phone?' — '+esc(r.phone):''}</option>`).join('');
-    if(restaurants.some(r=>r.id===current))$('assignPlanRestaurant').value=current;
-  }
-  if($('assignPlanSelect')){
-    const current=$('assignPlanSelect').value;
-    $('assignPlanSelect').innerHTML='<option value="">Select plan...</option>'+activePlans.map(p=>`<option value="${esc(p.id)}">${esc(p.name)} — ₹${Number(p.monthly_price||0).toLocaleString('en-IN')}/month</option>`).join('');
-    if(activePlans.some(p=>p.id===current))$('assignPlanSelect').value=current;
-  }
-  const list=restaurants.filter(r=>`${r.name} ${r.phone||''} ${r.slug||''}`.toLowerCase().includes(search));
-  $('subsTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Current Plan</th><th>Price</th><th>Plan Status</th><th>Assigned</th><th>Action</th></tr></thead><tbody>${list.map(r=>{const p=plans.find(x=>x.id===r.plan_id);return `<tr><td><b>${esc(r.name)}</b><br><small>${esc(r.phone||r.slug||'')}</small></td><td>${p?`<b>${esc(p.name)}</b><br><small>${esc(p.slug)}</small>`:'<span style="color:#98a2b3">Not Assigned</span>'}</td><td>${p?'₹'+Number(p.monthly_price||0).toLocaleString('en-IN'):'—'}</td><td>${p?pill(p.is_active?'active':'blocked'):'<span class="pill orange">● unassigned</span>'}</td><td>${r.plan_assigned_at?fmt(r.plan_assigned_at,true):'—'}</td><td><button class="iconbtn" onclick="openAssignRestaurantPlan('${r.id}')">Assign / Change</button>${p?` <button class="danger" onclick="removeRestaurantPlan('${r.id}')">Remove</button>`:''}</td></tr>`}).join('')||'<tr><td colspan="6"><div class="empty">No restaurants found.</div></td></tr>'}</tbody></table>`;
-}
-function openAssignRestaurantPlan(rid){
-  const r=restaurants.find(x=>x.id===rid); if(!r)return;
-  const current=plans.find(p=>p.id===r.plan_id);
-  modal('Assign Plan to Restaurant',`<div class="notice"><b>${esc(r.name)}</b><br>Current plan: <b>${esc(current?.name||'Not Assigned')}</b></div><div class="field"><label>Select Plan</label><select id="modalAssignPlan">${plans.filter(p=>p.is_active).map(p=>`<option value="${esc(p.id)}" ${p.id===r.plan_id?'selected':''}>${esc(p.name)} — ₹${Number(p.monthly_price||0).toLocaleString('en-IN')}/month</option>`).join('')}</select></div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveRestaurantPlan('${r.id}')">Save Plan</button></div>`);
-}
-async function assignRestaurantPlan(){
-  const rid=$('assignPlanRestaurant')?.value,pid=$('assignPlanSelect')?.value;
-  if(!rid||!pid)return toast('Restaurant aur plan select karein.');
-  await saveRestaurantPlan(rid,pid);
-}
-async function saveRestaurantPlan(rid,pidOverride=null){
-  const pid=pidOverride||$('modalAssignPlan')?.value;
-  if(!rid||!pid)return toast('Plan select karein.');
-  const plan=plans.find(p=>p.id===pid),restaurant=restaurants.find(r=>r.id===rid);
-  if(!plan)return toast('Selected plan not found.');
-  const r=await db.from('restaurants').update({plan_id:pid,plan_assigned_at:new Date().toISOString(),plan_assigned_by:session.user.id}).eq('id',rid);
-  if(r.error)return toast('Plan assignment failed: '+r.error.message);
-  await logAction(`Assigned plan ${plan.name} to ${restaurant?.name||rid}`,rid);
-  closeModal();
-  await loadAll();
-  toast(`${plan.name} assigned to ${restaurant?.name||'restaurant'}`);
-}
-async function removeRestaurantPlan(rid){
-  const restaurant=restaurants.find(r=>r.id===rid); if(!restaurant)return;
-  if(!confirm(`Remove the current plan from ${restaurant.name}?`))return;
-  const r=await db.from('restaurants').update({plan_id:null,plan_assigned_at:null,plan_assigned_by:null}).eq('id',rid);
-  if(r.error)return toast('Could not remove plan: '+r.error.message);
-  await logAction(`Removed restaurant plan from ${restaurant.name}`,rid);
-  await loadAll();toast('Plan removed');
-}
+function renderSubscriptions(){$('subsTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Plan</th><th>Status</th><th>Amount</th><th>Start</th><th>Expiry</th></tr></thead><tbody>${subscriptions.map(s=>{const r=restaurants.find(x=>x.id===s.restaurant_id);return `<tr><td>${esc(r?.name||s.restaurant_id)}</td><td>${esc(s.plan||'free')}</td><td>${pill(s.status||'pending')}</td><td>₹${Number(s.amount||0).toLocaleString('en-IN')}</td><td>${fmt(s.start_date)}</td><td>${fmt(s.expiry_date)}</td></tr>`}).join('')||'<tr><td colspan="6"><div class="empty">No subscriptions table/data yet.</div></td></tr>'}</tbody></table>`}
 function renderAdmins(){const list=profiles.filter(p=>p.role==='admin');$('adminsTable').innerHTML=`<table class="table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>ID</th></tr></thead><tbody>${list.map(p=>`<tr><td>${esc(p.name||p.full_name||'Super Admin')}</td><td>${esc(p.email||'—')}</td><td>${esc(p.role)}</td><td>${esc(p.id)}</td></tr>`).join('')}</tbody></table>`}
 async function renderLogs(){const logs=await q('activity_logs');$('logsTable').innerHTML=`<table class="table"><thead><tr><th>Time</th><th>Action</th><th>Admin</th><th>Restaurant</th></tr></thead><tbody>${(logs||[]).slice().reverse().map(l=>`<tr><td>${fmt(l.created_at,true)}</td><td>${esc(l.action||l.description)}</td><td>${esc(l.admin_id||'—')}</td><td>${esc(l.restaurant_id||'—')}</td></tr>`).join('')||'<tr><td colspan="4"><div class="empty">No logs yet.</div></td></tr>'}</tbody></table>`}
 function fmt(x,time=false){return x?new Date(x).toLocaleString('en-IN',{dateStyle:'medium',...(time?{timeStyle:'short'}:{})}):'—'}
@@ -469,7 +346,7 @@ function renderQRs(){
   const list=qrCodes.filter(x=>{const r=restaurants.find(y=>y.id===x.restaurant_id);const hay=`${x.code} ${x.label||''} ${r?.name||''}`.toLowerCase();return (!q||hay.includes(q))&&(!st||x.status===st)&&(!rid||x.restaurant_id===rid)});
   $('qrTotal').textContent=qrCodes.length;$('qrAvailable').textContent=qrCodes.filter(x=>x.status==='available').length;$('qrAssigned').textContent=qrCodes.filter(x=>x.status==='assigned').length;
   $('qrRestaurantFilter').innerHTML='<option value="">All Restaurants</option>'+restaurants.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}</option>`).join('');
-  $('qrTable').innerHTML=`<table class="table"><thead><tr><th>QR ID</th><th>Status</th><th>Restaurant</th><th>Label</th><th>Action</th></tr></thead><tbody>${list.map(x=>{const r=restaurants.find(y=>y.id===x.restaurant_id);return `<tr><td><b>${esc(x.code)}</b></td><td>${pill(x.status||'available')}</td><td>${esc(r?.name||'—')}</td><td>${esc(x.label||'—')}</td><td><div style="display:flex;gap:6px;flex-wrap:wrap">${x.status==='assigned'?`<button class="iconbtn" onclick="unassignQR('${x.id}')">Unassign</button>`:`<button class="iconbtn" onclick="openAssignQR('${x.id}')">Assign</button>`}<button class="iconbtn" onclick="printSingleQR('${x.id}')">🖨 Print QR</button></div></td></tr>`}).join('')||'<tr><td colspan="5"><div class="empty">No QR codes found.</div></td></tr>'}</tbody></table>`;
+  $('qrTable').innerHTML=`<table class="table"><thead><tr><th>QR ID</th><th>Status</th><th>Restaurant</th><th>Label</th><th>Action</th></tr></thead><tbody>${list.map(x=>{const r=restaurants.find(y=>y.id===x.restaurant_id);return `<tr><td><b>${esc(x.code)}</b></td><td>${pill(x.status||'available')}</td><td>${esc(r?.name||'—')}</td><td>${esc(x.label||'—')}</td><td>${x.status==='assigned'?`<button class="iconbtn" onclick="openQRPage('${x.code}')">View / Print</button> <button class="iconbtn" onclick="unassignQR('${x.id}')">Unassign</button>`:`<button class="iconbtn" onclick="openQRPage('${x.code}')">View QR</button> <button class="iconbtn" onclick="openAssignQR('${x.id}')">Assign</button>`}</td></tr>`}).join('')||'<tr><td colspan="5"><div class="empty">No QR codes found.</div></td></tr>'}</tbody></table>`;
 }
 async function generateQRBatch(n=100){
   if(!confirm(`Generate the next ${n} QR codes?`))return;
@@ -489,70 +366,11 @@ async function assignQR(id){
 }
 async function unassignQR(id){if(!confirm('Unassign this QR? It will become available again.'))return;const x=qrCodes.find(q=>q.id===id);const r=await db.from('qr_codes').update({restaurant_id:null,label:null,status:'available',assigned_at:null,assigned_by:null}).eq('id',id);if(r.error)return toast(r.error.message);await logAction('Unassigned QR '+(x?.code||''));await loadQRs();toast('QR is available again')}
 function qrTargetURL(code){return new URL('/qr.html?code='+encodeURIComponent(code),location.origin).href}
-
-function printSingleQR(id){
-  const x=qrCodes.find(q=>q.id===id);
-  if(!x)return toast('QR code not found.');
-  renderPrintQR([x], 'FreeMenu QR Code');
+function openQRPage(code){
+  const url=qrTargetURL(code);
+  const w=window.open(url,'_blank');
+  if(!w) toast('Please allow pop-ups to open the QR page.');
 }
-
-async function printAvailableQRs(){
-  const available=qrCodes.filter(x=>String(x.status||'available').toLowerCase()==='available');
-  if(!available.length)return toast('No available QR codes. Generate the next 100 first.');
-  await renderPrintQR(available,'FreeMenu QR Codes');
-}
-
-async function renderPrintQR(items,title){
-  const w=window.open('','_blank');
-  if(!w)return toast('Please allow pop-ups for printing QR codes.');
-  const payload=items.map(x=>({id:x.id,code:x.code,url:qrTargetURL(x.code)}));
-  const cards=payload.map(x=>`
-    <div class="qr-card">
-      <div class="badge">
-        <div class="scan"><span>SCAN FOR</span><strong>MENU</strong></div>
-        <div class="food-icon left">♜</div>
-        <div class="food-icon right">◖</div>
-        <div class="qr-circle"><div class="qrbox" id="qr-${x.id}"></div></div>
-        <div class="brand"><span>Free</span><b>Menu</b><i>.in</i></div>
-      </div>
-    </div>`).join('');
-
-  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title>
-<style>
-*{box-sizing:border-box}
-body{font-family:Arial,Helvetica,sans-serif;margin:8mm;color:#111;background:#fff}
-.head{text-align:center;margin-bottom:7mm}.head h2{margin:0 0 2mm;font-size:21px}.head p{margin:0;color:#666;font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7mm}
-.qr-card{display:flex;justify-content:center;break-inside:avoid}
-.badge{width:210px;height:210px;border-radius:50%;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 42%,#171717 0 62%,#080808 63% 100%);border:5px solid #d9a928;box-shadow:inset 0 0 0 3px #2a2a2a,0 2px 0 #8b6414;text-align:center;color:#fff}
-.badge:before{content:"";position:absolute;inset:5px;border:2px solid #f4c94f;border-radius:50%;pointer-events:none}
-.scan{position:absolute;top:13px;left:0;right:0;z-index:3;text-align:center;line-height:1}
-.scan span{display:block;font-size:13px;font-weight:800;letter-spacing:.8px;color:#fff}
-.scan strong{display:block;margin-top:3px;font-size:27px;letter-spacing:.8px;color:#f5c642;text-shadow:0 1px 0 #8b6414}
-.qr-circle{position:absolute;left:50%;top:70px;transform:translateX(-50%);width:112px;height:112px;border-radius:50%;background:#fff;border:4px solid #d9a928;display:grid;place-items:center;z-index:2}
-.qrbox{width:98px;height:98px;display:grid;place-items:center}.qrbox svg{display:block!important;width:98px!important;height:98px!important}
-.brand{position:absolute;left:50%;bottom:19px;transform:translateX(-50%);z-index:4;white-space:nowrap;font-size:18px;font-weight:900;letter-spacing:-.6px;text-shadow:0 1px 0 #111}
-.brand:before{content:"";position:absolute;left:50%;top:-5px;transform:translateX(-50%);width:132px;height:25px;border-radius:7px;background:#f2c33e;z-index:-1;box-shadow:0 1px 0 #8b6414}
-.brand span{color:#111}.brand b{color:#111}.brand i{font-style:normal;color:#fff}
-.food-icon{position:absolute;color:#f2c33e;font-size:31px;z-index:1;top:83px;font-weight:700}.food-icon.left{left:19px;transform:rotate(90deg)}.food-icon.right{right:20px;transform:rotate(-25deg)}
-@media print{body{margin:6mm}.grid{gap:5mm}.badge{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
-</style></head><body>
-<div class="head"><h2>${title}</h2><p>${payload.length} QR code${payload.length===1?'':'s'}</p></div>
-<div class="grid">${cards}</div>
-<script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.9.2/lib/qr-code-styling.js"><\/script>
-<script>
-const data=${JSON.stringify(payload)};
-window.onload=()=>{
- data.forEach(x=>{
-  const q=new QRCodeStyling({width:98,height:98,type:'svg',data:x.url,margin:0,qrOptions:{errorCorrectionLevel:'H'},dotsOptions:{type:'dots',color:'#000000'},cornersSquareOptions:{type:'dot',color:'#000000'},cornersDotOptions:{type:'dot',color:'#000000'},backgroundOptions:{color:'#ffffff'}});
-  q.append(document.getElementById('qr-'+x.id));
- });
- setTimeout(()=>window.print(),1200);
-};
-<\/script></body></html>`);
-  w.document.close();
-}
-
 $('qrSearch')?.addEventListener('input',renderQRs);$('qrStatus')?.addEventListener('change',renderQRs);$('qrRestaurantFilter')?.addEventListener('change',renderQRs);
 function exportRestaurantsCSV(){const rows=[['id','name','slug','phone','address','status'],...restaurants.map(r=>[r.id,r.name,r.slug,r.phone,r.address,statusOf(r)])];const csv=rows.map(row=>row.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='freemenu-restaurants.csv';a.click()}
 async function logout(){await db.auth.signOut();location.reload()}
