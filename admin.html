@@ -152,7 +152,25 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
   <div class="card"><div id="plansTable" class="tablewrap"></div></div>
   <div class="card" style="margin-top:12px"><div class="card-head"><h3>Plan Control Rules</h3></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:11px;color:#475467"><div><b>Pricing</b><br>Monthly price + one-time setup fee</div><div><b>Limits</b><br>QR stickers + 3D signature dishes</div><div><b>Display</b><br>Active, recommended, order, badge, button</div></div></div>
 </div>
-<div id="subscriptions" class="page"><div class="subpage-head"><h2>Subscriptions</h2></div><div class="card"><div id="subsTable" class="tablewrap"></div></div></div>
+<div id="subscriptions" class="page">
+  <div class="subpage-head">
+    <div><h2>Subscriptions & Plan Assignment</h2><p style="color:#667085;margin:4px 0 0">Manually assign a plan to any restaurant, just like QR assignment.</p></div>
+    <div class="toolbar"><button class="iconbtn" onclick="loadAll()">↻ Refresh</button></div>
+  </div>
+  <div class="notice"><b>Manual assignment:</b> Select a restaurant, choose an active plan from the dropdown, and save. The selected plan is stored directly on that restaurant.</div>
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-head"><h3>Assign Restaurant Plan</h3></div>
+    <div class="formgrid">
+      <div class="field"><label>Restaurant</label><select id="assignPlanRestaurant"></select></div>
+      <div class="field"><label>Plan</label><select id="assignPlanSelect"></select></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="primary" onclick="assignRestaurantPlan()">Assign Plan</button></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>Restaurant Plan Assignments</h3><input class="input" id="planAssignmentSearch" placeholder="Search restaurant..." oninput="renderSubscriptions()"></div>
+    <div id="subsTable" class="tablewrap"></div>
+  </div>
+</div>
 <div id="analytics" class="page"><div class="subpage-head"><h2>Analytics</h2></div><div class="grid3"><div class="card"><h3>Total Menu Views</h3><h1 id="anViews">0</h1></div><div class="card"><h3>Premium Restaurants</h3><h1 id="anPremium">0</h1></div><div class="card"><h3>Active Restaurants</h3><h1 id="anActive">0</h1></div></div><div class="card" style="margin-top:12px"><div class="charts"><canvas id="analyticsChart"></canvas></div></div></div>
 <div id="reports" class="page"><div class="subpage-head"><h2>Reports</h2><button class="primary" onclick="exportRestaurantsCSV()">Export Restaurants CSV</button></div><div class="card"><div class="empty">Use the export button to download the current restaurant dataset. More report modules can be added without changing the public menu.</div></div></div>
 <div id="customers" class="page"><div class="subpage-head"><h2>Customers</h2></div><div class="card"><div class="empty">Customer data is shown here when a customer/analytics table is configured.</div></div></div>
@@ -341,7 +359,53 @@ async function savePlan(){
 async function togglePlanActive(id,next){const p=plans.find(x=>x.id===id);const r=await db.from('plans').update({is_active:next,updated_at:new Date().toISOString(),updated_by:session.user.id}).eq('id',id);if(r.error)return toast(r.error.message);await logAction(`${next?'Enabled':'Disabled'} plan ${p?.name||id}`);await loadPlans();toast(next?'Plan enabled':'Plan disabled')}
 async function deletePlan(id){const p=plans.find(x=>x.id===id);if(!confirm(`Delete ${p?.name||'this plan'}?`))return;const r=await db.from('plans').delete().eq('id',id);if(r.error)return toast('Delete failed: '+r.error.message);await logAction(`Deleted plan ${p?.name||id}`);await loadPlans();toast('Plan deleted')}
 
-function renderSubscriptions(){$('subsTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Plan</th><th>Status</th><th>Amount</th><th>Start</th><th>Expiry</th></tr></thead><tbody>${subscriptions.map(s=>{const r=restaurants.find(x=>x.id===s.restaurant_id);return `<tr><td>${esc(r?.name||s.restaurant_id)}</td><td>${esc(s.plan||'free')}</td><td>${pill(s.status||'pending')}</td><td>₹${Number(s.amount||0).toLocaleString('en-IN')}</td><td>${fmt(s.start_date)}</td><td>${fmt(s.expiry_date)}</td></tr>`}).join('')||'<tr><td colspan="6"><div class="empty">No subscriptions table/data yet.</div></td></tr>'}</tbody></table>`}
+function renderSubscriptions(){
+  if(!$('subsTable'))return;
+  const search=($('planAssignmentSearch')?.value||'').toLowerCase().trim();
+  const activePlans=plans.filter(p=>p.is_active);
+  if($('assignPlanRestaurant')){
+    const current=$('assignPlanRestaurant').value;
+    $('assignPlanRestaurant').innerHTML='<option value="">Select restaurant...</option>'+restaurants.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}${r.phone?' — '+esc(r.phone):''}</option>`).join('');
+    if(restaurants.some(r=>r.id===current))$('assignPlanRestaurant').value=current;
+  }
+  if($('assignPlanSelect')){
+    const current=$('assignPlanSelect').value;
+    $('assignPlanSelect').innerHTML='<option value="">Select plan...</option>'+activePlans.map(p=>`<option value="${esc(p.id)}">${esc(p.name)} — ₹${Number(p.monthly_price||0).toLocaleString('en-IN')}/month</option>`).join('');
+    if(activePlans.some(p=>p.id===current))$('assignPlanSelect').value=current;
+  }
+  const list=restaurants.filter(r=>`${r.name} ${r.phone||''} ${r.slug||''}`.toLowerCase().includes(search));
+  $('subsTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Current Plan</th><th>Price</th><th>Plan Status</th><th>Assigned</th><th>Action</th></tr></thead><tbody>${list.map(r=>{const p=plans.find(x=>x.id===r.plan_id);return `<tr><td><b>${esc(r.name)}</b><br><small>${esc(r.phone||r.slug||'')}</small></td><td>${p?`<b>${esc(p.name)}</b><br><small>${esc(p.slug)}</small>`:'<span style="color:#98a2b3">Not Assigned</span>'}</td><td>${p?'₹'+Number(p.monthly_price||0).toLocaleString('en-IN'):'—'}</td><td>${p?pill(p.is_active?'active':'blocked'):'<span class="pill orange">● unassigned</span>'}</td><td>${r.plan_assigned_at?fmt(r.plan_assigned_at,true):'—'}</td><td><button class="iconbtn" onclick="openAssignRestaurantPlan('${r.id}')">Assign / Change</button>${p?` <button class="danger" onclick="removeRestaurantPlan('${r.id}')">Remove</button>`:''}</td></tr>`}).join('')||'<tr><td colspan="6"><div class="empty">No restaurants found.</div></td></tr>'}</tbody></table>`;
+}
+function openAssignRestaurantPlan(rid){
+  const r=restaurants.find(x=>x.id===rid); if(!r)return;
+  const current=plans.find(p=>p.id===r.plan_id);
+  modal('Assign Plan to Restaurant',`<div class="notice"><b>${esc(r.name)}</b><br>Current plan: <b>${esc(current?.name||'Not Assigned')}</b></div><div class="field"><label>Select Plan</label><select id="modalAssignPlan">${plans.filter(p=>p.is_active).map(p=>`<option value="${esc(p.id)}" ${p.id===r.plan_id?'selected':''}>${esc(p.name)} — ₹${Number(p.monthly_price||0).toLocaleString('en-IN')}/month</option>`).join('')}</select></div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveRestaurantPlan('${r.id}')">Save Plan</button></div>`);
+}
+async function assignRestaurantPlan(){
+  const rid=$('assignPlanRestaurant')?.value,pid=$('assignPlanSelect')?.value;
+  if(!rid||!pid)return toast('Restaurant aur plan select karein.');
+  await saveRestaurantPlan(rid,pid);
+}
+async function saveRestaurantPlan(rid,pidOverride=null){
+  const pid=pidOverride||$('modalAssignPlan')?.value;
+  if(!rid||!pid)return toast('Plan select karein.');
+  const plan=plans.find(p=>p.id===pid),restaurant=restaurants.find(r=>r.id===rid);
+  if(!plan)return toast('Selected plan not found.');
+  const r=await db.from('restaurants').update({plan_id:pid,plan_assigned_at:new Date().toISOString(),plan_assigned_by:session.user.id}).eq('id',rid);
+  if(r.error)return toast('Plan assignment failed: '+r.error.message);
+  await logAction(`Assigned plan ${plan.name} to ${restaurant?.name||rid}`,rid);
+  closeModal();
+  await loadAll();
+  toast(`${plan.name} assigned to ${restaurant?.name||'restaurant'}`);
+}
+async function removeRestaurantPlan(rid){
+  const restaurant=restaurants.find(r=>r.id===rid); if(!restaurant)return;
+  if(!confirm(`Remove the current plan from ${restaurant.name}?`))return;
+  const r=await db.from('restaurants').update({plan_id:null,plan_assigned_at:null,plan_assigned_by:null}).eq('id',rid);
+  if(r.error)return toast('Could not remove plan: '+r.error.message);
+  await logAction(`Removed restaurant plan from ${restaurant.name}`,rid);
+  await loadAll();toast('Plan removed');
+}
 function renderAdmins(){const list=profiles.filter(p=>p.role==='admin');$('adminsTable').innerHTML=`<table class="table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>ID</th></tr></thead><tbody>${list.map(p=>`<tr><td>${esc(p.name||p.full_name||'Super Admin')}</td><td>${esc(p.email||'—')}</td><td>${esc(p.role)}</td><td>${esc(p.id)}</td></tr>`).join('')}</tbody></table>`}
 async function renderLogs(){const logs=await q('activity_logs');$('logsTable').innerHTML=`<table class="table"><thead><tr><th>Time</th><th>Action</th><th>Admin</th><th>Restaurant</th></tr></thead><tbody>${(logs||[]).slice().reverse().map(l=>`<tr><td>${fmt(l.created_at,true)}</td><td>${esc(l.action||l.description)}</td><td>${esc(l.admin_id||'—')}</td><td>${esc(l.restaurant_id||'—')}</td></tr>`).join('')||'<tr><td colspan="4"><div class="empty">No logs yet.</div></td></tr>'}</tbody></table>`}
 function fmt(x,time=false){return x?new Date(x).toLocaleString('en-IN',{dateStyle:'medium',...(time?{timeStyle:'short'}:{})}):'—'}
