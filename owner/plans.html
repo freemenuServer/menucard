@@ -3,364 +3,364 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Subscription & Upgrade Plans - FreeMenu</title>
+  <title>Plans & Pricing — FreeMenu.in</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
-    :root {
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --border-color: #e2e8f0;
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --accent: #10b981;
+    *{box-sizing:border-box}
+    :root{
+      --bg:#08090b;
+      --card:#111317;
+      --card2:#15171c;
+      --border:#252932;
+      --text:#f5f5f5;
+      --muted:#9da3ae;
+      --red:#ef3340;
+      --red2:#ff5964;
+      --green:#36d399;
+      --shadow:0 20px 60px rgba(0,0,0,.35);
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    body{
+      margin:0;
+      min-height:100vh;
+      background:
+        radial-gradient(circle at 50% -10%,rgba(239,51,64,.13),transparent 34%),
+        var(--bg);
+      color:var(--text);
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
     }
-
-    body {
-      background-color: var(--bg);
-      color: var(--text-main);
-      padding: 24px 16px 60px;
+    a{text-decoration:none;color:inherit}
+    .wrap{max-width:1250px;margin:auto;padding:34px 20px 60px}
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;
+      gap:15px;margin-bottom:45px
     }
-
-    .container {
-      max-width: 1180px;
-      margin: 0 auto;
+    .brand{font-size:25px;font-weight:850;letter-spacing:-.7px}
+    .brand span{color:var(--red)}
+    .back{
+      border:1px solid var(--border);background:#101216;color:#fff;
+      padding:10px 16px;border-radius:11px;font-weight:700;font-size:14px
     }
-
-    /* Navigation Bar */
-    .top-nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
+    .back:hover{border-color:#3a3f49;background:#17191e}
+    .hero{text-align:center;max-width:760px;margin:0 auto 42px}
+    .eyebrow{
+      display:inline-flex;align-items:center;gap:7px;
+      color:#ff737c;background:rgba(239,51,64,.10);
+      border:1px solid rgba(239,51,64,.22);
+      padding:7px 12px;border-radius:999px;
+      font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase
     }
-
-    .btn-back {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      text-decoration: none;
-      color: var(--text-main);
-      background: #ffffff;
-      border: 1px solid var(--border-color);
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      transition: all 0.2s;
+    h1{
+      margin:16px 0 10px;font-size:clamp(34px,5vw,55px);
+      line-height:1.03;letter-spacing:-2px
     }
-
-    .btn-back:hover {
-      background: #f1f5f9;
+    .hero p{margin:0;color:var(--muted);font-size:16px;line-height:1.65}
+    #status{text-align:center;color:var(--muted);font-size:14px;margin:25px 0}
+    .plans{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:18px;
+      align-items:stretch;
     }
-
-    /* Page Header */
-    .header-section {
-      text-align: center;
-      margin-bottom: 36px;
+    .plan{
+      position:relative;display:flex;flex-direction:column;
+      background:linear-gradient(180deg,#15171c 0%,#101216 100%);
+      border:1px solid var(--border);border-radius:20px;
+      padding:25px;min-width:0;box-shadow:var(--shadow);
+      overflow:hidden
     }
-
-    .header-section h1 {
-      font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      margin-bottom: 8px;
+    .plan.recommended{
+      border-color:rgba(239,51,64,.72);
+      box-shadow:0 22px 70px rgba(239,51,64,.12)
     }
-
-    .header-section p {
-      color: var(--text-muted);
-      font-size: 15px;
+    .ribbon{
+      position:absolute;top:14px;right:14px;
+      background:var(--red);color:white;border-radius:999px;
+      padding:6px 10px;font-size:10px;font-weight:900;letter-spacing:.5px
     }
-
-    /* Pricing Cards Grid */
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
-      align-items: stretch;
+    .plan-name{font-size:22px;font-weight:850;margin-bottom:7px;padding-right:70px}
+    .desc{font-size:13px;line-height:1.55;color:var(--muted);min-height:42px}
+    .price-row{display:flex;align-items:flex-end;gap:6px;margin:22px 0 5px}
+    .currency{font-size:21px;font-weight:800;margin-bottom:6px}
+    .price{font-size:44px;font-weight:900;line-height:.95;letter-spacing:-1.5px}
+    .period{font-size:13px;color:var(--muted);margin-bottom:5px}
+    .setup{
+      font-size:12px;color:#c5c9d1;
+      background:#0c0e11;border:1px solid #22252b;
+      border-radius:9px;padding:9px 10px;margin-bottom:19px
     }
-
-    .plan-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: relative;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
-      transition: transform 0.2s, box-shadow 0.2s;
+    .setup strong{color:#fff}
+    .features{
+      list-style:none;padding:0;margin:0 0 22px;
+      display:flex;flex-direction:column;gap:12px;flex:1
     }
-
-    .plan-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+    .features li{
+      display:flex;gap:9px;align-items:flex-start;
+      color:#d9dce2;font-size:13px;line-height:1.45
     }
-
-    .plan-card.popular {
-      border: 2px solid var(--primary);
+    .check{
+      flex:0 0 auto;width:19px;height:19px;border-radius:50%;
+      display:grid;place-items:center;background:rgba(54,211,153,.12);
+      color:var(--green);font-size:12px;font-weight:900;margin-top:1px
     }
-
-    .popular-badge {
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--primary);
-      color: #ffffff;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 14px;
-      border-radius: 20px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
+    .disabled{opacity:.38;text-decoration:line-through}
+    .disabled .check{background:#24272d;color:#747983}
+    .plan-btn{
+      width:100%;border:0;border-radius:12px;
+      padding:13px 15px;font-size:14px;font-weight:850;
+      cursor:pointer;background:var(--red);color:white;
+      transition:.18s transform,.18s background
     }
-
-    .plan-name {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 12px;
+    .plan-btn:hover{background:var(--red2);transform:translateY(-1px)}
+    .plan.free .plan-btn{background:#252930}
+    .plan.free .plan-btn:hover{background:#30353e}
+    .empty{
+      grid-column:1/-1;text-align:center;padding:45px 20px;
+      border:1px dashed #30343c;border-radius:16px;color:var(--muted)
     }
-
-    /* Price Displays */
-    .price-block {
-      margin-bottom: 14px;
+    .footer{
+      text-align:center;color:#6f747e;font-size:12px;margin-top:42px
     }
-
-    .monthly-rate {
-      font-size: 32px;
-      font-weight: 900;
-      line-height: 1;
+    .toast{
+      position:fixed;left:50%;bottom:25px;transform:translate(-50%,20px);
+      background:#171a20;border:1px solid #30343d;color:#fff;
+      border-radius:12px;padding:12px 16px;font-size:13px;
+      opacity:0;pointer-events:none;transition:.22s;z-index:50
     }
-
-    .monthly-rate span {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-muted);
+    .toast.show{opacity:1;transform:translate(-50%,0)}
+    @media(max-width:1050px){
+      .plans{grid-template-columns:repeat(2,minmax(0,1fr))}
     }
-
-    .setup-rate {
-      display: inline-block;
-      margin-top: 8px;
-      background: #f1f5f9;
-      color: #334155;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 6px;
-    }
-
-    .setup-rate.highlight {
-      background: #eff6ff;
-      color: var(--primary);
-    }
-
-    /* Feature List */
-    .feature-list {
-      list-style: none;
-      margin: 20px 0 24px;
-      font-size: 13.5px;
-      color: #334155;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .feature-list li {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      line-height: 1.4;
-    }
-
-    .feature-list li::before {
-      content: "✓";
-      color: var(--accent);
-      font-weight: 800;
-    }
-
-    .qr-pill {
-      background: #e0f2fe;
-      color: #0369a1;
-      font-weight: 700;
-      padding: 1px 6px;
-      border-radius: 4px;
-      font-size: 12px;
-    }
-
-    /* Action Buttons */
-    .btn-action {
-      display: block;
-      width: 100%;
-      text-align: center;
-      padding: 12px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 700;
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-
-    .btn-current {
-      background: #f1f5f9;
-      color: var(--text-muted);
-      border: 1px solid var(--border-color);
-      cursor: default;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: #ffffff;
-      border: 1px solid var(--primary);
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-hover);
-    }
-
-    .btn-outline {
-      background: transparent;
-      border: 1.5px solid var(--primary);
-      color: var(--primary);
-    }
-
-    .btn-outline:hover {
-      background: #eff6ff;
-    }
-
-    .note-box {
-      margin-top: 40px;
-      background: #ffffff;
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 16px 20px;
-      text-align: center;
-      font-size: 13px;
-      color: var(--text-muted);
+    @media(max-width:600px){
+      .wrap{padding:22px 14px 40px}
+      .topbar{margin-bottom:32px}
+      .brand{font-size:21px}
+      .back{padding:9px 12px}
+      .hero{margin-bottom:28px}
+      h1{letter-spacing:-1.2px}
+      .plans{grid-template-columns:1fr}
+      .plan{padding:21px}
     }
   </style>
 </head>
+
 <body>
-
-  <div class="container">
-    <!-- Top Navigation -->
-    <div class="top-nav">
-      <a href="dashboard.html" class="btn-back">← Back to Dashboard</a>
-      <span style="font-size: 13px; color: var(--text-muted); font-weight: 600;">FreeMenu.in Partner</span>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">Free<span>Menu</span>.in</div>
+      <a class="back" href="../owner.html">← Owner Dashboard</a>
     </div>
 
-    <!-- Page Title -->
-    <div class="header-section">
-      <h1>Select Your Restaurant Plan</h1>
-      <p>Fixed table limits, zero hidden costs, and physical QR delivery included.</p>
-    </div>
+    <section class="hero">
+      <div class="eyebrow">Plans & Pricing</div>
+      <h1>Choose the plan that fits your restaurant</h1>
+      <p>
+        Simple pricing for your digital menu. Plan details, prices and features
+        are managed by FreeMenu Admin.
+      </p>
+    </section>
 
-    <!-- Pricing Grid -->
-    <div class="pricing-grid">
-      
-      <!-- 1. Free Starter -->
-      <div class="plan-card">
-        <div>
-          <h3 class="plan-name">Free Starter</h3>
-          <div class="price-block">
-            <div class="monthly-rate">₹0 <span>/ month</span></div>
-            <div class="setup-rate">Setup Fee: ₹0 (Free)</div>
-          </div>
-          <ul class="feature-list">
-            <li><span class="qr-pill">2 QR Stickers</span> (Fixed)</li>
-            <li>Complete Text Menu & Rates</li>
-            <li>Restaurant Logo & Banner</li>
-            <li>Instant Mobile Edit Dashboard</li>
-          </ul>
-        </div>
-        <div class="btn-action btn-current">Current Active Plan</div>
-      </div>
+    <div id="status">Loading plans...</div>
+    <section id="plans" class="plans"></section>
 
-      <!-- 2. Growth Plan -->
-      <div class="plan-card">
-        <div>
-          <h3 class="plan-name">Growth (Photos)</h3>
-          <div class="price-block">
-            <div class="monthly-rate">₹99 <span>/ month</span></div>
-            <div class="setup-rate">Setup Fee: ₹999 (One-Time)</div>
-          </div>
-          <ul class="feature-list">
-            <li><span class="qr-pill">5 QR Stickers</span></li>
-            <li>Full HD Photos for all items</li>
-            <li>Veg / Non-Veg / Egg Tags</li>
-            <li>Bestseller & Chef Special Badges</li>
-            <li>WhatsApp Menu Sharing</li>
-          </ul>
-        </div>
-        <a href="https://wa.me/919999999999?text=Hello%20FreeMenu%20Team%2C%20I%20want%20to%20upgrade%20my%20restaurant%20to%20the%20Growth%20Photo%20Plan%20(%E2%82%B999%2Fmo)." 
-           target="_blank" 
-           class="btn-action btn-outline">
-          Upgrade to Growth
-        </a>
-      </div>
-
-      <!-- 3. Signature 3D (Popular) -->
-      <div class="plan-card popular">
-        <div class="popular-badge">RECOMMENDED</div>
-        <div>
-          <h3 class="plan-name">Signature 3D</h3>
-          <div class="price-block">
-            <div class="monthly-rate">₹199 <span>/ month</span></div>
-            <div class="setup-rate highlight">Setup Fee: ₹2,499 (One-Time)</div>
-          </div>
-          <ul class="feature-list">
-            <li><span class="qr-pill">10 QR Stickers (Max)</span></li>
-            <li><strong>5 Signature Dishes in 3D AR</strong></li>
-            <li>Interactive 360° & Room Placement</li>
-            <li>HD Photos on remaining items</li>
-            <li>Physical Setup & Scan Optimization</li>
-          </ul>
-        </div>
-        <a href="https://wa.me/919999999999?text=Hello%20FreeMenu%20Team%2C%20I%20want%20to%20upgrade%20my%20restaurant%20to%20the%20Signature%203D%20Plan%20(%E2%82%B9199%2Fmo)." 
-           target="_blank" 
-           class="btn-action btn-primary">
-          ⚡ Upgrade to Signature 3D
-        </a>
-      </div>
-
-      <!-- 4. Full 3D AR -->
-      <div class="plan-card">
-        <div>
-          <h3 class="plan-name">Full 3D Experience</h3>
-          <div class="price-block">
-            <div class="monthly-rate">₹399 <span>/ month</span></div>
-            <div class="setup-rate">Setup Fee: ₹4,499 (One-Time)</div>
-          </div>
-          <ul class="feature-list">
-            <li><span class="qr-pill">10 QR Stickers (Max)</span></li>
-            <li><strong>15 Signature Dishes in 3D AR</strong></li>
-            <li>Ultra-Fast Cloudflare 3D CDN</li>
-            <li>Priority 24/7 WhatsApp Support</li>
-            <li>Full Menu Redesign Assistance</li>
-          </ul>
-        </div>
-        <a href="https://wa.me/919999999999?text=Hello%20FreeMenu%20Team%2C%20I%20want%20to%20upgrade%20my%20restaurant%20to%20the%20Full%203D%20AR%20Plan%20(%E2%82%B9399%2Fmo)." 
-           target="_blank" 
-           class="btn-action btn-outline">
-          Get Full 3D
-        </a>
-      </div>
-
-    </div>
-
-    <!-- Operational Transparency Note -->
-    <div class="note-box">
-      📦 <strong>Operational Policy:</strong> To maintain premium print durability and table service speed, each account is provided with up to 10 high-grade waterproof vinyl QR stickers. Additional replacement stickers are available on request at ₹50/unit.
+    <div class="footer">
+      FreeMenu.in • Digital Menu Platform
     </div>
   </div>
 
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+
+    const supabaseClient = window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+    const $ = id => document.getElementById(id);
+
+    function escapeHtml(value){
+      return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+    }
+
+    function money(value){
+      const n = Number(value || 0);
+      return n.toLocaleString("en-IN", {
+        maximumFractionDigits: 0
+      });
+    }
+
+    function showToast(message){
+      const el = $("toast");
+      el.textContent = message;
+      el.classList.add("show");
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(
+        () => el.classList.remove("show"), 2600
+      );
+    }
+
+    function normalizeFeatures(features){
+      if(!Array.isArray(features)) return [];
+
+      return features.map(item => {
+        if(typeof item === "string"){
+          return { text:item, enabled:true };
+        }
+        return {
+          text:item?.text || "",
+          enabled:item?.enabled !== false
+        };
+      }).filter(item => item.text);
+    }
+
+    function renderPlans(rows){
+      const root = $("plans");
+
+      if(!rows.length){
+        root.innerHTML = `
+          <div class="empty">
+            No active plans are available right now.
+          </div>`;
+        return;
+      }
+
+      root.innerHTML = rows.map(plan => {
+        const features = normalizeFeatures(plan.features);
+        const recommended = plan.is_recommended === true;
+        const isFree = plan.plan_type === "free" || Number(plan.monthly_price || 0) === 0;
+
+        const featureHtml = features.map(feature => `
+          <li class="${feature.enabled ? "" : "disabled"}">
+            <span class="check">${feature.enabled ? "✓" : "×"}</span>
+            <span>${escapeHtml(feature.text)}</span>
+          </li>
+        `).join("");
+
+        const badge = plan.badge_text
+          ? `<div class="ribbon">${escapeHtml(plan.badge_text)}</div>`
+          : "";
+
+        const setupLabel = plan.setup_fee_label || "One-Time";
+        const setupFee = Number(plan.setup_fee || 0);
+
+        const buttonText =
+          plan.button_text ||
+          (isFree ? "Current Active Plan" : `Upgrade to ${plan.name}`);
+
+        return `
+          <article class="plan ${recommended ? "recommended" : ""} ${isFree ? "free" : ""}">
+            ${badge}
+
+            <div class="plan-name">${escapeHtml(plan.name)}</div>
+
+            <div class="desc">
+              ${escapeHtml(plan.description || "")}
+            </div>
+
+            <div class="price-row">
+              <span class="currency">₹</span>
+              <span class="price">${money(plan.monthly_price)}</span>
+              <span class="period">${escapeHtml(plan.period_label || "/ month")}</span>
+            </div>
+
+            <div class="setup">
+              Setup Fee:
+              <strong>₹${money(setupFee)}</strong>
+              ${setupLabel ? ` <span>(${escapeHtml(setupLabel)})</span>` : ""}
+            </div>
+
+            <ul class="features">
+              ${featureHtml || `
+                <li>
+                  <span class="check">✓</span>
+                  <span>Plan details available from FreeMenu</span>
+                </li>
+              `}
+            </ul>
+
+            <button
+              class="plan-btn"
+              type="button"
+              onclick="selectPlan('${escapeHtml(plan.slug)}','${escapeHtml(plan.name)}',${isFree})">
+              ${escapeHtml(buttonText)}
+            </button>
+          </article>
+        `;
+      }).join("");
+    }
+
+    async function loadPlans(){
+      $("status").textContent = "Loading plans...";
+
+      const { data, error } = await supabaseClient
+        .from("plans")
+        .select(`
+          id,
+          name,
+          slug,
+          plan_type,
+          monthly_price,
+          setup_fee,
+          period_label,
+          setup_fee_label,
+          description,
+          badge_text,
+          button_text,
+          qr_stickers_max,
+          signature_3d_dishes_max,
+          features,
+          is_active,
+          is_recommended,
+          sort_order
+        `)
+        .eq("is_active", true)
+        .order("sort_order", { ascending:true })
+        .order("monthly_price", { ascending:true });
+
+      if(error){
+        console.error("Plans load error:", error);
+        $("status").textContent = "Unable to load plans.";
+        $("plans").innerHTML = `
+          <div class="empty">
+            <strong>Plans could not be loaded.</strong><br><br>
+            Please make sure the <b>plans</b> table SQL has been run in Supabase.
+          </div>`;
+        return;
+      }
+
+      $("status").textContent = "";
+      renderPlans(data || []);
+    }
+
+    function selectPlan(slug, name, isFree){
+      if(isFree){
+        showToast("This is the Free Starter plan.");
+        return;
+      }
+
+      /*
+        Payment/subscription gateway is not connected here yet.
+        This keeps the pricing page independent from payment logic.
+        Later the button can call your subscription/payment function
+        using the plan slug.
+      */
+      const params = new URLSearchParams({
+        plan: slug
+      });
+
+      window.location.href = `../owner.html?upgrade=${encodeURIComponent(slug)}`;
+    }
+
+    loadPlans();
+  </script>
 </body>
 </html>
