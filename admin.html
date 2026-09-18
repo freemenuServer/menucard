@@ -59,6 +59,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
     <button data-page="approvals"><i data-lucide="clock-3"></i>Pending Approvals <b class="badge" id="approvalBadge">0</b></button>
     <button data-page="ads"><i data-lucide="badge-dollar-sign"></i>Advertisements</button><button data-page="mediaRules"><i data-lucide="image"></i>Media Upload Rules</button>
     <button data-page="subscriptions"><i data-lucide="crown"></i>Subscriptions</button>
+    <button data-page="plans"><i data-lucide="badge-indian-rupee"></i>Plans & Pricing</button>
     <button data-page="analytics"><i data-lucide="bar-chart-3"></i>Analytics</button>
     <button data-page="reports"><i data-lucide="file-text"></i>Reports</button>
     <button data-page="customers"><i data-lucide="user-round"></i>Customers</button>
@@ -142,6 +143,15 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
 </div>
 
 
+<div id="plans" class="page">
+  <div class="subpage-head">
+    <div><h2>Plans & Pricing</h2><p style="color:#667085;margin:4px 0 0">Control every plan shown on <b>/owner/plans.html</b>. Changes are stored in Supabase and do not require editing the pricing page code.</p></div>
+    <div class="toolbar"><button class="iconbtn" onclick="loadPlans()">↻ Refresh</button><button class="primary" onclick="openPlanModal()">+ Add Plan</button></div>
+  </div>
+  <div class="notice">These are the four plans currently configured for the pricing page: Free Starter ₹0, Growth (Photos) ₹99, Signature 3D ₹199, and Full 3D Experience ₹399. Setup fees, limits, feature text, badges, buttons, recommendation status, active status and display order are all controlled here.</div>
+  <div class="card"><div id="plansTable" class="tablewrap"></div></div>
+  <div class="card" style="margin-top:12px"><div class="card-head"><h3>Plan Control Rules</h3></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:11px;color:#475467"><div><b>Pricing</b><br>Monthly price + one-time setup fee</div><div><b>Limits</b><br>QR stickers + 3D signature dishes</div><div><b>Display</b><br>Active, recommended, order, badge, button</div></div></div>
+</div>
 <div id="subscriptions" class="page"><div class="subpage-head"><h2>Subscriptions</h2></div><div class="card"><div id="subsTable" class="tablewrap"></div></div></div>
 <div id="analytics" class="page"><div class="subpage-head"><h2>Analytics</h2></div><div class="grid3"><div class="card"><h3>Total Menu Views</h3><h1 id="anViews">0</h1></div><div class="card"><h3>Premium Restaurants</h3><h1 id="anPremium">0</h1></div><div class="card"><h3>Active Restaurants</h3><h1 id="anActive">0</h1></div></div><div class="card" style="margin-top:12px"><div class="charts"><canvas id="analyticsChart"></canvas></div></div></div>
 <div id="reports" class="page"><div class="subpage-head"><h2>Reports</h2><button class="primary" onclick="exportRestaurantsCSV()">Export Restaurants CSV</button></div><div class="card"><div class="empty">Use the export button to download the current restaurant dataset. More report modules can be added without changing the public menu.</div></div></div>
@@ -163,12 +173,12 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
 const SUPABASE_URL='https://pfsrpowopbrevocwsuii.supabase.co';
 const SUPABASE_KEY='sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let session=null, restaurants=[], menuItems=[], profiles=[], subscriptions=[], charts={};
+let session=null, restaurants=[], menuItems=[], profiles=[], subscriptions=[], plans=[], charts={};
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 function toast(m){$('toast').textContent=m;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2400)}
 function toggleSidebar(){$('sidebar').classList.toggle('open')}
-function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$(id)?.classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(innerWidth<800)$('sidebar').classList.remove('open');if(id==='restaurants')renderRestaurantPage();if(id==='owners')renderOwners();if(id==='menu')renderMenu();if(id==='categories')renderCategories();if(id==='approvals')renderApprovals();if(id==='subscriptions')renderSubscriptions();if(id==='admins')renderAdmins();if(id==='logs')renderLogs();if(id==='analytics')renderAnalytics();if(id==='qrManagement')loadQRs()}
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$(id)?.classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(innerWidth<800)$('sidebar').classList.remove('open');if(id==='restaurants')renderRestaurantPage();if(id==='owners')renderOwners();if(id==='menu')renderMenu();if(id==='categories')renderCategories();if(id==='approvals')renderApprovals();if(id==='subscriptions')renderSubscriptions();if(id==='plans')renderPlans();if(id==='admins')renderAdmins();if(id==='logs')renderLogs();if(id==='analytics')renderAnalytics();if(id==='qrManagement')loadQRs()}
 document.querySelectorAll('.nav button[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
 function closeModal(){$('modal').classList.remove('show')}
 $('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeModal()});
@@ -203,6 +213,7 @@ async function loadAll(){
   menuItems=await q('menu_items');
   profiles=await q('profiles');
   subscriptions=await q('subscriptions');
+  await loadPlans();
   updateStats();renderDashboardTable();renderCities();renderPopularCats();await renderActivity();populateRestaurantFilters();renderRestaurantPage();renderMenu();renderCategories();renderApprovals();renderSubscriptions();renderOwners();renderAdmins();await renderLogs();renderAnalytics();await loadSettings();await loadAdSettings();await loadMediaRules();await loadQRs();
  }catch(e){console.error('loadAll failed',e);toast('Dashboard refresh failed: '+(e?.message||e));}
 }
@@ -282,6 +293,54 @@ async function saveCategory(){const rid=$('cf_rest').value,n=$('cf_name').value.
 function renderApprovals(){const list=restaurants.filter(r=>statusOf(r)==='pending');$('approvalsTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Phone</th><th>Address</th><th>Action</th></tr></thead><tbody>${list.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.phone||'—')}</td><td>${esc(r.address||'—')}</td><td><button class="primary" onclick="setRestaurantStatus('${r.id}','active')">Approve</button> <button class="danger" onclick="setRestaurantStatus('${r.id}','blocked')">Reject</button></td></tr>`).join('')||'<tr><td colspan="4"><div class="empty">No pending approvals.</div></td></tr>'}</tbody></table>`}
 function renderOwners(){let list=profiles.filter(p=>p.role==='owner'||p.role==='restaurant_owner');const s=($('ownerSearch')?.value||'').toLowerCase();list=list.filter(p=>`${p.name} ${p.full_name} ${p.email}`.toLowerCase().includes(s));$('ownersTable').innerHTML=`<table class="table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Restaurants</th></tr></thead><tbody>${list.map(p=>`<tr><td>${esc(p.name||p.full_name||'—')}</td><td>${esc(p.email||'—')}</td><td>${esc(p.role)}</td><td>${restaurants.filter(r=>r.owner_id===p.id).length}</td></tr>`).join('')||'<tr><td colspan="4"><div class="empty">No owner profiles found or RLS is restricting profile rows.</div></td></tr>'}</tbody></table>`}
 $('ownerSearch')?.addEventListener('input',renderOwners);
+let editingPlanId=null;
+async function loadPlans(){
+  const r=await db.from('plans').select('*').order('sort_order',{ascending:true}).order('monthly_price',{ascending:true});
+  if(r.error){console.warn('plans load:',r.error.message);plans=[];if($('plansTable'))$('plansTable').innerHTML='<div class="empty">Plans table is not installed yet. Run the supplied freemenu-plans.sql file.</div>';return;}
+  plans=r.data||[];renderPlans();
+}
+function planFeaturesText(features){
+  if(!Array.isArray(features)) return '';
+  return features.map(x=>typeof x==='string'?x:(x?.text||'')).filter(Boolean).join('\n');
+}
+function renderPlans(){
+  if(!$('plansTable'))return;
+  $('plansTable').innerHTML=`<table class="table"><thead><tr><th>Order</th><th>Plan</th><th>Monthly</th><th>Setup Fee</th><th>QR Max</th><th>3D Dishes</th><th>Display</th><th>Actions</th></tr></thead><tbody>${plans.map(p=>`<tr><td><b>${esc(p.sort_order??0)}</b></td><td><b>${esc(p.name)}</b><br><small>${esc(p.slug)}</small>${p.badge_text?`<br><span class="pill blue" style="background:#eaf2ff;color:#175cd3">${esc(p.badge_text)}</span>`:''}</td><td><b>₹${Number(p.monthly_price||0).toLocaleString('en-IN')}</b></td><td>₹${Number(p.setup_fee||0).toLocaleString('en-IN')}</td><td>${p.qr_stickers_max==null?'—':esc(p.qr_stickers_max)}</td><td>${p.signature_3d_dishes_max==null?'—':esc(p.signature_3d_dishes_max)}</td><td>${p.is_active?pill('active'):`<span class="pill red">● inactive</span>`}${p.is_recommended?'<br><span class="pill" style="margin-top:4px;background:#eaf2ff;color:#175cd3">★ Recommended</span>':''}</td><td><div class="actions"><button class="iconbtn" onclick="openPlanModal('${p.id}')">✎ Edit</button><button class="iconbtn" onclick="togglePlanActive('${p.id}',${!p.is_active})">${p.is_active?'Disable':'Enable'}</button><button class="danger" onclick="deletePlan('${p.id}')">Delete</button></div></td></tr>`).join('')||'<tr><td colspan="8"><div class="empty">No plans configured.</div></td></tr>'}</tbody></table>`;
+}
+function openPlanModal(id=null){
+  editingPlanId=id||null; const p=id?plans.find(x=>x.id===id):null;
+  const features=planFeaturesText(p?.features);
+  modal(id?'Edit Plan':'Add Plan',`<div class="formgrid">
+    <div class="field"><label>Plan Name *</label><input id="pf_name" value="${esc(p?.name||'')}" placeholder="Growth (Photos)"></div>
+    <div class="field"><label>Plan Slug *</label><input id="pf_slug" value="${esc(p?.slug||'')}" placeholder="growth-photos"></div>
+    <div class="field"><label>Monthly Price (₹)</label><input id="pf_monthly" type="number" min="0" step="1" value="${Number(p?.monthly_price||0)}"></div>
+    <div class="field"><label>One-Time Setup Fee (₹)</label><input id="pf_setup" type="number" min="0" step="1" value="${Number(p?.setup_fee||0)}"></div>
+    <div class="field"><label>QR Stickers Maximum</label><input id="pf_qr" type="number" min="0" value="${p?.qr_stickers_max??''}" placeholder="10"></div>
+    <div class="field"><label>Signature 3D Dishes Maximum</label><input id="pf_3d" type="number" min="0" value="${p?.signature_3d_dishes_max??''}" placeholder="5"></div>
+    <div class="field"><label>Setup Fee Label</label><input id="pf_setup_label" value="${esc(p?.setup_fee_label||'One-Time')}" placeholder="One-Time"></div>
+    <div class="field"><label>Price Period Label</label><input id="pf_period" value="${esc(p?.period_label||'/ month')}" placeholder="/ month"></div>
+    <div class="field"><label>Badge / Ribbon Text</label><input id="pf_badge" value="${esc(p?.badge_text||'')}" placeholder="RECOMMENDED"></div>
+    <div class="field"><label>Button Text</label><input id="pf_button" value="${esc(p?.button_text||'')}" placeholder="Upgrade to Growth"></div>
+    <div class="field"><label>Display Order</label><input id="pf_order" type="number" value="${Number(p?.sort_order||0)}"></div>
+    <div class="field"><label>Plan Type</label><select id="pf_type"><option value="free" ${p?.plan_type==='free'?'selected':''}>Free</option><option value="paid" ${p?.plan_type!=='free'?'selected':''}>Paid</option></select></div>
+    <div class="field"><label>Active</label><select id="pf_active"><option value="true" ${p?.is_active!==false?'selected':''}>Visible / Active</option><option value="false" ${p?.is_active===false?'selected':''}>Hidden / Inactive</option></select></div>
+    <div class="field"><label>Recommended</label><select id="pf_recommended"><option value="false" ${!p?.is_recommended?'selected':''}>No</option><option value="true" ${p?.is_recommended?'selected':''}>Yes</option></select></div>
+    <div class="field full"><label>Short Description</label><input id="pf_desc" value="${esc(p?.description||'')}" placeholder="Best for restaurants that want photo menus"></div>
+    <div class="field full"><label>Features — one feature per line</label><textarea id="pf_features" style="min-height:150px" placeholder="5 QR Stickers\nFull HD Photos for all items\nVeg / Non-Veg / Egg Tags\nBestseller & Chef Special Badges\nWhatsApp Menu Sharing">${esc(features)}</textarea><small style="color:#667085">Use exactly the text you want customers to see on plans.html. Prefixing is not required; the pricing page can render each line as a check item.</small></div>
+  </div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="savePlan()">Save Plan</button></div>`);
+}
+async function savePlan(){
+  const name=$('pf_name').value.trim(),slug=$('pf_slug').value.trim().toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-+|-+$/g,'');
+  if(!name||!slug)return toast('Plan name and slug are required.');
+  const features=$('pf_features').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(text=>({text,enabled:true}));
+  const payload={name,slug,monthly_price:Number($('pf_monthly').value||0),setup_fee:Number($('pf_setup').value||0),qr_stickers_max:$('pf_qr').value===''?null:Number($('pf_qr').value),signature_3d_dishes_max:$('pf_3d').value===''?null:Number($('pf_3d').value),setup_fee_label:$('pf_setup_label').value.trim()||'One-Time',period_label:$('pf_period').value.trim()||'/ month',badge_text:$('pf_badge').value.trim()||null,button_text:$('pf_button').value.trim()||null,sort_order:Number($('pf_order').value||0),plan_type:$('pf_type').value,is_active:$('pf_active').value==='true',is_recommended:$('pf_recommended').value==='true',description:$('pf_desc').value.trim()||null,features,updated_at:new Date().toISOString(),updated_by:session.user.id};
+  const r=editingPlanId?await db.from('plans').update(payload).eq('id',editingPlanId):await db.from('plans').insert(payload);
+  if(r.error)return toast('Plan save failed: '+r.error.message);
+  await logAction(`${editingPlanId?'Updated':'Created'} plan ${name}`);closeModal();await loadPlans();toast('Plan saved');
+}
+async function togglePlanActive(id,next){const p=plans.find(x=>x.id===id);const r=await db.from('plans').update({is_active:next,updated_at:new Date().toISOString(),updated_by:session.user.id}).eq('id',id);if(r.error)return toast(r.error.message);await logAction(`${next?'Enabled':'Disabled'} plan ${p?.name||id}`);await loadPlans();toast(next?'Plan enabled':'Plan disabled')}
+async function deletePlan(id){const p=plans.find(x=>x.id===id);if(!confirm(`Delete ${p?.name||'this plan'}?`))return;const r=await db.from('plans').delete().eq('id',id);if(r.error)return toast('Delete failed: '+r.error.message);await logAction(`Deleted plan ${p?.name||id}`);await loadPlans();toast('Plan deleted')}
+
 function renderSubscriptions(){$('subsTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Plan</th><th>Status</th><th>Amount</th><th>Start</th><th>Expiry</th></tr></thead><tbody>${subscriptions.map(s=>{const r=restaurants.find(x=>x.id===s.restaurant_id);return `<tr><td>${esc(r?.name||s.restaurant_id)}</td><td>${esc(s.plan||'free')}</td><td>${pill(s.status||'pending')}</td><td>₹${Number(s.amount||0).toLocaleString('en-IN')}</td><td>${fmt(s.start_date)}</td><td>${fmt(s.expiry_date)}</td></tr>`}).join('')||'<tr><td colspan="6"><div class="empty">No subscriptions table/data yet.</div></td></tr>'}</tbody></table>`}
 function renderAdmins(){const list=profiles.filter(p=>p.role==='admin');$('adminsTable').innerHTML=`<table class="table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>ID</th></tr></thead><tbody>${list.map(p=>`<tr><td>${esc(p.name||p.full_name||'Super Admin')}</td><td>${esc(p.email||'—')}</td><td>${esc(p.role)}</td><td>${esc(p.id)}</td></tr>`).join('')}</tbody></table>`}
 async function renderLogs(){const logs=await q('activity_logs');$('logsTable').innerHTML=`<table class="table"><thead><tr><th>Time</th><th>Action</th><th>Admin</th><th>Restaurant</th></tr></thead><tbody>${(logs||[]).slice().reverse().map(l=>`<tr><td>${fmt(l.created_at,true)}</td><td>${esc(l.action||l.description)}</td><td>${esc(l.admin_id||'—')}</td><td>${esc(l.restaurant_id||'—')}</td></tr>`).join('')||'<tr><td colspan="4"><div class="empty">No logs yet.</div></td></tr>'}</tbody></table>`}
@@ -370,81 +429,49 @@ function qrTargetURL(code){return new URL('/qr.html?code='+encodeURIComponent(co
 function printSingleQR(id){
   const x=qrCodes.find(q=>q.id===id);
   if(!x)return toast('QR code not found.');
-  renderPrintQR([x],'FreeMenu QR Code');
+  renderPrintQR([x], 'FreeMenu QR Code');
 }
 
 async function printAvailableQRs(){
   const available=qrCodes.filter(x=>String(x.status||'available').toLowerCase()==='available');
   if(!available.length)return toast('No available QR codes. Generate the next 100 first.');
-  await renderPrintQR(available,'FreeMenu — Available QR Codes');
+  await renderPrintQR(available,'FreeMenu QR Codes');
 }
 
 async function renderPrintQR(items,title){
   const w=window.open('','_blank');
   if(!w)return toast('Please allow pop-ups for printing QR codes.');
-
   const payload=items.map(x=>({id:x.id,code:x.code,url:qrTargetURL(x.code)}));
-
   const cards=payload.map(x=>`
     <div class="qr-card">
-      <div class="scan-title"><span>SCAN FOR</span><strong>MENU</strong></div>
-      <div class="qr-wrap">
-        <div class="corner tl"></div><div class="corner tr"></div>
-        <div class="corner bl"></div><div class="corner br"></div>
-        <div class="side-mark left-top"></div><div class="side-mark left-bottom"></div>
-        <div class="side-mark right-top"></div><div class="side-mark right-bottom"></div>
-        <div class="qrbox" id="qr-${x.id}"></div>
+      <div class="badge">
+        <div class="scan"><span>SCAN FOR</span><strong>MENU</strong></div>
+        <div class="food-icon left">♜</div>
+        <div class="food-icon right">◖</div>
+        <div class="qr-circle"><div class="qrbox" id="qr-${x.id}"></div></div>
+        <div class="brand"><span>Free</span><b>Menu</b><i>.in</i></div>
       </div>
-      <div class="brand">FreeMenu.in</div>
-      <div class="steps">
-        <div><span class="phone-icon">▯</span><b>Open<br>Camera</b></div>
-        <i></i>
-        <div><span class="scan-icon">⌗</span><b>Scan<br>QR</b></div>
-        <i></i>
-        <div><span class="menu-icon">▤</span><b>View<br>Menu</b></div>
-      </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 
-  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${title}</title>
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title>
 <style>
 *{box-sizing:border-box}
-body{font-family:Arial,Helvetica,sans-serif;margin:8mm;background:#fff;color:#111}
+body{font-family:Arial,Helvetica,sans-serif;margin:8mm;color:#111;background:#fff}
 .head{text-align:center;margin-bottom:7mm}.head h2{margin:0 0 2mm;font-size:21px}.head p{margin:0;color:#666;font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9mm 7mm}
-.qr-card{
-  width:300px;height:390px;margin:auto;background:#fff;border-radius:19px;
-  box-shadow:0 3px 18px rgba(0,0,0,.09);border:1px solid #eee;
-  text-align:center;break-inside:avoid;position:relative;overflow:hidden;padding:13px 12px 9px
-}
-.scan-title{line-height:.9;margin-top:0}.scan-title span{display:block;font-size:27px;font-weight:900;letter-spacing:-1px;color:#080808}
-.scan-title strong{display:block;margin-top:5px;font-size:47px;line-height:.9;font-weight:950;letter-spacing:-1px;color:#ed1825}
-.qr-wrap{width:224px;height:194px;margin:17px auto 0;position:relative;display:grid;place-items:center}
-.qrbox{width:174px;height:174px;display:grid;place-items:center;background:#fff}
-.qrbox svg{display:block!important;width:174px!important;height:174px!important}
-.corner{position:absolute;width:35px;height:35px;border-color:#ed1825;border-style:solid;border-width:0}
-.corner.tl{left:0;top:0;border-top-width:7px;border-left-width:7px;border-radius:11px 0 0 0}
-.corner.tr{right:0;top:0;border-top-width:7px;border-right-width:7px;border-radius:0 11px 0 0}
-.corner.bl{left:0;bottom:0;border-bottom-width:7px;border-left-width:7px;border-radius:0 0 0 11px}
-.corner.br{right:0;bottom:0;border-bottom-width:7px;border-right-width:7px;border-radius:0 0 11px 0}
-.side-mark{position:absolute;width:25px;height:6px;background:#ed1825;border-radius:8px}
-.left-top{left:2px;top:67px;transform:rotate(25deg)}.left-bottom{left:2px;top:108px;transform:rotate(-25deg)}
-.right-top{right:2px;top:67px;transform:rotate(-25deg)}.right-bottom{right:2px;top:108px;transform:rotate(25deg)}
-.brand{
-  display:inline-block;margin-top:8px;padding:7px 25px 8px;border-radius:30px;
-  background:#ed1825;color:#fff;font-size:26px;font-weight:900;letter-spacing:-.8px
-}
-.steps{height:62px;margin-top:9px;display:flex;align-items:center;justify-content:center;gap:14px}
-.steps>div{width:67px;text-align:center;font-size:11px;line-height:1.05}
-.steps b{display:block;margin-top:2px;font-size:11px}.steps i{height:48px;width:1px;background:#bdbdbd;display:block}
-.phone-icon,.scan-icon,.menu-icon{display:block;height:27px;font-size:28px;line-height:24px;font-weight:700}
-.phone-icon{font-size:34px}.scan-icon{font-size:32px}.menu-icon{font-size:30px}
-@media print{
-  body{margin:5mm}.grid{gap:6mm 5mm}.qr-card{
-    box-shadow:none;print-color-adjust:exact;-webkit-print-color-adjust:exact
-  }
-}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7mm}
+.qr-card{display:flex;justify-content:center;break-inside:avoid}
+.badge{width:210px;height:210px;border-radius:50%;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 42%,#171717 0 62%,#080808 63% 100%);border:5px solid #d9a928;box-shadow:inset 0 0 0 3px #2a2a2a,0 2px 0 #8b6414;text-align:center;color:#fff}
+.badge:before{content:"";position:absolute;inset:5px;border:2px solid #f4c94f;border-radius:50%;pointer-events:none}
+.scan{position:absolute;top:13px;left:0;right:0;z-index:3;text-align:center;line-height:1}
+.scan span{display:block;font-size:13px;font-weight:800;letter-spacing:.8px;color:#fff}
+.scan strong{display:block;margin-top:3px;font-size:27px;letter-spacing:.8px;color:#f5c642;text-shadow:0 1px 0 #8b6414}
+.qr-circle{position:absolute;left:50%;top:70px;transform:translateX(-50%);width:112px;height:112px;border-radius:50%;background:#fff;border:4px solid #d9a928;display:grid;place-items:center;z-index:2}
+.qrbox{width:98px;height:98px;display:grid;place-items:center}.qrbox svg{display:block!important;width:98px!important;height:98px!important}
+.brand{position:absolute;left:50%;bottom:19px;transform:translateX(-50%);z-index:4;white-space:nowrap;font-size:18px;font-weight:900;letter-spacing:-.6px;text-shadow:0 1px 0 #111}
+.brand:before{content:"";position:absolute;left:50%;top:-5px;transform:translateX(-50%);width:132px;height:25px;border-radius:7px;background:#f2c33e;z-index:-1;box-shadow:0 1px 0 #8b6414}
+.brand span{color:#111}.brand b{color:#111}.brand i{font-style:normal;color:#fff}
+.food-icon{position:absolute;color:#f2c33e;font-size:31px;z-index:1;top:83px;font-weight:700}.food-icon.left{left:19px;transform:rotate(90deg)}.food-icon.right{right:20px;transform:rotate(-25deg)}
+@media print{body{margin:6mm}.grid{gap:5mm}.badge{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
 </style></head><body>
 <div class="head"><h2>${title}</h2><p>${payload.length} QR code${payload.length===1?'':'s'}</p></div>
 <div class="grid">${cards}</div>
@@ -452,18 +479,11 @@ body{font-family:Arial,Helvetica,sans-serif;margin:8mm;background:#fff;color:#11
 <script>
 const data=${JSON.stringify(payload)};
 window.onload=()=>{
-  data.forEach(x=>{
-    const q=new QRCodeStyling({
-      width:174,height:174,type:"svg",data:x.url,margin:3,
-      qrOptions:{errorCorrectionLevel:"H"},
-      dotsOptions:{type:"dots",color:"#111111"},
-      cornersSquareOptions:{type:"dot",color:"#111111"},
-      cornersDotOptions:{type:"dot",color:"#111111"},
-      backgroundOptions:{color:"#ffffff"}
-    });
-    q.append(document.getElementById('qr-'+x.id));
-  });
-  setTimeout(()=>window.print(),1200);
+ data.forEach(x=>{
+  const q=new QRCodeStyling({width:98,height:98,type:'svg',data:x.url,margin:0,qrOptions:{errorCorrectionLevel:'H'},dotsOptions:{type:'dots',color:'#000000'},cornersSquareOptions:{type:'dot',color:'#000000'},cornersDotOptions:{type:'dot',color:'#000000'},backgroundOptions:{color:'#ffffff'}});
+  q.append(document.getElementById('qr-'+x.id));
+ });
+ setTimeout(()=>window.print(),1200);
 };
 <\/script></body></html>`);
   w.document.close();
