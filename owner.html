@@ -21,22 +21,26 @@
 button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoration:none;color:inherit}
 .hidden{display:none!important}.muted{color:var(--muted)}
 #loader{position:fixed;inset:0;background:#f6f7fb;display:grid;place-items:center;z-index:9999}
+/* Current assigned plan - compact dashboard card */
+.planSummary{margin:14px 0 16px;padding:16px 18px}
+.planSummaryTop{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.planSummaryTitle{display:flex;align-items:center;gap:10px}
+.planCrown{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:#fff3d9;color:#b7791f;font-size:16px}
+.planEyebrow{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.7px;font-weight:800}
+.planName{font-size:18px;font-weight:900;margin-top:2px}
+.planStatus{font-size:10px;font-weight:900;border-radius:999px;padding:6px 9px;background:#ecfdf3;color:#067647;border:1px solid #abefc6}
+.planPrice{font-size:24px;font-weight:900;line-height:1.1}
+.planPrice small{font-size:11px;color:var(--muted);font-weight:700}
+.planMetrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:14px}
+.planMetric{border:1px solid var(--line);background:#fafafa;border-radius:10px;padding:10px 11px}
+.planMetric .k{font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:800;letter-spacing:.4px}
+.planMetric .v{font-size:12px;font-weight:900;margin-top:3px}
+.planFeatureList{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.planFeatureChip{font-size:10px;border:1px solid var(--line);border-radius:999px;padding:6px 8px;background:#fff}
+.planFeatureChip i{color:#159455;margin-right:4px}
+.planSummaryActions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:13px}
+@media(max-width:760px){.planMetrics{grid-template-columns:repeat(2,minmax(0,1fr))}.planPrice{font-size:20px}}
 
-/* Current Plan */
-.currentPlanCard{background:linear-gradient(135deg,#101827,#1b2638);color:#fff;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 10px 28px rgba(15,23,42,.12);position:relative;overflow:hidden}
-.currentPlanCard:after{content:"";position:absolute;width:150px;height:150px;border-radius:50%;right:-65px;top:-75px;background:rgba(181,29,59,.18)}
-.currentPlanTop{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;z-index:1}
-.currentPlanLabel{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#b9c3d3;font-weight:800}
-.currentPlanName{font-size:23px;font-weight:800;margin-top:3px}
-.currentPlanBadge{background:#13a66b;color:#fff;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:800;white-space:nowrap}
-.currentPlanMeta{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;position:relative;z-index:1}
-.currentPlanMeta span{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);padding:7px 9px;border-radius:8px;font-size:10px;color:#dce4f0}
-.currentPlanFeatures{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;position:relative;z-index:1}
-.currentPlanFeatures span{font-size:10px;color:#e7edf6}
-.currentPlanFeatures span:before{content:"✓";color:#4ade80;font-weight:900;margin-right:4px}
-.currentPlanActions{margin-top:13px;position:relative;z-index:1}
-.currentPlanActions a{display:inline-flex;align-items:center;gap:6px;background:#b51d3b;color:#fff;padding:8px 11px;border-radius:8px;font-size:11px;font-weight:800}
-.currentPlanEmpty{color:#dce4f0;font-size:12px;line-height:1.6}
 .loader-card{text-align:center}.spinner{width:42px;height:42px;border:4px solid #ddd;border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:auto}@keyframes spin{to{transform:rotate(360deg)}}
 
 /* Layout */
@@ -112,7 +116,57 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .authFeatureBar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0 20px}.authFeature{border:1px solid #eceff4;border-radius:11px;padding:9px 7px;text-align:center;background:#fafbfd}.authFeature strong{display:block;font-size:10px;color:#253046}.authFeature span{font-size:15px;display:block;margin-bottom:3px}
 .menuStatusBtn{display:inline-flex;align-items:center;gap:8px;border:1px solid #e2e7ee;border-radius:999px;padding:6px 10px;background:#f8fafc;font-size:10px;font-weight:900;cursor:pointer;min-width:74px;justify-content:center;transition:.18s}.menuStatusBtn.on{background:#eafaf2;border-color:#9cddbd;color:#087443}.menuStatusBtn.off{background:#fff4e8;border-color:#f2c58d;color:#a35a00}.menuStatusBtn .dot{width:8px;height:8px;border-radius:50%;background:#12a36b}.menuStatusBtn.off .dot{background:#d97706}.menuStatusBtn:hover{transform:translateY(-1px)}
 @media(max-width:560px){.authFeatureBar{grid-template-columns:1fr 1fr 1fr}.menuStatusBtn{min-width:68px}}
-</style></head>
+</style>
+<style id="freemenu-login-brand-style">
+.freemenu-login-brand{position:relative;background:linear-gradient(145deg,#19070a 0%,#641219 58%,#8f252f 100%);color:#fff;overflow:hidden}
+.freemenu-login-brand:before,.freemenu-login-brand:after{content:"";position:absolute;border:1px solid rgba(216,173,98,.22);border-radius:50%}
+.freemenu-login-brand:before{width:420px;height:420px;right:-230px;top:-180px}
+.freemenu-login-brand:after{width:300px;height:300px;left:-190px;bottom:-150px}
+.freemenu-login-brand-inner{position:relative;z-index:2;padding:48px;height:100%;display:flex;flex-direction:column;justify-content:center}
+.freemenu-login-logo{width:68px;height:68px;border-radius:20px;background:linear-gradient(135deg,#ead084,#c8943e);color:#2b0b0e;display:grid;place-items:center;font-size:25px;font-weight:900;box-shadow:0 12px 30px #0005;margin-bottom:22px}
+.freemenu-login-brand h1{font-size:44px;letter-spacing:-1.5px;margin:0 0 10px}
+.freemenu-login-brand .fm-tagline{font-size:15px;line-height:1.7;color:#eadcdd;max-width:390px}
+.freemenu-login-points{display:grid;gap:14px;margin-top:28px}
+.freemenu-login-point{display:flex;align-items:center;gap:12px;font-size:13px;color:#f8eeee}
+.freemenu-login-point i{width:36px;height:36px;border-radius:11px;background:#ffffff12;display:grid;place-items:center;color:#e3c271}
+@media(max-width:760px){.freemenu-login-brand{display:none!important}}
+</style>
+
+
+<style id="freemenu-login-layout">
+.ownerAuthSplit{width:min(920px,96vw)!important;max-height:92vh!important;padding:0!important;overflow:hidden!important;display:grid!important;grid-template-columns:1fr 1fr;gap:0;background:#fff!important}
+.ownerAuthSplit .freemenu-login-brand{display:block!important;min-height:520px}
+.ownerAuthSplit .authRightPanel{padding:42px 42px 38px;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.ownerAuthSplit .authRightPanel .authBrand{margin:0 auto 12px}
+.ownerAuthSplit .authRightPanel h1,.ownerAuthSplit .authRightPanel .authSub{text-align:center}
+.ownerAuthSplit .authChoiceGrid{grid-template-columns:1fr 1fr}
+.fm-kicker{font-size:10px;letter-spacing:2px;font-weight:800;color:#e3c271;margin-bottom:8px}
+@media(max-width:760px){
+.ownerAuthSplit{grid-template-columns:1fr!important;width:min(470px,96vw)!important;overflow:auto!important}
+.ownerAuthSplit .freemenu-login-brand{min-height:250px}
+.ownerAuthSplit .freemenu-login-brand-inner{padding:30px}
+.ownerAuthSplit .authRightPanel{padding:30px 24px}
+}
+@media(max-width:560px){.ownerAuthSplit .authChoiceGrid{grid-template-columns:1fr}}
+</style>
+
+
+<style id="freemenu-two-screen-auth-fix">
+.authRightPanel{background:#fff;min-height:520px}
+.authTabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#f3f4f6;border-radius:12px;padding:4px;margin:0 0 22px}
+.authTab{border:0;background:transparent;border-radius:9px;padding:11px 10px;font-weight:800;color:#687386;cursor:pointer;font-size:13px}
+.authTab.active{background:#fff;color:#8f1831;box-shadow:0 3px 10px rgba(15,23,42,.08)}
+.authCombinedForm .authFormCard{display:block!important;padding:0;box-shadow:none;border:0;background:transparent;max-width:none;margin:0}
+.authCombinedForm .authBack{display:none}
+.authCombinedForm .authBrand,.authCombinedForm .authKicker{display:none}
+.authCombinedForm .authFormCard h1{font-size:30px;margin-bottom:4px}
+.authCombinedForm .authFormCard .authSub{margin-bottom:18px}
+.authCombinedForm .signupCard{display:none!important}
+.authCombinedForm .signupCard.active{display:block!important}
+.authCombinedForm .loginCard.active{display:block!important}
+@media(max-width:760px){.ownerAuthSplit{grid-template-columns:1fr!important}.freemenu-login-brand{display:block!important;min-height:250px}.freemenu-login-brand-inner{padding:28px}.freemenu-login-brand h1{font-size:36px}.authRightPanel{min-height:auto!important;padding:28px 22px!important}}
+</style>
+</head>
 
 <body>
 
@@ -120,28 +174,29 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 <div id="ownerAuth">
   <div class="ownerAuthBackdrop"></div>
 
-  <!-- FIRST SCREEN: choose Login or Sign Up -->
-  <div class="ownerAuthCard" id="authChoiceCard">
-    <div class="authBrand">🍽</div>
-    <div class="authKicker">FREEMENU • RESTAURANT PARTNER</div>
-    <h1>Restaurant Owner</h1>
-    <p class="authSub">Manage your digital menu, items and restaurant profile</p>
-    <div class="authFeatureBar"><div class="authFeature"><span>🍽️</span><strong>Digital Menu</strong></div><div class="authFeature"><span>📱</span><strong>QR Ready</strong></div><div class="authFeature"><span>⚡</span><strong>Easy Control</strong></div></div>
-    <div class="authChoiceGrid">
-      <button type="button" class="authChoiceBtn" id="openLoginBtn">
-        <span>🔐</span>
-        <b>Login</b>
-        <small>Already have an owner account</small>
-      </button>
-      <button type="button" class="authChoiceBtn" id="openSignupBtn">
-        <span>📝</span>
-        <b>Sign Up</b>
-        <small>Create a new restaurant account</small>
-      </button>
+  <!-- AUTH SCREEN: exactly 2 sides — FreeMenu branding + Login/Sign Up -->
+  <div class="ownerAuthCard ownerAuthSplit" id="authChoiceCard">
+    <div class="freemenu-login-brand">
+      <div class="freemenu-login-brand-inner">
+        <div class="freemenu-login-logo">FM</div>
+        <div class="fm-kicker">RESTAURANT PARTNER</div>
+        <h1>FreeMenu</h1>
+        <p class="fm-tagline">Your restaurant menu, profile, QR and daily menu management — all in one simple owner panel.</p>
+        <div class="freemenu-login-points">
+          <div class="freemenu-login-point"><i class="fa-solid fa-utensils"></i><span>Manage your digital menu</span></div>
+          <div class="freemenu-login-point"><i class="fa-solid fa-qrcode"></i><span>Share your QR menu</span></div>
+          <div class="freemenu-login-point"><i class="fa-solid fa-palette"></i><span>Customize your restaurant theme</span></div>
+        </div>
+      </div>
     </div>
-  </div>
-
-  <!-- LOGIN FORM -->
+    <div class="authRightPanel">
+      <div class="authKicker">FREEMENU • RESTAURANT PARTNER</div>
+      <div class="authTabs">
+        <button type="button" id="authLoginTab" class="authTab active">Login</button>
+        <button type="button" id="authSignupTab" class="authTab">Sign Up</button>
+      </div>
+      <div class="authCombinedForm">
+<!-- LOGIN FORM -->
   <div class="ownerAuthCard authFormCard" id="loginCard" style="display:none">
     <button type="button" class="authBack" id="backLoginBtn">← Back</button>
     <div class="authBrand">🔐</div><div class="authKicker">FreeMenu Owner Portal</div>
@@ -160,8 +215,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     <button type="button" class="loginSubmit" id="loginSubmitNew">🔐 Login to Owner Panel</button>
     <button type="button" class="authSwitch" id="goSignupFromLogin">New here? Create an account</button>
   </div>
-
-  <!-- SIGN UP FORM -->
+<!-- SIGN UP FORM -->
   <div class="ownerAuthCard authFormCard signupCard" id="signupCard" style="display:none">
     <button type="button" class="authBack" id="backSignupBtn">← Back</button>
     <div class="authBrand">📝</div><div class="authKicker">FreeMenu Partner</div>
@@ -209,6 +263,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     <button type="button" class="loginSubmit" id="signupSubmitNew">📝 Create Restaurant Account</button>
     <button type="button" class="authSwitch" id="goLoginFromSignup">Already have an account? Login</button>
   </div>
+      </div>
+    </div>
+  </div>
 </div>
 </div>
 
@@ -232,11 +289,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     <a class="navItem" href="#analytics" data-section="analytics"><i class="fa-solid fa-chart-column"></i> Analytics</a>
     <a class="navItem" href="#settings" data-section="settings"><i class="fa-solid fa-gear"></i> Settings</a>
     <a class="navItem" href="#support" data-section="support"><i class="fa-regular fa-circle-question"></i> Help & Support</a>
+    <a class="navItem" href="/owner/plans.html" id="plansNavLink"><i class="fa-solid fa-crown"></i> Plans & Pricing</a>
   </nav>
   <div class="sidePromo">
     <i class="fa-solid fa-crown"></i><strong>Grow Your Business</strong>
     <p>Delicious Food<br>Happier Customers</p>
     <button class="btn-pink" id="sidePublicBtn">View Public Menu</button>
+    <button class="btn-pink" id="sidePlansBtn" style="margin-top:8px;background:linear-gradient(135deg,#d8ad62,#b9822f);color:#1a1010"><i class="fa-solid fa-crown"></i> Plans & Pricing</button>
   </div>
 </aside>
 
@@ -259,20 +318,39 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
 <!-- DASHBOARD -->
 <section id="section-dashboard">
-  <div class="currentPlanCard" id="currentPlanCard">
-    <div class="currentPlanTop">
-      <div><div class="currentPlanLabel">Your Current Plan</div><div class="currentPlanName" id="currentPlanName">Loading...</div></div>
-      <div class="currentPlanBadge" id="currentPlanBadge">ASSIGNED</div>
-    </div>
-    <div class="currentPlanMeta" id="currentPlanMeta"></div>
-    <div class="currentPlanFeatures" id="currentPlanFeatures"></div>
-    <div class="currentPlanActions"><a href="owner/plans.html"><i class="fa-solid fa-crown"></i> View Plans & Pricing</a></div>
-  </div>
   <div class="grid4">
     <div class="stat"><div class="statTop"><div class="statIcon"><i class="fa-solid fa-utensils"></i></div><span class="statChange">Active</span></div><div class="statLabel">Total Menu Items</div><div class="statValue" id="statItems">0</div></div>
     <div class="stat"><div class="statTop"><div class="statIcon"><i class="fa-solid fa-grip"></i></div><span class="statChange" id="statCatsChange">Live</span></div><div class="statLabel">Categories</div><div class="statValue" id="statCats">0</div></div>
     <div class="stat"><div class="statTop"><div class="statIcon"><i class="fa-solid fa-eye"></i></div><span class="statChange">Ready</span></div><div class="statLabel">Profile / Menu Views</div><div class="statValue" id="statViews">—</div></div>
     <div class="stat"><div class="statTop"><div class="statIcon"><i class="fa-solid fa-qrcode"></i></div><span class="statChange">Ready</span></div><div class="statLabel">QR Scans</div><div class="statValue">—</div></div>
+  </div>
+
+  <div class="card planSummary" id="currentPlanCard">
+    <div class="planSummaryTop">
+      <div class="planSummaryTitle">
+        <div class="planCrown"><i class="fa-solid fa-crown"></i></div>
+        <div>
+          <div class="planEyebrow">Current Plan</div>
+          <div class="planName" id="currentPlanName">Loading plan...</div>
+          <div class="muted" id="currentPlanDescription" style="font-size:10px;margin-top:3px"></div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="planStatus" id="currentPlanStatus">ACTIVE</div>
+        <div class="planPrice" id="currentPlanPrice" style="margin-top:8px">—</div>
+      </div>
+    </div>
+    <div class="planMetrics" id="currentPlanMetrics">
+      <div class="planMetric"><div class="k">Setup Fee</div><div class="v">—</div></div>
+      <div class="planMetric"><div class="k">QR Stickers</div><div class="v">—</div></div>
+      <div class="planMetric"><div class="k">3D Dishes</div><div class="v">—</div></div>
+      <div class="planMetric"><div class="k">Plan Type</div><div class="v">—</div></div>
+    </div>
+    <div class="planFeatureList" id="currentPlanFeatures"></div>
+    <div class="planSummaryActions">
+      <a class="btn sm" href="/owner/plans.html"><i class="fa-solid fa-list"></i> View Plans & Pricing</a>
+      <span class="muted" id="currentPlanNote" style="font-size:10px">Plan details are controlled by FreeMenu Super Admin.</span>
+    </div>
   </div>
 
   <div class="twoCol">
@@ -516,7 +594,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
 <!-- SUPPORT / ORDERS -->
 <section id="section-orders" class="hidden"><div class="card"><div class="cardTitle">Orders <small>Preview</small></div><div style="text-align:center;padding:60px 10px;color:var(--muted)"><i class="fa-solid fa-cart-shopping" style="font-size:38px;margin-bottom:12px"></i><h3 style="color:var(--text)">Ordering system is ready for a future phase</h3><p style="font-size:12px">The supplied Supabase schema contains menu_items and restaurants, but no orders table.</p></div></div></section>
-<section id="section-support" class="hidden"><div class="card"><div class="cardTitle">Help & Support</div><p class="muted" style="font-size:13px;line-height:1.7">For the current build, the owner panel is connected to your existing Supabase Auth, restaurants, menu_items table and restaurant-logos storage bucket. Additional analytics, ordering and theme persistence require database fields/tables.</p></div></section>
+<section id="section-support" class="hidden"><div class="card"><div class="cardTitle">Help & Support</div><p class="muted" style="font-size:13px;line-height:1.7">For the current build, the owner panel is connected to your existing Supabase Auth, restaurants and menu_items tables, with restaurant images handled through the configured image upload system. Additional analytics, ordering and theme persistence require database fields/tables.</p></div></section>
 
 </div></div>
 
@@ -539,7 +617,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
    <input class="input" type="number" id="mFull" placeholder="Full ₹" min="0">
   </div>
   <div class="formGroup" style="margin-top:16px"><label>Menu Item Status</label><button type="button" class="menuStatusBtn on" id="mAvailableSwitch"><span class="dot"></span><span id="mAvailableText">ON • Visible</span></button></div>
-  <div style="margin-top:18px;display:flex;justify-content:flex-end;gap:8px><button class="btn" data-close="itemModal">Cancel</button><button class="btn primary" id="saveItem"><i class="fa-solid fa-floppy-disk"></i> Save Item</button></div>
+  <div style="margin-top:18px;display:flex;justify-content:flex-end;gap:8px"><button class="btn" data-close="itemModal">Cancel</button><button class="btn primary" id="saveItem"><i class="fa-solid fa-floppy-disk"></i> Save Item</button></div>
  </div>
 </div>
 
@@ -587,7 +665,12 @@ function showSection(name){
   if(activeSection==="preview") $("previewFrame").src=publicUrl();
   if(activeSection==="qr") renderQR();
 }
-document.querySelectorAll(".navItem").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();history.replaceState(null,"","#"+a.dataset.section);showSection(a.dataset.section)}));
+document.querySelectorAll(".navItem").forEach(a=>a.addEventListener("click",e=>{
+  if(a.id==="plansNavLink") return;
+  e.preventDefault();
+  history.replaceState(null,"","#"+a.dataset.section);
+  showSection(a.dataset.section);
+}));
 window.addEventListener("hashchange",()=>showSection(location.hash.slice(1)||"dashboard"));
 $("mobileMenu").onclick=()=>$("sidebar").classList.toggle("open");
 
@@ -596,34 +679,41 @@ $("mobileMenu").onclick=()=>$("sidebar").classList.toggle("open");
 function showOwnerLogin(){
   $("loader").classList.add("hidden");
   $("ownerAuth").classList.add("show");
-  $("authChoiceCard").style.display="block";
-  $("loginCard").style.display="none";
-  $("signupCard").style.display="none";
+  $("authChoiceCard").style.display="grid";
+  showLoginForm();
 }
 function hideOwnerLogin(){
   $("ownerAuth").classList.remove("show");
 }
 function showLoginForm(){
   $("ownerAuth").classList.add("show");
-  $("authChoiceCard").style.display="none";
+  $("authChoiceCard").style.display="grid";
+  $("loginCard").classList.add("active");
+  $("signupCard").classList.remove("active");
   $("loginCard").style.display="block";
   $("signupCard").style.display="none";
+  $("authLoginTab")?.classList.add("active");
+  $("authSignupTab")?.classList.remove("active");
 }
 function showSignupForm(){
   $("ownerAuth").classList.add("show");
-  $("authChoiceCard").style.display="none";
+  $("authChoiceCard").style.display="grid";
+  $("loginCard").classList.remove("active");
+  $("signupCard").classList.add("active");
   $("loginCard").style.display="none";
   $("signupCard").style.display="block";
+  $("authLoginTab")?.classList.remove("active");
+  $("authSignupTab")?.classList.add("active");
 }
-function showAuthChoice(){
-  $("ownerAuth").classList.add("show");
-  $("authChoiceCard").style.display="block";
-  $("loginCard").style.display="none";
-  $("signupCard").style.display="none";
-}
+function showAuthChoice(){ showLoginForm(); }
+$("authLoginTab")?.addEventListener("click",showLoginForm);
+$("authSignupTab")?.addEventListener("click",showSignupForm);
 function setAuthMsg(id,msg,ok=false){
-  const el=$(id); el.textContent=msg; el.style.display=msg?"block":"none";
-  if(el) el.className=ok?"authSuccess":"authError";
+  const el=$(id);
+  if(!el) return;
+  el.textContent=msg;
+  el.style.display=msg?"block":"none";
+  el.className=ok?"authSuccess":"authError";
 }
 
 async function ownerLogin(){
@@ -634,20 +724,30 @@ async function ownerLogin(){
     setAuthMsg("loginErrorNew","Please enter email and password.");
     return;
   }
-  $("loginSubmitNew").disabled=true;
-  $("loginSubmitNew").textContent="Signing in...";
-  const {error}=await supabaseClient.auth.signInWithPassword({email,password});
-  if(error){
-    setAuthMsg("loginErrorNew",error.message);
-    $("loginSubmitNew").disabled=false;
-    $("loginSubmitNew").textContent="🔐 Login to Owner Panel";
-    return;
+  const btn=$("loginSubmitNew");
+  btn.disabled=true;
+  btn.textContent="Signing in...";
+  try{
+    const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+    if(error){
+      setAuthMsg("loginErrorNew",error.message);
+      return;
+    }
+    if(!data?.session?.user){
+      setAuthMsg("loginErrorNew","Login succeeded but no active session was returned. Please try again.");
+      return;
+    }
+    hideOwnerLogin();
+    $("loader").classList.remove("hidden");
+    await init(true);
+  }catch(e){
+    console.error("Owner login failed:",e);
+    showLoginForm();
+    setAuthMsg("loginErrorNew",e?.message||"Unable to login. Please check your connection and try again.");
+  }finally{
+    btn.disabled=false;
+    btn.textContent="🔐 Login to Owner Panel";
   }
-  hideOwnerLogin();
-  $("loader").classList.remove("hidden");
-  await init();
-  $("loginSubmitNew").disabled=false;
-  $("loginSubmitNew").textContent="🔐 Login to Owner Panel";
 }
 
 async function ownerSignup(){
@@ -751,10 +851,6 @@ async function ownerSignup(){
   $("signupSubmitNew").textContent="📝 Create Restaurant Account";
 }
 
-$("openLoginBtn").onclick=showLoginForm;
-$("openSignupBtn").onclick=showSignupForm;
-$("backLoginBtn").onclick=showAuthChoice;
-$("backSignupBtn").onclick=showAuthChoice;
 $("goSignupFromLogin").onclick=showSignupForm;
 $("goLoginFromSignup").onclick=showLoginForm;
 $("loginSubmitNew").onclick=ownerLogin;
@@ -762,7 +858,7 @@ $("loginPasswordNew").addEventListener("keydown",e=>{if(e.key==="Enter")ownerLog
 $("signupSubmitNew").onclick=ownerSignup;
 
 /* ---------- Init/Auth ---------- */
-async function init(){
+async function init(afterLogin=false){
   try{
     $("loader")?.classList.remove("hidden");
     const result=await Promise.race([
@@ -775,44 +871,93 @@ async function init(){
       return;
     }
 
+    const adminRestaurantId=new URLSearchParams(location.search).get("admin_restaurant");
+
+    // Normal owner page: fresh loads still require an explicit owner login.
+    // Super Admin direct-access links are the exception: the existing authenticated
+    // Super Admin session is verified below and may open the selected restaurant.
+    if(!afterLogin && !adminRestaurantId){
+      showAuthChoice();
+      return;
+    }
+    let superAdminMode=false;
+    if(adminRestaurantId){
+      const pr=await supabaseClient.from("profiles").select("role").eq("id",session.user.id).maybeSingle();
+      if(pr.error) return fail("Super Admin verification failed: "+pr.error.message);
+      superAdminMode=pr.data?.role==="admin";
+      if(!superAdminMode) return fail("Direct restaurant access is available only to Super Admin.");
+    }
+
     if($("accountEmail")) $("accountEmail").value=session.user.email||"";
     if($("ownerName")) $("ownerName").textContent=session.user.user_metadata?.full_name||session.user.email?.split("@")[0]||"Owner";
     if($("avatar")) $("avatar").textContent=initials($("ownerName")?.textContent);
 
-    // IMPORTANT: Owner Panel always loads the restaurant linked to the
-    // currently authenticated owner. A URL slug must never override owner_id.
-    const {data,error}=await supabaseClient
-      .from("restaurants")
-      .select("*")
-      .eq("owner_id",session.user.id)
-      .limit(1);
-
-    if(error){
-      return fail("Could not load your restaurant profile: "+error.message);
+    // Super Admin can open any restaurant by ID. Normal owners remain
+    // restricted to their own owner_id relationship.
+    let data,error;
+    if(superAdminMode){
+      const res=await supabaseClient.from("restaurants").select("*").eq("id",adminRestaurantId).limit(1);
+      data=res.data; error=res.error;
+    }else{
+      const res=await supabaseClient.from("restaurants").select("*").eq("owner_id",session.user.id).limit(1);
+      data=res.data; error=res.error;
     }
+
+    if(error) return fail("Could not load restaurant profile: "+error.message);
+
+    // Backward compatibility for older owner accounts.
+    if(!data?.length && !superAdminMode){
+      const meta=session.user.user_metadata||{};
+      const rs=String(meta.restaurant_slug||"").trim().toLowerCase();
+      if(rs){
+        const bySlug=await supabaseClient.from("restaurants").select("*").eq("slug",rs).limit(1);
+        if(bySlug.error) return fail("Could not load your restaurant profile: "+bySlug.error.message);
+        if(bySlug.data?.length) data=bySlug.data;
+      }
+    }
+
     if(!data?.length){
-      return fail("No restaurant is linked to this login account. Please login with the restaurant owner account.");
+      return fail("No restaurant is linked to this login account. Please login with the correct restaurant owner account or link this Auth user to the restaurant.");
     }
 
     currentRestaurant=data[0];
     currentRestaurantId=currentRestaurant.id;
+    if(superAdminMode){
+      if($("ownerName")) $("ownerName").textContent="Super Admin";
+      if($("avatar")) $("avatar").textContent="SA";
+      const sub=document.querySelector(".sideSub");
+      if(sub) sub.textContent="SUPER ADMIN • DIRECT ACCESS";
+      const roleLabel=document.querySelector(".profile .profileName div");
+      if(roleLabel) roleLabel.textContent="Super Admin Access";
+    }
     fillProfile();
     await loadCurrentPlan();
     await loadItems();
     await loadMediaRules();
     $("loader")?.classList.add("hidden");
+    hideOwnerLogin();
     showSection(location.hash.slice(1)||"dashboard");
   }catch(e){
     console.error("Owner init failed:",e);
     fail(e?.message||"Unexpected error while loading the Owner Panel.");
   }
 }
+
 function fail(msg){
   const loader=$("loader");
   if(!loader) return alert(msg||"Unable to open Owner Panel");
   loader.classList.remove("hidden");
-  loader.innerHTML=`<div style="text-align:center;padding:25px;max-width:520px"><i class="fa-solid fa-circle-exclamation" style="font-size:38px;color:#c33"></i><h3>Unable to open Owner Panel</h3><p>${esc(msg)}</p><button class="btn" onclick="location.href=location.pathname">Retry</button></div>`;
+  loader.innerHTML=`<div style="text-align:center;padding:25px;max-width:560px;margin:auto">
+    <i class="fa-solid fa-circle-exclamation" style="font-size:38px;color:#c33"></i>
+    <h3>Unable to open Owner Panel</h3>
+    <p>${esc(msg)}</p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn" onclick="location.reload()">Retry</button>
+      <button class="btn" onclick="supabaseClient.auth.signOut().finally(()=>location.href=location.pathname+'?auth=login')">Back to Login</button>
+    </div>
+  </div>`;
 }
+
 function fillProfile(){
   const r=currentRestaurant;
   const name=r.name||"Restaurant",logo=r.logo_url||"";
@@ -847,60 +992,78 @@ function fillProfile(){
   if(r.gallery && $("fGallery")) $("fGallery").value=Array.isArray(r.gallery)?r.gallery.join("\n"):String(r.gallery);
   if(r.cover_url && $("fCover")) $("fCover").value=r.cover_url;
 }
+
 async function loadCurrentPlan(){
-  const nameEl=$("currentPlanName"), metaEl=$("currentPlanMeta"), featuresEl=$("currentPlanFeatures"), badgeEl=$("currentPlanBadge");
+  const nameEl=$("currentPlanName"), descEl=$("currentPlanDescription"), priceEl=$("currentPlanPrice"),
+        statusEl=$("currentPlanStatus"), metricsEl=$("currentPlanMetrics"), featuresEl=$("currentPlanFeatures"), noteEl=$("currentPlanNote");
   if(!nameEl)return;
-  nameEl.textContent="Loading...";
-  metaEl.innerHTML="";featuresEl.innerHTML="";
 
-  const planId=currentRestaurant?.plan_id;
-  if(!planId){
-    nameEl.textContent="Free Starter";
-    badgeEl.textContent="NOT ASSIGNED";
-    badgeEl.style.background="#667085";
-    metaEl.innerHTML='<span>₹0 / month</span><span>Free Plan</span>';
-    featuresEl.innerHTML='<span>Default FreeMenu access</span>';
+  const money=n=>"₹"+Number(n||0).toLocaleString("en-IN");
+  const period=v=>{
+    const x=String(v||"/ month").trim();
+    return x.startsWith("/")?x:"/ "+x.replace(/^\/\s*/,"");
+  };
+  const renderNoPlan=()=>{
+    nameEl.textContent="No plan assigned";
+    descEl.textContent="Ask Super Admin to assign a plan to this restaurant.";
+    priceEl.innerHTML='—';
+    statusEl.textContent="NOT ASSIGNED";
+    statusEl.style.background="#f2f4f7";statusEl.style.color="#475467";statusEl.style.borderColor="#d0d5dd";
+    metricsEl.innerHTML='<div class="planMetric"><div class="k">Setup Fee</div><div class="v">—</div></div><div class="planMetric"><div class="k">QR Stickers</div><div class="v">—</div></div><div class="planMetric"><div class="k">3D Dishes</div><div class="v">—</div></div><div class="planMetric"><div class="k">Plan Type</div><div class="v">—</div></div>';
+    featuresEl.innerHTML="";
+    noteEl.textContent="No plan_id is assigned to this restaurant yet.";
+  };
+
+  nameEl.textContent="Loading plan...";
+  descEl.textContent="";featuresEl.innerHTML="";
+  let plan=null, error=null;
+
+  if(currentRestaurant?.plan_id){
+    const res=await supabaseClient.from("plans").select("*").eq("id",currentRestaurant.plan_id).maybeSingle();
+    plan=res.data;error=res.error;
+  }else if(String(currentRestaurant?.plan||"").toLowerCase()==="free"){
+    const res=await supabaseClient.from("plans").select("*").eq("slug","free-starter").maybeSingle();
+    plan=res.data;error=res.error;
+  }else{
+    renderNoPlan();
     return;
   }
 
-  const {data,error}=await supabaseClient
-    .from("plans")
-    .select("id,name,plan_type,monthly_price,setup_fee,period_label,setup_fee_label,badge_text,description,qr_stickers_max,signature_3d_dishes_max,features,is_active")
-    .eq("id",planId)
-    .maybeSingle();
-
-  if(error){
-    console.warn("Current plan load failed:",error.message);
-    nameEl.textContent="Plan unavailable";
-    badgeEl.textContent="CHECK ADMIN";
-    badgeEl.style.background="#f79009";
+  if(error||!plan){
+    console.warn("Assigned plan could not be loaded:",error?.message||"Plan not found");
+    nameEl.textContent="Assigned plan";
+    descEl.textContent="Plan is assigned, but its details could not be read.";
+    priceEl.innerHTML='—';
+    statusEl.textContent="DETAILS UNAVAILABLE";
+    statusEl.style.background="#fffaeb";statusEl.style.color="#b54708";statusEl.style.borderColor="#fedf89";
+    metricsEl.innerHTML='<div class="planMetric"><div class="k">Setup Fee</div><div class="v">—</div></div><div class="planMetric"><div class="k">QR Stickers</div><div class="v">—</div></div><div class="planMetric"><div class="k">3D Dishes</div><div class="v">—</div></div><div class="planMetric"><div class="k">Plan Type</div><div class="v">—</div></div>';
+    featuresEl.innerHTML="";
+    noteEl.textContent="Check the plans SELECT/RLS policy if this plan was assigned by Super Admin.";
     return;
   }
 
-  if(!data){
-    nameEl.textContent="Plan not found";
-    badgeEl.textContent="UNASSIGNED";
-    badgeEl.style.background="#667085";
-    metaEl.innerHTML='<span>Please contact FreeMenu Admin</span>';
-    return;
-  }
+  nameEl.textContent=plan.name||"Current Plan";
+  descEl.textContent=plan.description||"";
+  priceEl.innerHTML=`${money(plan.monthly_price)} <small>${esc(period(plan.period_label))}</small>`;
+  statusEl.textContent=plan.is_active===false?"INACTIVE PLAN":"ACTIVE PLAN";
+  statusEl.style.background=plan.is_active===false?"#f2f4f7":"#ecfdf3";
+  statusEl.style.color=plan.is_active===false?"#475467":"#067647";
+  statusEl.style.borderColor=plan.is_active===false?"#d0d5dd":"#abefc6";
 
-  nameEl.textContent=data.name||"Current Plan";
-  badgeEl.textContent=data.badge_text||"ACTIVE PLAN";
-  badgeEl.style.background=data.is_active===false?"#667085":"#13a66b";
+  const setupText=Number(plan.setup_fee||0)===0 ? (plan.setup_fee_label||"Free") : `${money(plan.setup_fee)}${plan.setup_fee_label?" • "+plan.setup_fee_label:""}`;
+  const qr=plan.qr_stickers_max==null?"—":String(plan.qr_stickers_max);
+  const dishes=plan.signature_3d_dishes_max==null?"—":String(plan.signature_3d_dishes_max);
+  const type=String(plan.plan_type||"free").replace(/_/g," ");
+  metricsEl.innerHTML=`
+    <div class="planMetric"><div class="k">Setup Fee</div><div class="v">${esc(setupText)}</div></div>
+    <div class="planMetric"><div class="k">QR Stickers</div><div class="v">${esc(qr)}</div></div>
+    <div class="planMetric"><div class="k">3D Dishes</div><div class="v">${esc(dishes)}</div></div>
+    <div class="planMetric"><div class="k">Plan Type</div><div class="v">${esc(type)}</div></div>`;
 
-  const price=Number(data.monthly_price||0).toLocaleString("en-IN");
-  const setup=Number(data.setup_fee||0).toLocaleString("en-IN");
-  const meta=[];
-  meta.push(`₹${price} ${data.period_label||"/ month"}`);
-  meta.push(`Setup ₹${setup} ${data.setup_fee_label?"• "+data.setup_fee_label:""}`);
-  if(data.qr_stickers_max!=null)meta.push(`${data.qr_stickers_max} QR Stickers`);
-  if(data.signature_3d_dishes_max!=null)meta.push(`${data.signature_3d_dishes_max} 3D Dishes`);
-  metaEl.innerHTML=meta.map(x=>`<span>${esc(x)}</span>`).join("");
-
-  let features=Array.isArray(data.features)?data.features:[];
-  features=features.filter(x=>typeof x==="string"?true:x?.enabled!==false).map(x=>typeof x==="string"?x:(x?.text||"")).filter(Boolean).slice(0,6);
-  featuresEl.innerHTML=features.map(x=>`<span>${esc(x)}</span>`).join("");
+  let features=Array.isArray(plan.features)?plan.features:[];
+  features=features.map(f=>typeof f==="string"?f:(f?.enabled===false?"":(f?.text||f?.name||""))).filter(Boolean);
+  featuresEl.innerHTML=features.slice(0,8).map(f=>`<span class="planFeatureChip"><i class="fa-solid fa-check"></i>${esc(f)}</span>`).join("");
+  noteEl.textContent=plan.badge_text?plan.badge_text+" • Plan assigned by Super Admin.":"Plan assigned by Super Admin.";
 }
 
 async function loadItems(){
@@ -1010,7 +1173,7 @@ $("saveProfile").onclick=async()=>{
  if(error){toast("Profile save failed: "+error.message);return}
  currentRestaurant=data;fillProfile();toast("Restaurant details saved");
 };
-$("chooseLogo").onclick=()=>$("logoFile").click();
+$("chooseLogo").onclick=()=>$("logoMediaFile").click();
 $("logoFile").onchange=()=>{$("chooseLogo").textContent=$("logoFile").files[0]?.name?.slice(0,18)||"Choose"};
 $("uploadLogo").onclick=()=>uploadMediaFile("logo");
 
@@ -1065,6 +1228,7 @@ $("downloadQR").onclick=()=>{const a=document.createElement("a");a.href=$("qrBox
 /* ---------- Public menu ---------- */
 function openPublic(){window.open(publicUrl(),"_blank","noopener")}
 ["publicTop","sidePublicBtn","quickPreview","openPublic2"].forEach(id=>$(id).onclick=openPublic);
+$("sidePlansBtn").onclick=()=>{window.location.href="/owner/plans.html"};
 
 /* ---------- Theme preview ---------- */
 function updateTheme(){
@@ -1156,49 +1320,73 @@ function validateMediaFile(file){
   if(file.size>mb*1024*1024)return `Image must be ${mb} MB or smaller.`;
   return "";
 }
+async function uploadToR2(file, folder){
+  if(!file) throw new Error("Choose an image first.");
+  const bad=validateMediaFile(file);
+  if(bad) throw new Error(bad);
+  const {data:{session:activeSession},error:sessionError}=await supabaseClient.auth.getSession();
+  if(sessionError || !activeSession?.access_token) throw new Error("Please login again.");
+  const fd=new FormData();
+  fd.append("file",file);
+  fd.append("restaurant_id",currentRestaurantId);
+  fd.append("folder",folder);
+  const response=await fetch(`${SUPABASE_URL}/functions/v1/r2-upload`,{
+    method:"POST",
+    headers:{Authorization:`Bearer ${activeSession.access_token}`,apikey:SUPABASE_ANON_KEY},
+    body:fd
+  });
+  let result={}; try{result=await response.json()}catch(e){}
+  if(!response.ok) throw new Error(result?.error || `R2 upload failed (${response.status})`);
+  if(!result?.url) throw new Error("R2 did not return an image URL.");
+  return result.url;
+}
+let r2UploadInProgress={logo:false,banner:false,gallery:false};
 async function uploadMediaFile(kind){
   const enabled=kind==="logo"?mediaRules.logo_enabled:mediaRules.banner_enabled;
+  if(r2UploadInProgress[kind])return toast("Upload already in progress. Please wait.");
   if(!enabled)return toast(`${kind==="logo"?"Logo":"Banner"} upload is disabled by Super Admin.`);
-  const file=kind==="logo"?$("logoFile").files[0]:$("bannerMediaFile").files[0];
+  const file=kind==="logo"?$("logoMediaFile").files[0]:$("bannerMediaFile").files[0];
   const bad=validateMediaFile(file);if(bad)return toast(bad);
-  const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"");
-  const path=`${kind}_${currentRestaurantId}.${ext}`;
-  const btn=kind==="logo"?$("uploadLogo"):$("uploadBannerMedia");
+  const btn=kind==="logo"?$("uploadLogoMedia"):$("uploadBannerMedia");
   if(btn){btn.disabled=true;btn.textContent="Uploading...";}
-  const {error}=await supabaseClient.storage.from("restaurant-logos").upload(path,file,{cacheControl:"3600",upsert:true,contentType:file.type});
-  if(btn){btn.disabled=false;btn.textContent="Upload";}
-  if(error)return toast("Upload failed: "+error.message);
-  const {data}=supabaseClient.storage.from("restaurant-logos").getPublicUrl(path);
-  if(kind==="logo"){ $("fLogo").value=data.publicUrl; $("fLogoMedia").value=data.publicUrl; }
-  else $("fBannerMedia").value=data.publicUrl;
-  toast(`${kind==="logo"?"Logo":"Banner"} uploaded — click Save`);
+  r2UploadInProgress[kind]=true;
+  try{
+    const url=await uploadToR2(file,kind==="logo"?"logo":"banner");
+    if(kind==="logo"){$("fLogo").value=url;$("fLogoMedia").value=url;}
+    else $("fBannerMedia").value=url;
+    toast(`${kind==="logo"?"Logo":"Banner"} uploaded to Cloudflare R2 — click Save`);
+  }catch(error){console.error("R2 upload error:",error);toast("Upload failed: "+(error?.message||"Unknown error"))}
+  finally{
+    r2UploadInProgress[kind]=false;
+    if(btn){btn.disabled=!mediaRules[`${kind}_enabled`];btn.textContent="Upload";}
+    if(kind==="logo"){$("logoMediaFile").value="";$("chooseLogoMedia").textContent="Choose";}
+    if(kind==="banner"){$("bannerMediaFile").value="";$("chooseBannerMedia").textContent="Choose";}
+  }
 }
 $("chooseLogoMedia").onclick=()=>$("logoMediaFile").click();
 $("logoMediaFile").onchange=()=>{$("chooseLogoMedia").textContent=$("logoMediaFile").files[0]?.name?.slice(0,18)||"Choose"};
 $("uploadLogoMedia").onclick=()=>uploadMediaFile("logo");
-
 $("chooseBannerMedia").onclick=()=>$("bannerMediaFile").click();
 $("bannerMediaFile").onchange=()=>{$("chooseBannerMedia").textContent=$("bannerMediaFile").files[0]?.name?.slice(0,18)||"Choose"};
 $("uploadBannerMedia").onclick=()=>uploadMediaFile("banner");
-
 $("chooseGalleryMedia").onclick=()=>$("galleryMediaFile").click();
 $("galleryMediaFile").onchange=()=>{$("chooseGalleryMedia").textContent=$("galleryMediaFile").files[0]?.name?.slice(0,18)||"Choose"};
 $("uploadGalleryMedia").onclick=async()=>{
   if(!mediaRules.gallery_paid_enabled)return toast("Gallery is disabled by Super Admin.");
   if(!isPremiumRestaurant)return toast("Upgrade to Premium to use the Gallery.");
   const file=$("galleryMediaFile").files[0],bad=validateMediaFile(file);if(bad)return toast(bad);
-  const ext=(file.name.split(".").pop()||"jpg").toLowerCase().replace(/[^a-z0-9]/g,"");
-  const path=`gallery/${currentRestaurantId}/${Date.now()}.${ext}`;
   $("uploadGalleryMedia").disabled=true;$("uploadGalleryMedia").textContent="Uploading...";
-  const {error}=await supabaseClient.storage.from("restaurant-logos").upload(path,file,{cacheControl:"3600",upsert:false,contentType:file.type});
-  $("uploadGalleryMedia").disabled=false;$("uploadGalleryMedia").textContent="Upload to Gallery";
-  if(error)return toast("Gallery upload failed: "+error.message);
-  const {data}=supabaseClient.storage.from("restaurant-logos").getPublicUrl(path);
-  const gallery=Array.isArray(currentRestaurant.gallery)?[...currentRestaurant.gallery]:[];
-  gallery.push(data.publicUrl);
-  const {data:updated,error:updateError}=await supabaseClient.from("restaurants").update({gallery}).eq("id",currentRestaurantId).select("*").single();
-  if(updateError)return toast("Gallery save failed: "+updateError.message);
-  currentRestaurant=updated;fillProfile();renderGalleryList();toast("Gallery image added");
+  try{
+    const url=await uploadToR2(file,"gallery");
+    const gallery=Array.isArray(currentRestaurant.gallery)?[...currentRestaurant.gallery]:[];
+    gallery.push(url);
+    const {data:updated,error:updateError}=await supabaseClient.from("restaurants").update({gallery}).eq("id",currentRestaurantId).select("*").single();
+    if(updateError)throw new Error(updateError.message);
+    currentRestaurant=updated;fillProfile();renderGalleryList();
+    $("galleryMediaFile").value="";$("chooseGalleryMedia").textContent="Choose Gallery Image";
+    toast("Gallery image uploaded to Cloudflare R2");
+  }catch(error){console.error("R2 gallery upload error:",error);toast("Gallery upload failed: "+(error?.message||"Unknown error"))}
+  finally{$("uploadGalleryMedia").disabled=false;$("uploadGalleryMedia").textContent="Upload to Gallery";}
 };
 function renderGalleryList(){
   const el=$("galleryList");if(!el)return;
@@ -1234,20 +1422,33 @@ document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{showSection(b.dataset.go==="restaurantEdit"?"restaurant":b.dataset.go==="galleryEdit"?"gallery":"dashboard")});
 supabaseClient.auth.onAuthStateChange((event, newSession)=>{
   if(event==="SIGNED_OUT"){
-    currentRestaurant=null; currentRestaurantId=null; items=[];
+    session=null; currentRestaurant=null; currentRestaurantId=null; items=[];
     showOwnerLogin();
   }
 });
-window.addEventListener("load",()=>{
-  Promise.resolve(init()).catch(err=>{
-    console.error("Owner init failed:",err);
-    $("loader").innerHTML=`<div style="text-align:center;padding:25px">
-      <i class="fa-solid fa-circle-exclamation" style="font-size:38px;color:#c33"></i>
-      <h3>Unable to open Owner Panel</h3>
-      <p>${esc(err?.message||"Unexpected error while loading the owner dashboard.")}</p>
-      <button class="btn" onclick="location.reload()">Retry</button>
-    </div>`;
-  });
+window.addEventListener("load",async()=>{
+  try{
+    if(!window.supabase){
+      throw new Error("Supabase library could not be loaded. Check your internet connection.");
+    }
+
+    // Super Admin direct access: reuse the already authenticated Super Admin
+    // session and open the selected restaurant without asking for the owner's password.
+    const adminRestaurantId=new URLSearchParams(location.search).get("admin_restaurant");
+    if(adminRestaurantId){
+      await init(false);
+      return;
+    }
+
+    showAuthChoice();
+  }catch(e){
+    console.error("Owner page startup failed:",e);
+    const loader=$("loader");
+    if(loader){
+      loader.classList.remove("hidden");
+      loader.innerHTML=`<div style="text-align:center;padding:25px"><h3>Unable to load Owner Login</h3><p>${esc(e?.message||"Unexpected startup error")}</p><button class="btn" onclick="location.reload()">Retry</button></div>`;
+    }
+  }
 });
 </script>
 
