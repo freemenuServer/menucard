@@ -21,6 +21,22 @@
 button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoration:none;color:inherit}
 .hidden{display:none!important}.muted{color:var(--muted)}
 #loader{position:fixed;inset:0;background:#f6f7fb;display:grid;place-items:center;z-index:9999}
+
+/* Current Plan */
+.currentPlanCard{background:linear-gradient(135deg,#101827,#1b2638);color:#fff;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 10px 28px rgba(15,23,42,.12);position:relative;overflow:hidden}
+.currentPlanCard:after{content:"";position:absolute;width:150px;height:150px;border-radius:50%;right:-65px;top:-75px;background:rgba(181,29,59,.18)}
+.currentPlanTop{display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative;z-index:1}
+.currentPlanLabel{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#b9c3d3;font-weight:800}
+.currentPlanName{font-size:23px;font-weight:800;margin-top:3px}
+.currentPlanBadge{background:#13a66b;color:#fff;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:800;white-space:nowrap}
+.currentPlanMeta{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;position:relative;z-index:1}
+.currentPlanMeta span{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);padding:7px 9px;border-radius:8px;font-size:10px;color:#dce4f0}
+.currentPlanFeatures{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;position:relative;z-index:1}
+.currentPlanFeatures span{font-size:10px;color:#e7edf6}
+.currentPlanFeatures span:before{content:"✓";color:#4ade80;font-weight:900;margin-right:4px}
+.currentPlanActions{margin-top:13px;position:relative;z-index:1}
+.currentPlanActions a{display:inline-flex;align-items:center;gap:6px;background:#b51d3b;color:#fff;padding:8px 11px;border-radius:8px;font-size:11px;font-weight:800}
+.currentPlanEmpty{color:#dce4f0;font-size:12px;line-height:1.6}
 .loader-card{text-align:center}.spinner{width:42px;height:42px;border:4px solid #ddd;border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:auto}@keyframes spin{to{transform:rotate(360deg)}}
 
 /* Layout */
@@ -230,7 +246,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     <button class="mobileMenu" id="mobileMenu"><i class="fa-solid fa-bars"></i></button>
     <div class="restIdentity">
       <img class="restLogo" id="topLogo" alt="Restaurant">
-      <div><div class="restTitle" id="topName">Restaurant</div><div class="restAddress" id="topAddress">Loading...</div><div id="topPlanMini" style="font-size:9px;color:#ef3340;font-weight:800;margin-top:2px">Plan: Loading...</div></div>
+      <div><div class="restTitle" id="topName">Restaurant</div><div class="restAddress" id="topAddress">Loading...</div></div>
     </div>
   </div>
   <div class="topActions">
@@ -243,6 +259,15 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
 <!-- DASHBOARD -->
 <section id="section-dashboard">
+  <div class="currentPlanCard" id="currentPlanCard">
+    <div class="currentPlanTop">
+      <div><div class="currentPlanLabel">Your Current Plan</div><div class="currentPlanName" id="currentPlanName">Loading...</div></div>
+      <div class="currentPlanBadge" id="currentPlanBadge">ASSIGNED</div>
+    </div>
+    <div class="currentPlanMeta" id="currentPlanMeta"></div>
+    <div class="currentPlanFeatures" id="currentPlanFeatures"></div>
+    <div class="currentPlanActions"><a href="owner/plans.html"><i class="fa-solid fa-crown"></i> View Plans & Pricing</a></div>
+  </div>
   <div class="grid4">
     <div class="stat"><div class="statTop"><div class="statIcon"><i class="fa-solid fa-utensils"></i></div><span class="statChange">Active</span></div><div class="statLabel">Total Menu Items</div><div class="statValue" id="statItems">0</div></div>
     <div class="stat"><div class="statTop"><div class="statIcon"><i class="fa-solid fa-grip"></i></div><span class="statChange" id="statCatsChange">Live</span></div><div class="statLabel">Categories</div><div class="statValue" id="statCats">0</div></div>
@@ -266,21 +291,6 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
         <button class="serviceBtn"><i class="fa-solid fa-utensils"></i> Dine In</button>
         <button class="serviceBtn"><i class="fa-solid fa-bag-shopping"></i> Takeaway</button>
         <button class="serviceBtn"><i class="fa-solid fa-motorcycle"></i> Home Delivery</button>
-      </div>
-    </div>
-
-    <div class="card" id="currentPlanCard">
-      <div class="cardTitle">Current Plan <span id="currentPlanBadge" style="font-size:10px;padding:5px 9px;border-radius:999px;background:#eef2f6;color:#475467">Loading...</span></div>
-      <div style="display:flex;align-items:center;gap:16px;padding:8px 0 4px">
-        <div style="width:54px;height:54px;border-radius:14px;background:linear-gradient(135deg,#111827,#ef3340);display:grid;place-items:center;color:#fff;font-size:23px;box-shadow:0 8px 20px #10182820">♛</div>
-        <div style="min-width:0">
-          <div id="currentPlanName" style="font-size:20px;font-weight:800">—</div>
-          <div id="currentPlanPrice" class="muted" style="font-size:12px;margin-top:3px">—</div>
-        </div>
-      </div>
-      <div id="currentPlanDetails" style="margin-top:14px;font-size:12px;color:#475467;line-height:1.7">Loading plan details...</div>
-      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
-        <a class="btn sm" href="plans.html">View All Plans</a>
       </div>
     </div>
 
@@ -803,53 +813,6 @@ function fail(msg){
   loader.classList.remove("hidden");
   loader.innerHTML=`<div style="text-align:center;padding:25px;max-width:520px"><i class="fa-solid fa-circle-exclamation" style="font-size:38px;color:#c33"></i><h3>Unable to open Owner Panel</h3><p>${esc(msg)}</p><button class="btn" onclick="location.href=location.pathname">Retry</button></div>`;
 }
-async function loadCurrentPlan(){
-  const r=currentRestaurant||{};
-  const badge=$("currentPlanBadge"),nameEl=$("currentPlanName"),priceEl=$("currentPlanPrice"),details=$("currentPlanDetails");
-  if(!badge||!nameEl||!priceEl||!details)return;
-
-  let plan=null;
-  if(r.plan_id){
-    const {data,error}=await supabaseClient.from("plans").select("id,name,slug,plan_type,monthly_price,setup_fee,period_label,setup_fee_label,badge_text,description,qr_stickers_max,signature_3d_dishes_max,features,is_active,is_recommended").eq("id",r.plan_id).maybeSingle();
-    if(!error) plan=data||null;
-  }
-
-  // Backward compatibility for older restaurants created before plan_id existed.
-  if(!plan && String(r.plan||"").toLowerCase()==="premium"){
-    const {data}=await supabaseClient.from("plans").select("id,name,slug,plan_type,monthly_price,setup_fee,period_label,setup_fee_label,badge_text,description,qr_stickers_max,signature_3d_dishes_max,features,is_active,is_recommended").eq("slug","growth").maybeSingle();
-    plan=data||null;
-  }
-  if(!plan){
-    const {data}=await supabaseClient.from("plans").select("id,name,slug,plan_type,monthly_price,setup_fee,period_label,setup_fee_label,badge_text,description,qr_stickers_max,signature_3d_dishes_max,features,is_active,is_recommended").eq("slug","free-starter").maybeSingle();
-    plan=data||null;
-  }
-
-  if(!plan){
-    badge.textContent="Not Assigned";
-    badge.style.background="#fff1f2"; badge.style.color="#b42318";
-    nameEl.textContent="No Plan Assigned";
-    if($("topPlanMini"))$("topPlanMini").textContent="Plan: Not Assigned";
-    priceEl.textContent="Please contact FreeMenu Admin.";
-    details.textContent="Your restaurant does not have a plan assigned yet.";
-    return;
-  }
-
-  badge.textContent=plan.badge_text || (plan.plan_type==="free" ? "FREE" : "ACTIVE PLAN");
-  badge.style.background=plan.is_recommended?"#fff1f2":"#eef2f6";
-  badge.style.color=plan.is_recommended?"#c81e2d":"#475467";
-  nameEl.textContent=plan.name||"Current Plan";
-  if($("topPlanMini"))$("topPlanMini").textContent=`Plan: ${plan.name||"—"}`;
-  priceEl.textContent=`₹${Number(plan.monthly_price||0).toLocaleString("en-IN")} ${plan.period_label||"/ month"}${Number(plan.setup_fee||0)>0?` • Setup ₹${Number(plan.setup_fee).toLocaleString("en-IN")}`:""}`;
-
-  const limits=[];
-  if(plan.qr_stickers_max!=null)limits.push(`QR Stickers: <b>${esc(plan.qr_stickers_max)}</b>`);
-  if(plan.signature_3d_dishes_max!=null)limits.push(`3D Signature Dishes: <b>${esc(plan.signature_3d_dishes_max)}</b>`);
-  const features=Array.isArray(plan.features)?plan.features.filter(x=>typeof x==="string"?true:x?.enabled!==false).map(x=>typeof x==="string"?x:x.text).filter(Boolean).slice(0,4):[];
-  details.innerHTML=(plan.description?`<div style="margin-bottom:7px">${esc(plan.description)}</div>`:"")+
-    (limits.length?`<div>${limits.join(" &nbsp;•&nbsp; ")}</div>`:"")+
-    (features.length?`<div style="margin-top:5px">${features.map(x=>`✓ ${esc(x)}`).join(" &nbsp;•&nbsp; ")}</div>`:"");
-}
-
 function fillProfile(){
   const r=currentRestaurant;
   const name=r.name||"Restaurant",logo=r.logo_url||"";
@@ -884,6 +847,62 @@ function fillProfile(){
   if(r.gallery && $("fGallery")) $("fGallery").value=Array.isArray(r.gallery)?r.gallery.join("\n"):String(r.gallery);
   if(r.cover_url && $("fCover")) $("fCover").value=r.cover_url;
 }
+async function loadCurrentPlan(){
+  const nameEl=$("currentPlanName"), metaEl=$("currentPlanMeta"), featuresEl=$("currentPlanFeatures"), badgeEl=$("currentPlanBadge");
+  if(!nameEl)return;
+  nameEl.textContent="Loading...";
+  metaEl.innerHTML="";featuresEl.innerHTML="";
+
+  const planId=currentRestaurant?.plan_id;
+  if(!planId){
+    nameEl.textContent="Free Starter";
+    badgeEl.textContent="NOT ASSIGNED";
+    badgeEl.style.background="#667085";
+    metaEl.innerHTML='<span>₹0 / month</span><span>Free Plan</span>';
+    featuresEl.innerHTML='<span>Default FreeMenu access</span>';
+    return;
+  }
+
+  const {data,error}=await supabaseClient
+    .from("plans")
+    .select("id,name,plan_type,monthly_price,setup_fee,period_label,setup_fee_label,badge_text,description,qr_stickers_max,signature_3d_dishes_max,features,is_active")
+    .eq("id",planId)
+    .maybeSingle();
+
+  if(error){
+    console.warn("Current plan load failed:",error.message);
+    nameEl.textContent="Plan unavailable";
+    badgeEl.textContent="CHECK ADMIN";
+    badgeEl.style.background="#f79009";
+    return;
+  }
+
+  if(!data){
+    nameEl.textContent="Plan not found";
+    badgeEl.textContent="UNASSIGNED";
+    badgeEl.style.background="#667085";
+    metaEl.innerHTML='<span>Please contact FreeMenu Admin</span>';
+    return;
+  }
+
+  nameEl.textContent=data.name||"Current Plan";
+  badgeEl.textContent=data.badge_text||"ACTIVE PLAN";
+  badgeEl.style.background=data.is_active===false?"#667085":"#13a66b";
+
+  const price=Number(data.monthly_price||0).toLocaleString("en-IN");
+  const setup=Number(data.setup_fee||0).toLocaleString("en-IN");
+  const meta=[];
+  meta.push(`₹${price} ${data.period_label||"/ month"}`);
+  meta.push(`Setup ₹${setup} ${data.setup_fee_label?"• "+data.setup_fee_label:""}`);
+  if(data.qr_stickers_max!=null)meta.push(`${data.qr_stickers_max} QR Stickers`);
+  if(data.signature_3d_dishes_max!=null)meta.push(`${data.signature_3d_dishes_max} 3D Dishes`);
+  metaEl.innerHTML=meta.map(x=>`<span>${esc(x)}</span>`).join("");
+
+  let features=Array.isArray(data.features)?data.features:[];
+  features=features.filter(x=>typeof x==="string"?true:x?.enabled!==false).map(x=>typeof x==="string"?x:(x?.text||"")).filter(Boolean).slice(0,6);
+  featuresEl.innerHTML=features.map(x=>`<span>${esc(x)}</span>`).join("");
+}
+
 async function loadItems(){
   const {data,error}=await supabaseClient.from("menu_items").select("*").eq("restaurant_id",currentRestaurantId).order("id",{ascending:false});
   if(error){toast(error.message);return}
