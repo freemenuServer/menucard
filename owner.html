@@ -571,6 +571,20 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
   </div>
   <div class="formGroup"><label>Category *</label><input class="input" id="mCategory" placeholder="Main Course"></div>
   <div class="formGroup"><label>Description</label><textarea class="textarea" id="mDesc"></textarea></div>
+  <div class="formGroup" id="menuPhotoBox">
+   <label>Food Photo <span id="menuPhotoPlanBadge" style="padding:3px 7px;background:#eef6ff;color:#2563eb;border-radius:99px;font-size:9px;font-weight:800">GROWTH • PHOTOS</span></label>
+   <div class="uploadRow">
+    <input class="input" id="mPhotoUrl" placeholder="Food photo URL" readonly>
+    <input type="file" id="mPhotoFile" accept="image/*" hidden>
+    <button class="fileBtn" type="button" id="chooseMenuPhoto">Choose</button>
+    <button class="btn blue" type="button" id="uploadMenuPhoto">Upload</button>
+   </div>
+   <div id="menuPhotoPreview" style="display:none;margin-top:9px;align-items:center;gap:10px">
+    <img id="menuPhotoPreviewImg" alt="Food photo preview" style="width:72px;height:58px;object-fit:cover;border-radius:10px;border:1px solid var(--border);background:#f8fafc">
+    <button class="btn sm" type="button" id="removeMenuPhoto">Remove Photo</button>
+   </div>
+   <div id="menuPhotoHelp" class="muted" style="font-size:10px;margin-top:6px">Growth (Photos) plan: upload one photo for each menu item. The photo appears on the Growth public menu.</div>
+  </div>
   <div class="formGroup"><label>Single Price (use when portions are not needed)</label><input class="input" type="number" id="mPrice" min="0"></div>
   <label style="display:block;font-size:11px;font-weight:800;color:#64748b;margin-bottom:6px">PORTION PRICES</label>
   <div class="threeCol">
@@ -606,7 +620,7 @@ const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-let session=null,currentRestaurant=null,currentRestaurantId=null,items=[],activeSection="dashboard";
+let session=null,currentRestaurant=null,currentRestaurantId=null,currentPlan=null,items=[],activeSection="dashboard";
 let mediaRules={max_mb:1,logo_enabled:true,banner_enabled:true,gallery_paid_enabled:false};
 let isPremiumRestaurant=false;
 
@@ -880,6 +894,7 @@ async function init(afterLogin=false){
 
     currentRestaurant=data[0];
     currentRestaurantId=currentRestaurant.id;
+    await loadAssignedPlan();
     if(superAdminMode){
       if($("ownerName")) $("ownerName").textContent="Super Admin";
       if($("avatar")) $("avatar").textContent="SA";
@@ -915,6 +930,31 @@ function fail(msg){
   </div>`;
 }
 
+async function loadAssignedPlan(){
+  currentPlan=null;
+  const planId=String(currentRestaurant?.plan_id||"").trim();
+  if(!planId)return;
+  const {data,error}=await supabaseClient.from("plans").select("id,name,slug,plan_type,monthly_price,setup_fee,qr_stickers_max,signature_3d_dishes_max,features,is_active,sort_order").eq("id",planId).maybeSingle();
+  if(error){console.warn("Assigned plan load failed:",error.message);return;}
+  currentPlan=data||null;
+}
+function isGrowthPhotosPlan(){
+  const key=`${currentPlan?.slug||""} ${currentPlan?.name||""} ${currentPlan?.plan_type||""}`.toLowerCase().trim();
+  return key.includes("growth") || key.includes("growth-photos") || key.includes("growth photos") || key.includes("photo_menu_v1");
+}
+function updateMenuPhotoUI(photoUrl=""){
+  const box=$("menuPhotoBox"),help=$("menuPhotoHelp"),badge=$("menuPhotoPlanBadge"),choose=$("chooseMenuPhoto"),upload=$("uploadMenuPhoto");
+  if(!box)return;
+  const enabled=isGrowthPhotosPlan();
+  box.style.display="block";
+  if(badge){badge.textContent=enabled?"GROWTH • PHOTOS":"PHOTO UPLOAD • GROWTH PLAN";badge.style.background=enabled?"#eef6ff":"#f2f4f7";badge.style.color=enabled?"#2563eb":"#667085";}
+  if(help)help.textContent=enabled?`Growth (Photos) plan: upload one photo for each menu item. Max image size follows your media upload policy. The photo appears on the Growth public menu.`:"Food photos are available with the Growth (Photos) plan. Assign the Growth plan from Super Admin to enable uploads.";
+  if(choose)choose.disabled=!enabled;
+  if(upload)upload.disabled=!enabled;
+  $("mPhotoUrl").value=photoUrl||"";
+  const preview=$("menuPhotoPreview"),img=$("menuPhotoPreviewImg");
+  if(photoUrl){preview.style.display="flex";img.src=photoUrl;}else{preview.style.display="none";img.removeAttribute("src");}
+}
 function fillProfile(){
   const r=currentRestaurant;
   const name=r.name||"Restaurant",logo=r.logo_url||"";
@@ -1002,16 +1042,20 @@ function openItem(id=null){
  const i=id?items.find(x=>String(x.id)===String(id)):null;
  $("mName").value=i?.name||"";$("mCategory").value=i?.category||"";
  $("mDesc").value=i?.description||"";$("mType").value=i?.item_type||((i?.is_veg===false)?"nonveg":"veg");
+ $("mPhotoUrl").value=i?.image_url||i?.photo_url||i?.image||i?.photo||"";
  $("mPrice").value=i?.price??"";$("mQtr").value=i?.price_quarter??"";$("mHalf").value=i?.price_half??"";$("mFull").value=i?.price_full??"";
  $("mAvailable").value=String(i?.is_available!==false);
  $("mAvailableSwitch").className=`switch ${i?.is_available!==false?"on":""}`;
  $("mAvailableText").textContent=i?.is_available!==false?"ON — Visible":"OFF — Hidden";
+ updateMenuPhotoUI($("mPhotoUrl").value);
  $("itemModal").classList.add("show");
 }
 async function saveItem(){
  const id=$("editId").value,name=$("mName").value.trim(),category=$("mCategory").value.trim()||"General",description=$("mDesc").value.trim(),item_type=$("mType").value;
  if(!name)return toast("Item name is required");
+ const photoUrl=$("mPhotoUrl").value.trim();
  const payload={name,category,description,item_type,is_veg:item_type==="veg",price:cleanNum($("mPrice").value),price_quarter:cleanNum($("mQtr").value),price_half:cleanNum($("mHalf").value),price_full:cleanNum($("mFull").value),is_available:$("mAvailable").value!=="false"};
+ if(isGrowthPhotosPlan()) payload.image_url=photoUrl||null;
  $("saveItem").disabled=true;$("saveItem").textContent="Saving...";
  let res;
  if(id) res=await supabaseClient.from("menu_items").update(payload).eq("id",id).eq("restaurant_id",currentRestaurantId);
@@ -1044,6 +1088,30 @@ document.addEventListener("click",e=>{
  if(del)deleteItem(del.dataset.id);
  if(status)toggleAvailability(status.dataset.status,status);
 });
+let menuPhotoUploadBusy=false;
+$("chooseMenuPhoto").onclick=()=>{if(isGrowthPhotosPlan())$("mPhotoFile").click();};
+$("mPhotoFile").onchange=()=>{
+  const file=$("mPhotoFile").files[0];
+  $("chooseMenuPhoto").textContent=file?.name?.slice(0,18)||"Choose";
+};
+$("uploadMenuPhoto").onclick=async()=>{
+  if(!isGrowthPhotosPlan())return toast("Food photo upload is available on the Growth (Photos) plan.");
+  if(menuPhotoUploadBusy)return toast("Upload already in progress. Please wait.");
+  const file=$("mPhotoFile").files[0],bad=validateMediaFile(file);
+  if(bad)return toast(bad);
+  const btn=$("uploadMenuPhoto");
+  menuPhotoUploadBusy=true;btn.disabled=true;btn.textContent="Uploading...";
+  try{
+    const url=await uploadToR2(file,"menu-items");
+    $("mPhotoUrl").value=url;
+    updateMenuPhotoUI(url);
+    $("mPhotoFile").value="";$("chooseMenuPhoto").textContent="Choose";
+    toast("Food photo uploaded — click Save Item");
+  }catch(error){console.error("Menu photo upload error:",error);toast("Photo upload failed: "+(error?.message||"Unknown error"));}
+  finally{menuPhotoUploadBusy=false;btn.disabled=!isGrowthPhotosPlan();btn.textContent="Upload";}
+};
+$("removeMenuPhoto").onclick=()=>{ $("mPhotoUrl").value=""; updateMenuPhotoUI(""); };
+
 $("saveItem").onclick=saveItem;$("openAdd").onclick=()=>openItem();$("openAdd2").onclick=()=>openItem();
 $("menuSearch").oninput=renderDashboardTable;$("menuCategoryFilter").onchange=renderDashboardTable;$("menuTypeFilter").onchange=renderDashboardTable;
 $("fullSearch").oninput=renderFullTable;$("fullCatFilter").onchange=renderFullTable;$("fullTypeFilter").onchange=renderFullTable;
