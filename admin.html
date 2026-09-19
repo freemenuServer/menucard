@@ -1,291 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FreeMenu.in — Super Admin</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-<script src="https://unpkg.com/lucide@latest"></script>
-<style>
-:root{--nav:#0d1929;--nav2:#132238;--red:#ef3340;--red2:#ff5662;--ink:#101828;--muted:#667085;--line:#e7eaf0;--bg:#f6f8fb;--white:#fff;--green:#12b76a;--orange:#f79009;--blue:#1570ef;--purple:#7f56d9}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--ink)}
-button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:flex;min-height:100vh}.sidebar{width:238px;background:linear-gradient(180deg,#0b1727,#122238);color:#d8e0ea;position:fixed;inset:0 auto 0 0;z-index:20;overflow:auto}.brand{height:74px;background:#fff;color:#111;display:flex;align-items:center;padding:10px 18px;gap:9px}.brand-mark{font-size:32px;color:var(--red)}.brand strong{font-size:24px;letter-spacing:-1px}.brand span{color:var(--red)}.tag{display:block;font-size:9px;color:#64748b;margin-top:-4px}.nav{padding:10px}.nav-title{font-size:12px;color:#91a0b5;padding:14px 11px 7px}.nav button{width:100%;border:0;background:transparent;color:#dbe4ef;text-align:left;padding:10px 11px;border-radius:8px;display:flex;align-items:center;gap:12px;font-size:14px;margin:2px 0}.nav button:hover{background:#1c3048}.nav button.active{background:linear-gradient(90deg,#ed2637,#f13d4c);color:#fff;box-shadow:0 4px 10px #0002}.nav svg{width:18px;height:18px}.badge{margin-left:auto;background:#f04444;color:#fff;border-radius:20px;padding:2px 7px;font-size:10px}.promo{margin:20px 16px;background:linear-gradient(145deg,#5d2631,#231a28);border:1px solid #d23b50;border-radius:10px;padding:18px;color:#fff;min-height:130px}.promo .crown{font-size:32px}.main{margin-left:238px;width:calc(100% - 238px)}.topbar{height:62px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 25px;gap:20px;position:sticky;top:0;z-index:15}.hamb{border:0;background:none}.search{height:38px;background:#f3f6fa;border:1px solid #e2e7ef;border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 12px;flex:1;max-width:555px;color:#98a2b3}.search input{border:0;outline:0;background:transparent;width:100%;color:#344054}.admin{margin-left:auto;display:flex;align-items:center;gap:10px}.avatar{width:38px;height:38px;border-radius:50%;background:#e9eef5;display:grid;place-items:center;font-weight:800}.admin small{display:block;color:#667085}.bell{position:relative}.bell b{position:absolute;top:-4px;right:-4px;background:#ef3340;color:#fff;border-radius:50%;font-size:9px;padding:3px 5px}.content{padding:24px 27px}.page{display:none}.page.active{display:block}.welcome{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15px}.welcome h1{font-size:29px;margin:0 0 3px;letter-spacing:-.8px}.welcome p{margin:0;color:#667085;font-size:17px}.date{text-align:right;color:#344054}.date strong{display:block;font-size:14px}.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}.stat{background:#fff;border:1px solid #edf0f4;border-radius:9px;padding:14px;min-height:104px;box-shadow:0 2px 8px #10182805}.stat-top{display:flex;gap:10px;align-items:center}.ico{width:43px;height:43px;border-radius:50%;display:grid;place-items:center}.ico.red{background:#ffe4e6;color:#e11d48}.ico.green{background:#dcfce7;color:#16a34a}.ico.orange{background:#ffedd5;color:#ea580c}.ico.blue{background:#dbeafe;color:#2563eb}.ico.purple{background:#ede9fe;color:#6d28d9}.stat h2{margin:0;font-size:20px}.stat p{margin:2px 0 0;color:#667085;font-size:11px}.trend{font-size:10px;margin:8px 0 0;color:var(--green)}.trend.down{color:#ef4444}.grid3{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:12px;margin-top:12px}.card{background:#fff;border:1px solid #e9edf3;border-radius:9px;box-shadow:0 2px 8px #10182805;padding:15px}.card h3{font-size:15px;margin:0}.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.select,.smallbtn{border:1px solid #e4e7ec;background:#fff;border-radius:7px;padding:7px 10px;font-size:11px;color:#344054}.charts{height:180px}.donut-wrap{display:flex;align-items:center;justify-content:center;gap:25px;height:180px}.legend{font-size:12px;line-height:2}.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:7px}.revenue-row{display:flex;gap:10px;align-items:center;margin:12px 0}.revicon{width:42px;height:42px;border-radius:9px;background:#f4f6f8;display:grid;place-items:center}.revenue-row strong{font-size:17px}.revenue-row small{display:block;color:#667085}.lower{display:grid;grid-template-columns:2.3fr 1fr;gap:12px;margin-top:12px}.tabs{display:flex;gap:24px;border-bottom:1px solid var(--line);margin:-15px -15px 10px;padding:0 15px}.tab{border:0;background:none;padding:13px 4px 10px;color:#475467;font-size:12px}.tab.active{color:#e11d2e;border-bottom:2px solid #e11d2e;font-weight:700}.tablewrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:11px}.table th{background:#f8fafc;color:#475467;text-align:left;padding:9px}.table td{padding:9px;border-bottom:1px solid #eef1f5;vertical-align:middle}.pill{display:inline-flex;align-items:center;gap:5px;border-radius:15px;padding:4px 8px;font-size:10px}.pill.green{background:#e7f8ef;color:#087443}.pill.orange{background:#fff1dc;color:#b54708}.pill.red{background:#feeceb;color:#b42318}.actions{display:flex;gap:5px}.iconbtn{border:1px solid #e4e7ec;background:#fff;border-radius:6px;padding:5px;color:#475467}.quick{display:grid;grid-template-columns:1fr 1fr;gap:8px}.quick button{background:#fff;border:1px solid #e4e7ec;border-radius:8px;padding:12px 8px;text-align:left;font-size:11px;color:#344054}.quick button:hover{border-color:#cbd5e1;background:#f8fafc}.quick svg{vertical-align:middle;margin-right:6px}.bottom3{display:grid;grid-template-columns:1.2fr 1.2fr 1.3fr;gap:12px;margin-top:12px}.bars .bar{display:flex;align-items:center;gap:8px;margin:12px 0;font-size:11px}.barbg{height:8px;background:#edf1f6;border-radius:20px;flex:1}.barfg{height:100%;background:#ef3340;border-radius:20px}.activity{font-size:11px}.activity div{display:flex;gap:8px;padding:9px 0;border-bottom:1px solid #eef1f5}.activity i{width:8px;height:8px;border-radius:50%;margin-top:4px}.subpage-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.subpage-head h2{margin:0}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.input{border:1px solid #dfe3ea;border-radius:7px;padding:9px 10px;background:#fff;outline:0}.primary{background:#ef3340;color:#fff;border:0;border-radius:7px;padding:9px 13px;font-weight:700}.danger{background:#fff;border:1px solid #f1b8bc;color:#c81e2d;border-radius:7px;padding:7px 9px}.modal{position:fixed;inset:0;background:#0b122080;display:none;place-items:center;z-index:50;padding:20px}.modal.show{display:grid}.modalbox{background:#fff;width:min(680px,100%);max-height:90vh;overflow:auto;border-radius:12px;padding:20px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field label{font-size:11px;color:#475467;display:block;margin-bottom:5px}.field input,.field select,.field textarea{width:100%;padding:9px;border:1px solid #dfe3ea;border-radius:7px;outline:0}.field.full{grid-column:1/-1}.modalfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}.notice{padding:12px;background:#fff8e7;border:1px solid #fedf89;color:#925b00;border-radius:8px;font-size:12px;margin-bottom:12px}.empty{padding:25px;text-align:center;color:#667085}.toast{position:fixed;right:20px;bottom:20px;background:#101828;color:#fff;padding:11px 15px;border-radius:8px;display:none;z-index:80;font-size:12px}.toast.show{display:block}.mobile-only{display:none}.restaurant-direct-link{color:#111;text-decoration:none}.restaurant-direct-link:hover{text-decoration:underline;color:#e11d2e}
-@media(max-width:1150px){.stats{grid-template-columns:repeat(3,1fr)}.grid3,.bottom3{grid-template-columns:1fr}.lower{grid-template-columns:1fr}}
-@media(max-width:800px){.sidebar{transform:translateX(-100%);transition:.2s}.sidebar.open{transform:translateX(0)}.main{margin-left:0;width:100%}.mobile-only{display:block}.topbar{padding:0 12px}.content{padding:16px 12px}.stats{grid-template-columns:1fr 1fr}.search{display:none}.formgrid{grid-template-columns:1fr}.welcome h1{font-size:22px}.date{display:none}}
-
-
-
-.ai-ready{border-color:#12b76a!important;background:#ecfdf3!important}
-.ai-working{opacity:.65;pointer-events:none}
-
-#aiReviewTable .ai-input{width:100%;min-width:90px;padding:8px 9px;border:1px solid #d0d5dd;border-radius:8px;background:#fff;font:inherit;font-size:12px}
-#aiReviewTable .ai-textarea{min-height:50px;resize:vertical}
-#aiReviewTable td{vertical-align:top}
-.ai-confidence{font-size:10px;margin-top:4px;color:#667085}
-.ai-low{border-color:#f79009 !important;background:#fffaeb !important}
-.ai-file{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid #eaecf0;border-radius:9px;background:#f9fafb;margin-top:7px;font-size:12px}
-
-
-
-.restaurant-direct-link{color:inherit;text-decoration:none;cursor:pointer}
-.restaurant-direct-link b{transition:opacity .15s}
-.restaurant-direct-link:hover b{opacity:.72;text-decoration:underline}
-</style>
-</head>
-<body>
-
-<div id="loginScreen" style="position:fixed;inset:0;background:#f6f8fb;z-index:100;display:grid;place-items:center;padding:20px">
-  <div style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;width:min(410px,100%);padding:28px;box-shadow:0 20px 60px #10182818">
-    <div style="text-align:center;margin-bottom:20px"><div style="font-size:34px">👑</div><h2 style="margin:5px 0">Super Admin Login</h2><p style="margin:0;color:#667085;font-size:13px">FreeMenu.in Administration</p></div>
-    <label style="display:block;font-size:12px;color:#475467;margin:10px 0 5px">Email</label>
-    <input id="loginEmail" class="input" style="width:100%" value="athravsharma2828@gmail.com" readonly>
-    <label style="display:block;font-size:12px;color:#475467;margin:10px 0 5px">Password</label>
-    <input id="loginPassword" class="input" style="width:100%" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')adminLogin()">
-    <button class="primary" style="width:100%;margin-top:12px;padding:11px" onclick="adminLogin()">Login as Super Admin</button>
-    <div id="loginError" style="color:#b42318;font-size:12px;margin-top:10px;text-align:center"></div>
-  </div>
-</div>
-
-<div class="app">
-<aside class="sidebar" id="sidebar">
-  <div class="brand"><div class="brand-mark">♨</div><div><strong>FreeMenu<span>.in</span></strong><span class="tag">Every Restaurant. One Digital Menu.</span></div></div>
-  <nav class="nav">
-    <button class="active" data-page="dashboard"><i data-lucide="home"></i>Dashboard</button>
-    <button data-page="restaurants"><i data-lucide="store"></i>Restaurants</button><button data-page="qrManagement"><i data-lucide="qr-code"></i>QR Management</button>
-    <button data-page="owners"><i data-lucide="users"></i>Restaurant Owners</button>
-    <button data-page="menu"><i data-lucide="book-open"></i>Menu Management</button>
-    <button data-page="categories"><i data-lucide="layers"></i>Categories</button>
-    <button data-page="approvals"><i data-lucide="clock-3"></i>Pending Approvals <b class="badge" id="approvalBadge">0</b></button>
-    <button data-page="ads"><i data-lucide="badge-dollar-sign"></i>Advertisements</button><button data-page="mediaRules"><i data-lucide="image"></i>Media Upload Rules</button>
-    <button data-page="subscriptions"><i data-lucide="crown"></i>Subscriptions</button>
-    <button data-page="analytics"><i data-lucide="bar-chart-3"></i>Analytics</button>
-    <button data-page="reports"><i data-lucide="file-text"></i>Reports</button>
-    <button data-page="customers"><i data-lucide="user-round"></i>Customers</button>
-    <div class="nav-title">SYSTEM MANAGEMENT</div>
-    <button data-page="admins"><i data-lucide="user-cog"></i>Admin Users</button>
-    <button data-page="settings"><i data-lucide="settings"></i>Platform Settings</button>
-    <button data-page="logs"><i data-lucide="history"></i>Activity Logs</button>
-    <button data-page="security"><i data-lucide="shield-check"></i>Security</button>
-    <div class="nav-title">SUPPORT</div>
-    <button data-page="support"><i data-lucide="messages-square"></i>Support / Complaints <b class="badge">0</b></button>
-    <button data-page="announcements"><i data-lucide="megaphone"></i>Announcements</button>
-    <button data-page="help"><i data-lucide="circle-help"></i>Help & Resources</button>
-  </nav>
-  <div class="promo"><div class="crown">♛</div><b>Build Bigger<br>Food for Everyone!</b><div style="margin-top:14px;font-size:11px">FreeMenu.in</div></div>
-</aside>
-
-<main class="main">
-<header class="topbar">
-  <button class="hamb mobile-only" onclick="toggleSidebar()"><i data-lucide="menu"></i></button>
-  <div class="search"><i data-lucide="search" style="width:17px"></i><input id="globalSearch" placeholder="Search restaurants, owners, menus, cities..."><span style="font-size:10px">Ctrl + K</span></div>
-  <div class="admin"><button class="bell iconbtn" onclick="showPage('logs')"><i data-lucide="bell"></i><b id="notifCount">0</b></button><div class="avatar" id="avatar">SA</div><div><strong id="adminName">Super Admin</strong><small>Administrator</small></div><button class="iconbtn" onclick="logout()"><i data-lucide="log-out"></i></button></div>
-</header>
-
-<section class="content">
-<div id="dashboard" class="page active">
-  <div class="welcome"><div><h1>Good Morning, Super Admin! 👋</h1><p>Here’s what’s happening on FreeMenu.in today.</p></div><div class="date"><strong id="todayDate"></strong><span id="todayTime"></span></div></div>
-  <div class="stats">
-    <div class="stat"><div class="stat-top"><div class="ico red"><i data-lucide="store"></i></div><div><h2 id="sRestaurants">0</h2><p>Total Restaurants</p></div></div><div class="trend">↑ Live from Supabase</div></div>
-    <div class="stat"><div class="stat-top"><div class="ico green"><i data-lucide="circle-check"></i></div><div><h2 id="sActive">0</h2><p>Active Restaurants</p></div></div><div class="trend">↑ Current status</div></div>
-    <div class="stat"><div class="stat-top"><div class="ico orange"><i data-lucide="clock-3"></i></div><div><h2 id="sPending">0</h2><p>Pending Approval</p></div></div><div class="trend">Awaiting action</div></div>
-    <div class="stat"><div class="stat-top"><div class="ico red"><i data-lucide="ban"></i></div><div><h2 id="sBlocked">0</h2><p>Blocked Restaurants</p></div></div><div class="trend down">Needs attention</div></div>
-    <div class="stat"><div class="stat-top"><div class="ico blue"><i data-lucide="utensils"></i></div><div><h2 id="sItems">0</h2><p>Total Menu Items</p></div></div><div class="trend">↑ Live count</div></div>
-    <div class="stat"><div class="stat-top"><div class="ico purple"><i data-lucide="eye"></i></div><div><h2 id="sViews">0</h2><p>Menu Views</p></div></div><div class="trend">If analytics table exists</div></div>
-  </div>
-  <div class="grid3">
-    <div class="card"><div class="card-head"><h3>Restaurant Growth</h3><select class="select" id="growthPeriod"><option>Last 9 Months</option><option>Last 30 Days</option></select></div><div class="charts"><canvas id="growthChart"></canvas></div></div>
-    <div class="card"><div class="card-head"><h3>Restaurants by Status</h3></div><div class="donut-wrap"><div style="width:145px;height:145px"><canvas id="statusChart"></canvas></div><div class="legend"><div><span class="dot" style="background:#12b76a"></span>Active <b id="lgActive">0</b></div><div><span class="dot" style="background:#f79009"></span>Pending <b id="lgPending">0</b></div><div><span class="dot" style="background:#ef3340"></span>Blocked <b id="lgBlocked">0</b></div></div></div></div>
-    <div class="card"><div class="card-head"><h3>Revenue Overview</h3><select class="select"><option>This Month</option><option>All Time</option></select></div><div class="revenue-row"><div class="revicon">📢</div><div><strong id="adRevenue">₹0</strong><small>Ad Revenue (optional)</small></div></div><div class="revenue-row"><div class="revicon">♛</div><div><strong id="subRevenue">₹0</strong><small>Premium Subscriptions</small></div></div><div class="revenue-row"><div class="revicon">▥</div><div><strong id="totalRevenue">₹0</strong><small>Total Revenue</small></div></div></div>
-  </div>
-  <div class="lower">
-    <div class="card"><div class="tabs"><button class="tab active" onclick="dashTab(this,'recent')">Recent Restaurants</button><button class="tab" onclick="dashTab(this,'pending')">Pending Approvals <span class="badge" id="pendingTabBadge">0</span></button></div><div id="dashTable" class="tablewrap"></div></div>
-    <div class="card"><div class="card-head"><h3>⚙ Quick Actions</h3></div><div class="quick">
-      <button onclick="openRestaurantModal()">🏪 Add New Restaurant</button><button onclick="showPage('approvals')">✅ Approve Restaurants</button>
-      <button onclick="showPage('owners')">👥 Manage Owners</button><button onclick="showPage('ads')">🅰 Manage Ads</button>
-      <button onclick="showPage('reports')">▥ View Reports</button><button onclick="showPage('settings')">⚙ Platform Settings</button>
-    </div></div>
-  </div>
-  <div class="bottom3">
-    <div class="card"><div class="card-head"><h3>Top Cities by Restaurants</h3></div><div id="cities" class="bars"></div></div>
-    <div class="card"><div class="card-head"><h3>Popular Menu Categories</h3></div><div id="popularCats" class="bars"></div></div>
-    <div class="card"><div class="card-head"><h3>Recent Activity</h3></div><div id="activity" class="activity"></div></div>
-  </div>
-</div>
-
-<div id="restaurants" class="page"><div class="subpage-head"><div><h2>Restaurants</h2><p style="color:#667085">Manage all registered restaurants.</p></div><div style="display:flex;gap:8px"><button class="iconbtn" onclick="loadAll()" title="Refresh data">↻ Refresh</button><button class="primary" onclick="openRestaurantModal()">+ Add Restaurant</button></div></div><div class="card"><div class="toolbar"><input class="input" id="restaurantSearch" placeholder="Search restaurant, phone, city..."><select class="input" id="restaurantStatus"><option value="">All Status</option><option>active</option><option>pending</option><option>blocked</option></select></div><div id="restaurantPageTable" class="tablewrap" style="margin-top:12px"></div></div></div>
-
-<div id="qrManagement" class="page"><div class="subpage-head"><div><h2>QR Management</h2><p style="color:#667085">Generate QR codes in lots of 100 and assign up to 10 QR codes to each restaurant.</p></div><div class="toolbar"><button class="iconbtn" onclick="loadQRs()">↻ Refresh</button><button class="primary" onclick="generateQRBatch(100)">＋ Generate Next 100</button></div></div><div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:12px"><div class="stat"><div class="stat-top"><div class="ico blue">📱</div><div><h2 id="qrTotal">0</h2><p>Total QR Codes</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico green">✓</div><div><h2 id="qrAvailable">0</h2><p>Available</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico orange">↗</div><div><h2 id="qrAssigned">0</h2><p>Assigned</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico purple">10</div><div><h2>10</h2><p>Max per Restaurant</p></div></div></div></div><div class="card"><div class="toolbar"><input class="input" id="qrSearch" placeholder="Search QR ID, restaurant, label..."><select class="input" id="qrStatus"><option value="">All Status</option><option value="available">Available</option><option value="assigned">Assigned</option></select><select class="input" id="qrRestaurantFilter"><option value="">All Restaurants</option></select></div><div id="qrTable" class="tablewrap" style="margin-top:12px"></div></div></div><div id="owners" class="page"><div class="subpage-head"><h2>Restaurant Owners</h2></div><div class="card"><div class="toolbar"><input class="input" id="ownerSearch" placeholder="Search owner email/name..."></div><div id="ownersTable" class="tablewrap" style="margin-top:12px"></div></div></div>
-
-<div id="menu" class="page"><div class="subpage-head"><h2>Menu Management</h2></div><div class="card"><div class="toolbar"><select class="input" id="menuRestaurantFilter"><option value="">All Restaurants</option></select><input class="input" id="menuSearch" placeholder="Search item/category..."><button class="primary" onclick="openMenuModal()">+ Add Menu Item</button></div><div id="menuTable" class="tablewrap" style="margin-top:12px"></div></div></div>
-
-<div id="categories" class="page"><div class="subpage-head"><h2>Categories</h2><button class="primary" onclick="openCategoryModal()">+ Add Category</button></div><div class="card"><div id="categoriesTable" class="tablewrap"></div></div></div>
-<div id="approvals" class="page"><div class="subpage-head"><h2>Pending Approvals</h2></div><div class="card"><div id="approvalsTable" class="tablewrap"></div></div></div>
-<div id="ads" class="page"><div class="subpage-head"><h2>Advertisements</h2></div><div class="card"><div class="notice">Free plan ads can be enabled here. Premium restaurants should automatically stop showing public-menu ads while their active subscription is valid.</div><div class="formgrid"><div class="field"><label>Google AdSense Client ID</label><input id="adsClient" placeholder="ca-pub-xxxxxxxx"></div><div class="field"><label>Default Ad Slot</label><input id="adsSlot" placeholder="1234567890"></div><div class="field"><label>Ads on Free Menus</label><select id="adsFree"><option value="true">Enabled</option><option value="false">Disabled</option></select></div><div class="field"><label>Ads on Premium Menus</label><select id="adsPremium"><option value="false">Disabled</option><option value="true">Enabled</option></select></div><div class="field"><label>Menu Ad Position</label><select id="adsPosition"><option value="after_2_categories">After every 2 categories</option><option value="after_1_category">After every category</option></select></div></div><div class="modalfoot"><button class="primary" onclick="saveAdSettings()">Save Ad Settings</button></div></div></div>
-
-<div id="mediaRules" class="page">
-  <div class="subpage-head"><h2>Media Upload Rules</h2></div>
-  <div class="card">
-    <div class="notice">Super Admin controls restaurant image uploads. The maximum image size cannot exceed <b>1 MB</b>.</div>
-    <div class="formgrid">
-      <div class="field"><label>Maximum Image Size (MB)</label><input id="mediaMaxMb" type="number" min="0.1" max="1" step="0.1" value="1"><small style="color:#667085">You may lower the limit, but not above 1 MB.</small></div>
-      <div class="field"><label>Logo Upload</label><select id="mediaLogoEnabled"><option value="true">ON — 1 Logo</option><option value="false">OFF</option></select></div>
-      <div class="field"><label>Banner Upload</label><select id="mediaBannerEnabled"><option value="true">ON — 1 Banner</option><option value="false">OFF</option></select></div>
-      <div class="field"><label>Paid Gallery</label><select id="mediaGalleryPaid"><option value="false">OFF</option><option value="true">ON — Premium Only</option></select><small style="color:#667085">Only active Premium restaurants can use Gallery when ON.</small></div>
-    </div>
-    <div class="modalfoot"><button class="primary" onclick="saveMediaRules()">Save Media Rules</button></div>
-  </div>
-  <div class="card" style="margin-top:12px">
-    <h3>Current Media Policy</h3>
-    <div id="mediaRulesSummary" class="empty">Loading...</div>
-  </div>
-</div>
-
-
-<div id="subscriptions" class="page"><div class="subpage-head"><h2>Subscriptions</h2></div><div class="card"><div id="subsTable" class="tablewrap"></div></div></div>
-<div id="analytics" class="page"><div class="subpage-head"><h2>Analytics</h2></div><div class="grid3"><div class="card"><h3>Total Menu Views</h3><h1 id="anViews">0</h1></div><div class="card"><h3>Premium Restaurants</h3><h1 id="anPremium">0</h1></div><div class="card"><h3>Active Restaurants</h3><h1 id="anActive">0</h1></div></div><div class="card" style="margin-top:12px"><div class="charts"><canvas id="analyticsChart"></canvas></div></div></div>
-<div id="reports" class="page"><div class="subpage-head"><h2>Reports</h2><button class="primary" onclick="exportRestaurantsCSV()">Export Restaurants CSV</button></div><div class="card"><div class="empty">Use the export button to download the current restaurant dataset. More report modules can be added without changing the public menu.</div></div></div>
-<div id="customers" class="page"><div class="subpage-head"><h2>Customers</h2></div><div class="card"><div class="empty">Customer data is shown here when a customer/analytics table is configured.</div></div></div>
-<div id="admins" class="page"><div class="subpage-head"><h2>Admin Users</h2></div><div class="card"><div id="adminsTable"></div></div></div>
-<div id="settings" class="page"><div class="subpage-head"><h2>Platform Settings</h2></div><div class="card"><div class="notice">Settings are stored in <b>platform_settings</b>. Run the supplied SQL setup once before using this module.</div><div class="formgrid"><div class="field"><label>Platform Name</label><input id="setName" value="FreeMenu.in"></div><div class="field"><label>Support Email</label><input id="setEmail" placeholder="support@example.com"></div><div class="field"><label>Public Menus Enabled</label><select id="setPublic"><option value="true">Enabled</option><option value="false">Disabled</option></select></div><div class="field"><label>New Restaurant Approval</label><select id="setApproval"><option value="true">Required</option><option value="false">Automatic</option></select></div></div><div class="modalfoot"><button class="primary" onclick="savePlatformSettings()">Save Settings</button></div></div></div>
-<div id="logs" class="page"><div class="subpage-head"><h2>Activity Logs</h2></div><div class="card"><div id="logsTable" class="tablewrap"></div></div></div>
-<div id="security" class="page"><div class="subpage-head"><h2>Security</h2></div><div class="card"><div class="notice">Super Admin access is checked against <b>profiles.role = 'admin'</b>. Database RLS should also enforce admin-only writes; the SQL file included with this page adds the required policies for the new admin tables.</div><p>Current session: <b id="securityUser">—</b></p></div></div>
-<div id="support" class="page"><div class="subpage-head"><h2>Support / Complaints</h2></div><div class="card"><div class="empty">Support module is ready for a <b>support_tickets</b> table when you want ticket management.</div></div></div>
-<div id="announcements" class="page"><div class="subpage-head"><h2>Announcements</h2></div><div class="card"><div class="empty">Announcement publishing can be connected to an <b>announcements</b> table.</div></div></div>
-<div id="help" class="page"><div class="subpage-head"><h2>Help & Resources</h2></div><div class="card"><h3>Super Admin</h3><p style="color:#667085">Use Restaurants to manage status, Menu Management for menu items, Subscriptions for premium status, Advertisements for ad configuration, and Activity Logs to audit changes.</p></div></div>
-</section>
-</main></div>
-
-<div class="modal" id="modal"><div class="modalbox" id="modalBox"></div></div>
-<div class="toast" id="toast"></div>
-
-<script>
-const SUPABASE_URL='https://pfsrpowopbrevocwsuii.supabase.co';
-const SUPABASE_KEY='sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let session=null, restaurants=[], menuItems=[], profiles=[], subscriptions=[], charts={};
-const $=id=>document.getElementById(id);
-const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-function toast(m){$('toast').textContent=m;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2400)}
-function toggleSidebar(){$('sidebar').classList.toggle('open')}
-function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$(id)?.classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(innerWidth<800)$('sidebar').classList.remove('open');if(id==='restaurants')renderRestaurantPage();if(id==='owners')renderOwners();if(id==='menu')renderMenu();if(id==='categories')renderCategories();if(id==='approvals')renderApprovals();if(id==='subscriptions')renderSubscriptions();if(id==='admins')renderAdmins();if(id==='logs')renderLogs();if(id==='analytics')renderAnalytics();if(id==='qrManagement')loadQRs()}
-document.querySelectorAll('.nav button[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
-function closeModal(){$('modal').classList.remove('show')}
-$('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeModal()});
-function modal(title,body){$('modalBox').innerHTML=`<div class="card-head"><h3>${title}</h3><button class="iconbtn" onclick="closeModal()">✕</button></div>${body}`;$('modal').classList.add('show')}
-async function q(table,select='*'){const r=await db.from(table).select(select);if(r.error){console.error('Supabase '+table+' error:',r.error);toast(table+' load failed: '+r.error.message);return []}return r.data||[]}
-async function adminLogin(){
- const email=$('loginEmail').value.trim(),password=$('loginPassword').value;
- $('loginError').textContent='';
- if(!password)return $('loginError').textContent='Password enter karein.';
- const {data,error}=await db.auth.signInWithPassword({email,password});
- if(error)return $('loginError').textContent=error.message;
- session=data.session;
- const {data:p,error:pe}=await db.from('profiles').select('*').eq('id',data.user.id).single();
- if(pe||!p||p.role!=='admin'){await db.auth.signOut();return $('loginError').textContent='Access Denied! profiles.role must be admin.'}
- $('loginScreen').style.display='none';
- $('adminName').textContent=p.name||p.full_name||'Super Admin';$('avatar').textContent=(p.name||p.full_name||'SA').slice(0,2).toUpperCase();
- $('securityUser').textContent=session.user.email||session.user.id;
- await loadAll(); buildCharts(); updateStats();
-}
-async function adminCheck(){
- const {data,error}=await db.auth.getSession(); if(error)throw error; session=data.session;
- if(!session){$('loginScreen').style.display='grid';return false}
- const {data:p,error:pe}=await db.from('profiles').select('*').eq('id',session.user.id).single();
- if(pe||!p||p.role!=='admin'){await db.auth.signOut();$('loginScreen').style.display='grid';$('loginError').textContent='Access Denied! Super Admin role required.';return false}
- $('loginScreen').style.display='none';
- $('adminName').textContent=p.name||p.full_name||'Super Admin';$('avatar').textContent=(p.name||p.full_name||'SA').slice(0,2).toUpperCase();
- $('securityUser').textContent=session.user.email||session.user.id;return true
-}
-async function loadAll(){
- try{
-  restaurants=await q('restaurants');
-  menuItems=await q('menu_items');
-  profiles=await q('profiles');
-  subscriptions=await q('subscriptions');
-  updateStats();renderDashboardTable();renderCities();renderPopularCats();await renderActivity();populateRestaurantFilters();renderRestaurantPage();renderMenu();renderCategories();renderApprovals();renderSubscriptions();renderOwners();renderAdmins();await renderLogs();renderAnalytics();await loadSettings();await loadAdSettings();await loadMediaRules();await loadQRs();
- }catch(e){console.error('loadAll failed',e);toast('Dashboard refresh failed: '+(e?.message||e));}
-}
-function statusOf(r){return String(r.status|| (r.is_active===false?'blocked':r.is_active===true?'active':'active')).toLowerCase()}
-function updateStats(){
- const active=restaurants.filter(r=>statusOf(r)==='active').length,pending=restaurants.filter(r=>statusOf(r)==='pending').length,blocked=restaurants.filter(r=>statusOf(r)==='blocked').length;
- $('sRestaurants').textContent=restaurants.length;$('sActive').textContent=active;$('sPending').textContent=pending;$('sBlocked').textContent=blocked;$('sItems').textContent=menuItems.length;
- $('lgActive').textContent=active;$('lgPending').textContent=pending;$('lgBlocked').textContent=blocked;$('approvalBadge').textContent=pending;$('pendingTabBadge').textContent=pending;
- $('sViews').textContent=localStorage.getItem('fm_admin_views')||'0';$('anViews').textContent=$('sViews').textContent;$('anActive').textContent=active;$('anPremium').textContent=subscriptions.filter(s=>s.status==='active'&&s.plan==='premium').length;
- $('subRevenue').textContent='₹'+subscriptions.reduce((a,s)=>a+Number(s.amount||0),0).toLocaleString('en-IN');$('totalRevenue').textContent=$('subRevenue').textContent;$('adRevenue').textContent='₹0';
- if(charts.status){charts.status.data.datasets[0].data=[active,pending,blocked];charts.status.update()}
-}
-function renderDashboardTable(list=restaurants.slice(-5).reverse()){
- list=list||[];
- $('dashTable').innerHTML=`<table class="table"><thead><tr><th>#</th><th>Logo</th><th>Restaurant</th><th>Owner</th><th>Location</th><th>Items</th><th>Status</th><th>Action</th></tr></thead><tbody>${list.map((r,i)=>{const owner=profiles.find(p=>p.id===r.owner_id);const cnt=menuItems.filter(m=>m.restaurant_id===r.id).length;return `<tr><td>${i+1}</td><td>${r.logo_url?`<img src="${esc(r.logo_url)}" style="width:30px;height:30px;border-radius:50%;object-fit:cover">`:'🍽️'}</td><td><a href="javascript:void(0)" class="restaurant-direct-link" title="Open Owner Panel" onclick="openOwnerPanel('${r.id}')"><b>${esc(r.name)}</b></a><br><small>${esc(r.phone||'')}</small></td><td>${esc(owner?.name||owner?.full_name||owner?.email||'—')}</td><td>${esc(r.address||'—')}</td><td>${cnt}</td><td>${pill(statusOf(r))}</td><td>${actionBtns(r)}</td></tr>`}).join('')}</tbody></table>`}
-function pill(s){return `<span class="pill ${s==='active'?'green':s==='pending'?'orange':'red'}">● ${esc(s)}</span>`}
-function actionBtns(r){return `<div class="actions"><button class="iconbtn" title="Open Owner Panel (Super Admin)" aria-label="Open Owner Panel" onclick="openOwnerPanel('${r.id}')">🔑</button><button class="iconbtn" title="Public Menu" onclick="openPublic('${esc(r.slug)}')">👁</button><button class="iconbtn" onclick="openRestaurantModal('${r.id}')">✎</button><button class="iconbtn" onclick="setRestaurantStatus('${r.id}','${statusOf(r)==='blocked'?'active':'blocked'}')">${statusOf(r)==='blocked'?'✓':'⊘'}</button><button class="iconbtn" onclick="deleteRestaurant('${r.id}')">⋯</button></div>`}
-function openOwnerPanel(id){if(!session?.user?.id)return toast('Super Admin session expired. Please login again.');const url=`owner.html?admin_restaurant=${encodeURIComponent(id)}&admin=1`;window.open(url,'_blank','noopener,noreferrer')}
-function openPublic(slug){window.open(`/menu/${encodeURIComponent(slug)}`,'_blank')}
-function renderCities(){
- const counts={};restaurants.forEach(r=>{const a=(r.address||'Unknown').split(',')[0].trim()||'Unknown';counts[a]=(counts[a]||0)+1});const arr=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5),max=arr[0]?.[1]||1;
- $('cities').innerHTML=arr.map(([n,v])=>`<div class="bar"><span style="width:72px">${esc(n)}</span><div class="barbg"><div class="barfg" style="width:${v/max*100}%"></div></div><b>${v}</b></div>`).join('')||'<div class="empty">No data</div>'
-}
-function renderPopularCats(){
- const c={};menuItems.forEach(m=>{const n=m.category||'Uncategorized';c[n]=(c[n]||0)+1});const arr=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,5),max=arr[0]?.[1]||1;
- $('popularCats').innerHTML=arr.map(([n,v])=>`<div class="bar"><span style="width:90px">${esc(n)}</span><div class="barbg"><div class="barfg" style="width:${v/max*100}%"></div></div><b>${v}</b></div>`).join('')||'<div class="empty">No data</div>'
-}
-async function renderActivity(){
- const logs=await q('activity_logs');const arr=(logs||[]).slice(-5).reverse();$('activity').innerHTML=arr.length?arr.map(x=>`<div><i style="background:#12b76a"></i><span>${esc(x.action||x.description||'Activity')}<small style="display:block;color:#98a2b3">${x.created_at?new Date(x.created_at).toLocaleString():''}</small></span></div>`).join(''):'<div class="empty">No activity logs yet.</div>'
-}
-function renderRestaurantPage(){
- const search=($('restaurantSearch')?.value||'').toLowerCase(),st=$('restaurantStatus')?.value||'';
- const list=restaurants.filter(r=>(!st||statusOf(r)===st)&&(`${r.name} ${r.phone} ${r.address} ${r.slug}`.toLowerCase().includes(search)));
- $('restaurantPageTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Owner</th><th>Slug</th><th>Items</th><th>Status</th><th>Actions</th></tr></thead><tbody>${list.map(r=>{const o=profiles.find(p=>p.id===r.owner_id);return `<tr><td><a href="javascript:void(0)" class="restaurant-direct-link" title="Open Owner Panel" onclick="openOwnerPanel('${r.id}')"><b>${esc(r.name)}</b></a><br><small>${esc(r.phone||'')}</small></td><td>${esc(o?.name||o?.full_name||o?.email||'—')}</td><td>${esc(r.slug)}</td><td>${menuItems.filter(m=>m.restaurant_id===r.id).length}</td><td>${pill(statusOf(r))}</td><td>${actionBtns(r)}</td></tr>`}).join('')||'<tr><td colspan="6"><div class="empty">No restaurants found.</div></td></tr>'}</tbody></table>`
-}
-$('restaurantSearch')?.addEventListener('input',renderRestaurantPage);$('restaurantStatus')?.addEventListener('change',renderRestaurantPage);
-function openRestaurantModal(id){
- const r=id?restaurants.find(x=>x.id===id):{};modal(id?'Edit Restaurant':'Add Restaurant',`<div class="formgrid">
- <div class="field"><label>Name</label><input id="rf_name" value="${esc(r?.name)}"></div><div class="field"><label>Slug</label><input id="rf_slug" value="${esc(r?.slug)}" placeholder="restaurant-name"></div>
- <div class="field"><label>Phone</label><input id="rf_phone" value="${esc(r?.phone)}"></div><div class="field"><label>Logo URL</label><input id="rf_logo" value="${esc(r?.logo_url)}"></div>
- <div class="field full"><label>Address</label><textarea id="rf_address">${esc(r?.address)}</textarea></div>
- <div class="field"><label>Status</label><select id="rf_status"><option ${statusOf(r)==='active'?'selected':''}>active</option><option ${statusOf(r)==='pending'?'selected':''}>pending</option><option ${statusOf(r)==='blocked'?'selected':''}>blocked</option></select></div>
- </div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveRestaurant('${id||''}')">Save Restaurant</button></div>`)
-}
-async function saveRestaurant(id){
- const payload={name:$('rf_name').value.trim(),slug:$('rf_slug').value.trim(),phone:$('rf_phone').value.trim(),logo_url:$('rf_logo').value.trim(),address:$('rf_address').value.trim(),status:$('rf_status').value};
- let r=id?await db.from('restaurants').update(payload).eq('id',id):await db.from('restaurants').insert({...payload});
- if(r.error){toast(r.error.message);return}await logAction(id?'Updated restaurant':'Created restaurant',id);closeModal();toast('Restaurant saved');await loadAll()
-}
-async function setRestaurantStatus(id,status){const r=await db.from('restaurants').update({status}).eq('id',id);if(r.error)return toast(r.error.message);await logAction(`Changed restaurant status to ${status}`,id);toast('Status updated');await loadAll()}
-async function deleteRestaurant(id){if(!confirm('Delete this restaurant?'))return;const r=await db.from('restaurants').delete().eq('id',id);if(r.error)return toast(r.error.message);await logAction('Deleted restaurant',id);toast('Restaurant deleted');await loadAll()}
-function populateRestaurantFilters(){const s=$('menuRestaurantFilter');if(!s)return;s.innerHTML='<option value="">All Restaurants</option>'+restaurants.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('')}
-function renderMenu(){
- const rid=$('menuRestaurantFilter')?.value||'',search=($('menuSearch')?.value||'').toLowerCase();let list=menuItems.filter(m=>(!rid||m.restaurant_id===rid)&&`${m.name} ${m.category} ${m.description}`.toLowerCase().includes(search));
- $('menuTable').innerHTML=`<table class="table"><thead><tr><th>Item</th><th>Restaurant</th><th>Category</th><th>Qtr</th><th>Half</th><th>Full</th><th>Price</th><th>Veg</th><th>Action</th></tr></thead><tbody>${list.map(m=>{const r=restaurants.find(x=>x.id===m.restaurant_id);return `<tr><td><b>${esc(m.name)}</b><br><small>${esc(m.description||'')}</small></td><td>${esc(r?.name||'—')}</td><td>${esc(m.category||'—')}</td><td>${m.price_quarter??'—'}</td><td>${m.price_half??'—'}</td><td>${m.price_full??'—'}</td><td>${m.price??'—'}</td><td>${m.is_veg?'🟢':'🔴'}</td><td><button class="iconbtn" onclick="openMenuModal('${m.id}')">✎</button> <button class="iconbtn" onclick="deleteMenu('${m.id}')">🗑</button></td></tr>`}).join('')||'<tr><td colspan="9"><div class="empty">No menu items.</div></td></tr>'}</tbody></table>`
-}
-$('menuRestaurantFilter')?.addEventListener('change',renderMenu);$('menuSearch')?.addEventListener('input',renderMenu);
-function openMenuModal(id){
- const m=id?menuItems.find(x=>x.id===id):{};modal(id?'Edit Menu Item':'Add Menu Item',`<div class="formgrid">
- <div class="field"><label>Restaurant</label><select id="mf_rest">${restaurants.map(r=>`<option value="${r.id}" ${r.id===m?.restaurant_id?'selected':''}>${esc(r.name)}</option>`).join('')}</select></div>
- <div class="field"><label>Category</label><input id="mf_cat" value="${esc(m?.category)}"></div><div class="field"><label>Name</label><input id="mf_name" value="${esc(m?.name)}"></div><div class="field"><label>Item Type</label><input id="mf_type" value="${esc(m?.item_type)}" placeholder="Main Course"></div>
- <div class="field full"><label>Description</label><textarea id="mf_desc">${esc(m?.description)}</textarea></div>
- <div class="field"><label>Quarter</label><input id="mf_q" type="number" step="0.01" value="${m?.price_quarter??''}"></div><div class="field"><label>Half</label><input id="mf_h" type="number" step="0.01" value="${m?.price_half??''}"></div>
- <div class="field"><label>Full</label><input id="mf_f" type="number" step="0.01" value="${m?.price_full??''}"></div><div class="field"><label>Single Price</label><input id="mf_price" type="number" step="0.01" value="${m?.price??''}"></div>
- <div class="field"><label>Veg</label><select id="mf_veg"><option value="true" ${m?.is_veg?'selected':''}>Yes</option><option value="false" ${m&&!m.is_veg?'selected':''}>No</option></select></div>
- </div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveMenu('${id||''}')">Save Item</button></div>`)
-}
-async function saveMenu(id){
- const p={restaurant_id:$('mf_rest').value,category:$('mf_cat').value.trim(),name:$('mf_name').value.trim(),item_type:$('mf_type').value.trim(),description:$('mf_desc').value.trim(),price_quarter:num('mf_q'),price_half:num('mf_h'),price_full:num('mf_f'),price:num('mf_price'),is_veg:$('mf_veg').value==='true'};
- const r=id?await db.from('menu_items').update(p).eq('id',id):await db.from('menu_items').insert(p);if(r.error)return toast(r.error.message);await logAction(id?'Updated menu item':'Created menu item',p.restaurant_id);closeModal();toast('Menu item saved');await loadAll()
-}
-function num(id){const v=$(id).value;return v===''?null:Number(v)}
-async function deleteMenu(id){if(!confirm('Delete this menu item?'))return;const r=await db.from('menu_items').delete().eq('id',id);if(r.error)return toast(r.error.message);toast('Item deleted');await loadAll()}
-function renderCategories(){const c={};menuItems.forEach(m=>{if(m.category)c[m.category]=(c[m.category]||0)+1});$('categoriesTable').innerHTML=`<table class="table"><thead><tr><th>Category</th><th>Items</th><th>Restaurants</th></tr></thead><tbody>${Object.entries(c).sort((a,b)=>b[1]-a[1]).map(([n,v])=>`<tr><td><b>${esc(n)}</b></td><td>${v}</td><td>${new Set(menuItems.filter(m=>m.category===n).map(m=>m.restaurant_id)).size}</td></tr>`).join('')||'<tr><td colspan="3"><div class="empty">Categories come from menu_items.category. Add one by creating a menu item.</div></td></tr>'}</tbody></table>`}
-function openCategoryModal(){modal('Add Category',`<div class="formgrid"><div class="field"><label>Restaurant</label><select id="cf_rest">${restaurants.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('')}</select></div><div class="field"><label>Category Name</label><input id="cf_name" placeholder="Main Course"></div></div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCategory()">Create</button></div>`)}
-async function saveCategory(){const rid=$('cf_rest').value,n=$('cf_name').value.trim();if(!n)return;const first=menuItems.find(m=>m.restaurant_id===rid);if(first){const p={...first};delete p.id;p.category=n;delete p.created_at;const r=await db.from('menu_items').insert({...p,name:'New Item'});if(r.error)return toast(r.error.message)}closeModal();toast('Category created by adding a starter menu item');await loadAll()}
-function renderApprovals(){const list=restaurants.filter(r=>statusOf(r)==='pending');$('approvalsTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Phone</th><th>Address</th><th>Action</th></tr></thead><tbody>${list.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.phone||'—')}</td><td>${esc(r.address||'—')}</td><td><button class="primary" onclick="setRestaurantStatus('${r.id}','active')">Approve</button> <button class="danger" onclick="setRestaurantStatus('${r.id}','blocked')">Reject</button></td></tr>`).join('')||'<tr><td colspan="4"><div class="empty">No pending approvals.</div></td></tr>'}</tbody></table>`}
-function renderOwners(){let list=profiles.filter(p=>p.role==='owner'||p.role==='restaurant_owner');const s=($('ownerSearch')?.value||'').toLowerCase();list=list.filter(p=>`${p.name} ${p.full_name} ${p.email}`.toLowerCase().includes(s));$('ownersTable').innerHTML=`<table class="table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Restaurants</th></tr></thead><tbody>${list.map(p=>`<tr><td>${esc(p.name||p.full_name||'—')}</td><td>${esc(p.email||'—')}</td><td>${esc(p.role)}</td><td>${restaurants.filter(r=>r.owner_id===p.id).length}</td></tr>`).join('')||'<tr><td colspan="4"><div class="empty">No owner profiles found or RLS is restricting profile rows.</div></td></tr>'}</tbody></table>`}
-$('ownerSearch')?.addEventListener('input',renderOwners);
-function renderSubscriptions(){$('subsTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Plan</th><th>Status</th><th>Amount</th><th>Start</th><th>Expiry</th></tr></thead><tbody>${subscriptions.map(s=>{const r=restaurants.find(x=>x.id===s.restaurant_id);return `<tr><td>${esc(r?.name||s.restaurant_id)}</td><td>${esc(s.plan||'free')}</td><td>${pill(s.status||'pending')}</td><td>₹${Number(s.amount||0).toLocaleString('en-IN')}</td><td>${fmt(s.start_date)}</td><td>${fmt(s.expiry_date)}</td></tr>`}).join('')||'<tr><td colspan="6"><div class="empty">No subscriptions table/data yet.</div></td></tr>'}</tbody></table>`}
-function renderAdmins(){const list=profiles.filter(p=>p.role==='admin');$('adminsTable').innerHTML=`<table class="table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>ID</th></tr></thead><tbody>${list.map(p=>`<tr><td>${esc(p.name||p.full_name||'Super Admin')}</td><td>${esc(p.email||'—')}</td><td>${esc(p.role)}</td><td>${esc(p.id)}</td></tr>`).join('')}</tbody></table>`}
-async function renderLogs(){const logs=await q('activity_logs');$('logsTable').innerHTML=`<table class="table"><thead><tr><th>Time</th><th>Action</th><th>Admin</th><th>Restaurant</th></tr></thead><tbody>${(logs||[]).slice().reverse().map(l=>`<tr><td>${fmt(l.created_at,true)}</td><td>${esc(l.action||l.description)}</td><td>${esc(l.admin_id||'—')}</td><td>${esc(l.restaurant_id||'—')}</td></tr>`).join('')||'<tr><td colspan="4"><div class="empty">No logs yet.</div></td></tr>'}</tbody></table>`}
-function fmt(x,time=false){return x?new Date(x).toLocaleString('en-IN',{dateStyle:'medium',...(time?{timeStyle:'short'}:{})}):'—'}
 async function logAction(action,restaurant_id=null){try{await db.from('activity_logs').insert({admin_id:session?.user?.id,action,restaurant_id})}catch(e){}}
 function dashTab(btn,type){document.querySelectorAll('.tabs .tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');renderDashboardTable(type==='pending'?restaurants.filter(r=>statusOf(r)==='pending'):restaurants.slice(-5).reverse())}
 function buildCharts(){
@@ -346,7 +58,7 @@ function renderQRs(){
   const list=qrCodes.filter(x=>{const r=restaurants.find(y=>y.id===x.restaurant_id);const hay=`${x.code} ${x.label||''} ${r?.name||''}`.toLowerCase();return (!q||hay.includes(q))&&(!st||x.status===st)&&(!rid||x.restaurant_id===rid)});
   $('qrTotal').textContent=qrCodes.length;$('qrAvailable').textContent=qrCodes.filter(x=>x.status==='available').length;$('qrAssigned').textContent=qrCodes.filter(x=>x.status==='assigned').length;
   $('qrRestaurantFilter').innerHTML='<option value="">All Restaurants</option>'+restaurants.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}</option>`).join('');
-  $('qrTable').innerHTML=`<table class="table"><thead><tr><th>QR ID</th><th>Status</th><th>Restaurant</th><th>Label</th><th>Action</th></tr></thead><tbody>${list.map(x=>{const r=restaurants.find(y=>y.id===x.restaurant_id);return `<tr><td><b>${esc(x.code)}</b></td><td>${pill(x.status||'available')}</td><td>${esc(r?.name||'—')}</td><td>${esc(x.label||'—')}</td><td>${x.status==='assigned'?`<button class="iconbtn" onclick="openQRPage('${x.code}')">View / Print</button> <button class="iconbtn" onclick="unassignQR('${x.id}')">Unassign</button>`:`<button class="iconbtn" onclick="openQRPage('${x.code}')">View QR</button> <button class="iconbtn" onclick="openAssignQR('${x.id}')">Assign</button>`}</td></tr>`}).join('')||'<tr><td colspan="5"><div class="empty">No QR codes found.</div></td></tr>'}</tbody></table>`;
+  $('qrTable').innerHTML=`<table class="table"><thead><tr><th>QR ID</th><th>Status</th><th>Restaurant</th><th>Slug</th><th>Label</th><th>Scan Target</th><th>Assigned</th><th>Action</th></tr></thead><tbody>${list.map(x=>{const r=restaurants.find(y=>y.id===x.restaurant_id);const target=r?.slug?getQRMenuTarget(r.slug):getQRPreprintedTarget(x.code);return `<tr><td><b>${esc(x.code)}</b><br><small>Pre-printed ID</small></td><td>${pill(x.status||'available')}</td><td>${esc(r?.name||'—')}</td><td>${esc(r?.slug||'—')}</td><td>${esc(x.label||'—')}</td><td><a href="${esc(target)}" target="_blank" rel="noopener" style="font-size:10px">${esc(target)}</a></td><td>${x.assigned_at?fmt(x.assigned_at,true):'—'}</td><td><div class="actions">${x.status==='assigned'?`<button class="iconbtn" onclick="openQRDetails('${x.id}')">Details</button><button class="iconbtn" onclick="openQRPage('${x.code}')">View / Print</button><button class="iconbtn" onclick="copyQRTarget('${x.code}')">Copy</button><button class="iconbtn" onclick="unassignQR('${x.id}')">Unassign</button>`:`<button class="iconbtn" onclick="openQRDetails('${x.id}')">Details</button><button class="iconbtn" onclick="openQRPage('${x.code}')">View QR</button><button class="iconbtn" onclick="copyQRTarget('${x.code}')">Copy</button><button class="iconbtn" onclick="openAssignQR('${x.id}')">Assign</button>`}</div></td></tr>`}).join('')||'<tr><td colspan="8"><div class="empty">No QR codes found.</div></td></tr>'}</tbody></table>`;
 }
 async function generateQRBatch(n=100){
   if(!confirm(`Generate the next ${n} QR codes?`))return;
@@ -359,17 +71,47 @@ function openAssignQR(id){
   modal('Assign QR Code',`<div class="notice"><b>${esc(x.code)}</b> can be assigned to one restaurant. A restaurant can have maximum 10 active QR codes.</div><div class="field"><label>Restaurant</label><select id="qrAssignRest">${restaurants.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}</option>`).join('')}</select></div><div class="field" style="margin-top:10px"><label>Label (optional)</label><input id="qrAssignLabel" placeholder="Table 1"></div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="assignQR('${x.id}')">Assign QR</button></div>`);
 }
 async function assignQR(id){
+  const x=qrCodes.find(q=>q.id===id);if(!x)return toast('QR code not found.');
+  if(String(x.status||'available')!=='available')return toast('This QR is already assigned.');
   const rid=$('qrAssignRest').value,label=$('qrAssignLabel').value.trim();
+  if(!rid)return toast('Restaurant select karein.');
   const count=qrCodes.filter(x=>x.restaurant_id===rid&&x.status==='assigned').length;if(count>=10)return toast('This restaurant already has the maximum 10 QR codes.');
-  const r=await db.from('qr_codes').update({restaurant_id:rid,label:label||null,status:'assigned',assigned_at:new Date().toISOString(),assigned_by:session.user.id}).eq('id',id);
-  if(r.error)return toast(r.error.message);await logAction('Assigned QR '+(qrCodes.find(x=>x.id===id)?.code||''),rid);closeModal();await loadQRs();toast('QR assigned');
+  const r=await db.from('qr_codes').update({restaurant_id:rid,label:label||null,status:'assigned',assigned_at:new Date().toISOString(),assigned_by:session.user.id}).eq('id',id).eq('status','available');
+  if(r.error)return toast(r.error.message);await logAction('Assigned QR '+(x.code||''),rid);closeModal();await loadQRs();toast('QR assigned');
 }
 async function unassignQR(id){if(!confirm('Unassign this QR? It will become available again.'))return;const x=qrCodes.find(q=>q.id===id);const r=await db.from('qr_codes').update({restaurant_id:null,label:null,status:'available',assigned_at:null,assigned_by:null}).eq('id',id);if(r.error)return toast(r.error.message);await logAction('Unassigned QR '+(x?.code||''));await loadQRs();toast('QR is available again')}
-function qrTargetURL(code){return new URL('/qr.html?code='+encodeURIComponent(code),location.origin).href}
+function qrTargetURL(code){return new URL('/qr.html?code='+encodeURIComponent(code)+'&view=print',location.origin).href}
+function getQRPreprintedTarget(code){return new URL('/qr.html?code='+encodeURIComponent(code),location.origin).href}
+function getQRMenuTarget(slug){return new URL('/menu.html?r='+encodeURIComponent(slug),location.origin).href}
 function openQRPage(code){
   const url=qrTargetURL(code);
   const w=window.open(url,'_blank');
   if(!w) toast('Please allow pop-ups to open the QR page.');
+}
+async function copyQRTarget(code){
+  const x=qrCodes.find(q=>q.code===code);
+  const r=x?.restaurant_id?restaurants.find(y=>y.id===x.restaurant_id):null;
+  const url=r?.slug?getQRMenuTarget(r.slug):getQRPreprintedTarget(code);
+  try{await navigator.clipboard.writeText(url);toast('QR target copied');}
+  catch(e){prompt('Copy QR target URL:',url);}
+}
+function openQRDetails(id){
+  const x=qrCodes.find(q=>q.id===id); if(!x)return;
+  const r=x.restaurant_id?restaurants.find(y=>y.id===x.restaurant_id):null;
+  const direct=r?.slug?getQRMenuTarget(r.slug):'—';
+  const preprinted=getQRPreprintedTarget(x.code);
+  modal('QR Details — '+esc(x.code),`<div class="formgrid">
+    <div class="field"><label>QR Code ID</label><input readonly value="${esc(x.code)}"></div>
+    <div class="field"><label>Status</label><input readonly value="${esc(x.status||'available')}"></div>
+    <div class="field"><label>Restaurant</label><input readonly value="${esc(r?.name||'Not assigned')}"></div>
+    <div class="field"><label>Restaurant Slug</label><input readonly value="${esc(r?.slug||'—')}"></div>
+    <div class="field"><label>Label</label><input readonly value="${esc(x.label||'—')}"></div>
+    <div class="field"><label>Assigned At</label><input readonly value="${esc(x.assigned_at?fmt(x.assigned_at,true):'—')}"></div>
+    <div class="field full"><label>Pre-printed QR target</label><input readonly value="${esc(preprinted)}"></div>
+    <div class="field full"><label>Current restaurant menu target</label><input readonly value="${esc(direct)}"></div>
+  </div>
+  <div class="notice" style="margin-top:12px"><b>Customer scan:</b> pre-printed QR uses the stable code URL and is resolved to the assigned restaurant menu. The printable QR generated here encodes the direct menu engine URL.</div>
+  <div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Close</button>${x.status==='assigned'?`<button class="primary" onclick="copyQRTarget('${x.code}')">Copy Scan Target</button>`:''}</div>`);
 }
 $('qrSearch')?.addEventListener('input',renderQRs);$('qrStatus')?.addEventListener('change',renderQRs);$('qrRestaurantFilter')?.addEventListener('change',renderQRs);
 function exportRestaurantsCSV(){const rows=[['id','name','slug','phone','address','status'],...restaurants.map(r=>[r.id,r.name,r.slug,r.phone,r.address,statusOf(r)])];const csv=rows.map(row=>row.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='freemenu-restaurants.csv';a.click()}
