@@ -1,127 +1,96 @@
-async function logAction(action,restaurant_id=null){try{await db.from('activity_logs').insert({admin_id:session?.user?.id,action,restaurant_id})}catch(e){}}
-function dashTab(btn,type){document.querySelectorAll('.tabs .tab').forEach(x=>x.classList.remove('active'));btn.classList.add('active');renderDashboardTable(type==='pending'?restaurants.filter(r=>statusOf(r)==='pending'):restaurants.slice(-5).reverse())}
-function buildCharts(){
- charts.growth=new Chart($('growthChart'),{type:'bar',data:{labels:monthLabels(),datasets:[{label:'Restaurants',data:growthData()}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
- const a=restaurants.filter(r=>statusOf(r)==='active').length,p=restaurants.filter(r=>statusOf(r)==='pending').length,b=restaurants.filter(r=>statusOf(r)==='blocked').length;
- charts.status=new Chart($('statusChart'),{type:'doughnut',data:{labels:['Active','Pending','Blocked'],datasets:[{data:[a,p,b],backgroundColor:['#12b76a','#f79009','#ef3340'],borderWidth:0}]},options:{cutout:'70%',plugins:{legend:{display:false}}}});
-}
-function monthLabels(){return Array.from({length:9},(_,i)=>new Date(new Date().getFullYear(),new Date().getMonth()-8+i,1).toLocaleString('en',{month:'short'}))}
-function growthData(){const now=new Date();return Array.from({length:9},(_,i)=>restaurants.filter(r=>{const d=new Date(r.created_at||0);const target=new Date(now.getFullYear(),now.getMonth()-8+i+1,1);const start=new Date(now.getFullYear(),now.getMonth()-8+i,1);return d>=start&&d<target}).length)}
-function menuGrowthData(){const now=new Date();return Array.from({length:9},(_,i)=>menuItems.filter(m=>{const d=new Date(m.created_at||0);const start=new Date(now.getFullYear(),now.getMonth()-8+i,1);const end=new Date(now.getFullYear(),now.getMonth()-8+i+1,1);return d>=start&&d<end}).length)}
-function renderAnalytics(){if(!charts.analytics){charts.analytics=new Chart($('analyticsChart'),{type:'line',data:{labels:monthLabels(),datasets:[{label:'Menu Items Added',data:menuGrowthData()}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}})}}
-async function loadSettings(){const rows=await q('platform_settings');if(!rows?.length)return;const m=Object.fromEntries(rows.map(x=>[x.key,x.value]));$('setName').value=m.platform_name||'FreeMenu.in';$('setEmail').value=m.support_email||'';$('setPublic').value=String(m.public_menus_enabled??true);$('setApproval').value=String(m.approval_required??true)}
-async function savePlatformSettings(){const vals={platform_name:$('setName').value,support_email:$('setEmail').value,public_menus_enabled:$('setPublic').value,approval_required:$('setApproval').value};for(const [key,value] of Object.entries(vals)){const r=await db.from('platform_settings').upsert({key,value,updated_by:session.user.id},{onConflict:'key'});if(r.error)return toast(r.error.message)}await logAction('Updated platform settings');toast('Settings saved')}
-async function loadAdSettings(){const rows=await q('platform_settings');if(!rows)return;const m=Object.fromEntries(rows.map(x=>[x.key,x.value]));$('adsClient').value=m.adsense_client_id||'';$('adsSlot').value=m.ads_default_slot||'';$('adsFree').value=String(m.free_plan_ads??true);$('adsPremium').value=String(m.premium_plan_ads??false);if($('adsPosition'))$('adsPosition').value=m.ads_position||'after_2_categories'}
-async function saveAdSettings(){const vals={adsense_client_id:$('adsClient').value.trim(),ads_default_slot:$('adsSlot').value.trim(),free_plan_ads:$('adsFree').value,premium_plan_ads:$('adsPremium').value,ads_position:$('adsPosition')?.value||'after_2_categories'};for(const [key,value] of Object.entries(vals)){const r=await db.from('platform_settings').upsert({key,value,updated_by:session.user.id},{onConflict:'key'});if(r.error)return toast(r.error.message)}await logAction('Updated advertisement settings');toast('Ad settings saved')}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FreeMenu.in — Super Admin</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root{--nav:#0d1929;--nav2:#132238;--red:#ef3340;--red2:#ff5662;--ink:#101828;--muted:#667085;--line:#e7eaf0;--bg:#f6f8fb;--white:#fff;--green:#12b76a;--orange:#f79009;--blue:#1570ef;--purple:#7f56d9}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--ink)}
+button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:flex;min-height:100vh}.sidebar{width:238px;background:linear-gradient(180deg,#0b1727,#122238);color:#d8e0ea;position:fixed;inset:0 auto 0 0;z-index:20;overflow:auto}.brand{height:74px;background:#fff;color:#111;display:flex;align-items:center;padding:10px 18px;gap:9px}.brand-mark{font-size:32px;color:var(--red)}.brand strong{font-size:24px;letter-spacing:-1px}.brand span{color:var(--red)}.tag{display:block;font-size:9px;color:#64748b;margin-top:-4px}.nav{padding:10px}.nav-title{font-size:12px;color:#91a0b5;padding:14px 11px 7px}.nav button{width:100%;border:0;background:transparent;color:#dbe4ef;text-align:left;padding:10px 11px;border-radius:8px;display:flex;align-items:center;gap:12px;font-size:14px;margin:2px 0}.nav button:hover{background:#1c3048}.nav button.active{background:linear-gradient(90deg,#ed2637,#f13d4c);color:#fff;box-shadow:0 4px 10px #0002}.nav svg{width:18px;height:18px}.badge{margin-left:auto;background:#f04444;color:#fff;border-radius:20px;padding:2px 7px;font-size:10px}.promo{margin:20px 16px;background:linear-gradient(145deg,#5d2631,#231a28);border:1px solid #d23b50;border-radius:10px;padding:18px;color:#fff;min-height:130px}.promo .crown{font-size:32px}.main{margin-left:238px;width:calc(100% - 238px)}.topbar{height:62px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 25px;gap:20px;position:sticky;top:0;z-index:15}.hamb{border:0;background:none}.search{height:38px;background:#f3f6fa;border:1px solid #e2e7ef;border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 12px;flex:1;max-width:555px;color:#98a2b3}.search input{border:0;outline:0;background:transparent;width:100%;color:#344054}.admin{margin-left:auto;display:flex;align-items:center;gap:10px}.avatar{width:38px;height:38px;border-radius:50%;background:#e9eef5;display:grid;place-items:center;font-weight:800}.admin small{display:block;color:#667085}.bell{position:relative}.bell b{position:absolute;top:-4px;right:-4px;background:#ef3340;color:#fff;border-radius:50%;font-size:9px;padding:3px 5px}.content{padding:24px 27px}.page{display:none}.page.active{display:block}.welcome{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15px}.welcome h1{font-size:29px;margin:0 0 3px;letter-spacing:-.8px}.welcome p{margin:0;color:#667085;font-size:17px}.date{text-align:right;color:#344054}.date strong{display:block;font-size:14px}.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}.stat{background:#fff;border:1px solid #edf0f4;border-radius:9px;padding:14px;min-height:104px;box-shadow:0 2px 8px #10182805}.stat-top{display:flex;gap:10px;align-items:center}.ico{width:43px;height:43px;border-radius:50%;display:grid;place-items:center}.ico.red{background:#ffe4e6;color:#e11d48}.ico.green{background:#dcfce7;color:#16a34a}.ico.orange{background:#ffedd5;color:#ea580c}.ico.blue{background:#dbeafe;color:#2563eb}.ico.purple{background:#ede9fe;color:#6d28d9}.stat h2{margin:0;font-size:20px}.stat p{margin:2px 0 0;color:#667085;font-size:11px}.trend{font-size:10px;margin:8px 0 0;color:var(--green)}.trend.down{color:#ef4444}.grid3{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:12px;margin-top:12px}.card{background:#fff;border:1px solid #e9edf3;border-radius:9px;box-shadow:0 2px 8px #10182805;padding:15px}.card h3{font-size:15px;margin:0}.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.select,.smallbtn{border:1px solid #e4e7ec;background:#fff;border-radius:7px;padding:7px 10px;font-size:11px;color:#344054}.charts{height:180px}.donut-wrap{display:flex;align-items:center;justify-content:center;gap:25px;height:180px}.legend{font-size:12px;line-height:2}.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:7px}.revenue-row{display:flex;gap:10px;align-items:center;margin:12px 0}.revicon{width:42px;height:42px;border-radius:9px;background:#f4f6f8;display:grid;place-items:center}.revenue-row strong{font-size:17px}.revenue-row small{display:block;color:#667085}.lower{display:grid;grid-template-columns:2.3fr 1fr;gap:12px;margin-top:12px}.tabs{display:flex;gap:24px;border-bottom:1px solid var(--line);margin:-15px -15px 10px;padding:0 15px}.tab{border:0;background:none;padding:13px 4px 10px;color:#475467;font-size:12px}.tab.active{color:#e11d2e;border-bottom:2px solid #e11d2e;font-weight:700}.tablewrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:11px}.table th{background:#f8fafc;color:#475467;text-align:left;padding:9px}.table td{padding:9px;border-bottom:1px solid #eef1f5;vertical-align:middle}.pill{display:inline-flex;align-items:center;gap:5px;border-radius:15px;padding:4px 8px;font-size:10px}.pill.green{background:#e7f8ef;color:#087443}.pill.orange{background:#fff1dc;color:#b54708}.pill.red{background:#feeceb;color:#b42318}.actions{display:flex;gap:5px}.iconbtn{border:1px solid #e4e7ec;background:#fff;border-radius:6px;padding:5px;color:#475467}.quick{display:grid;grid-template-columns:1fr 1fr;gap:8px}.quick button{background:#fff;border:1px solid #e4e7ec;border-radius:8px;padding:12px 8px;text-align:left;font-size:11px;color:#344054}.quick button:hover{border-color:#cbd5e1;background:#f8fafc}.quick svg{vertical-align:middle;margin-right:6px}.bottom3{display:grid;grid-template-columns:1.2fr 1.2fr 1.3fr;gap:12px;margin-top:12px}.bars .bar{display:flex;align-items:center;gap:8px;margin:12px 0;font-size:11px}.barbg{height:8px;background:#edf1f6;border-radius:20px;flex:1}.barfg{height:100%;background:#ef3340;border-radius:20px}.activity{font-size:11px}.activity div{display:flex;gap:8px;padding:9px 0;border-bottom:1px solid #eef1f5}.activity i{width:8px;height:8px;border-radius:50%;margin-top:4px}.subpage-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.subpage-head h2{margin:0}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.input{border:1px solid #dfe3ea;border-radius:7px;padding:9px 10px;background:#fff;outline:0}.primary{background:#ef3340;color:#fff;border:0;border-radius:7px;padding:9px 13px;font-weight:700}.danger{background:#fff;border:1px solid #f1b8bc;color:#c81e2d;border-radius:7px;padding:7px 9px}.modal{position:fixed;inset:0;background:#0b122080;display:none;place-items:center;z-index:50;padding:20px}.modal.show{display:grid}.modalbox{background:#fff;width:min(680px,100%);max-height:90vh;overflow:auto;border-radius:12px;padding:20px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field label{font-size:11px;color:#475467;display:block;margin-bottom:5px}.field input,.field select,.field textarea{width:100%;padding:9px;border:1px solid #dfe3ea;border-radius:7px;outline:0}.field.full{grid-column:1/-1}.modalfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}.notice{padding:12px;background:#fff8e7;border:1px solid #fedf89;color:#925b00;border-radius:8px;font-size:12px;margin-bottom:12px}.empty{padding:25px;text-align:center;color:#667085}.toast{position:fixed;right:20px;bottom:20px;background:#101828;color:#fff;padding:11px 15px;border-radius:8px;display:none;z-index:80;font-size:12px}.toast.show{display:block}.mobile-only{display:none}.restaurant-direct-link{color:#111;text-decoration:none}.restaurant-direct-link:hover{text-decoration:underline;color:#e11d2e}
+@media(max-width:1150px){.stats{grid-template-columns:repeat(3,1fr)}.grid3,.bottom3{grid-template-columns:1fr}.lower{grid-template-columns:1fr}}
+@media(max-width:800px){.sidebar{transform:translateX(-100%);transition:.2s}.sidebar.open{transform:translateX(0)}.main{margin-left:0;width:100%}.mobile-only{display:block}.topbar{padding:0 12px}.content{padding:16px 12px}.stats{grid-template-columns:1fr 1fr}.search{display:none}.formgrid{grid-template-columns:1fr}.welcome h1{font-size:22px}.date{display:none}}
 
-async function loadMediaRules(){
- const rows=await q('platform_settings');if(!rows)return;
- const m=Object.fromEntries(rows.map(x=>[x.key,x.value]));
- $('mediaMaxMb').value=Math.min(1,Math.max(.1,Number(m.media_max_image_mb||1)));
- $('mediaLogoEnabled').value=String(m.media_logo_enabled??true);
- $('mediaBannerEnabled').value=String(m.media_banner_enabled??true);
- $('mediaGalleryPaid').value=String(m.media_gallery_paid_enabled??false);
- renderMediaRulesSummary();
-}
-function renderMediaRulesSummary(){
- const mb=Math.min(1,Math.max(.1,Number($('mediaMaxMb').value||1)));
- const logo=$('mediaLogoEnabled').value==='true',banner=$('mediaBannerEnabled').value==='true',gallery=$('mediaGalleryPaid').value==='true';
- $('mediaRulesSummary').innerHTML=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px"><div><b>${mb} MB</b><small>Max image size</small></div><div><b>${logo?'ON':'OFF'}</b><small>Logo (1 max)</small></div><div><b>${banner?'ON':'OFF'}</b><small>Banner (1 max)</small></div><div><b>${gallery?'ON':'OFF'}</b><small>Paid Gallery</small></div></div>`;
-}
-async function saveMediaRules(){
- let mb=Math.min(1,Math.max(.1,Number($('mediaMaxMb').value||1)));$('mediaMaxMb').value=mb;
- const vals={
-  media_max_image_mb:String(mb),
-  media_logo_enabled:$('mediaLogoEnabled').value,
-  media_banner_enabled:$('mediaBannerEnabled').value,
-  media_gallery_paid_enabled:$('mediaGalleryPaid').value
- };
- for(const [key,value] of Object.entries(vals)){
-  const r=await db.from('platform_settings').upsert({key,value,updated_by:session.user.id},{onConflict:'key'});
-  if(r.error)return toast(r.error.message);
- }
- await logAction('Updated media upload rules');renderMediaRulesSummary();toast('Media rules saved');
-}
-$('mediaMaxMb')?.addEventListener('input',renderMediaRulesSummary);
-$('mediaLogoEnabled')?.addEventListener('change',renderMediaRulesSummary);
-$('mediaBannerEnabled')?.addEventListener('change',renderMediaRulesSummary);
-$('mediaGalleryPaid')?.addEventListener('change',renderMediaRulesSummary);
 
-let qrCodes=[];
-async function loadQRs(){
-  const r=await db.from('qr_codes').select('*').order('code',{ascending:true});
-  if(r.error){console.error(r.error);toast('QR table not ready: '+r.error.message);return}
-  qrCodes=r.data||[]; renderQRs();
-}
-function renderQRs(){
-  const q=($('qrSearch')?.value||'').toLowerCase(); const st=$('qrStatus')?.value||''; const rid=$('qrRestaurantFilter')?.value||'';
-  const list=qrCodes.filter(x=>{const r=restaurants.find(y=>y.id===x.restaurant_id);const hay=`${x.code} ${x.label||''} ${r?.name||''}`.toLowerCase();return (!q||hay.includes(q))&&(!st||x.status===st)&&(!rid||x.restaurant_id===rid)});
-  $('qrTotal').textContent=qrCodes.length;$('qrAvailable').textContent=qrCodes.filter(x=>x.status==='available').length;$('qrAssigned').textContent=qrCodes.filter(x=>x.status==='assigned').length;
-  $('qrRestaurantFilter').innerHTML='<option value="">All Restaurants</option>'+restaurants.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}</option>`).join('');
-  $('qrTable').innerHTML=`<table class="table"><thead><tr><th>QR ID</th><th>Status</th><th>Restaurant</th><th>Slug</th><th>Label</th><th>Scan Target</th><th>Assigned</th><th>Action</th></tr></thead><tbody>${list.map(x=>{const r=restaurants.find(y=>y.id===x.restaurant_id);const target=r?.slug?getQRMenuTarget(r.slug):getQRPreprintedTarget(x.code);return `<tr><td><b>${esc(x.code)}</b><br><small>Pre-printed ID</small></td><td>${pill(x.status||'available')}</td><td>${esc(r?.name||'—')}</td><td>${esc(r?.slug||'—')}</td><td>${esc(x.label||'—')}</td><td><a href="${esc(target)}" target="_blank" rel="noopener" style="font-size:10px">${esc(target)}</a></td><td>${x.assigned_at?fmt(x.assigned_at,true):'—'}</td><td><div class="actions">${x.status==='assigned'?`<button class="iconbtn" onclick="openQRDetails('${x.id}')">Details</button><button class="iconbtn" onclick="openQRPage('${x.code}')">View / Print</button><button class="iconbtn" onclick="copyQRTarget('${x.code}')">Copy</button><button class="iconbtn" onclick="unassignQR('${x.id}')">Unassign</button>`:`<button class="iconbtn" onclick="openQRDetails('${x.id}')">Details</button><button class="iconbtn" onclick="openQRPage('${x.code}')">View QR</button><button class="iconbtn" onclick="copyQRTarget('${x.code}')">Copy</button><button class="iconbtn" onclick="openAssignQR('${x.id}')">Assign</button>`}</div></td></tr>`}).join('')||'<tr><td colspan="8"><div class="empty">No QR codes found.</div></td></tr>'}</tbody></table>`;
-}
-async function generateQRBatch(n=100){
-  if(!confirm(`Generate the next ${n} QR codes?`))return;
-  const r=await db.rpc('generate_qr_batch',{p_count:n});
-  if(r.error)return toast(r.error.message);
-  await logAction(`Generated ${n} QR codes`); await loadQRs(); toast(`${n} QR codes generated successfully`);
-}
-function openAssignQR(id){
-  const x=qrCodes.find(q=>q.id===id); if(!x)return;
-  modal('Assign QR Code',`<div class="notice"><b>${esc(x.code)}</b> can be assigned to one restaurant. A restaurant can have maximum 10 active QR codes.</div><div class="field"><label>Restaurant</label><select id="qrAssignRest">${restaurants.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}</option>`).join('')}</select></div><div class="field" style="margin-top:10px"><label>Label (optional)</label><input id="qrAssignLabel" placeholder="Table 1"></div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="assignQR('${x.id}')">Assign QR</button></div>`);
-}
-async function assignQR(id){
-  const x=qrCodes.find(q=>q.id===id);if(!x)return toast('QR code not found.');
-  if(String(x.status||'available')!=='available')return toast('This QR is already assigned.');
-  const rid=$('qrAssignRest').value,label=$('qrAssignLabel').value.trim();
-  if(!rid)return toast('Restaurant select karein.');
-  const count=qrCodes.filter(x=>x.restaurant_id===rid&&x.status==='assigned').length;if(count>=10)return toast('This restaurant already has the maximum 10 QR codes.');
-  const r=await db.from('qr_codes').update({restaurant_id:rid,label:label||null,status:'assigned',assigned_at:new Date().toISOString(),assigned_by:session.user.id}).eq('id',id).eq('status','available');
-  if(r.error)return toast(r.error.message);await logAction('Assigned QR '+(x.code||''),rid);closeModal();await loadQRs();toast('QR assigned');
-}
-async function unassignQR(id){if(!confirm('Unassign this QR? It will become available again.'))return;const x=qrCodes.find(q=>q.id===id);const r=await db.from('qr_codes').update({restaurant_id:null,label:null,status:'available',assigned_at:null,assigned_by:null}).eq('id',id);if(r.error)return toast(r.error.message);await logAction('Unassigned QR '+(x?.code||''));await loadQRs();toast('QR is available again')}
-function qrTargetURL(code){return new URL('/qr.html?code='+encodeURIComponent(code)+'&view=print',location.origin).href}
-function getQRPreprintedTarget(code){return new URL('/qr.html?code='+encodeURIComponent(code),location.origin).href}
-function getQRMenuTarget(slug){return new URL('/menu.html?r='+encodeURIComponent(slug),location.origin).href}
-function openQRPage(code){
-  const url=qrTargetURL(code);
-  const w=window.open(url,'_blank');
-  if(!w) toast('Please allow pop-ups to open the QR page.');
-}
-async function copyQRTarget(code){
-  const x=qrCodes.find(q=>q.code===code);
-  const r=x?.restaurant_id?restaurants.find(y=>y.id===x.restaurant_id):null;
-  const url=r?.slug?getQRMenuTarget(r.slug):getQRPreprintedTarget(code);
-  try{await navigator.clipboard.writeText(url);toast('QR target copied');}
-  catch(e){prompt('Copy QR target URL:',url);}
-}
-function openQRDetails(id){
-  const x=qrCodes.find(q=>q.id===id); if(!x)return;
-  const r=x.restaurant_id?restaurants.find(y=>y.id===x.restaurant_id):null;
-  const direct=r?.slug?getQRMenuTarget(r.slug):'—';
-  const preprinted=getQRPreprintedTarget(x.code);
-  modal('QR Details — '+esc(x.code),`<div class="formgrid">
-    <div class="field"><label>QR Code ID</label><input readonly value="${esc(x.code)}"></div>
-    <div class="field"><label>Status</label><input readonly value="${esc(x.status||'available')}"></div>
-    <div class="field"><label>Restaurant</label><input readonly value="${esc(r?.name||'Not assigned')}"></div>
-    <div class="field"><label>Restaurant Slug</label><input readonly value="${esc(r?.slug||'—')}"></div>
-    <div class="field"><label>Label</label><input readonly value="${esc(x.label||'—')}"></div>
-    <div class="field"><label>Assigned At</label><input readonly value="${esc(x.assigned_at?fmt(x.assigned_at,true):'—')}"></div>
-    <div class="field full"><label>Pre-printed QR target</label><input readonly value="${esc(preprinted)}"></div>
-    <div class="field full"><label>Current restaurant menu target</label><input readonly value="${esc(direct)}"></div>
+
+.ai-ready{border-color:#12b76a!important;background:#ecfdf3!important}
+.ai-working{opacity:.65;pointer-events:none}
+
+#aiReviewTable .ai-input{width:100%;min-width:90px;padding:8px 9px;border:1px solid #d0d5dd;border-radius:8px;background:#fff;font:inherit;font-size:12px}
+#aiReviewTable .ai-textarea{min-height:50px;resize:vertical}
+#aiReviewTable td{vertical-align:top}
+.ai-confidence{font-size:10px;margin-top:4px;color:#667085}
+.ai-low{border-color:#f79009 !important;background:#fffaeb !important}
+.ai-file{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid #eaecf0;border-radius:9px;background:#f9fafb;margin-top:7px;font-size:12px}
+
+
+
+.restaurant-direct-link{color:inherit;text-decoration:none;cursor:pointer}
+.restaurant-direct-link b{transition:opacity .15s}
+.restaurant-direct-link:hover b{opacity:.72;text-decoration:underline}
+</style>
+</head>
+<body>
+
+<div id="loginScreen" style="position:fixed;inset:0;background:#f6f8fb;z-index:100;display:grid;place-items:center;padding:20px">
+  <div style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;width:min(410px,100%);padding:28px;box-shadow:0 20px 60px #10182818">
+    <div style="text-align:center;margin-bottom:20px"><div style="font-size:34px">👑</div><h2 style="margin:5px 0">Super Admin Login</h2><p style="margin:0;color:#667085;font-size:13px">FreeMenu.in Administration</p></div>
+    <label style="display:block;font-size:12px;color:#475467;margin:10px 0 5px">Email</label>
+    <input id="loginEmail" class="input" style="width:100%" value="athravsharma2828@gmail.com" readonly>
+    <label style="display:block;font-size:12px;color:#475467;margin:10px 0 5px">Password</label>
+    <input id="loginPassword" class="input" style="width:100%" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')adminLogin()">
+    <button class="primary" style="width:100%;margin-top:12px;padding:11px" onclick="adminLogin()">Login as Super Admin</button>
+    <div id="loginError" style="color:#b42318;font-size:12px;margin-top:10px;text-align:center"></div>
   </div>
-  <div class="notice" style="margin-top:12px"><b>Customer scan:</b> pre-printed QR uses the stable code URL and is resolved to the assigned restaurant menu. The printable QR generated here encodes the direct menu engine URL.</div>
-  <div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Close</button>${x.status==='assigned'?`<button class="primary" onclick="copyQRTarget('${x.code}')">Copy Scan Target</button>`:''}</div>`);
-}
-$('qrSearch')?.addEventListener('input',renderQRs);$('qrStatus')?.addEventListener('change',renderQRs);$('qrRestaurantFilter')?.addEventListener('change',renderQRs);
-function exportRestaurantsCSV(){const rows=[['id','name','slug','phone','address','status'],...restaurants.map(r=>[r.id,r.name,r.slug,r.phone,r.address,statusOf(r)])];const csv=rows.map(row=>row.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='freemenu-restaurants.csv';a.click()}
-async function logout(){await db.auth.signOut();location.reload()}
-function startClock(){const tick=()=>{const d=new Date();$('todayDate').textContent=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});$('todayTime').textContent=d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});};tick();setInterval(tick,1000)}
-document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('globalSearch').focus()}});
-$('globalSearch').addEventListener('input',e=>{const v=e.target.value.toLowerCase();const found=restaurants.filter(r=>`${r.name} ${r.slug} ${r.address}`.toLowerCase().includes(v));if(v){showPage('restaurants');$('restaurantSearch').value=v;renderRestaurantPage()}})
-window.addEventListener('load',async()=>{lucide.createIcons();startClock();try{if(await adminCheck()){await loadAll();buildCharts();updateStats();}}catch(e){console.error(e);alert('Supabase error: '+e.message)}})
+</div>
 
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><div class="brand-mark">♨</div><div><strong>FreeMenu<span>.in</span></strong><span class="tag">Every Restaurant. One Digital Menu.</span></div></div>
+  <nav class="nav">
+    <button class="active" data-page="dashboard"><i data-lucide="home"></i>Dashboard</button>
+    <button data-page="restaurants"><i data-lucide="store"></i>Restaurants</button><button data-page="qrManagement"><i data-lucide="qr-code"></i>QR Management</button>
+    <button data-page="owners"><i data-lucide="users"></i>Restaurant Owners</button>
+    <button data-page="menu"><i data-lucide="book-open"></i>Menu Management</button>
+    <button data-page="categories"><i data-lucide="layers"></i>Categories</button>
+    <button data-page="approvals"><i data-lucide="clock-3"></i>Pending Approvals <b class="badge" id="approvalBadge">0</b></button>
+    <button data-page="ads"><i data-lucide="badge-dollar-sign"></i>Advertisements</button><button data-page="mediaRules"><i data-lucide="image"></i>Media Upload Rules</button>
+    <button data-page="subscriptions"><i data-lucide="crown"></i>Subscriptions</button>
+    <button data-page="analytics"><i data-lucide="bar-chart-3"></i>Analytics</button>
+    <button data-page="reports"><i data-lucide="file-text"></i>Reports</button>
+    <button data-page="customers"><i data-lucide="user-round"></i>Customers</button>
+    <div class="nav-title">SYSTEM MANAGEMENT</div>
+    <button data-page="admins"><i data-lucide="user-cog"></i>Admin Users</button>
+    <button data-page="settings"><i data-lucide="settings"></i>Platform Settings</button>
+    <button data-page="logs"><i data-lucide="history"></i>Activity Logs</button>
+    <button data-page="security"><i data-lucide="shield-check"></i>Security</button>
+    <div class="nav-title">SUPPORT</div>
+    <button data-page="support"><i data-lucide="messages-square"></i>Support / Complaints <b class="badge">0</b></button>
+    <button data-page="announcements"><i data-lucide="megaphone"></i>Announcements</button>
+    <button data-page="help"><i data-lucide="circle-help"></i>Help & Resources</button>
+  </nav>
+  <div class="promo"><div class="crown">♛</div><b>Build Bigger<br>Food for Everyone!</b><div style="margin-top:14px;font-size:11px">FreeMenu.in</div></div>
+</aside>
 
-</script>
-</body>
-</html>
+<main class="main">
+<header class="topbar">
+  <button class="hamb mobile-only" onclick="toggleSidebar()"><i data-lucide="menu"></i></button>
+  <div class="search"><i data-lucide="search" style="width:17px"></i><input id="globalSearch" placeholder="Search restaurants, owners, menus, cities..."><span style="font-size:10px">Ctrl + K</span></div>
+  <div class="admin"><button class="bell iconbtn" onclick="showPage('logs')"><i data-lucide="bell"></i><b id="notifCount">0</b></button><div class="avatar" id="avatar">SA</div><div><strong id="adminName">Super Admin</strong><small>Administrator</small></div><button class="iconbtn" onclick="logout()"><i data-lucide="log-out"></i></button></div>
+</header>
+
+<section class="content">
+<div id="dashboard" class="page active">
+  <div class="welcome"><div><h1>Good Morning, Super Admin! 👋</h1><p>Here’s what’s happening on FreeMenu.in today.</p></div><div class="date"><strong id="todayDate"></strong><span id="todayTime"></span></div></div>
+  <div class="stats">
+    <div class="stat"><div class="stat-top"><div class="ico red"><i data-lucide="store"></i></div><div><h2 id="sRestaurants">0</h2><p>Total Restaurants</p></div></div><div class="trend">↑ Live from Supabase</div></div>
+    <div class="stat"><div class="stat-top"><div class="ico green"><i data-lucide="circle-check"></i></div><div><h2 id="sActive">0</h2><p>Active Restaurants</p></div></div><div class="trend">↑ Current status</div></div>
+    <div class="stat"><div class="stat-top"><div class="ico orange"><i data-lucide="clock-3"></i></div><div><h2 id="sPending">0</h2><p>Pending Approval</p></div></div><div class="trend">Awaiting action</div></div>
+    <div class="stat"><div class="stat-top"><div class="ico red"><i data-lucide="ban"></i></div><div><h2 id="sBlocked">0</h2><p>Blocked Restaurants</p></div></div><div class="trend down">Needs attention</div></div>
+    <div class="stat"><div class="stat-top"><div class="ico blue"><i data-lucide="utensils"></i></div><div><h2 id="sItems">0</h2><p>Total Menu Items</p></div></div><div class="trend">↑ Live count</div></div>
+    <div class="stat"><div class="stat-top"><div class="ico purple"><i data-lucide="eye"></i></div><div><h2 id="sViews">0</h2><p>Menu Views</p></div></div><div class="trend">If analytics table exists</div></div>
+  </div>
+  <div class="grid3">
