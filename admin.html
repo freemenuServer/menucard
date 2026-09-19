@@ -406,14 +406,37 @@ async function assignQR(id){
   const r=await db.from('qr_codes').update({restaurant_id:rid,label:label||null,status:'assigned',assigned_at:new Date().toISOString(),assigned_by:session.user.id}).eq('id',id).eq('status','available');
   if(r.error)return toast(r.error.message);await logAction('Assigned QR '+(x.code||''),rid);closeModal();await loadQRs();toast('QR assigned');
 }
-async function unassignQR(id){if(!confirm('Unassign this QR? It will become available again.'))return;const x=qrCodes.find(q=>q.id===id);const r=await db.from('qr_codes').update({restaurant_id:null,label:null,status:'available',assigned_at:null,assigned_by:null}).eq('id',id);if(r.error)return toast(r.error.message);await logAction('Unassigned QR '+(x?.code||''));await loadQRs();toast('QR is available again')}
-function qrTargetURL(code){return new URL('/qr.html?code='+encodeURIComponent(code)+'&view=print',location.origin).href}
-function getQRPreprintedTarget(code){return new URL('/qr.html?code='+encodeURIComponent(code),location.origin).href}
-function getQRMenuTarget(slug){return new URL('/menu.html?r='+encodeURIComponent(slug),location.origin).href}
-function openQRPage(code){
-  const url=qrTargetURL(code);
-  const w=window.open(url,'_blank');
-  if(!w) toast('Please allow pop-ups to open the QR page.');
+async function unassignQR(id){
+  if(!confirm('Unassign this QR? It will become available again.')) return;
+
+  const x = qrCodes.find(q=>q.id===id);
+  if(!x) return toast('QR code not found.');
+
+  const r = await db.from('qr_codes')
+    .update({
+      restaurant_id:null,
+      label:null,
+      status:'available',
+      assigned_at:null,
+      assigned_by:null
+    })
+    .eq('id',id)
+    .eq('status','assigned')
+    .select('id,code,status,restaurant_id')
+    .maybeSingle();
+
+  if(r.error){
+    console.error('Unassign QR failed:',r.error);
+    return toast('Unassign failed: '+r.error.message);
+  }
+
+  if(!r.data){
+    return toast('QR was not updated. Check qr_codes UPDATE permission/RLS.');
+  }
+
+  await logAction('Unassigned QR '+(x.code||''));
+  await loadQRs();
+  toast('QR is now available');
 }
 async function copyPrePrintedQRTarget(code){
   const url = getQRPreprintedTarget(code);
@@ -426,11 +449,13 @@ async function copyPrePrintedQRTarget(code){
 }
 
 async function copyQRTarget(code){
-  const x=qrCodes.find(q=>q.code===code);
-  const r=x?.restaurant_id?restaurants.find(y=>y.id===x.restaurant_id):null;
-  const url=r?.slug?getQRMenuTarget(r.slug):getQRPreprintedTarget(code);
-  try{await navigator.clipboard.writeText(url);toast('QR target copied');}
-  catch(e){prompt('Copy QR target URL:',url);}
+  const url = getQRPreprintedTarget(code);
+  try{
+    await navigator.clipboard.writeText(url);
+    toast('Permanent pre-printed QR URL copied');
+  }catch(e){
+    prompt('Copy permanent QR URL:',url);
+  }
 }
 function openQRDetails(id){
   const x=qrCodes.find(q=>q.id===id); if(!x)return;
