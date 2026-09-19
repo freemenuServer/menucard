@@ -380,12 +380,40 @@ async function loadQRs(){
   if(r.error){console.error(r.error);toast('QR table not ready: '+r.error.message);return}
   qrCodes=r.data||[]; renderQRs();
 }
+
+function getQRPreprintedTarget(code){
+  return new URL(
+    '/qr.html?code='+encodeURIComponent(code),
+    location.origin
+  ).href;
+}
+
+function getQRMenuTarget(slug){
+  return new URL(
+    '/menu.html?r='+encodeURIComponent(slug),
+    location.origin
+  ).href;
+}
+
+function qrTargetURL(code){
+  return new URL(
+    '/qr.html?code='+encodeURIComponent(code)+'&view=print',
+    location.origin
+  ).href;
+}
+
+function openQRPage(code){
+  const url = qrTargetURL(code);
+  const w = window.open(url,'_blank');
+  if(!w) toast('Please allow pop-ups to open the QR page.');
+}
+
 function renderQRs(){
   const q=($('qrSearch')?.value||'').toLowerCase(); const st=$('qrStatus')?.value||''; const rid=$('qrRestaurantFilter')?.value||'';
-  const list=qrCodes.filter(x=>{const r=restaurants.find(y=>y.id===x.restaurant_id);const hay=`${x.code} ${x.label||''} ${r?.name||''}`.toLowerCase();return (!q||hay.includes(q))&&(!st||x.status===st)&&(!rid||x.restaurant_id===rid)});
+  const list=qrCodes.filter(x=>{const r=restaurants.find(y=>y.id===x.restaurant_id);const hay=`${x.code||''} ${x.label||''} ${r?.name||''}`.toLowerCase();return (!q||hay.includes(q))&&(!st||String(x.status||'available')===st)&&(!rid||x.restaurant_id===rid)});
   $('qrTotal').textContent=qrCodes.length;$('qrAvailable').textContent=qrCodes.filter(x=>x.status==='available').length;$('qrAssigned').textContent=qrCodes.filter(x=>x.status==='assigned').length;
   $('qrRestaurantFilter').innerHTML='<option value="">All Restaurants</option>'+restaurants.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}</option>`).join('');
-  $('qrTable').innerHTML=`<table class="table"><thead><tr><th>QR ID</th><th>Status</th><th>Restaurant</th><th>Slug</th><th>Label</th><th>Scan Target</th><th>Assigned</th><th>Action</th></tr></thead><tbody>${list.map(x=>{const r=restaurants.find(y=>y.id===x.restaurant_id);const target=r?.slug?getQRMenuTarget(r.slug):getQRPreprintedTarget(x.code);return `<tr><td><b>${esc(x.code)}</b><br><small>Pre-printed ID</small></td><td>${pill(x.status||'available')}</td><td>${esc(r?.name||'—')}</td><td>${esc(r?.slug||'—')}</td><td>${esc(x.label||'—')}</td><td><a href="${esc(target)}" target="_blank" rel="noopener" style="font-size:10px">${esc(target)}</a></td><td>${x.assigned_at?fmt(x.assigned_at,true):'—'}</td><td><div class="actions">${x.status==='assigned'?`<button class="iconbtn" onclick="openQRDetails('${x.id}')">Details</button><button class="iconbtn" onclick="openQRPage('${x.code}')">View / Print</button><button class="iconbtn" onclick="copyQRTarget('${x.code}')">Copy</button><button class="iconbtn" onclick="unassignQR('${x.id}')">Unassign</button>`:`<button class="iconbtn" onclick="openQRDetails('${x.id}')">Details</button><button class="iconbtn" onclick="openQRPage('${x.code}')">View QR</button><button class="iconbtn" onclick="copyQRTarget('${x.code}')">Copy</button><button class="iconbtn" onclick="openAssignQR('${x.id}')">Assign</button>`}</div></td></tr>`}).join('')||'<tr><td colspan="8"><div class="empty">No QR codes found.</div></td></tr>'}</tbody></table>`;
+  $('qrTable').innerHTML=`<table class="table"><thead><tr><th>QR ID</th><th>Status</th><th>Restaurant</th><th>Slug</th><th>Label</th><th>Scan Target</th><th>Assigned</th><th>Action</th></tr></thead><tbody>${list.map(x=>{try{const r=restaurants.find(y=>y.id===x.restaurant_id);const target=r?.slug?getQRMenuTarget(r.slug):getQRPreprintedTarget(x.code);return `<tr><td><b>${esc(x.code)}</b><br><small>Pre-printed ID</small></td><td>${pill(x.status||'available')}</td><td>${esc(r?.name||'—')}</td><td>${esc(r?.slug||'—')}</td><td>${esc(x.label||'—')}</td><td><a href="${esc(target)}" target="_blank" rel="noopener" style="font-size:10px">${esc(target)}</a></td><td>${x.assigned_at?fmt(x.assigned_at,true):'—'}</td><td><div class="actions">${x.status==='assigned'?`<button class="iconbtn" onclick="openQRDetails('${x.id}')">Details</button><button class="iconbtn" onclick="openQRPage('${x.code}')">View / Print</button><button class="iconbtn" onclick="copyQRTarget('${x.code}')">Copy</button><button class="iconbtn" onclick="unassignQR('${x.id}')">Unassign</button>`:`<button class="iconbtn" onclick="openQRDetails('${x.id}')">Details</button><button class="iconbtn" onclick="openQRPage('${x.code}')">View QR</button><button class="iconbtn" onclick="copyQRTarget('${x.code}')">Copy</button><button class="iconbtn" onclick="openAssignQR('${x.id}')">Assign</button>`}</div></td></tr>`}catch(e){console.error('QR row render failed:',e);return ''}}).join('')||'<tr><td colspan="8"><div class="empty">No QR codes found.</div></td></tr>'}</tbody></table>`;
 }
 async function generateQRBatch(n=100){
   if(!confirm(`Generate the next ${n} QR codes?`))return;
