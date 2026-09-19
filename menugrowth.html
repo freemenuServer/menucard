@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Urban Cafe - Photo Menu</title>
+  <meta name="description" content="Responsive public restaurant photo menu template" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --brand:#9f1620;
+      --brand-dark:#7d0e16;
+      --gold:#f1b640;
+      --green:#10a957;
+      --text:#141414;
+      --muted:#6f7580;
+      --line:#eceef2;
+      --soft:#f7f8fa;
+      --white:#fff;
+      --shadow:0 12px 35px rgba(16,24,40,.08);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:#f4f5f7;color:var(--text);font-family:"DM Sans",sans-serif}
+    button,input{font:inherit}
+    button{cursor:pointer}
+    a{text-decoration:none;color:inherit}
+    img{display:block;width:100%;object-fit:cover}
+
+    .app{max-width:1180px;margin:0 auto;background:#fff;min-height:100vh;box-shadow:0 0 50px rgba(0,0,0,.06)}
+
+    .hero{position:relative;min-height:320px;color:#fff;overflow:hidden;background:
+      linear-gradient(90deg,rgba(5,5,5,.92) 0%,rgba(5,5,5,.74) 42%,rgba(5,5,5,.18) 72%,rgba(5,5,5,.36) 100%),
+      url('https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1800&q=88') center/cover no-repeat;}
+    .hero-inner{padding:42px 44px;display:grid;grid-template-columns:1.1fr .9fr;gap:20px;align-items:center;min-height:320px}
+    .brand-row{display:flex;align-items:center;gap:18px}
+    .logo{width:78px;height:78px;border:2px solid #fff;border-radius:50%;display:grid;place-items:center;font-size:37px;background:rgba(159,22,32,.55);backdrop-filter:blur(5px)}
+    .brand h1{font-family:"Playfair Display",serif;font-size:54px;line-height:1;margin:0;letter-spacing:-1px}.brand h1 span{color:var(--gold)}
+    .tagline{margin-top:10px;letter-spacing:6px;font-size:12px;font-weight:700}
+    .info{display:flex;flex-wrap:wrap;gap:18px 28px;margin-top:28px;font-size:14px;color:#f5f5f5}
+    .info span{display:flex;align-items:center;gap:8px}
+    .quote{margin-top:28px;font-family:"Playfair Display",serif;font-size:24px;font-style:italic;color:#ffd86c}
+    .hero-right{display:flex;justify-content:flex-end;align-items:center}.hero-word{font-family:"Playfair Display",serif;font-size:33px;line-height:1.08;text-align:right}.hero-word span{color:var(--gold)}
+
+    .content{border-radius:30px 30px 0 0;margin-top:-24px;position:relative;background:#fff;padding:22px 30px 120px}
+    .toolbar{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;position:sticky;top:0;z-index:10;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);padding:6px 0 16px}
+    .cats{display:flex;gap:10px;overflow:auto;scrollbar-width:none}.cats::-webkit-scrollbar{display:none}
+    .cat{border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px 16px;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.04);font-weight:600}
+    .cat.active{background:var(--brand);border-color:var(--brand);color:#fff}
+    .search{position:relative}.search input{width:100%;padding:14px 16px 14px 44px;border:1px solid var(--line);border-radius:14px;background:#fafbfc;outline:none}.search input:focus{border-color:#d7a7aa;box-shadow:0 0 0 4px rgba(159,22,32,.08)}
+    .search:before{content:'⌕';position:absolute;left:16px;top:8px;font-size:25px;color:#667085}
+
+    .section{margin-top:28px}.section-head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:14px}.section h2{font-family:"Playfair Display",serif;font-size:34px;margin:0}.section-sub{color:var(--muted);font-size:14px}.see-all{font-weight:700;color:var(--brand);border:none;background:none}
+
+    .popular-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+    .food-card{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.045);display:flex;flex-direction:column;min-width:0}
+    .food-image{position:relative;height:175px;background:#eee}.food-image img{height:100%}.badge{position:absolute;left:10px;top:10px;padding:6px 10px;border-radius:999px;color:#fff;font-size:12px;font-weight:800}.badge.red{background:#e82d2d}.badge.gold{background:#ffca38;color:#3b2d00}.type-icon{position:absolute;right:10px;top:10px;width:25px;height:25px;border:2px solid currentColor;border-radius:3px;background:#fff;display:grid;place-items:center}.type-icon:after{content:'';width:10px;height:10px;border-radius:50%;background:currentColor}.veg{color:#10a957}.nonveg{color:#e22a2a}.egg{color:#f3b51b}
+    .food-body{padding:13px;display:flex;flex-direction:column;gap:8px;flex:1}.food-title{font-family:"Playfair Display",serif;font-size:19px;font-weight:700}.food-desc{font-size:13px;line-height:1.45;color:#626a76;min-height:38px}.food-bottom{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px}.price{font-size:22px;font-weight:800;color:#9b141d}.add{border:none;border-radius:999px;background:linear-gradient(135deg,var(--brand),#b62431);color:#fff;padding:10px 17px;font-weight:800}
+
+    .list-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.dish-row{border:1px solid var(--line);border-radius:16px;padding:9px;display:grid;grid-template-columns:118px 1fr auto;gap:14px;align-items:center;box-shadow:0 6px 18px rgba(0,0,0,.035)}.dish-row img{height:105px;border-radius:11px}.dish-main{min-width:0}.dish-name-line{display:flex;align-items:center;gap:9px}.mini-type{width:22px;height:22px;border:2px solid currentColor;border-radius:3px;display:grid;place-items:center;flex:0 0 auto}.mini-type:after{content:'';width:8px;height:8px;border-radius:50%;background:currentColor}.dish-title{font-family:"Playfair Display",serif;font-size:18px;font-weight:700}.dish-desc{font-size:13px;line-height:1.45;color:#667085;margin:6px 0 8px}.dish-price{font-size:20px;font-weight:800;color:#9b141d}.dish-row .add{align-self:end;margin-bottom:4px}
+
+    .bottom-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(1180px,100%);z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:12px 22px;display:grid;grid-template-columns:230px 1fr 270px;align-items:center;gap:14px;box-shadow:0 -10px 28px rgba(0,0,0,.06)}
+    .cart-btn,.whatsapp{border:none;border-radius:13px;color:#fff;font-weight:800;padding:15px 18px}.cart-btn{background:var(--brand);display:flex;justify-content:space-between}.whatsapp{background:#10ad55}.nav-actions{display:flex;justify-content:center;gap:34px}.nav-action{border:none;background:none;display:flex;flex-direction:column;gap:4px;align-items:center;font-size:12px;color:#313844}.nav-action b{font-size:18px}
+
+    .toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%) translateY(20px);background:#111;color:#fff;padding:11px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s;z-index:99}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    @media(max-width:900px){
+      .hero-inner{grid-template-columns:1fr;padding:32px 24px}.hero-right{display:none}.brand h1{font-size:45px}.content{padding:18px 18px 118px}.toolbar{grid-template-columns:1fr}.popular-grid{grid-template-columns:repeat(2,1fr)}.list-grid{grid-template-columns:1fr}.bottom-bar{grid-template-columns:1fr 1fr}.nav-actions{display:none}.whatsapp{display:block}.cart-btn{display:block}.section h2{font-size:30px}
+    }
+    @media(max-width:560px){
+      .hero{min-height:285px}.hero-inner{min-height:285px;padding:28px 18px}.logo{width:62px;height:62px;font-size:30px}.brand h1{font-size:36px}.tagline{letter-spacing:3px}.info{gap:9px 14px;font-size:12px}.quote{font-size:19px}.content{border-radius:22px 22px 0 0;margin-top:-18px;padding:14px 12px 110px}.popular-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.food-image{height:135px}.food-body{padding:10px}.food-title{font-size:16px}.food-desc{font-size:12px;min-height:auto}.food-bottom{align-items:flex-end}.price{font-size:18px}.add{padding:9px 12px;font-size:13px}.section h2{font-size:27px}.section-head{align-items:center}.section-sub{display:none}.dish-row{grid-template-columns:92px 1fr;gap:10px}.dish-row img{height:90px}.dish-row .add{grid-column:2;justify-self:end;margin-top:-38px}.dish-title{font-size:16px}.dish-desc{font-size:12px;padding-right:6px}.bottom-bar{grid-template-columns:1fr 1fr;padding:10px}.whatsapp,.cart-btn{padding:13px 12px;font-size:13px}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="brand-row">
+          <div class="logo">♨</div>
+          <div class="brand"><h1>Urban <span>Cafe</span></h1><div class="tagline">GOOD FOOD • GOOD MOOD</div></div>
+        </div>
+        <div class="info">
+          <span>📍 MG Road, Indore</span><span>◷ 10:00 AM - 11:00 PM</span><span>☎ +91 98765 43210</span>
+        </div>
+        <div class="quote">Food Brings People Together</div>
+      </div>
+      <div class="hero-right"><div class="hero-word">Good<br><span>Food</span><br>Good<br><span>Mood</span></div></div>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="toolbar">
+      <div class="cats" id="categoryTabs"></div>
+      <div class="search"><input id="searchInput" placeholder="Search dishes..." /></div>
+    </div>
+
+    <section class="section" id="popularSection">
+      <div class="section-head"><div><h2>Popular Dishes</h2><div class="section-sub">Our most loved items</div></div><button class="see-all">See All →</button></div>
+      <div class="popular-grid" id="popularGrid"></div>
+    </section>
+
+    <div id="categorySections"></div>
+  </main>
+</div>
+
+<div class="bottom-bar">
+  <button class="cart-btn" onclick="showCart()"><span>🍴 View Cart</span><span id="cartCount">0</span></button>
+  <div class="nav-actions">
+    <button class="nav-action" onclick="window.scrollTo({top:0,behavior:'smooth'})"><b>⌂</b><span>Home</span></button>
+    <button class="nav-action" onclick="shareMenu()"><b>↗</b><span>Share Menu</span></button>
+    <button class="nav-action" onclick="location.href='tel:+919876543210'"><b>☎</b><span>Call Us</span></button>
+  </div>
+  <button class="whatsapp" onclick="shareWhatsApp()">☘ Share on WhatsApp</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+  // Internal template key for future plan mapping: photo_menu_v1
+  const menuData = [
+    {id:1,name:'Paneer Tikka',category:'Starters',price:249,type:'veg',badge:'Bestseller',image:'https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=700&q=85',description:'Soft paneer cubes marinated in special spices and grilled to perfection.',popular:true},
+    {id:2,name:'Chicken Wings',category:'Starters',price:299,type:'nonveg',badge:'Chef Special',image:'https://images.unsplash.com/photo-1527477396000-e27163b481c2?auto=format&fit=crop&w=700&q=85',description:'Crispy & juicy wings tossed in our signature sauce.',popular:true},
+    {id:3,name:'White Sauce Pasta',category:'Main Course',price:249,type:'veg',image:'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=700&q=85',description:'Creamy, cheesy and absolutely delicious.',popular:true},
+    {id:4,name:'Chocolate Brownie',category:'Desserts',price:199,type:'veg',image:'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=700&q=85',description:'Warm chocolate brownie served with vanilla ice cream.',popular:true},
+    {id:5,name:'Hara Bhara Kebab',category:'Starters',price:189,type:'veg',image:'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=700&q=85',description:'Healthy and tasty kebabs made with fresh greens and spices.'},
+    {id:6,name:'Chicken Seekh Kebab',category:'Starters',price:259,type:'nonveg',image:'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?auto=format&fit=crop&w=700&q=85',description:'Juicy minced chicken with aromatic spices.'},
+    {id:7,name:'French Fries',category:'Starters',price:149,type:'veg',image:'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=700&q=85',description:'Crispy golden fries served with special dip.'},
+    {id:8,name:'Masala Egg Bites',category:'Starters',price:179,type:'egg',image:'https://images.unsplash.com/photo-1608039829572-78524f79c4c7?auto=format&fit=crop&w=700&q=85',description:'Spicy and flavorful egg bites.'},
+    {id:9,name:'Butter Paneer Masala',category:'Main Course',price:299,type:'veg',image:'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?auto=format&fit=crop&w=700&q=85',description:'Rich and creamy tomato gravy with soft paneer cubes.'},
+    {id:10,name:'Chicken Biryani',category:'Main Course',price:349,type:'nonveg',image:'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?auto=format&fit=crop&w=700&q=85',description:'Aromatic basmati rice with tender chicken and traditional spices.'},
+    {id:11,name:'Cold Coffee',category:'Beverages',price:159,type:'veg',image:'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=700&q=85',description:'Chilled coffee blended smooth and creamy.'},
+    {id:12,name:'Fresh Lime Soda',category:'Beverages',price:99,type:'veg',image:'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=700&q=85',description:'Refreshing lime soda, sweet or salted.'}
+  ];
+
+  const categories = ['All Items','Starters','Main Course','Beverages','Desserts'];
+  let selectedCategory='All Items';
+  let cart=[];
+
+  function typeIcon(type,mini=false){
+    return `<span class="${mini?'mini-type':'type-icon'} ${type}"></span>`;
+  }
+  function badgeHTML(badge){
+    if(!badge) return '';
+    return `<span class="badge ${badge==='Chef Special'?'gold':'red'}">${badge}</span>`;
+  }
+  function money(v){return '₹'+Number(v).toLocaleString('en-IN')}
+
+  function renderTabs(){
+    document.getElementById('categoryTabs').innerHTML=categories.map(c=>`<button class="cat ${selectedCategory===c?'active':''}" onclick="selectCategory('${c.replace(/'/g,"\\'")}')">${c}</button>`).join('');
+  }
+  function filteredItems(){
+    const q=document.getElementById('searchInput').value.trim().toLowerCase();
+    return menuData.filter(i=>(selectedCategory==='All Items'||i.category===selectedCategory) && (!q||i.name.toLowerCase().includes(q)||i.description.toLowerCase().includes(q)));
+  }
+  function renderMenu(){
+    renderTabs();
+    const items=filteredItems();
+    const popular=items.filter(x=>x.popular).slice(0,4);
+    document.getElementById('popularSection').style.display=popular.length?'block':'none';
+    document.getElementById('popularGrid').innerHTML=popular.map(i=>`
+      <article class="food-card">
+        <div class="food-image"><img src="${i.image}" alt="${i.name}">${badgeHTML(i.badge)}${typeIcon(i.type)}</div>
+        <div class="food-body"><div class="food-title">${i.name}</div><div class="food-desc">${i.description}</div><div class="food-bottom"><span class="price">${money(i.price)}</span><button class="add" onclick="addToCart(${i.id})">+ Add</button></div></div>
+      </article>`).join('');
+
+    const visibleCats=categories.slice(1).filter(c=>selectedCategory==='All Items'||selectedCategory===c);
+    document.getElementById('categorySections').innerHTML=visibleCats.map(cat=>{
+      const list=items.filter(i=>i.category===cat);
+      if(!list.length) return '';
+      return `<section class="section"><div class="section-head"><div><h2>${cat}</h2><div class="section-sub">${cat==='Starters'?'Start your food journey with amazing flavors':'Delicious choices for every appetite'}</div></div><button class="see-all">See All →</button></div><div class="list-grid">${list.map(i=>`
+        <article class="dish-row"><img src="${i.image}" alt="${i.name}"><div class="dish-main"><div class="dish-name-line">${typeIcon(i.type,true)}<div class="dish-title">${i.name}</div></div><div class="dish-desc">${i.description}</div><div class="dish-price">${money(i.price)}</div></div><button class="add" onclick="addToCart(${i.id})">+ Add</button></article>`).join('')}</div></section>`;
+    }).join('');
+  }
+  function selectCategory(c){selectedCategory=c;renderMenu();if(c!=='All Items')document.getElementById('categorySections').scrollIntoView({behavior:'smooth',block:'start'})}
+  function addToCart(id){const item=menuData.find(x=>x.id===id);cart.push(item);document.getElementById('cartCount').textContent=cart.length;toast(`${item.name} added to cart`)}
+  function showCart(){toast(cart.length?`${cart.length} item(s) in cart`:'Cart is empty')}
+  function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove('show'),1800)}
+  async function shareMenu(){if(navigator.share){try{await navigator.share({title:'Urban Cafe Menu',text:'Check our menu',url:location.href})}catch(e){}}else{navigator.clipboard?.writeText(location.href);toast('Menu link copied')}}
+  function shareWhatsApp(){window.open('https://wa.me/?text='+encodeURIComponent('Urban Cafe Menu: '+location.href),'_blank')}
+
+  document.getElementById('searchInput').addEventListener('input',renderMenu);
+  renderMenu();
+</script>
+</body>
+</html>
