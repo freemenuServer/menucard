@@ -1,5 +1,9 @@
-# FreeMenu clean restaurant menu URLs
-/menu/:slug    /menu/menu1.html?r=:slug    200
-
-# Keep legacy menu URL working
-/menu.html     /menu/menu1.html     200
+https://freemenu.in/menu/urban
+        ↓
+/menu.html?r=urban
+        ↓
+menu.html
+        ↓
+Supabase → slug = urban
+        ↓
+Urban Restaurant Menu
