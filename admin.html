@@ -39,7 +39,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
   <div style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;width:min(410px,100%);padding:28px;box-shadow:0 20px 60px #10182818">
     <div style="text-align:center;margin-bottom:20px"><div style="font-size:34px">👑</div><h2 style="margin:5px 0">Super Admin Login</h2><p style="margin:0;color:#667085;font-size:13px">FreeMenu.in Administration</p></div>
     <label style="display:block;font-size:12px;color:#475467;margin:10px 0 5px">Email</label>
-    <input id="loginEmail" class="input" style="width:100%" value="athravsharma2828@gmail.com" readonly>
+    <input id="loginEmail" class="input" style="width:100%" value="" autocomplete="email" placeholder="admin email">
     <label style="display:block;font-size:12px;color:#475467;margin:10px 0 5px">Password</label>
     <input id="loginPassword" class="input" style="width:100%" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')adminLogin()">
     <button class="primary" style="width:100%;margin-top:12px;padding:11px" onclick="adminLogin()">Login as Super Admin</button>
@@ -174,28 +174,67 @@ function closeModal(){$('modal').classList.remove('show')}
 $('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeModal()});
 function modal(title,body){$('modalBox').innerHTML=`<div class="card-head"><h3>${title}</h3><button class="iconbtn" onclick="closeModal()">✕</button></div>${body}`;$('modal').classList.add('show')}
 async function q(table,select='*'){const r=await db.from(table).select(select);if(r.error){console.error('Supabase '+table+' error:',r.error);toast(table+' load failed: '+r.error.message);return []}return r.data||[]}
+async function getAdminProfile(userId){
+ const {data:p,error:pe}=await db.from('profiles').select('*').eq('id',userId).maybeSingle();
+ if(pe) throw pe;
+ return p;
+}
+function showAdminSession(p){
+ $('loginScreen').style.display='none';
+ const name=p?.name||p?.full_name||'Super Admin';
+ $('adminName').textContent=name;
+ $('avatar').textContent=name.slice(0,2).toUpperCase();
+ $('securityUser').textContent=session?.user?.email||session?.user?.id||'—';
+}
 async function adminLogin(){
  const email=$('loginEmail').value.trim(),password=$('loginPassword').value;
  $('loginError').textContent='';
+ if(!email)return $('loginError').textContent='Admin email enter karein.';
  if(!password)return $('loginError').textContent='Password enter karein.';
- const {data,error}=await db.auth.signInWithPassword({email,password});
- if(error)return $('loginError').textContent=error.message;
- session=data.session;
- const {data:p,error:pe}=await db.from('profiles').select('*').eq('id',data.user.id).single();
- if(pe||!p||p.role!=='admin'){await db.auth.signOut();return $('loginError').textContent='Access Denied! profiles.role must be admin.'}
- $('loginScreen').style.display='none';
- $('adminName').textContent=p.name||p.full_name||'Super Admin';$('avatar').textContent=(p.name||p.full_name||'SA').slice(0,2).toUpperCase();
- $('securityUser').textContent=session.user.email||session.user.id;
- await loadAll(); buildCharts(); updateStats();
+ try{
+  const {data,error}=await db.auth.signInWithPassword({email,password});
+  if(error) throw error;
+  if(!data?.session||!data?.user) throw new Error('Login session create nahi hui.');
+  session=data.session;
+  const p=await getAdminProfile(data.user.id);
+  if(!p || String(p.role||'').toLowerCase()!=='admin'){
+    await db.auth.signOut();
+    session=null;
+    throw new Error('Access Denied: is user ke profiles.role mein admin set nahi hai.');
+  }
+  showAdminSession(p);
+  await loadAll();
+  buildCharts();
+  updateStats();
+ }catch(e){
+  console.error('Admin login failed:',e);
+  $('loginError').textContent=e?.message||'Admin login failed. Supabase settings check karein.';
+ }
 }
 async function adminCheck(){
- const {data,error}=await db.auth.getSession(); if(error)throw error; session=data.session;
+ const {data,error}=await db.auth.getSession();
+ if(error) throw error;
+ session=data.session;
  if(!session){$('loginScreen').style.display='grid';return false}
- const {data:p,error:pe}=await db.from('profiles').select('*').eq('id',session.user.id).single();
- if(pe||!p||p.role!=='admin'){await db.auth.signOut();$('loginScreen').style.display='grid';$('loginError').textContent='Access Denied! Super Admin role required.';return false}
- $('loginScreen').style.display='none';
- $('adminName').textContent=p.name||p.full_name||'Super Admin';$('avatar').textContent=(p.name||p.full_name||'SA').slice(0,2).toUpperCase();
- $('securityUser').textContent=session.user.email||session.user.id;return true
+ try{
+  const p=await getAdminProfile(session.user.id);
+  if(!p || String(p.role||'').toLowerCase()!=='admin'){
+    await db.auth.signOut();
+    session=null;
+    $('loginScreen').style.display='grid';
+    $('loginError').textContent='Access Denied: Super Admin role required.';
+    return false;
+  }
+  showAdminSession(p);
+  return true;
+ }catch(e){
+  console.error('Admin session check failed:',e);
+  await db.auth.signOut();
+  session=null;
+  $('loginScreen').style.display='grid';
+  $('loginError').textContent='Admin profile check failed: '+(e?.message||e);
+  return false;
+ }
 }
 async function loadAll(){
  try{
@@ -376,7 +415,7 @@ function openQRPage(code){
   const w=window.open(url,'_blank');
   if(!w) toast('Please allow pop-ups to open the QR page.');
 }
-async async function copyPrePrintedQRTarget(code){
+async function copyPrePrintedQRTarget(code){
   const url = getQRPreprintedTarget(code);
   try{
     await navigator.clipboard.writeText(url);
@@ -386,7 +425,7 @@ async async function copyPrePrintedQRTarget(code){
   }
 }
 
-function copyQRTarget(code){
+async function copyQRTarget(code){
   const x=qrCodes.find(q=>q.code===code);
   const r=x?.restaurant_id?restaurants.find(y=>y.id===x.restaurant_id):null;
   const url=r?.slug?getQRMenuTarget(r.slug):getQRPreprintedTarget(code);
