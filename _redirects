@@ -4,6 +4,6 @@ https://freemenu.in/menu/urban
         ↓
 menu.html
         ↓
-Supabase → slug = urban
+Supabase → restaurants.slug = urban
         ↓
-Urban Restaurant Menu
+Restaurant Menu
