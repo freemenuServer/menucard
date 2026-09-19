@@ -1,9 +1,1 @@
-https://freemenu.in/menu/urban
-        ↓
-/menu.html?r=urban
-        ↓
-menu.html
-        ↓
-Supabase → restaurants.slug = urban
-        ↓
-Restaurant Menu
+/menu/:slug    /menu.html?r=:slug    200
