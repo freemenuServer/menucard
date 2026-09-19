@@ -52,51 +52,11 @@ const SUPABASE_ANON_KEY='sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const loading=document.getElementById('loading'),poster=document.getElementById('poster'),unassigned=document.getElementById('unassigned'),errorBox=document.getElementById('error'),errorText=document.getElementById('errorText'),restaurantName=document.getElementById('restaurantName'),unassignedCode=document.getElementById('unassignedCode'),qrContainer=document.getElementById('qrcode');
 let currentCode='',qrInstance=null;
-function getMenuUrl(slug){return new URL('/menu.html?r='+encodeURIComponent(slug),window.location.origin).href}
-function showUnassigned(code){loading.style.display='none';poster.style.display='none';errorBox.style.display='none';unassigned.style.display='block';unassignedCode.textContent=code;unassigned.querySelector('.state').style.display='block'}
-function showError(message){loading.style.display='none';poster.style.display='none';unassigned.style.display='none';errorBox.style.display='block';errorText.textContent=message||'We could not process this QR code.';errorBox.querySelector('.state').style.display='block'}
-function createQR(slug){qrContainer.innerHTML='';const scanURL=getMenuUrl(slug);qrInstance=new QRCodeStyling({width:390,height:390,type:'canvas',data:scanURL,margin:6,qrOptions:{typeNumber:0,mode:'Byte',errorCorrectionLevel:'H'},dotsOptions:{type:'dots',color:'#151820'},cornersSquareOptions:{type:'extra-rounded',color:'#ffad18'},cornersDotOptions:{type:'dot',color:'#151820'},backgroundOptions:{color:'#ffffff'}});qrInstance.append(qrContainer)}
-function downloadQR(){if(!qrInstance){alert('QR is not ready yet.');return}qrInstance.download({name:'FreeMenu-'+(currentCode||'QR'),extension:'png'})}
-async function openQR(){
-try{
-  if(!window.supabase)throw new Error('Menu service could not load. Please try again.');
-  const params=new URLSearchParams(window.location.search);
-  const code=String(params.get('code')||'').trim();
-  const printMode=params.get('view')==='print';
-  if(!code)throw new Error('QR code is missing.');
-  currentCode=code;
-  const qrResult=await db.from('qr_codes').select('restaurant_id,status,code').eq('code',code).maybeSingle();
-  if(qrResult.error)throw new Error(qrResult.error.message);
-  const qr=qrResult.data;
-  if(!qr)throw new Error('QR code '+code+' was not found.');
-  const status=String(qr.status||'available').toLowerCase();
-  if(status!=='assigned'||!qr.restaurant_id){
-    if(!printMode){
-      showUnassigned(code);
-      return;
-    }
-    showUnassigned(code);
-    return;
-  }
-  const restaurantResult=await db.from('restaurants').select('name,slug').eq('id',qr.restaurant_id).maybeSingle();
-  if(restaurantResult.error)throw new Error(restaurantResult.error.message);
-  const restaurant=restaurantResult.data;
-  if(!restaurant||!restaurant.slug)throw new Error('Restaurant menu is not available.');
-
-  // Pre-printed QR compatibility:
-  // Physical/stable QR links may point to /qr.html?code=FM-0001.
-  // Normal customer scan is redirected directly to the restaurant menu.
-  if(!printMode){
-    window.location.replace(getMenuUrl(restaurant.slug));
-    return;
-  }
-
-  restaurantName.textContent=restaurant.name||'Restaurant Menu';
-  createQR(restaurant.slug);
-  loading.style.display='none';
-  poster.style.display='block';
-  unassigned.style.display='none';
-  errorBox.style.display='none';
+function getMenuUrl(slug){
+  return new URL(
+    '/menu.html?r='+encodeURIComponent(slug),
+    window.location.origin
+  ).href;
 }catch(e){
   console.error('FreeMenu QR Error:',e);
   showError(e&&e.message?e.message:'Unable to process this QR code.')
