@@ -47,7 +47,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .serviceBtns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:15px}.serviceBtn{border:1px solid var(--border);background:#fff;border-radius:9px;padding:10px;font-size:11px;font-weight:700}.serviceBtn i{margin-right:5px}
 
 /* Menu */
-.menuToolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.menuToolbar .input{max-width:260px}.menuTable{width:100%;border-collapse:collapse;font-size:12px}.menuTable th{text-align:left;color:#6b7280;font-size:10px;text-transform:uppercase;padding:9px 6px;border-bottom:1px solid var(--border)}.menuTable td{padding:10px 6px;border-bottom:1px solid #eef0f3;vertical-align:middle}.menuTable tr:last-child td{border-bottom:0}.foodName{font-weight:800}.foodCat{font-size:10px;color:var(--muted);margin-top:2px}.foodType{display:inline-grid;place-items:center;width:16px;height:16px;border:1.5px solid #19a45a;border-radius:3px}.foodType.nv{border-color:#d93838}.foodType.nv:after{content:"";border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:7px solid #d93838}.foodType.veg:after{content:"";width:6px;height:6px;background:#19a45a;border-radius:50%}.foodType.egg{border-color:#d98b17}.foodType.egg:after{content:"";width:6px;height:6px;background:#d98b17;border-radius:50%}.pricesMini{white-space:nowrap;font-weight:700}.switch{width:38px;height:21px;background:#cbd5e1;border-radius:20px;padding:2px;border:0}.switch:after{content:"";display:block;width:17px;height:17px;border-radius:50%;background:#fff;transition:.2s}.switch.on{background:#17aa6b}.switch.on:after{transform:translateX(17px)}.statusToggle{display:inline-flex;align-items:center;gap:7px;border:0;background:transparent;padding:0;font-size:10px;font-weight:800}.statusToggle .statusText{min-width:30px;text-align:left}.statusToggle.off .statusText{color:#b45309}.statusToggle.on .statusText{color:#087443}.categoryCards{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.categoryCard{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff}.catImage{height:80px;background:#eee center/cover}.catBody{padding:9px}.catName{font-weight:800;font-size:12px}.catCount{font-size:10px;color:var(--muted);margin-top:3px}
+.menuToolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.menuToolbar .input{max-width:260px}.menuTable{width:100%;border-collapse:collapse;font-size:12px}.menuTable th{text-align:left;color:#6b7280;font-size:10px;text-transform:uppercase;padding:9px 6px;border-bottom:1px solid var(--border)}.menuTable td{padding:10px 6px;border-bottom:1px solid #eef0f3;vertical-align:middle}.menuTable tr:last-child td{border-bottom:0}.foodName{font-weight:800}.foodCat{font-size:10px;color:var(--muted);margin-top:2px}.foodType{display:inline-grid;place-items:center;width:16px;height:16px;border:1.5px solid #19a45a;border-radius:3px}.foodType.nv{border-color:#d93838}.foodType.nv:after{content:"";border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:7px solid #d93838}.foodType.veg:after{content:"";width:6px;height:6px;background:#19a45a;border-radius:50%}.foodType.egg{border-color:#d98b17}.foodType.egg:after{content:"";width:6px;height:6px;background:#d98b17;border-radius:50%}.pricesMini{white-space:nowrap;font-weight:700}.switch{width:38px;height:21px;background:#cbd5e1;border-radius:20px;padding:2px;border:0}.switch:after{content:"";display:block;width:17px;height:17px;border-radius:50%;background:#fff;transition:.2s}.switch.on{background:#17aa6b}.switch.on:after{transform:translateX(17px)}.categoryCards{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.categoryCard{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff}.catImage{height:80px;background:#eee center/cover}.catBody{padding:9px}.catName{font-weight:800;font-size:12px}.catCount{font-size:10px;color:var(--muted);margin-top:3px}
 
 /* Quick actions */
 .quickGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.quick{padding:14px;border-radius:10px;border:1px solid var(--border);display:flex;gap:12px;align-items:center}.quick i{font-size:20px;color:var(--green)}.quick strong{font-size:12px}.quick small{display:block;font-size:10px;color:var(--muted);margin-top:3px}
@@ -66,31 +66,31 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 @media(max-width:430px){.grid4{grid-template-columns:1fr 1fr}.statLabel{font-size:9px}.statValue{font-size:18px}.restTitle{font-size:14px}.restAddress{font-size:9px}}
 </style>
 
-
 <style id="ownerLoginStyles">
-#ownerAuth{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:18px}
-#ownerAuth.show{display:flex}
-.ownerAuthBackdrop{position:absolute;inset:0;background:radial-gradient(circle at 15% 15%,rgba(245,47,114,.18),transparent 30%),radial-gradient(circle at 85% 80%,rgba(181,29,59,.22),transparent 32%),linear-gradient(135deg,#080e18,#162235 55%,#241321)}
-.ownerAuthCard{position:relative;width:min(470px,100%);max-height:92vh;overflow:auto;background:rgba(255,255,255,.98);border:1px solid rgba(255,255,255,.7);border-radius:24px;padding:30px;box-shadow:0 30px 90px rgba(0,0,0,.42),0 8px 30px rgba(181,29,59,.12);backdrop-filter:blur(12px)}
-.authBrand{width:72px;height:72px;border-radius:22px;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(135deg,#8f1831,#c52345 65%,#f02e6f);color:#fff;font-size:29px;box-shadow:0 12px 28px rgba(181,29,59,.28)}
-.authKicker{text-align:center;color:#8f1831;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;font-size:10px;margin-top:2px}.ownerAuthCard h1{text-align:center;font-family:"Cormorant Garamond",serif;font-size:32px;margin:0;color:#151c2a}
-.authSub{text-align:center;color:#718096;font-size:12px;margin:4px 0 22px}
-.authChoiceGrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
-.authChoiceBtn{border:1px solid #e5e7eb;background:#fafbfc;border-radius:15px;padding:19px 15px;cursor:pointer;text-align:left;transition:.2s;box-shadow:0 5px 16px rgba(15,23,42,.04)}
-.authChoiceBtn:hover{transform:translateY(-2px);box-shadow:0 9px 25px rgba(0,0,0,.08);border-color:#cbd5e1}
-.authChoiceBtn span{display:block;font-size:24px;margin-bottom:8px}
-.authChoiceBtn b{display:block;font-size:16px;color:#172033}
-.authChoiceBtn small{display:block;color:#7a8495;font-size:10px;margin-top:5px;line-height:1.4}
-.authFormCard{text-align:left}
-.authFormCard .authBrand{margin-left:auto;margin-right:auto}
-.authFormCard h1,.authFormCard .authSub{text-align:center}
-.authBack,.authSwitch{border:0;background:none;color:#5b6474;font-weight:700;cursor:pointer;padding:0}
-.authBack{margin-bottom:9px}
-.authSwitch{display:block;margin:13px auto 0;color:#8f1831}
-.authError{background:#fff0f0;color:#b4232e;border:1px solid #ffd0d0;border-radius:8px;padding:9px 10px;font-size:11px;margin-bottom:12px}
-.authSuccess{background:#edfff5;color:#167647;border:1px solid #bce8cc;border-radius:8px;padding:9px 10px;font-size:11px;margin-bottom:12px}
-.slugHint{font-size:9px;color:#8a93a3;margin-top:4px}
-@media(max-width:560px){.authChoiceGrid{grid-template-columns:1fr}.ownerAuthCard{padding:22px}.twoCol{grid-template-columns:1fr}}
-.loginSubmit{width:100%;border:0;border-radius:13px;padding:13px 16px;background:linear-gradient(135deg,#8f1831,#d21f4a 60%,#f02e6f);color:#fff;font-weight:800;font-size:13px;box-shadow:0 10px 24px rgba(181,29,59,.24);transition:.2s}.loginSubmit:hover{transform:translateY(-1px);box-shadow:0 14px 30px rgba(181,29,59,.32)}
-.authFormCard .formGroup{margin-bottom:13px}.authFormCard label{font-size:11px;font-weight:800;color:#445066;margin-bottom:6px;display:block}.authFormCard .input{width:100%;border:1px solid #dfe4ec;border-radius:11px;padding:12px 13px;background:#fbfcfe;outline:none}.authFormCard .input:focus{border-color:#b51d3b;box-shadow:0 0 0 4px rgba(181,29,59,.08)}
-.authFeatureBar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0 20px}.authFeature{border:1px solid #eceff4;border-radius:11px;padding:9px 7px;text-align:center;background:#fafbfd}.authFeature strong{display:block;font-size:10px;color:#253046}.authFeature span{font-size:15px;display:block;margin-bottom:3px}
+#ownerLogin{position:fixed;inset:0;background:linear-gradient(135deg,#0d1624,#18263b);z-index:10000;display:none;align-items:center;justify-content:center;padding:18px}
+#ownerLogin.show{display:flex}
+.loginCard{width:min(430px,100%);background:#fff;border-radius:18px;padding:30px;box-shadow:0 25px 70px rgba(0,0,0,.28)}
+.loginLogo{width:66px;height:66px;border-radius:50%;margin:0 auto 12px;display:grid;place-items:center;background:linear-gradient(135deg,#8f1831,#c52345);color:#fff;font-size:27px}
+.loginCard h1{font-family:"Cormorant Garamond",serif;text-align:center;font-size:34px;margin:0;color:#151c2a}
+.loginCard .sub{text-align:center;color:#718096;font-size:12px;margin:4px 0 22px}
+.loginError{background:#fff0f0;color:#b4232e;border:1px solid #ffd0d0;border-radius:8px;padding:9px 10px;font-size:11px;margin-bottom:12px}
+.loginSubmit{width:100%;border:0;background:linear-gradient(90deg,#8f1831,#c52345);color:#fff;border-radius:9px;padding:12px;font-weight:800;cursor:pointer}
+.loginSubmit:disabled{opacity:.6}
+.loginHint{text-align:center;font-size:10px;color:#8a93a3;margin-top:13px;line-height:1.5}
+</style></head>
+
+<body>
+
+<div id="ownerLogin">
+  <div class="loginCard">
+    <div class="loginLogo"><i class="fa-solid fa-utensils"></i></div>
+    <h1>Owner Login</h1>
+    <div class="sub">Restaurant Owner Panel</div>
+    <div id="loginError" class="loginError hidden"></div>
+    <div class="formGroup">
+      <label>Email Address</label>
+      <input class="input" id="loginEmail" type="email" autocomplete="email" placeholder="owner@example.com">
+    </div>
+    <div class="formGroup">
+      <label>Password</label>
+      <input class="input" id="loginPassword" type="password" autocomplete="current-password" placeholder="Enter your password">
