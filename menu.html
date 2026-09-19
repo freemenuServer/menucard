@@ -1906,6 +1906,35 @@ function getSavedCategoryOrder(rest, items) {
         }
 
         const rest = restaurants[0];
+
+        // PLAN -> PUBLIC MENU TEMPLATE ROUTING
+        // Super Admin assigns restaurants.plan_id. Growth (Photos) is routed
+        // to the photo-menu template; other plans keep the stable/default menu
+        // until their dedicated public templates are enabled.
+        if (rest.plan_id) {
+          const { data: assignedPlan, error: planError } = await supabaseClient
+            .from("plans")
+            .select("id,name,slug,is_active")
+            .eq("id", rest.plan_id)
+            .maybeSingle();
+
+          if (!planError && assignedPlan && assignedPlan.is_active !== false) {
+            const planKey = `${assignedPlan.slug || ""} ${assignedPlan.name || ""}`.toLowerCase().trim();
+            const isGrowthPhotos =
+              planKey.includes("growth") ||
+              planKey.includes("growth-photos") ||
+              planKey.includes("growth photos") ||
+              planKey.includes("photo_menu_v1");
+
+            if (isGrowthPhotos) {
+              const growthUrl = new URL("/menugrowth.html", window.location.origin);
+              growthUrl.searchParams.set("r", rest.slug);
+              window.location.replace(growthUrl.href);
+              return;
+            }
+          }
+        }
+
         renderRestaurant(rest);
         fmAdConfig = await loadFreeMenuAdConfig(rest);
         if (fmAdConfig) ensureAdSenseScript(fmAdConfig.client);
