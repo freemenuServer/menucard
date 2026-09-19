@@ -28,6 +28,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .logoArea{text-align:center;padding:5px 8px 22px}.chefLogo{font-size:32px;color:#f5bf47}.sideBrand{font-family:"Cormorant Garamond",serif;font-size:25px;font-weight:700;color:#fff}.sideSub{font-size:10px;letter-spacing:1.5px;color:#aab5c7}
 .navItem{display:flex;align-items:center;gap:13px;padding:12px 13px;margin:4px 0;border-radius:8px;font-size:13px;font-weight:600;color:#bdc8d9}
 .navItem i{width:19px;text-align:center}.navItem:hover{background:#1c2a40;color:#fff}.navItem.active{background:linear-gradient(90deg,#8f1831,#b51d3b);color:#fff;box-shadow:0 6px 18px rgba(181,29,59,.2)}
+.planNavBadge{margin-left:auto;background:#f32f72;color:#fff;border-radius:999px;padding:2px 7px;font-size:9px;font-weight:900}.planCard{border:1px solid #e4e7ec;border-radius:16px;background:#fff;padding:20px}.planCurrent{background:linear-gradient(135deg,#fff5f7,#fff);border-color:#f2b7c4}.planPrice{font-size:34px;font-weight:900;letter-spacing:-1px}.planGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.planMini{border:1px solid #e4e7ec;border-radius:14px;padding:16px;background:#fff;display:flex;flex-direction:column}.planMini.current{border-color:#d91f35;box-shadow:0 8px 24px rgba(217,31,53,.10)}.planMini h4{margin:0 0 5px;font-size:16px}.planMini .muted{min-height:34px}.planMini ul{padding-left:18px;margin:12px 0 18px;flex:1}.planMini li{font-size:11px;margin:6px 0;color:#475467}.planStatus{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;font-size:10px;font-weight:800;background:#eafaf2;color:#087443}.planBtn{border:0;border-radius:9px;background:#d91f35;color:#fff;padding:10px 12px;font-weight:800;cursor:pointer}.planBtn.secondary{background:#eef1f5;color:#344054}.planMeta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.planMetaBox{background:#f8fafc;border:1px solid #eaecf0;border-radius:10px;padding:11px}.planMetaBox b{display:block;font-size:14px}.planMetaBox span{font-size:10px;color:#667085}@media(max-width:1000px){.planGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:620px){.planGrid{grid-template-columns:1fr}.planMeta{grid-template-columns:1fr}}
+
 .sidePromo{margin:24px 0 0;padding:20px 12px;border:1px solid rgba(255,255,255,.13);border-radius:10px;background:linear-gradient(145deg,#242039,#321f3a);text-align:center}
 .sidePromo i{color:#ffd34f;font-size:24px}.sidePromo strong{display:block;margin:8px 0 5px}.sidePromo p{font-size:11px;color:#c7c9d5;line-height:1.5;margin:0 0 12px}
 .btn-pink{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:0;background:#f32f72;color:#fff;border-radius:8px;padding:10px 12px;font-weight:800;font-size:12px;width:100%}
@@ -267,6 +269,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     <a class="navItem" href="#qr" data-section="qr"><i class="fa-solid fa-qrcode"></i> QR Code</a>
     <a class="navItem" href="#preview" data-section="preview"><i class="fa-solid fa-mobile-screen-button"></i> Menu Preview</a>
     <a class="navItem" href="#analytics" data-section="analytics"><i class="fa-solid fa-chart-column"></i> Analytics</a>
+    <a class="navItem" href="#plans" data-section="plans"><i class="fa-solid fa-crown"></i> Plans & Billing <span class="planNavBadge">UPGRADE</span></a>
     <a class="navItem" href="#settings" data-section="settings"><i class="fa-solid fa-gear"></i> Settings</a>
     <a class="navItem" href="#support" data-section="support"><i class="fa-regular fa-circle-question"></i> Help & Support</a>
   </nav>
@@ -517,6 +520,15 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
   </div>
 </section>
 
+<!-- PLANS & BILLING -->
+<section id="section-plans" class="hidden">
+  <div class="card">
+    <div class="cardTitle">Plans & Billing <small>See your active plan and upgrade whenever you need.</small></div>
+    <div id="ownerPlanStatus">Loading your current plan...</div>
+    <div id="ownerPlanGrid" class="planGrid" style="margin-top:16px"></div>
+  </div>
+</section>
+
 <!-- SETTINGS -->
 <section id="section-settings" class="hidden">
   <div class="twoCol">
@@ -603,10 +615,10 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const cleanNum=v=>v!==""&&v!==null&&v!==undefined&&!Number.isNaN(Number(v))?Number(v):null;
 function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),2300)}
 function initials(name){return (name||"Owner").split(/\s+/).slice(0,2).map(x=>x[0]).join("").toUpperCase()}
-function publicUrl(){return new URL("menu.html?r="+encodeURIComponent(currentRestaurant?.slug||""),location.href).href}
+function publicUrl(){return new URL("/menu/"+encodeURIComponent(currentRestaurant?.slug||""),location.origin).href}
 
 /* ---------- Navigation ---------- */
-const sections=["dashboard","restaurant","menu","categories","gallery","qr","preview","analytics","settings","orders","support"];
+const sections=["dashboard","restaurant","menu","categories","gallery","qr","preview","analytics","plans","settings","orders","support"];
 function showSection(name){
   activeSection=sections.includes(name)?name:"dashboard";
   sections.forEach(s=>$("section-"+s)?.classList.toggle("hidden",s!==activeSection));
@@ -614,6 +626,7 @@ function showSection(name){
   $("sidebar").classList.remove("open");
   if(activeSection==="preview") $("previewFrame").src=publicUrl();
   if(activeSection==="qr") renderQR();
+  if(activeSection==="plans") loadOwnerPlans();
 }
 document.querySelectorAll(".navItem").forEach(a=>a.addEventListener("click",e=>{e.preventDefault();history.replaceState(null,"","#"+a.dataset.section);showSection(a.dataset.section)}));
 window.addEventListener("hashchange",()=>showSection(location.hash.slice(1)||"dashboard"));
@@ -1034,6 +1047,54 @@ document.addEventListener("click",e=>{
 $("saveItem").onclick=saveItem;$("openAdd").onclick=()=>openItem();$("openAdd2").onclick=()=>openItem();
 $("menuSearch").oninput=renderDashboardTable;$("menuCategoryFilter").onchange=renderDashboardTable;$("menuTypeFilter").onchange=renderDashboardTable;
 $("fullSearch").oninput=renderFullTable;$("fullCatFilter").onchange=renderFullTable;$("fullTypeFilter").onchange=renderFullTable;
+
+/* ---------- Plans & Billing ---------- */
+function ownerPlanKey(r){
+  return String(r?.plan_id||r?.plan_slug||r?.plan||"free").trim();
+}
+function ownerPlanLabel(r){
+  return String(r?.plan_name||r?.plan||"Free Starter").trim() || "Free Starter";
+}
+function ownerPlanIsActive(r){
+  const status=String(r?.subscription_status||"active").toLowerCase();
+  return status!=="cancelled" && status!=="inactive" && status!=="expired";
+}
+function planUpgradeUrl(slug){
+  const qs=new URLSearchParams({upgrade:String(slug||"")});
+  if(currentRestaurantId) qs.set("restaurant_id",currentRestaurantId);
+  return "/plans.html?"+qs.toString();
+}
+function renderOwnerPlans(rows){
+  const statusEl=$("ownerPlanStatus"),root=$("ownerPlanGrid");
+  if(!statusEl||!root)return;
+  const r=currentRestaurant||{};
+  const currentKey=String(r.plan_id||r.plan_slug||r.plan||"free").toLowerCase();
+  const currentRow=rows.find(p=>String(p.id||"").toLowerCase()===currentKey || String(p.slug||"").toLowerCase()===currentKey || String(p.plan_type||"").toLowerCase()===currentKey) || rows.find(p=>String(p.plan_type||"").toLowerCase()==="free");
+  const currentName=currentRow?.name||ownerPlanLabel(r);
+  const subStatus=String(r.subscription_status||"active").toLowerCase();
+  const expiry=r.subscription_expires_at?new Date(r.subscription_expires_at):null;
+  const expiryText=expiry&&!Number.isNaN(expiry.getTime())?expiry.toLocaleDateString("en-IN"):"No expiry set";
+  statusEl.innerHTML=`<div class="planCard planCurrent"><div style="display:flex;justify-content:space-between;gap:15px;align-items:flex-start;flex-wrap:wrap"><div><div class="muted" style="font-size:10px;text-transform:uppercase;letter-spacing:.7px">CURRENT PLAN</div><h2 style="margin:5px 0 4px">${esc(currentName)}</h2><div class="muted" style="font-size:11px">Subscription: <b>${esc(subStatus)}</b> • Expiry: <b>${esc(expiryText)}</b></div></div><span class="planStatus">● ${ownerPlanIsActive(r)?"Active":"Inactive"}</span></div><div class="planMeta"><div class="planMetaBox"><b>${Number(currentRow?.qr_stickers_max??r.qr_stickers_max??0)}</b><span>QR limit</span></div><div class="planMetaBox"><b>${Number(currentRow?.signature_3d_dishes_max??r.signature_3d_dishes_max??0)}</b><span>3D/AR dishes</span></div><div class="planMetaBox"><b>₹${Number(currentRow?.monthly_price||0).toLocaleString("en-IN")}</b><span>Monthly</span></div></div></div>`;
+  if(!rows.length){root.innerHTML='<div class="empty">No active plans are available. Please contact FreeMenu Admin.</div>';return;}
+  root.innerHTML=rows.map(p=>{
+    const key=String(p.slug||p.id||p.plan_type||"").toLowerCase();
+    const isCurrent=key===currentKey || String(p.id||"").toLowerCase()===currentKey || String(p.plan_type||"").toLowerCase()===currentKey || (!currentKey&&String(p.plan_type||"").toLowerCase()==="free");
+    let features=[];
+    if(Array.isArray(p.features)) features=p.features.map(x=>typeof x==="string"?x:x?.text).filter(Boolean).slice(0,6);
+    if(!features.length){features=[`${Number(p.qr_stickers_max||0)} QR codes`,`${Number(p.signature_3d_dishes_max||0)} Signature 3D/AR dishes`];}
+    const price=Number(p.monthly_price||0).toLocaleString("en-IN");
+    return `<div class="planMini ${isCurrent?"current":""}"><div style="display:flex;justify-content:space-between;gap:8px"><h4>${esc(p.name||"Plan")}</h4>${isCurrent?'<span class="planStatus">Current</span>':''}</div><div class="planPrice">₹${price}<span style="font-size:11px;font-weight:600;color:#667085"> / month</span></div><div class="muted" style="font-size:10px;margin-top:5px">Setup ₹${Number(p.setup_fee||0).toLocaleString("en-IN")}</div><ul>${features.map(f=>`<li>✓ ${esc(f)}</li>`).join("")}</ul>${isCurrent?'<button class="planBtn secondary" type="button" disabled>Current Active Plan</button>':`<button class="planBtn" type="button" onclick="location.href='${planUpgradeUrl(p.slug||p.id)}'">Upgrade to ${esc(p.name||"Plan")}</button>`}</div>`;
+  }).join("");
+}
+async function loadOwnerPlans(){
+  const statusEl=$("ownerPlanStatus"),root=$("ownerPlanGrid");
+  if(!statusEl||!root)return;
+  statusEl.dataset.loaded="loading";
+  const {data,error}=await supabaseClient.from("plans").select("id,name,slug,plan_type,monthly_price,setup_fee,qr_stickers_max,signature_3d_dishes_max,features,is_active,sort_order").eq("is_active",true).order("sort_order",{ascending:true}).order("monthly_price",{ascending:true});
+  if(error){console.error("Owner plans load error:",error);statusEl.innerHTML=`<div class="planCard">Unable to load plan details. <button class="btn sm" type="button" onclick="loadOwnerPlans()">Retry</button></div>`;return;}
+  renderOwnerPlans(data||[]);
+  statusEl.dataset.loaded="ready";
+}
 
 /* ---------- Profile ---------- */
 $("saveProfile").onclick=async()=>{
