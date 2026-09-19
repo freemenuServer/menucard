@@ -53,14 +53,110 @@ const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const loading=document.getElementById('loading'),poster=document.getElementById('poster'),unassigned=document.getElementById('unassigned'),errorBox=document.getElementById('error'),errorText=document.getElementById('errorText'),restaurantName=document.getElementById('restaurantName'),unassignedCode=document.getElementById('unassignedCode'),qrContainer=document.getElementById('qrcode');
 let currentCode='',qrInstance=null;
 function getMenuUrl(slug){
-  return new URL(
-    '/menu.html?r='+encodeURIComponent(slug),
-    window.location.origin
-  ).href;
-}catch(e){
-  console.error('FreeMenu QR Error:',e);
-  showError(e&&e.message?e.message:'Unable to process this QR code.')
-}}
+  return new URL('/menu.html?r='+encodeURIComponent(slug),window.location.origin).href;
+}
+function getPreprintedUrl(code){
+  return new URL('/qr.html?code='+encodeURIComponent(code),window.location.origin).href;
+}
+function showUnassigned(code){loading.style.display='none';poster.style.display='none';errorBox.style.display='none';unassigned.style.display='block';unassignedCode.textContent=code;unassigned.querySelector('.state').style.display='block'}
+function showError(message){loading.style.display='none';poster.style.display='none';unassigned.style.display='none';errorBox.style.display='block';errorText.textContent=message||'We could not process this QR code.';errorBox.querySelector('.state').style.display='block'}
+function createQRTarget(scanURL){qrContainer.innerHTML='';qrInstance=new QRCodeStyling({width:390,height:390,type:'canvas',data:scanURL,margin:6,qrOptions:{typeNumber:0,mode:'Byte',errorCorrectionLevel:'H'},dotsOptions:{type:'dots',color:'#151820'},cornersSquareOptions:{type:'extra-rounded',color:'#ffad18'},cornersDotOptions:{type:'dot',color:'#151820'},backgroundOptions:{color:'#ffffff'}});qrInstance.append(qrContainer)}
+function downloadQR(){if(!qrInstance){alert('QR is not ready yet.');return}qrInstance.download({name:'FreeMenu-'+(currentCode||'QR'),extension:'png'})}
+async function openQR(){
+  try{
+    if(!window.supabase) throw new Error('Supabase could not load.');
+
+    const params = new URLSearchParams(window.location.search);
+    const code = String(params.get('code') || '').trim();
+    const printMode = params.get('view') === 'print';
+
+    if(!code) throw new Error('QR code is missing.');
+    currentCode = code;
+
+    /*
+      PRE-PRINT MODE:
+      This QR is printed BEFORE restaurant assignment.
+      The QR itself always contains the permanent resolver:
+      /qr.html?code=FM-0001
+
+      Later, when FM-0001 is assigned, the resolver sends
+      the customer to that restaurant's menu.
+    */
+    if(printMode){
+      restaurantName.textContent = 'Pre-Printed Menu QR';
+      createQRTarget(getPreprintedUrl(code));
+
+      loading.style.display = 'none';
+      poster.style.display = 'block';
+      unassigned.style.display = 'none';
+      errorBox.style.display = 'none';
+
+      // Try to show the currently assigned restaurant name, but
+      // NEVER block printing if the lookup is unavailable.
+      db.from('qr_codes')
+        .select('restaurant_id,status')
+        .eq('code',code)
+        .maybeSingle()
+        .then(async ({data,error})=>{
+          if(error || !data || !data.restaurant_id) return;
+          const rr = await db.from('restaurants')
+            .select('name')
+            .eq('id',data.restaurant_id)
+            .maybeSingle();
+          if(!rr.error && rr.data?.name){
+            restaurantName.textContent = rr.data.name;
+          }
+        })
+        .catch(()=>{});
+
+      return;
+    }
+
+    /*
+      CUSTOMER SCAN MODE:
+      /qr.html?code=FM-0001
+      -> qr_codes
+      -> restaurant_id
+      -> restaurants.slug
+      -> /menu.html?r=slug
+    */
+    const qrResult = await db.from('qr_codes')
+      .select('restaurant_id,status,code')
+      .eq('code',code)
+      .maybeSingle();
+
+    if(qrResult.error) throw new Error(qrResult.error.message);
+
+    const qr = qrResult.data;
+    if(!qr) throw new Error('QR code '+code+' was not found.');
+
+    const status = String(qr.status || 'available').toLowerCase();
+
+    if(status !== 'assigned' || !qr.restaurant_id){
+      showUnassigned(code);
+      return;
+    }
+
+    const restaurantResult = await db.from('restaurants')
+      .select('name,slug')
+      .eq('id',qr.restaurant_id)
+      .maybeSingle();
+
+    if(restaurantResult.error)
+      throw new Error(restaurantResult.error.message);
+
+    const restaurant = restaurantResult.data;
+
+    if(!restaurant || !restaurant.slug)
+      throw new Error('Restaurant menu is not available.');
+
+    window.location.replace(getMenuUrl(restaurant.slug));
+
+  }catch(e){
+    console.error('FreeMenu QR Error:',e);
+    showError(e && e.message ? e.message : 'Unable to process this QR code.');
+  }
+}
 openQR();
 </script>
 </body>
