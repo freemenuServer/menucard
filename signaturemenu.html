@@ -475,6 +475,7 @@
               loading="eager"
               reveal="auto"
               alt="${esc(item.name || "3D food model")}"
+              crossorigin="anonymous"
               data-model-src="${esc(proxySrc)}"
               data-direct-src="${esc(directSrc)}"
               data-usdz-src="${esc(usdzProxy)}"
@@ -545,45 +546,69 @@
 
       async function fetchModel(url, label){
         if(!url) throw new Error(`${label} URL missing`);
-        const response = await fetch(url, { mode:"cors", credentials:"omit", cache:"force-cache" });
+        const response = await fetch(url, {
+          mode:"cors",
+          credentials:"omit",
+          cache:"no-store",
+          headers:{"Accept": label === "USDZ" ? "model/vnd.usdz+zip,*/*" : "model/gltf-binary,*/*"}
+        });
         if(!response.ok) throw new Error(`${label} HTTP ${response.status}`);
-        const blob = await response.blob();
-        if(!blob.size) throw new Error(`${label} is empty`);
+
+        const buffer = await response.arrayBuffer();
+        if(!buffer.byteLength) throw new Error(`${label} is empty`);
+
+        if(label === "GLB") {
+          const head = new Uint8Array(buffer, 0, Math.min(4, buffer.byteLength));
+          const magic = String.fromCharCode(...head);
+          if(magic !== "glTF") throw new Error(`GLB response is not a valid GLB file (${magic || "no header"})`);
+        }
+
+        const mime = label === "USDZ" ? "model/vnd.usdz+zip" : "model/gltf-binary";
+        const blob = new Blob([buffer], {type:mime});
         return URL.createObjectURL(blob);
       }
 
       (async () => {
         try{
-          setState("Loading 3D model…", "Downloading secure 3D asset…", true);
+          setState("Loading 3D model…", "Loading interactive 360° viewer…", true);
+
+          // Direct R2 URL is preferred because a GLB may contain relative asset
+          // references. The secure proxy is the fallback when R2 CORS blocks it.
           try{
+            viewer.src = direct;
+            setState("Loading 3D model…", "Opening 3D asset…", true);
+
+            await new Promise((resolve, reject) => {
+              let done = false;
+              const ok = () => { if(!done){ done=true; cleanup(); resolve(); } };
+              const fail = () => { if(!done){ done=true; cleanup(); reject(new Error("Direct GLB load failed")); } };
+              const timer = setTimeout(fail, 9000);
+              const cleanup = () => {
+                clearTimeout(timer);
+                viewer.removeEventListener("load", ok);
+                viewer.removeEventListener("error", fail);
+              };
+              viewer.addEventListener("load", ok, {once:true});
+              viewer.addEventListener("error", fail, {once:true});
+            });
+          }catch(directError){
+            console.warn("Direct GLB load failed, using secure proxy", directError);
             objectUrl = await fetchModel(proxy, "GLB");
-          }catch(proxyError){
-            console.warn("3D proxy failed, trying direct GLB", proxyError);
-            objectUrl = await fetchModel(direct, "GLB");
+            viewer.src = objectUrl;
           }
 
-          viewer.src = objectUrl;
-
-          if(usdzProxy || usdzDirect){
+          // USDZ is fetched only for iOS AR, and is never allowed to block the GLB viewer.
+          if(usdzDirect || usdzProxy){
             try{
-              try{
-                usdzObjectUrl = await fetchModel(usdzProxy, "USDZ");
-              }catch(e){
-                if(usdzDirect) usdzObjectUrl = await fetchModel(usdzDirect, "USDZ");
-              }
-              if(usdzObjectUrl) viewer.setAttribute("ios-src", usdzObjectUrl);
+              usdzObjectUrl = await fetchModel(usdzDirect || usdzProxy, "USDZ");
+              viewer.setAttribute("ios-src", usdzObjectUrl);
             }catch(e){
               console.warn("USDZ optional load failed", e);
             }
           }
-
-          // Give model-viewer a moment to dispatch load/error after src is set.
-          if(!viewer.loaded){
-            setState("Loading 3D model…", "Building interactive 360° viewer…", true);
-          }
         }catch(error){
           console.error("3D model load failed", error);
-          setState("3D model could not load", "The secure GLB delivery failed. Tap Open 3D file to test the model.", true);
+          setState("3D model could not load", "GLB delivery or CORS failed. Use Open 3D file to verify the stored model.", true);
         }
       })();
 
