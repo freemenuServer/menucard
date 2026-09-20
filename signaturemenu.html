@@ -337,6 +337,24 @@
     return safeUrl(item.ar_model_url || item.model_url || item.glb_url || "");
   }
 
+  /*
+     Public 3D loading goes through the deployed Edge Function.
+     The GLB itself lives in Cloudflare R2; the proxy adds the correct
+     CORS + Content-Type headers so <model-viewer> can fetch it reliably.
+  */
+  function modelProxyUrl(item){
+    const direct = modelUrl(item);
+    if(!direct) return "";
+    try{
+      const u = new URL(direct);
+      const key = u.pathname.replace(/^\/+/, "");
+      if(!key || !key.startsWith("restaurants/") || !key.includes("/signature-3d/")) return direct;
+      return `${SUPABASE_URL}/functions/v1/signature-3d-model-upload?key=${encodeURIComponent(key)}`;
+    }catch(e){
+      return direct;
+    }
+  }
+
   function usdzUrl(item){
     return safeUrl(item.ar_usdz_url || item.usdz_url || "");
   }
@@ -412,7 +430,8 @@
     $("signatureCount").textContent = `${filtered.length} dish${filtered.length === 1 ? "" : "es"}`;
 
     $("signatureGrid").innerHTML = filtered.map((item, index) => {
-      const src = modelUrl(item);
+      const directSrc = modelUrl(item);
+      const src = modelProxyUrl(item);
       const usdz = usdzUrl(item);
       const poster = photoUrl(item);
       const modelId = `model-${index}-${String(item.id || item.name || "dish").replace(/[^a-zA-Z0-9_-]/g,"-")}`;
@@ -448,6 +467,7 @@
               ${poster ? `poster="${esc(poster)}"` : ""}
               camera-controls
               touch-action="pan-y"
+              crossorigin="anonymous"
               auto-rotate
               rotation-per-second="22deg"
               ar
@@ -456,6 +476,7 @@
               exposure="1"
               loading="lazy"
               reveal="auto"
+              data-direct-src="${esc(directSrc)}"
               alt="${esc(item.name || "3D food model")}">
             </model-viewer>
 
@@ -463,7 +484,7 @@
               <div class="loadStateBox">
                 <strong>Loading 3D model…</strong>
                 <small>360° view will appear here.</small>
-                <a href="${esc(src)}" target="_blank" rel="noopener">Open model file</a>
+                <a href="${esc(directSrc)}" target="_blank" rel="noopener">Open / download GLB</a>
               </div>
             </div>
 
@@ -499,10 +520,10 @@
           <div class="loadStateBox">
             <strong>3D model load nahi hua</strong>
             <small>
-              GLB URL mil raha hai, lekin browser/model-viewer usse load nahi kar pa raha.
-              Agar file direct download hoti hai, R2 CORS policy check karein.
+              3D proxy se GLB load nahi ho paaya. Direct GLB download ho raha ho to
+              R2 file theek hai; Edge Function GET/CORS response check karein.
             </small>
-            <a href="${esc(viewer.src)}" target="_blank" rel="noopener">Open / download GLB</a>
+            <a href="${esc(viewer.dataset.directSrc || viewer.src)}" target="_blank" rel="noopener">Open / download GLB</a>
           </div>`;
         state.style.display = "grid";
       });
