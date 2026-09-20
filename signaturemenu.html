@@ -128,6 +128,9 @@ img{display:block;width:100%;object-fit:cover}
   .photo-card{grid-template-columns:100px 1fr;gap:10px}.photo-card img{height:88px}.photo-name{font-size:16px}.photo-desc{font-size:11px}.photo-price{font-size:18px}
   .footer-grid{grid-template-columns:1fr 1fr;gap:14px}.footer-note{font-size:17px}
 }
+
+/* Customer-facing menu: never show internal plan/pricing marketing strips. */
+.plan-strip,.footer-grid,.footer-note{display:none!important}
 </style>
 </head>
 <body>
@@ -252,15 +255,6 @@ function renderShell(){
       </div>
     </header>
 
-    <div class="plan-strip">
-      <span>★ <b>Signature 3D</b></span>
-      <span>10 QR Stickers (Max)</span>
-      <span>5 Signature Dishes in 3D AR</span>
-      <span>Interactive 360° & Room Placement</span>
-      <span>HD Photos on remaining items</span>
-      <span>Physical Setup & Scan Optimization</span>
-    </div>
-
     <main class="content">
       <nav class="categories" id="categories"></nav>
       <div class="search-wrap"><input id="search" type="search" placeholder="Search for dishes..."></div>
@@ -279,29 +273,19 @@ function renderShell(){
       <section class="section" id="signatureSection">
         <div class="section-head">
           <div><h2>★ Our Signature 3D Dishes</h2><p>Tap “View in AR” to see the dish in 3D and place it in your space.</p></div>
-          <span class="count-badge">${arItems.length}/5 AR dishes</span>
+          <span class="count-badge">${arItems.length} Signature dishes</span>
         </div>
         <div class="ar-grid" id="arGrid"></div>
       </section>
 
       <section class="section" id="photoSection">
         <div class="section-head">
-          <div><h2>More Delicious Choices</h2><p>HD Photos on remaining items</p></div>
+          <div><h2>More Delicious Choices</h2><p>Explore more dishes from our menu.</p></div>
         </div>
         <div class="photo-grid" id="photoGrid"></div>
       </section>
     </main>
 
-    <footer class="footer">
-      <div class="footer-grid">
-        <div class="footer-item"><b>▦</b>10 QR Stickers<br>(Max)</div>
-        <div class="footer-item"><b>♨</b>5 Signature Dishes<br>in 3D AR</div>
-        <div class="footer-item"><b>360°</b>Interactive 360° &<br>Room Placement</div>
-        <div class="footer-item"><b>HD</b>HD Photos<br>on remaining items</div>
-        <div class="footer-item"><b>⚙</b>Physical Setup &<br>Scan Optimization</div>
-      </div>
-      <div class="footer-note">Scan. Explore. Experience Food Like Never Before!</div>
-    </footer>
   `;
 
   $("search").addEventListener("input",renderItems);
@@ -328,7 +312,7 @@ function renderItems(){
   $("arGrid").innerHTML=ar.length?ar.map(renderAR).join(""):`<div class="empty">No 3D dishes are available in this category yet.</div>`;
   $("photoGrid").innerHTML=photos.length?photos.map(renderPhoto).join(""):`<div class="empty">No additional menu items found.</div>`;
   const count=$(".count-badge");
-  if(count)count.textContent=`${ar.length}/5 AR dishes`;
+  if(count)count.textContent=`${ar.length} Signature dishes`;
 }
 function renderAR(i){
   const [type,label]=itemType(i),model=itemModel(i),usdz=itemUsdz(i),img=itemImage(i);
