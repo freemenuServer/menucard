@@ -341,21 +341,20 @@
     return safeUrl(item.ar_model_url || item.model_url || item.glb_url || "");
   }
 
-  function modelProxyUrl(item){
-    const direct = modelUrl(item);
-    if(!direct) return "";
+  function publicModelProxyUrl(url){
+    const value = String(url || "").trim();
+    if(!value) return "";
     try{
-      const u = new URL(direct);
-      const key = u.pathname.replace(/^\/+/, "");
-      if(!key || !key.startsWith("restaurants/") || !key.includes("/signature-3d/")) return direct;
+      const u = new URL(value, location.origin);
+      const marker = "/restaurants/";
+      const idx = u.pathname.indexOf(marker);
+      if(idx < 0) return value;
+      const key = u.pathname.slice(idx + 1);
+      if(!key.startsWith("restaurants/") || !key.includes("/signature-3d/")) return value;
       return `${SUPABASE_URL}/functions/v1/signature-3d-model-upload?key=${encodeURIComponent(key)}`;
     }catch(e){
-      return direct;
+      return value;
     }
-  }
-
-  function usdzUrl(item){
-    return safeUrl(item.ar_usdz_url || item.usdz_url || "");
   }
 
   function photoUrl(item){
@@ -430,33 +429,28 @@
 
     $("signatureGrid").innerHTML = filtered.map((item, index) => {
       const directSrc = modelUrl(item);
-      const proxySrc = modelProxyUrl(item);
-      // Always use the public Edge Function for browser delivery. It adds CORS
-      // and serves the R2 object safely without exposing R2 credentials.
-      const src = proxySrc || directSrc;
-      const usdz = usdzUrl(item);
+      const proxySrc = publicModelProxyUrl(directSrc);
+      const usdzDirect = usdzUrl(item);
+      const usdzProxy = publicModelProxyUrl(usdzDirect);
       const poster = photoUrl(item);
       const modelId = `model-${index}-${String(item.id || item.name || "dish").replace(/[^a-zA-Z0-9_-]/g,"-")}`;
 
-      if(!src){
+      if(!directSrc){
         return `
           <article class="sigCard">
             <div class="viewer">
               ${poster ? `<img src="${esc(poster)}" alt="" style="width:100%;height:100%;object-fit:cover;opacity:.72">` : ""}
-              <div class="loadState">
-                <div class="loadStateBox">
-                  <strong>3D model unavailable</strong>
-                  <small>This dish is marked as Signature 3D, but no GLB model URL is stored.</small>
-                </div>
-              </div>
+              <div class="loadState"><div class="loadStateBox">
+                <strong>3D model unavailable</strong>
+                <small>No GLB model URL is stored for this dish.</small>
+              </div></div>
             </div>
             <div class="sigInfo">
               <div class="sigTop"><div class="sigName">${esc(item.name || "Unnamed dish")}</div><div class="price">${priceText(item)}</div></div>
               ${item.description ? `<div class="desc">${esc(item.description)}</div>` : ""}
               <div class="badges">${itemBadges(item)}</div>
             </div>
-          </article>
-        `;
+          </article>`;
       }
 
       return `
@@ -464,12 +458,9 @@
           <div class="viewer">
             <model-viewer
               id="${esc(modelId)}"
-              src="${esc(src)}"
-              ${usdz ? `ios-src="${esc(usdz)}"` : ""}
               ${poster ? `poster="${esc(poster)}"` : ""}
               camera-controls
               touch-action="pan-y"
-              crossorigin="anonymous"
               interaction-prompt="none"
               auto-rotate
               rotation-per-second="22deg"
@@ -479,16 +470,18 @@
               exposure="1"
               loading="eager"
               reveal="auto"
+              alt="${esc(item.name || "3D food model")}"
+              data-model-src="${esc(proxySrc)}"
               data-direct-src="${esc(directSrc)}"
-              data-proxy-src="${esc(proxySrc)}"
-              alt="${esc(item.name || "3D food model")}">
+              data-usdz-src="${esc(usdzProxy)}"
+              data-usdz-direct="${esc(usdzDirect)}">
             </model-viewer>
 
             <div class="loadState" id="${esc(modelId)}-state">
               <div class="loadStateBox">
                 <strong>Loading 3D model…</strong>
-                <small>Rotate • Zoom • View in AR</small>
-                <a href="${esc(directSrc)}" target="_blank" rel="noopener">Open 3D file</a>
+                <small>Preparing interactive 360° viewer…</small>
+                <a href="${esc(directSrc)}" target="_blank" rel="noopener noreferrer">Open 3D file</a>
               </div>
             </div>
 
@@ -507,14 +500,17 @@
             ${priceVariants(item) ? `<div class="prices">${priceVariants(item)}</div>` : ""}
             <div class="badges">${itemBadges(item)}</div>
           </div>
-        </article>
-      `;
+        </article>`;
     }).join("");
 
     document.querySelectorAll("model-viewer").forEach(viewer => {
       const state = $(viewer.id + "-state");
+      const proxy = viewer.dataset.modelSrc || "";
       const direct = viewer.dataset.directSrc || "";
-      const proxy = viewer.dataset.proxySrc || viewer.getAttribute("src") || "";
+      const usdzProxy = viewer.dataset.usdzSrc || "";
+      const usdzDirect = viewer.dataset.usdzDirect || "";
+      let objectUrl = "";
+      let usdzObjectUrl = "";
       let loaded = false;
 
       const setState = (title, body, show = true) => {
@@ -540,15 +536,57 @@
 
       viewer.addEventListener("error", () => {
         if(loaded) return;
-        setState(
-          "3D model could not load",
-          "Secure 3D delivery failed. Tap Open 3D file to verify the GLB.",
-          true
-        );
+        setState("3D model could not load", "The GLB could not be decoded. Open 3D file to verify the stored model.", true);
       });
 
-      // Give the custom element a clean initial state. No endless fallback loop.
-      setState("Loading 3D model…", "Rotate • Zoom • View in AR", true);
+      async function fetchModel(url, label){
+        if(!url) throw new Error(`${label} URL missing`);
+        const response = await fetch(url, { mode:"cors", credentials:"omit", cache:"force-cache" });
+        if(!response.ok) throw new Error(`${label} HTTP ${response.status}`);
+        const blob = await response.blob();
+        if(!blob.size) throw new Error(`${label} is empty`);
+        return URL.createObjectURL(blob);
+      }
+
+      (async () => {
+        try{
+          setState("Loading 3D model…", "Downloading secure 3D asset…", true);
+          try{
+            objectUrl = await fetchModel(proxy, "GLB");
+          }catch(proxyError){
+            console.warn("3D proxy failed, trying direct GLB", proxyError);
+            objectUrl = await fetchModel(direct, "GLB");
+          }
+
+          viewer.src = objectUrl;
+
+          if(usdzProxy || usdzDirect){
+            try{
+              try{
+                usdzObjectUrl = await fetchModel(usdzProxy, "USDZ");
+              }catch(e){
+                if(usdzDirect) usdzObjectUrl = await fetchModel(usdzDirect, "USDZ");
+              }
+              if(usdzObjectUrl) viewer.setAttribute("ios-src", usdzObjectUrl);
+            }catch(e){
+              console.warn("USDZ optional load failed", e);
+            }
+          }
+
+          // Give model-viewer a moment to dispatch load/error after src is set.
+          if(!viewer.loaded){
+            setState("Loading 3D model…", "Building interactive 360° viewer…", true);
+          }
+        }catch(error){
+          console.error("3D model load failed", error);
+          setState("3D model could not load", "The secure GLB delivery failed. Tap Open 3D file to test the model.", true);
+        }
+      })();
+
+      viewer.addEventListener("load", () => {
+        if(objectUrl) viewer.dataset.objectUrl = objectUrl;
+        if(usdzObjectUrl) viewer.dataset.usdzObjectUrl = usdzObjectUrl;
+      }, {once:false});
     });
   }
 
@@ -734,7 +772,7 @@
     }catch(e){}
   };
 
-  document.addEventListener("click", event => {
+  document.addEventListener("click", async event => {
     const rotateBtn = event.target.closest("[data-rotate]");
     if(rotateBtn){
       const viewer = $(rotateBtn.dataset.rotate);
@@ -749,30 +787,24 @@
       const viewer = $(arBtn.dataset.ar);
       if(!viewer) return;
 
-      // model-viewer can only enter AR after the GLB is successfully loaded.
       if(!viewer.loaded){
-        showToast("3D model abhi load ho raha hai. Please try again.");
+        showToast("3D model abhi load ho raha hai. 2–3 seconds baad try karein.");
         return;
       }
 
       if(typeof viewer.activateAR !== "function"){
-        showToast("AR is not supported on this browser.");
+        showToast("AR is not supported on this browser/device.");
         return;
       }
 
       try{
-        const result = viewer.activateAR();
-        if(result && typeof result.catch === "function") {
-          result.catch(() => {
-            const ua = navigator.userAgent || "";
-            const isIOS = /iPhone|iPad|iPod/i.test(ua);
-            showToast(isIOS
-              ? "iPhone AR ke liye USDZ model required hai."
-              : "AR is not supported on this device/browser");
-          });
-        }
+        await viewer.activateAR();
       }catch(e){
-        showToast("AR is not supported on this device/browser");
+        const ua = navigator.userAgent || "";
+        const isIOS = /iPhone|iPad|iPod/i.test(ua);
+        showToast(isIOS
+          ? "iPhone AR ke liye USDZ model upload hona chahiye."
+          : "AR is not available on this device/browser.");
       }
     }
   });
