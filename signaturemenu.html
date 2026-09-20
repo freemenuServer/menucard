@@ -546,18 +546,25 @@
 
       async function fetchModel(url, label){
         if(!url) throw new Error(`${label} URL missing`);
-        const response = await fetch(url, {
+        // Public GET is intentionally JWT-free. Keep this request a simple CORS
+        // request so the browser does not trigger a preflight for `apikey`.
+        // If the gateway still asks for an API key, retry once with it.
+        let response = await fetch(url, {
           mode:"cors",
           credentials:"omit",
-          cache:"no-store",
-          headers:{
-            "apikey": SUPABASE_ANON_KEY,
-            "Accept": label === "USDZ" ? "model/vnd.usdz+zip,*/*" : "model/gltf-binary,*/*"
-          }
+          cache:"no-store"
         });
+        if(response.status === 401 || response.status === 403){
+          response = await fetch(url, {
+            mode:"cors",
+            credentials:"omit",
+            cache:"no-store",
+            headers:{"apikey": SUPABASE_ANON_KEY}
+          });
+        }
         if(!response.ok){
           let detail = "";
-          try{ detail = (await response.text()).slice(0,240); }catch(e){}
+          try{ detail = (await response.text()).slice(0,320); }catch(e){}
           throw new Error(`${label} HTTP ${response.status}${detail ? ` — ${detail}` : ""}`);
         }
 
@@ -632,7 +639,8 @@
           }
         }catch(error){
           console.error("3D model load failed", error);
-          setState("3D model could not load", "Secure GLB delivery failed. Check the Edge Function deployment and R2 CORS.", true);
+          const msg = String(error?.message || "Unknown 3D loading error");
+          setState("3D model could not load", msg.length > 180 ? msg.slice(0,180) + "…" : msg, true);
         }
       })();
 
