@@ -148,11 +148,15 @@
     .loadState{
       position:absolute;inset:0;display:grid;place-items:center;
       padding:20px;text-align:center;pointer-events:none;
+      z-index:4;
     }
     .loadStateBox{
-      max-width:270px;padding:15px;border:1px solid var(--line);
-      background:rgba(12,12,14,.84);border-radius:15px;
+      max-width:270px;padding:13px 15px;border:1px solid rgba(255,255,255,.10);
+      background:rgba(10,10,12,.72);border-radius:15px;
+      box-shadow:0 12px 30px rgba(0,0,0,.28);
+      backdrop-filter:blur(10px);
     }
+    .errorState{border-color:rgba(255,119,119,.22)}
     .loadState strong{display:block;font-size:12px;margin-bottom:5px}
     .loadState small{display:block;color:var(--muted);font-size:10px;line-height:1.5}
     .loadState a{
@@ -337,11 +341,6 @@
     return safeUrl(item.ar_model_url || item.model_url || item.glb_url || "");
   }
 
-  /*
-     Public 3D loading goes through the deployed Edge Function.
-     The GLB itself lives in Cloudflare R2; the proxy adds the correct
-     CORS + Content-Type headers so <model-viewer> can fetch it reliably.
-  */
   function modelProxyUrl(item){
     const direct = modelUrl(item);
     if(!direct) return "";
@@ -431,7 +430,8 @@
 
     $("signatureGrid").innerHTML = filtered.map((item, index) => {
       const directSrc = modelUrl(item);
-      const src = modelProxyUrl(item);
+      const proxySrc = modelProxyUrl(item);
+      const src = directSrc || proxySrc;
       const usdz = usdzUrl(item);
       const poster = photoUrl(item);
       const modelId = `model-${index}-${String(item.id || item.name || "dish").replace(/[^a-zA-Z0-9_-]/g,"-")}`;
@@ -468,6 +468,7 @@
               camera-controls
               touch-action="pan-y"
               crossorigin="anonymous"
+              interaction-prompt="none"
               auto-rotate
               rotation-per-second="22deg"
               ar
@@ -477,14 +478,15 @@
               loading="eager"
               reveal="auto"
               data-direct-src="${esc(directSrc)}"
+              data-proxy-src="${esc(proxySrc)}"
               alt="${esc(item.name || "3D food model")}">
             </model-viewer>
 
             <div class="loadState" id="${esc(modelId)}-state">
               <div class="loadStateBox">
                 <strong>Loading 3D model…</strong>
-                <small>360° view will appear here.</small>
-                <a href="${esc(directSrc)}" target="_blank" rel="noopener">Open / download GLB</a>
+                <small>Rotate • Zoom • View in AR</small>
+                <a href="${esc(directSrc)}" target="_blank" rel="noopener">Open 3D file</a>
               </div>
             </div>
 
@@ -509,24 +511,53 @@
 
     document.querySelectorAll("model-viewer").forEach(viewer => {
       const state = $(viewer.id + "-state");
+      const direct = viewer.dataset.directSrc || viewer.getAttribute("src") || "";
+      const proxy = viewer.dataset.proxySrc || "";
+      let usedProxyFallback = false;
+      let loaded = false;
 
-      viewer.addEventListener("load", () => {
+      const hideState = () => {
+        loaded = true;
         if(state) state.style.display = "none";
-      });
+      };
+
+      viewer.addEventListener("load", hideState, {once:true});
 
       viewer.addEventListener("error", () => {
+        if(loaded) return;
+
+        // If the direct R2 URL fails, try the public Edge Function once.
+        if(!usedProxyFallback && proxy && viewer.getAttribute("src") !== proxy){
+          usedProxyFallback = true;
+          if(state){
+            state.style.display = "grid";
+            state.querySelector("strong")?.replaceChildren(document.createTextNode("Trying secure 3D delivery…"));
+          }
+          viewer.setAttribute("src", proxy);
+          return;
+        }
+
         if(!state) return;
         state.innerHTML = `
-          <div class="loadStateBox">
-            <strong>3D model load nahi hua</strong>
+          <div class="loadStateBox errorState">
+            <strong>3D model could not load</strong>
             <small>
-              Public 3D proxy se GLB load nahi ho paaya. Agar neeche wala GLB link
-              browser me download hota hai, to Edge Function GET response check karein.
+              The 3D file is saved, but the browser could not render it.
+              Check R2 CORS and the GLB Content-Type (model/gltf-binary).
             </small>
-            <a href="${esc(viewer.dataset.directSrc || viewer.src)}" target="_blank" rel="noopener">Open / download GLB</a>
+            <a href="${esc(direct)}" target="_blank" rel="noopener">Open 3D file</a>
           </div>`;
         state.style.display = "grid";
       });
+
+      // Never leave a broken network request covering the viewer forever.
+      setTimeout(() => {
+        if(loaded || usedProxyFallback) return;
+        if(proxy){
+          usedProxyFallback = true;
+          viewer.setAttribute("src", proxy);
+        }
+      }, 7000);
     });
   }
 
@@ -742,7 +773,11 @@
   }
 
   window.addEventListener("load",async () => {
-    try{ await customElements.whenDefined("model-viewer"); }catch(e){}
+    try{
+      await customElements.whenDefined("model-viewer");
+    }catch(e){
+      console.warn("model-viewer custom element not ready",e);
+    }
     await loadMenu();
   });
 </script>
