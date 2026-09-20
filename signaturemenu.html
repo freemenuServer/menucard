@@ -89,6 +89,10 @@ img{display:block;width:100%;object-fit:cover}
 .ar-btn{border:0;border-radius:13px;padding:12px 18px;font-weight:900;background:linear-gradient(135deg,#e8b34b,#f3ce78);color:#171717}
 .info-btn{border:1px solid var(--line);border-radius:13px;padding:11px 15px;background:#fff;font-weight:800}
 
+.menu-category{margin-bottom:30px;scroll-margin-top:78px}
+.menu-category-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px;padding:0 2px}
+.menu-category-head h2{font-family:"Playfair Display",serif;font-size:28px;margin:0}
+.menu-category-head span{font-size:12px;font-weight:800;color:#777d86;background:#f4f5f6;padding:7px 10px;border-radius:999px;white-space:nowrap}
 .photo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .photo-card{border:1px solid var(--line);border-radius:17px;padding:9px;background:#fff;display:grid;grid-template-columns:130px 1fr;gap:14px;align-items:center}
 .photo-card img{height:110px;border-radius:12px}
@@ -123,7 +127,7 @@ img{display:block;width:100%;object-fit:cover}
   .hero{min-height:235px}.hero-inner{min-height:235px;padding:20px 15px}.logo{width:62px;height:62px}.brand h1{font-size:29px}.tagline{font-size:12px}.meta{font-size:11px;gap:7px 12px}.hero-actions{gap:6px}.circle-btn{width:38px!important;height:38px!important;font-size:16px}
   .plan-strip{gap:10px 15px;padding:10px 12px;font-size:10px}.content{padding:0 11px 90px}.categories{margin:0 -11px;padding:12px 11px}.cat{padding:9px 13px;font-size:12px}
   .ar-hero{border-radius:16px}.ar-hero h2{font-size:24px}.ar-hero p{font-size:13px}
-  .section-head h2{font-size:26px}.section-head p{font-size:12px}.count-badge{font-size:10px}
+  .section-head h2{font-size:26px}.section-head p{font-size:12px}.count-badge{font-size:10px}.menu-category-head h2{font-size:23px}
   .ar-visual,.ar-visual model-viewer{min-height:245px}.dish-title{font-size:23px}.desc{font-size:13px}.price{font-size:24px}.ar-btn{width:100%}.info-btn{width:100%}
   .photo-card{grid-template-columns:100px 1fr;gap:10px}.photo-card img{height:88px}.photo-name{font-size:16px}.photo-desc{font-size:11px}.photo-price{font-size:18px}
   .footer-grid{grid-template-columns:1fr 1fr;gap:14px}.footer-note{font-size:17px}
@@ -259,30 +263,27 @@ function renderShell(){
       <nav class="categories" id="categories"></nav>
       <div class="search-wrap"><input id="search" type="search" placeholder="Search for dishes..."></div>
 
-      <section class="ar-hero">
+      <section class="ar-hero" id="arHeroSection">
         <div class="ar-hero-bg" style="${bg?`background-image:url('${esc(bg).replace(/'/g,"%27")}')`:''}"></div>
         <div class="ar-hero-content">
           <div class="ar-hero-copy">
             <h2>Experience Our<br><span>Signature Dishes in 3D AR</span></h2>
             <p>Scan, View, Rotate & Place in Your Space</p>
           </div>
-          ${arItems[0]&&itemModel(arItems[0])?`<div class="ar-hero-phone"><model-viewer src="${esc(itemModel(arItems[0]))}" ${itemUsdz(arItems[0])?`ios-src="${esc(itemUsdz(arItems[0]))}"`:""} camera-controls auto-rotate ar ar-modes="webxr scene-viewer quick-look" interaction-prompt="none" alt="${esc(arItems[0].name||"Signature dish")}"></model-viewer></div>`:""}
+          <div class="ar-hero-phone" id="arHeroViewer"></div>
         </div>
       </section>
 
       <section class="section" id="signatureSection">
         <div class="section-head">
           <div><h2>★ Our Signature 3D Dishes</h2><p>Tap “View in AR” to see the dish in 3D and place it in your space.</p></div>
-          <span class="count-badge">${arItems.length} Signature dishes</span>
+          <span class="count-badge" id="arCountBadge">0 Signature dishes</span>
         </div>
         <div class="ar-grid" id="arGrid"></div>
       </section>
 
       <section class="section" id="photoSection">
-        <div class="section-head">
-          <div><h2>More Delicious Choices</h2><p>Explore more dishes from our menu.</p></div>
-        </div>
-        <div class="photo-grid" id="photoGrid"></div>
+        <div id="photoGrid"></div>
       </section>
     </main>
 
@@ -297,7 +298,12 @@ function renderCategories(){
   const cats=["All Items",...new Set(allItems.map(categoryKey))];
   $("categories").innerHTML=cats.map(c=>`<button class="cat ${selectedCategory===c?"active":""}" onclick="selectCategory('${esc(c).replace(/'/g,"\\'")}')">${esc(c)}</button>`).join("");
 }
-function selectCategory(c){selectedCategory=c;renderCategories();renderItems();$("signatureSection").scrollIntoView({behavior:"smooth",block:"start"});}
+function selectCategory(c){
+  selectedCategory=c;
+  renderCategories();
+  renderItems();
+  $("photoSection").scrollIntoView({behavior:"smooth",block:"start"});
+}
 function filtered(){
   const q=$("search")?.value.trim().toLowerCase()||"";
   return allItems.filter(i=>{
@@ -308,11 +314,44 @@ function filtered(){
 function renderItems(){
   const items=filtered();
   const ar=items.filter(isAR).slice(0,5);
-  const photos=items.filter(i=>!ar.includes(i));
-  $("arGrid").innerHTML=ar.length?ar.map(renderAR).join(""):`<div class="empty">No 3D dishes are available in this category yet.</div>`;
-  $("photoGrid").innerHTML=photos.length?photos.map(renderPhoto).join(""):`<div class="empty">No additional menu items found.</div>`;
-  const count=$(".count-badge");
+  const photos=items.filter(i=>!isAR(i));
+
+  // Show the 3D area only when the currently selected category actually has 3D dishes.
+  const arVisible=ar.length>0;
+  $("arHeroSection").style.display=arVisible?"block":"none";
+  $("signatureSection").style.display=arVisible?"block":"none";
+  $("arGrid").innerHTML=ar.map(renderAR).join("");
+
+  const count=$("#arCountBadge");
   if(count)count.textContent=`${ar.length} Signature dishes`;
+
+  // Organize normal menu items category-by-category instead of one mixed 2-column list.
+  const groups=[];
+  const map=new Map();
+  photos.forEach(item=>{
+    const category=categoryKey(item);
+    if(!map.has(category)){
+      const group={category,items:[]};
+      map.set(category,group);
+      groups.push(group);
+    }
+    map.get(category).items.push(item);
+  });
+
+  if(!groups.length){
+    $("photoGrid").innerHTML=`<div class="empty">No menu items found.</div>`;
+    return;
+  }
+
+  $("photoGrid").innerHTML=groups.map(group=>`
+    <section class="menu-category" id="category-${esc(group.category).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}">
+      <div class="menu-category-head">
+        <h2>${esc(group.category)}</h2>
+        <span>${group.items.length} ${group.items.length===1?"item":"items"}</span>
+      </div>
+      <div class="photo-grid">${group.items.map(renderPhoto).join("")}</div>
+    </section>
+  `).join("");
 }
 function renderAR(i){
   const [type,label]=itemType(i),model=itemModel(i),usdz=itemUsdz(i),img=itemImage(i);
