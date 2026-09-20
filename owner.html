@@ -959,35 +959,57 @@ async function uploadSignature3DAsset(file,itemId,assetType){
   if(!itemId)throw new Error("Save the menu item first so the 3D model can be linked to it.");
   if(!isSignature3DPlan())throw new Error("Signature 3D plan is required.");
 
-  const maxBytes=assetType==="glb"?20*1024*1024:20*1024*1024;
+  const maxBytes=20*1024*1024;
   if(file.size>maxBytes)throw new Error(`${assetType.toUpperCase()} file must be 20 MB or smaller.`);
-  const allowed=assetType==="glb"
-    ? ["model/gltf-binary","application/octet-stream",""]
-    : ["model/vnd.usdz+zip","application/octet-stream",""];
+
   const ext=(file.name.split(".").pop()||"").toLowerCase();
   if(assetType==="glb" && ext!=="glb")throw new Error("Please select a .glb file.");
   if(assetType==="usdz" && ext!=="usdz")throw new Error("Please select a .usdz file.");
 
   const {data:{session:activeSession},error:sessionError}=await supabaseClient.auth.getSession();
-  if(sessionError||!activeSession?.access_token)throw new Error("Please login again.");
+  if(sessionError)throw new Error("Could not read Owner session: "+sessionError.message);
+  if(!activeSession?.access_token)throw new Error("Owner session expired. Please login again.");
 
   const fd=new FormData();
-  fd.append("file",file);
-  fd.append("restaurant_id",currentRestaurantId);
-  fd.append("menu_item_id",itemId);
+  fd.append("file",file,file.name);
+  fd.append("restaurant_id",String(currentRestaurantId));
+  fd.append("menu_item_id",String(itemId));
   fd.append("asset_type",assetType);
 
-  const response=await fetch(`${SUPABASE_URL}/functions/v1/signature-3d-model-upload`,{
-    method:"POST",
-    headers:{
-      Authorization:`Bearer ${activeSession.access_token}`,
-      apikey:SUPABASE_ANON_KEY
-    },
-    body:fd
-  });
-  let result={};try{result=await response.json()}catch(e){}
-  if(!response.ok)throw new Error(result?.error||`3D R2 upload failed (${response.status})`);
-  if(!result?.url)throw new Error("Cloudflare R2 did not return a model URL.");
+  const endpoint=`${SUPABASE_URL}/functions/v1/signature-3d-model-upload`;
+  let response;
+
+  try{
+    response=await fetch(endpoint,{
+      method:"POST",
+      headers:{
+        Authorization:`Bearer ${activeSession.access_token}`,
+        apikey:SUPABASE_ANON_KEY
+      },
+      body:fd,
+      mode:"cors",
+      cache:"no-store"
+    });
+  }catch(networkError){
+    console.error("3D upload network error:",networkError);
+    throw new Error(
+      "3D upload connection failed. Check that signature-3d-model-upload is deployed and Verify JWT is OFF. Endpoint: "+endpoint
+    );
+  }
+
+  const raw=await response.text();
+  let result={};
+  try{result=raw?JSON.parse(raw):{}}catch(e){result={raw};}
+
+  if(!response.ok){
+    const detail=result?.error || result?.message || result?.raw || `HTTP ${response.status}`;
+    throw new Error(`3D upload failed (${response.status}): ${detail}`);
+  }
+
+  if(!result?.url){
+    throw new Error("3D upload completed but Edge Function did not return an R2 URL.");
+  }
+
   return result.url;
 }
 
