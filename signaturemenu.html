@@ -74,6 +74,8 @@ img{display:block;width:100%;object-fit:cover}
 .ar-visual model-viewer{width:100%;height:100%;min-height:255px;background:transparent;--poster-color:transparent}
 .ar-photo{width:100%;height:100%;min-height:255px;object-fit:cover}
 .model-note{position:absolute;left:12px;bottom:12px;padding:7px 10px;border-radius:999px;background:rgba(0,0,0,.68);color:#fff;font-size:11px;font-weight:700;z-index:2}
+.model-error{position:absolute;left:12px;right:12px;top:50%;transform:translateY(-50%);padding:12px 14px;border-radius:12px;background:rgba(255,248,240,.96);color:#8b4d00;font-size:13px;font-weight:800;text-align:center;z-index:4}
+.ar-btn.disabled{opacity:.55;cursor:not-allowed}
 .badge-3d{position:absolute;left:12px;top:12px;background:#fff;color:#0d4b8c;border-radius:999px;padding:7px 10px;font-weight:900;font-size:12px;z-index:2}
 .rotate-badge{position:absolute;right:12px;bottom:12px;background:rgba(0,0,0,.7);color:#fff;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:700;z-index:2}
 .ar-info{padding:24px;display:flex;flex-direction:column;justify-content:center;min-width:0}
@@ -321,6 +323,7 @@ function renderItems(){
   $("arHeroSection").style.display=arVisible?"block":"none";
   $("signatureSection").style.display=arVisible?"block":"none";
   $("arGrid").innerHTML=ar.map(renderAR).join("");
+  wire3DViewers();
 
   const count=$("#arCountBadge");
   if(count)count.textContent=`${ar.length} Signature dishes`;
@@ -360,8 +363,9 @@ function renderAR(i){
   return `<article class="ar-card">
     <div class="ar-visual">
       <span class="badge-3d">3D</span>
-      <model-viewer src="${esc(model)}" ${usdz?`ios-src="${esc(usdz)}"`:""} ${img?`poster="${esc(img)}"`:""} camera-controls auto-rotate ar ar-modes="webxr scene-viewer quick-look" interaction-prompt="auto" loading="lazy" alt="${title} 3D model"></model-viewer>
+      <model-viewer class="signature-model" src="${esc(model)}" ${usdz?`ios-src="${esc(usdz)}"`:""} ${img?`poster="${esc(img)}"`:""} crossorigin="anonymous" camera-controls auto-rotate ar ar-modes="webxr scene-viewer quick-look" interaction-prompt="auto" reveal="auto" loading="eager" alt="${title} 3D model" data-model-url="${esc(model)}"></model-viewer>
       <span class="model-note">Drag to rotate • Pinch to zoom</span>
+      <span class="model-error" hidden>3D model load nahi hua. R2 public URL/CORS check karein.</span>
       <span class="rotate-badge">360° Interactive</span>
     </div>
     <div class="ar-info">
@@ -389,13 +393,21 @@ function renderPhoto(i){
   </article>`;
 }
 function openAR(btn){
-  const model=btn.dataset.model||"",usdz=btn.dataset.usdz||"";
+  const model=btn.dataset.model||"";
   const viewer=btn.closest(".ar-card")?.querySelector("model-viewer");
-  if(viewer&&typeof viewer.activateAR==="function"){
-    viewer.activateAR().catch(()=>toast("AR is not available on this device/browser."));
-    return;
-  }
-  if(model)window.open(model,"_blank","noopener");
+  if(!model){toast("3D model URL missing for this dish.");return;}
+  if(!viewer){toast("3D viewer load nahi hua.");return;}
+  if(viewer.dataset.modelError==="1"){toast("3D model load nahi hua. R2 public URL/CORS check karein.");return;}
+  if(typeof viewer.activateAR==="function"){viewer.activateAR().catch(()=>toast("AR is not available on this device/browser. 360° view can still be used."));return;}
+  window.open(model,"_blank","noopener");
+}
+function wire3DViewers(){
+  document.querySelectorAll("model-viewer.signature-model").forEach(viewer=>{
+    const card=viewer.closest(".ar-card"), error=card?.querySelector(".model-error"), arBtn=card?.querySelector(".ar-btn");
+    const ready=()=>{viewer.dataset.modelError="0";if(error)error.hidden=true;if(arBtn){arBtn.disabled=false;arBtn.classList.remove("disabled");}};
+    const fail=()=>{viewer.dataset.modelError="1";if(error)error.hidden=false;if(arBtn){arBtn.disabled=true;arBtn.classList.add("disabled");}};
+    viewer.addEventListener("load",ready,{once:true}); viewer.addEventListener("error",fail); if(viewer.loaded)ready();
+  });
 }
 async function shareMenu(){
   const data={title:`${restaurant?.name||"Restaurant"} — Signature 3D Menu`,text:"Experience our Signature 3D dishes in AR.",url:location.href};
