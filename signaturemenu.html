@@ -341,6 +341,10 @@
     return safeUrl(item.ar_model_url || item.model_url || item.glb_url || "");
   }
 
+  function usdzUrl(item){
+    return safeUrl(item.ar_usdz_url || item.usdz_url || item.ios_src || item.ios_model_url || "");
+  }
+
   function publicModelProxyUrl(url){
     const value = String(url || "").trim();
     if(!value) return "";
