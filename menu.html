@@ -1908,9 +1908,8 @@ function getSavedCategoryOrder(rest, items) {
         const rest = restaurants[0];
 
         // PLAN -> PUBLIC MENU TEMPLATE ROUTING
-        // Super Admin assigns restaurants.plan_id. Growth (Photos) is routed
-        // to the photo-menu template; other plans keep the stable/default menu
-        // until their dedicated public templates are enabled.
+        // Super Admin assigns restaurants.plan_id. The assigned plan decides
+        // which public menu template the restaurant receives.
         if (rest.plan_id) {
           const { data: assignedPlan, error: planError } = await supabaseClient
             .from("plans")
@@ -1920,6 +1919,20 @@ function getSavedCategoryOrder(rest, items) {
 
           if (!planError && assignedPlan && assignedPlan.is_active !== false) {
             const planKey = `${assignedPlan.slug || ""} ${assignedPlan.name || ""}`.toLowerCase().trim();
+
+            const isSignature3D =
+              planKey.includes("signature 3d") ||
+              planKey.includes("signature-3d") ||
+              planKey.includes("signature_3d") ||
+              (planKey.includes("signature") && planKey.includes("3d"));
+
+            if (isSignature3D) {
+              const signatureUrl = new URL("/signaturemenu.html", window.location.origin);
+              signatureUrl.searchParams.set("r", rest.slug);
+              window.location.replace(signatureUrl.href);
+              return;
+            }
+
             const isGrowthPhotos =
               planKey.includes("growth") ||
               planKey.includes("growth-photos") ||
