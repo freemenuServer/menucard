@@ -71,7 +71,7 @@ img{display:block;width:100%;object-fit:cover}
 .ar-grid{display:grid;grid-template-columns:1fr;gap:14px}
 .ar-card{border:1px solid var(--line);border-radius:20px;background:#fff;box-shadow:var(--shadow);display:grid;grid-template-columns:42% 1fr;overflow:hidden;min-height:255px}
 .ar-visual{position:relative;background:radial-gradient(circle at 50% 42%,#30343a,#0d0f11 70%);min-height:255px}
-.ar-visual model-viewer{width:100%;height:100%;min-height:255px;background:transparent;--poster-color:transparent}
+.ar-visual model-viewer{width:100%;height:100%;min-height:255px;background:transparent;--poster-color:transparent;touch-action:none}
 .ar-photo{width:100%;height:100%;min-height:255px;object-fit:cover}
 .model-note{position:absolute;left:12px;bottom:12px;padding:7px 10px;border-radius:999px;background:rgba(0,0,0,.68);color:#fff;font-size:11px;font-weight:700;z-index:2}
 .model-error{position:absolute;left:12px;right:12px;top:50%;transform:translateY(-50%);padding:12px 14px;border-radius:12px;background:rgba(255,248,240,.96);color:#8b4d00;font-size:13px;font-weight:800;text-align:center;z-index:4}
@@ -182,11 +182,30 @@ function categoryKey(i){
 function itemImage(i){
   return String(i.image_url||i.photo_url||i.image||i.photo||"").trim();
 }
-function itemModel(i){
+function rawModelUrl(i){
   return String(i.ar_model_url||i.model_3d_url||i.glb_url||i.model_url||"").trim();
 }
-function itemUsdz(i){
+function r2ProxyUrl(url){
+  const value=String(url||"").trim();
+  if(!value)return "";
+  try{
+    const u=new URL(value,location.origin);
+    const marker="/restaurants/";
+    const idx=u.pathname.indexOf(marker);
+    if(idx<0)return value;
+    const key=u.pathname.slice(idx+1);
+    if(!key)return value;
+    return `${SUPABASE_URL}/functions/v1/signature-3d-model-upload?key=${encodeURIComponent(key)}`;
+  }catch(e){return value;}
+}
+function itemModel(i){
+  return r2ProxyUrl(rawModelUrl(i));
+}
+function rawUsdzUrl(i){
   return String(i.ar_usdz_url||i.usdz_url||i.ios_model_url||"").trim();
+}
+function itemUsdz(i){
+  return r2ProxyUrl(rawUsdzUrl(i));
 }
 function isAR(i){
   return Boolean(
@@ -392,14 +411,25 @@ function renderPhoto(i){
     </div>
   </article>`;
 }
-function openAR(btn){
+async function openAR(btn){
   const model=btn.dataset.model||"";
   const viewer=btn.closest(".ar-card")?.querySelector("model-viewer");
   if(!model){toast("3D model URL missing for this dish.");return;}
   if(!viewer){toast("3D viewer load nahi hua.");return;}
-  if(viewer.dataset.modelError==="1"){toast("3D model load nahi hua. R2 public URL/CORS check karein.");return;}
-  if(typeof viewer.activateAR==="function"){viewer.activateAR().catch(()=>toast("AR is not available on this device/browser. 360° view can still be used."));return;}
-  window.open(model,"_blank","noopener");
+  if(viewer.dataset.modelError==="1"){toast("3D model load nahi hua. Model proxy/R2 configuration check karein.");return;}
+  if(!viewer.loaded){
+    toast("3D model loading…");
+    try{await new Promise((resolve,reject)=>{
+      const timer=setTimeout(()=>reject(new Error("timeout")),12000);
+      viewer.addEventListener("load",()=>{clearTimeout(timer);resolve();},{once:true});
+      viewer.addEventListener("error",()=>{clearTimeout(timer);reject(new Error("load"));},{once:true});
+    });}catch(e){toast("3D model load nahi hua.");return;}
+  }
+  if(typeof viewer.activateAR==="function"){
+    try{await viewer.activateAR();}catch(e){toast("AR is not available on this device/browser. 360° view can still be used.");}
+    return;
+  }
+  toast("AR is not supported on this browser.");
 }
 function wire3DViewers(){
   document.querySelectorAll("model-viewer.signature-model").forEach(viewer=>{
