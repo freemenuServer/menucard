@@ -431,7 +431,9 @@
     $("signatureGrid").innerHTML = filtered.map((item, index) => {
       const directSrc = modelUrl(item);
       const proxySrc = modelProxyUrl(item);
-      const src = directSrc || proxySrc;
+      // Always use the public Edge Function for browser delivery. It adds CORS
+      // and serves the R2 object safely without exposing R2 credentials.
+      const src = proxySrc || directSrc;
       const usdz = usdzUrl(item);
       const poster = photoUrl(item);
       const modelId = `model-${index}-${String(item.id || item.name || "dish").replace(/[^a-zA-Z0-9_-]/g,"-")}`;
@@ -511,53 +513,42 @@
 
     document.querySelectorAll("model-viewer").forEach(viewer => {
       const state = $(viewer.id + "-state");
-      const direct = viewer.dataset.directSrc || viewer.getAttribute("src") || "";
-      const proxy = viewer.dataset.proxySrc || "";
-      let usedProxyFallback = false;
+      const direct = viewer.dataset.directSrc || "";
+      const proxy = viewer.dataset.proxySrc || viewer.getAttribute("src") || "";
       let loaded = false;
 
-      const hideState = () => {
-        loaded = true;
-        if(state) state.style.display = "none";
+      const setState = (title, body, show = true) => {
+        if(!state) return;
+        state.style.display = show ? "grid" : "none";
+        const strong = state.querySelector("strong");
+        const small = state.querySelector("small");
+        if(strong) strong.textContent = title;
+        if(small) small.textContent = body;
       };
 
-      viewer.addEventListener("load", hideState, {once:true});
+      viewer.addEventListener("load", () => {
+        loaded = true;
+        setState("", "", false);
+      });
+
+      viewer.addEventListener("progress", event => {
+        if(loaded) return;
+        const p = Math.round((event.detail?.totalProgress || 0) * 100);
+        const small = state?.querySelector("small");
+        if(small && p > 0) small.textContent = `Loading 3D model… ${p}%`;
+      });
 
       viewer.addEventListener("error", () => {
         if(loaded) return;
-
-        // If the direct R2 URL fails, try the public Edge Function once.
-        if(!usedProxyFallback && proxy && viewer.getAttribute("src") !== proxy){
-          usedProxyFallback = true;
-          if(state){
-            state.style.display = "grid";
-            state.querySelector("strong")?.replaceChildren(document.createTextNode("Trying secure 3D delivery…"));
-          }
-          viewer.setAttribute("src", proxy);
-          return;
-        }
-
-        if(!state) return;
-        state.innerHTML = `
-          <div class="loadStateBox errorState">
-            <strong>3D model could not load</strong>
-            <small>
-              The 3D file is saved, but the browser could not render it.
-              Check R2 CORS and the GLB Content-Type (model/gltf-binary).
-            </small>
-            <a href="${esc(direct)}" target="_blank" rel="noopener">Open 3D file</a>
-          </div>`;
-        state.style.display = "grid";
+        setState(
+          "3D model could not load",
+          "Secure 3D delivery failed. Tap Open 3D file to verify the GLB.",
+          true
+        );
       });
 
-      // Never leave a broken network request covering the viewer forever.
-      setTimeout(() => {
-        if(loaded || usedProxyFallback) return;
-        if(proxy){
-          usedProxyFallback = true;
-          viewer.setAttribute("src", proxy);
-        }
-      }, 7000);
+      // Give the custom element a clean initial state. No endless fallback loop.
+      setState("Loading 3D model…", "Rotate • Zoom • View in AR", true);
     });
   }
 
@@ -757,9 +748,30 @@
     if(arBtn){
       const viewer = $(arBtn.dataset.ar);
       if(!viewer) return;
-      if(typeof viewer.activateAR === "function"){
-        viewer.activateAR().catch(() => showToast("AR is not supported on this device/browser"));
-      }else{
+
+      // model-viewer can only enter AR after the GLB is successfully loaded.
+      if(!viewer.loaded){
+        showToast("3D model abhi load ho raha hai. Please try again.");
+        return;
+      }
+
+      if(typeof viewer.activateAR !== "function"){
+        showToast("AR is not supported on this browser.");
+        return;
+      }
+
+      try{
+        const result = viewer.activateAR();
+        if(result && typeof result.catch === "function") {
+          result.catch(() => {
+            const ua = navigator.userAgent || "";
+            const isIOS = /iPhone|iPad|iPod/i.test(ua);
+            showToast(isIOS
+              ? "iPhone AR ke liye USDZ model required hai."
+              : "AR is not supported on this device/browser");
+          });
+        }
+      }catch(e){
         showToast("AR is not supported on this device/browser");
       }
     }
