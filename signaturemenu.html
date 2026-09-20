@@ -550,9 +550,16 @@
           mode:"cors",
           credentials:"omit",
           cache:"no-store",
-          headers:{"Accept": label === "USDZ" ? "model/vnd.usdz+zip,*/*" : "model/gltf-binary,*/*"}
+          headers:{
+            "apikey": SUPABASE_ANON_KEY,
+            "Accept": label === "USDZ" ? "model/vnd.usdz+zip,*/*" : "model/gltf-binary,*/*"
+          }
         });
-        if(!response.ok) throw new Error(`${label} HTTP ${response.status}`);
+        if(!response.ok){
+          let detail = "";
+          try{ detail = (await response.text()).slice(0,240); }catch(e){}
+          throw new Error(`${label} HTTP ${response.status}${detail ? ` — ${detail}` : ""}`);
+        }
 
         const buffer = await response.arrayBuffer();
         if(!buffer.byteLength) throw new Error(`${label} is empty`);
@@ -572,17 +579,19 @@
         try{
           setState("Loading 3D model…", "Loading interactive 360° viewer…", true);
 
-          // Direct R2 URL is preferred because a GLB may contain relative asset
-          // references. The secure proxy is the fallback when R2 CORS blocks it.
+          // Always use the same-origin-safe Edge Function first. The R2 custom
+          // domain is a separate origin and may be blocked by bucket CORS.
+          // The publishable key is sent in `apikey`, as required by Supabase.
           try{
-            viewer.src = direct;
-            setState("Loading 3D model…", "Opening 3D asset…", true);
+            setState("Loading 3D model…", "Securely loading 3D asset…", true);
+            objectUrl = await fetchModel(proxy, "GLB");
+            viewer.src = objectUrl;
 
             await new Promise((resolve, reject) => {
               let done = false;
               const ok = () => { if(!done){ done=true; cleanup(); resolve(); } };
-              const fail = () => { if(!done){ done=true; cleanup(); reject(new Error("Direct GLB load failed")); } };
-              const timer = setTimeout(fail, 9000);
+              const fail = () => { if(!done){ done=true; cleanup(); reject(new Error("Proxy GLB decode failed")); } };
+              const timer = setTimeout(fail, 15000);
               const cleanup = () => {
                 clearTimeout(timer);
                 viewer.removeEventListener("load", ok);
@@ -591,10 +600,25 @@
               viewer.addEventListener("load", ok, {once:true});
               viewer.addEventListener("error", fail, {once:true});
             });
-          }catch(directError){
-            console.warn("Direct GLB load failed, using secure proxy", directError);
-            objectUrl = await fetchModel(proxy, "GLB");
-            viewer.src = objectUrl;
+          }catch(proxyError){
+            console.warn("Secure GLB delivery failed, trying direct R2 URL", proxyError);
+            if(!direct) throw proxyError;
+            setState("Loading 3D model…", "Trying direct 3D asset…", true);
+            viewer.src = direct;
+
+            await new Promise((resolve, reject) => {
+              let done = false;
+              const ok = () => { if(!done){ done=true; cleanup(); resolve(); } };
+              const fail = () => { if(!done){ done=true; cleanup(); reject(new Error("Direct GLB load failed — check R2 CORS")); } };
+              const timer = setTimeout(fail, 12000);
+              const cleanup = () => {
+                clearTimeout(timer);
+                viewer.removeEventListener("load", ok);
+                viewer.removeEventListener("error", fail);
+              };
+              viewer.addEventListener("load", ok, {once:true});
+              viewer.addEventListener("error", fail, {once:true});
+            });
           }
 
           // USDZ is fetched only for iOS AR, and is never allowed to block the GLB viewer.
@@ -608,7 +632,7 @@
           }
         }catch(error){
           console.error("3D model load failed", error);
-          setState("3D model could not load", "GLB delivery or CORS failed. Use Open 3D file to verify the stored model.", true);
+          setState("3D model could not load", "Secure GLB delivery failed. Check the Edge Function deployment and R2 CORS.", true);
         }
       })();
 
