@@ -333,6 +333,7 @@ function filtered(){
   });
 }
 function renderItems(){
+  cleanup3DUrls();
   const items=filtered();
   const ar=items.filter(isAR).slice(0,5);
   const photos=items.filter(i=>!isAR(i));
@@ -375,6 +376,59 @@ function renderItems(){
     </section>
   `).join("");
 }
+async function load3DModel(viewer, modelUrl, usdzUrl){
+  if(!viewer || !modelUrl)return false;
+  try{
+    viewer.dataset.loading="1";
+    const headers={"apikey":SUPABASE_ANON_KEY};
+    // If a public legacy anon JWT is configured in this page, it can be used
+    // as Authorization for a JWT-protected Edge Function. Leave blank when
+    // the project uses only the new sb_publishable key.
+    const jwt=window.FREEMENU_PUBLIC_ANON_JWT||"";
+    if(jwt) headers.Authorization=`Bearer ${jwt}`;
+
+    const response=await fetch(modelUrl,{headers,mode:"cors",credentials:"omit"});
+    if(!response.ok)throw new Error(`Model proxy HTTP ${response.status}`);
+    const blob=await response.blob();
+    const objectUrl=URL.createObjectURL(blob);
+    viewer.src=objectUrl;
+    viewer.dataset.objectUrl=objectUrl;
+    viewer.dataset.modelLoaded="1";
+
+    if(usdzUrl){
+      try{
+        const u=await fetch(usdzUrl,{headers,mode:"cors",credentials:"omit"});
+        if(u.ok){
+          const ub=await u.blob();
+          const uu=URL.createObjectURL(ub);
+          viewer.setAttribute("ios-src",uu);
+          viewer.dataset.usdzObjectUrl=uu;
+        }
+      }catch(e){ console.warn("USDZ proxy load failed",e); }
+    }
+    return true;
+  }catch(error){
+    console.error("3D model proxy load failed",error);
+    viewer.dataset.modelError="1";
+    const card=viewer.closest(".ar-card");
+    const errorBox=card?.querySelector(".model-error");
+    if(errorBox){
+      errorBox.hidden=false;
+      errorBox.textContent="3D model load nahi hua. Edge Function / R2 configuration check karein.";
+    }
+    return false;
+  }finally{
+    viewer.dataset.loading="0";
+  }
+}
+
+function cleanup3DUrls(){
+  document.querySelectorAll("model-viewer.signature-model").forEach(v=>{
+    if(v.dataset.objectUrl)URL.revokeObjectURL(v.dataset.objectUrl);
+    if(v.dataset.usdzObjectUrl)URL.revokeObjectURL(v.dataset.usdzObjectUrl);
+  });
+}
+
 function renderAR(i){
   const [type,label]=itemType(i),model=itemModel(i),usdz=itemUsdz(i),img=itemImage(i);
   const title=esc(i.name||"Signature Dish"),description=esc(i.description||"Signature dish");
@@ -382,7 +436,7 @@ function renderAR(i){
   return `<article class="ar-card">
     <div class="ar-visual">
       <span class="badge-3d">3D</span>
-      <model-viewer class="signature-model" src="${esc(model)}" ${usdz?`ios-src="${esc(usdz)}"`:""} ${img?`poster="${esc(img)}"`:""} crossorigin="anonymous" camera-controls auto-rotate ar ar-modes="webxr scene-viewer quick-look" interaction-prompt="auto" reveal="auto" loading="eager" alt="${title} 3D model" data-model-url="${esc(model)}"></model-viewer>
+      <model-viewer class="signature-model" ${img?`poster="${esc(img)}"`:""} crossorigin="anonymous" camera-controls auto-rotate ar ar-modes="webxr scene-viewer quick-look" interaction-prompt="auto" reveal="auto" loading="eager" alt="${title} 3D model" data-model-url="${esc(model)}" data-usdz-url="${esc(usdz)}"></model-viewer>
       <span class="model-note">Drag to rotate • Pinch to zoom</span>
       <span class="model-error" hidden>3D model load nahi hua. R2 public URL/CORS check karein.</span>
       <span class="rotate-badge">360° Interactive</span>
@@ -420,9 +474,11 @@ async function openAR(btn){
   if(!viewer.loaded){
     toast("3D model loading…");
     try{await new Promise((resolve,reject)=>{
-      const timer=setTimeout(()=>reject(new Error("timeout")),12000);
-      viewer.addEventListener("load",()=>{clearTimeout(timer);resolve();},{once:true});
-      viewer.addEventListener("error",()=>{clearTimeout(timer);reject(new Error("load"));},{once:true});
+      const timer=setTimeout(()=>reject(new Error("timeout")),15000);
+      const done=()=>{clearTimeout(timer);resolve();};
+      const bad=()=>{clearTimeout(timer);reject(new Error("load"));};
+      viewer.addEventListener("load",done,{once:true});
+      viewer.addEventListener("error",bad,{once:true});
     });}catch(e){toast("3D model load nahi hua.");return;}
   }
   if(typeof viewer.activateAR==="function"){
@@ -433,12 +489,28 @@ async function openAR(btn){
 }
 function wire3DViewers(){
   document.querySelectorAll("model-viewer.signature-model").forEach(viewer=>{
-    const card=viewer.closest(".ar-card"), error=card?.querySelector(".model-error"), arBtn=card?.querySelector(".ar-btn");
-    const ready=()=>{viewer.dataset.modelError="0";if(error)error.hidden=true;if(arBtn){arBtn.disabled=false;arBtn.classList.remove("disabled");}};
-    const fail=()=>{viewer.dataset.modelError="1";if(error)error.hidden=false;if(arBtn){arBtn.disabled=true;arBtn.classList.add("disabled");}};
-    viewer.addEventListener("load",ready,{once:true}); viewer.addEventListener("error",fail); if(viewer.loaded)ready();
+    const card=viewer.closest(".ar-card");
+    const error=card?.querySelector(".model-error");
+    const arBtn=card?.querySelector(".ar-btn");
+    const model=viewer.dataset.modelUrl||"";
+    const usdz=viewer.dataset.usdzUrl||"";
+    const ready=()=>{
+      viewer.dataset.modelError="0";
+      if(error)error.hidden=true;
+      if(arBtn){arBtn.disabled=false;arBtn.classList.remove("disabled");}
+    };
+    const fail=()=>{
+      viewer.dataset.modelError="1";
+      if(error)error.hidden=false;
+      if(arBtn){arBtn.disabled=true;arBtn.classList.add("disabled");}
+    };
+    viewer.addEventListener("load",ready);
+    viewer.addEventListener("error",fail);
+    if(model)load3DModel(viewer,model,usdz).then(ok=>ok?ready():fail());
+    else fail();
   });
 }
+
 async function shareMenu(){
   const data={title:`${restaurant?.name||"Restaurant"} — Signature 3D Menu`,text:"Experience our Signature 3D dishes in AR.",url:location.href};
   if(navigator.share){try{await navigator.share(data);return}catch(e){}}
