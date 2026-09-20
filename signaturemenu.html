@@ -7,7 +7,7 @@
   <title>Signature Menu • FreeMenu</title>
 
   <script type="module"
-    src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+    src="https://unpkg.com/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -474,7 +474,7 @@
               ar-modes="webxr scene-viewer quick-look"
               shadow-intensity="1"
               exposure="1"
-              loading="lazy"
+              loading="eager"
               reveal="auto"
               data-direct-src="${esc(directSrc)}"
               alt="${esc(item.name || "3D food model")}">
@@ -520,8 +520,8 @@
           <div class="loadStateBox">
             <strong>3D model load nahi hua</strong>
             <small>
-              3D proxy se GLB load nahi ho paaya. Direct GLB download ho raha ho to
-              R2 file theek hai; Edge Function GET/CORS response check karein.
+              Public 3D proxy se GLB load nahi ho paaya. Agar neeche wala GLB link
+              browser me download hota hai, to Edge Function GET response check karein.
             </small>
             <a href="${esc(viewer.dataset.directSrc || viewer.src)}" target="_blank" rel="noopener">Open / download GLB</a>
           </div>`;
@@ -741,7 +741,10 @@
     window.__fmToast = setTimeout(() => $("toast").classList.remove("show"),2200);
   }
 
-  window.addEventListener("load",loadMenu);
+  window.addEventListener("load",async () => {
+    try{ await customElements.whenDefined("model-viewer"); }catch(e){}
+    await loadMenu();
+  });
 </script>
 </body>
 </html>
