@@ -15,6 +15,7 @@
 <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
 <style>
+
 *{
     box-sizing:border-box;
     margin:0;
@@ -34,14 +35,17 @@ body{
 }
 
 /* ================= HEADER ================= */
+
 .header{
     min-height:230px;
     padding:20px 25px;
     position:relative;
     overflow:hidden;
+
     background:
     linear-gradient(rgba(0,0,0,.68),rgba(0,0,0,.88)),
     url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=85");
+
     background-size:cover;
     background-position:center;
     border-bottom:1px solid #8e6723;
@@ -56,8 +60,8 @@ body{
 }
 
 .logo{
-    width:160px;
-    height:160px;
+    width:175px;
+    height:175px;
     border:3px solid #e6b84c;
     border-radius:50%;
     display:flex;
@@ -65,47 +69,34 @@ body{
     align-items:center;
     justify-content:center;
     flex-shrink:0;
+
     background:#050505;
     box-shadow:
         0 0 25px rgba(229,177,65,.25),
         inset 0 0 20px rgba(229,177,65,.12);
-    overflow: hidden;
-    position: relative;
-}
-
-.logo img{
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-}
-
-.logo-fallback{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 8px;
 }
 
 .logo-icon{
-    font-size:38px;
+    font-size:46px;
     color:#e8bd58;
-    margin-bottom:3px;
+    margin-bottom:5px;
 }
 
 .logo h2{
     color:#e9bb50;
-    font-size:16px;
-    letter-spacing:1.5px;
-    line-height: 1.1;
+    font-size:21px;
+    letter-spacing:2px;
+}
+
+.logo p{
+    color:#fff;
+    font-size:12px;
+    letter-spacing:2px;
 }
 
 .logo small{
     color:#e9bb50;
-    margin-top:4px;
-    font-size: 9px;
+    margin-top:8px;
 }
 
 .brand{
@@ -114,36 +105,36 @@ body{
 
 .signature{
     font-family:"Playfair Display",serif;
-    font-size:45px;
+    font-size:55px;
     font-style:italic;
     color:#e9bb50;
 }
 
 .brand-title{
     font-family:"Playfair Display",serif;
-    font-size:55px;
-    line-height:1;
+    font-size:68px;
+    line-height:.9;
     color:#f5cc68;
     letter-spacing:2px;
 }
 
 .tagline{
-    margin-top:10px;
-    font-size:13px;
-    letter-spacing:4px;
+    margin-top:12px;
+    font-size:14px;
+    letter-spacing:6px;
     color:#fff;
-    text-transform: uppercase;
 }
 
 .subtag{
-    margin-top:8px;
+    margin-top:12px;
     color:#e8bc54;
     font-family:"Playfair Display",serif;
     font-style:italic;
-    font-size:18px;
+    font-size:20px;
 }
 
 /* ================= CATEGORY NAV ================= */
+
 .category-wrap{
     padding:12px 15px;
     background:#0b0c0d;
@@ -155,8 +146,10 @@ body{
 .categories{
     max-width:1100px;
     margin:auto;
+
     display:flex;
     overflow-x:auto;
+
     border:1px solid #3c3c3c;
     border-radius:20px;
     background:#101112;
@@ -176,12 +169,11 @@ body{
     cursor:pointer;
     font-size:13px;
     transition:.25s;
-    white-space: nowrap;
 }
 
 .category span{
     display:block;
-    font-size:20px;
+    font-size:22px;
     margin-bottom:4px;
 }
 
@@ -193,6 +185,7 @@ body{
 }
 
 /* ================= SECTION ================= */
+
 .section{
     padding:25px 20px 5px;
 }
@@ -207,7 +200,7 @@ body{
 .section-title h2{
     font-family:"Playfair Display",serif;
     color:#f0ca6b;
-    font-size:26px;
+    font-size:28px;
     white-space:nowrap;
 }
 
@@ -219,11 +212,12 @@ body{
 
 .view-all{
     color:#e9bd5b;
-    font-size:13px;
+    font-size:14px;
     white-space:nowrap;
 }
 
 /* ================= FOOD GRID ================= */
+
 .food-grid{
     display:grid;
     grid-template-columns:repeat(3,1fr);
@@ -235,10 +229,11 @@ body{
     border:1px solid #393939;
     border-radius:15px;
     overflow:hidden;
-    box-shadow:0 5px 20px rgba(0,0,0,.35);
+
+    box-shadow:
+    0 5px 20px rgba(0,0,0,.35);
+
     transition:.25s;
-    display: flex;
-    flex-direction: column;
 }
 
 .food-card:hover{
@@ -247,7 +242,7 @@ body{
 }
 
 .food-img{
-    height:190px;
+    height:205px;
     position:relative;
     overflow:hidden;
 }
@@ -267,11 +262,14 @@ body{
     position:absolute;
     right:10px;
     top:10px;
-    width:20px;
-    height:20px;
+
+    width:21px;
+    height:21px;
+
     background:#fff;
     border:2px solid #1c9d4d;
     border-radius:4px;
+
     display:flex;
     align-items:center;
     justify-content:center;
@@ -279,18 +277,14 @@ body{
 
 .veg::after{
     content:"";
-    width:8px;
-    height:8px;
+    width:9px;
+    height:9px;
     background:#19a14a;
     border-radius:50%;
 }
 
 .food-content{
     padding:14px;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    justify-content: space-between;
 }
 
 .food-name-row{
@@ -300,33 +294,43 @@ body{
 }
 
 .food-name{
-    font-size:16px;
+    font-size:17px;
     font-weight:700;
 }
 
 .price{
     color:#f5c85c;
-    font-size:16px;
+    font-size:17px;
     font-weight:800;
     white-space:nowrap;
 }
 
 .description{
     color:#aaa;
-    font-size:12.5px;
+    font-size:13px;
     line-height:1.45;
-    margin:6px 0 12px;
+    min-height:38px;
+    margin:7px 0 12px;
 }
 
-/* ================= 3D BUTTON ================= */
+/* ================= BUTTONS ================= */
+
 .actions{
-    margin-top: auto;
+    display:flex;
+    gap:8px;
+}
+
+.btn{
+    height:42px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:700;
+    font-size:13px;
+    transition:.2s;
 }
 
 .btn-3d{
     width: 100%;
-    height: 40px;
-    border-radius: 10px;
     background:#0b0c0d;
     color:#f5cc68;
     border:1px solid #e8b33f;
@@ -334,10 +338,7 @@ body{
     align-items: center;
     justify-content: center;
     gap: 6px;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: .2s;
+    letter-spacing: 0.5px;
 }
 
 .btn-3d:hover{
@@ -348,9 +349,11 @@ body{
 }
 
 /* ================= FOOTER ================= */
+
 .footer{
     margin-top:30px;
     padding:30px 20px;
+
     border-top:1px solid #333;
     background:#070809;
 }
@@ -358,6 +361,7 @@ body{
 .footer-inner{
     max-width:1100px;
     margin:auto;
+
     display:grid;
     grid-template-columns:1.2fr 1fr 1fr 170px;
     gap:25px;
@@ -378,12 +382,15 @@ body{
 }
 
 .ar-button{
-    height:50px;
+    height:52px;
     padding:0 20px;
+
     border:1px solid #e5b443;
     border-radius:30px;
+
     background:#111;
     color:#f3c75d;
+
     font-weight:700;
     cursor:pointer;
 }
@@ -407,14 +414,18 @@ body{
 }
 
 /* ================= 3D MODAL & AR ================= */
+
 .modal{
     position:fixed;
     inset:0;
+
     background:rgba(0,0,0,.88);
     backdrop-filter: blur(5px);
+
     display:none;
     align-items:center;
     justify-content:center;
+
     z-index:1000;
     padding:20px;
 }
@@ -426,11 +437,14 @@ body{
 .modal-box{
     width:min(550px,100%);
     height:min(680px,88vh);
+
     background:#101112;
     border:1px solid #dbaa42;
     border-radius:20px;
+
     position:relative;
     overflow:hidden;
+
     box-shadow:0 0 50px rgba(225,174,62,.25);
     display: flex;
     flex-direction: column;
@@ -441,13 +455,14 @@ body{
     display:flex;
     align-items:center;
     justify-content:space-between;
+
     padding:0 20px;
     border-bottom:1px solid #222;
 }
 
 .modal-header h3{
     color:#efc25b;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
 }
 
@@ -476,6 +491,7 @@ model-viewer{
     background: radial-gradient(circle,#252525,#090a0b 75%);
 }
 
+/* Native AR Placement Button */
 .ar-view-btn {
     position: absolute;
     bottom: 50px;
@@ -505,69 +521,187 @@ model-viewer{
     border-top: 1px solid #1c1d1e;
 }
 
+/* ================= RESPONSIVE ================= */
+
 @media(max-width:900px){
-    .food-grid{ grid-template-columns:repeat(2,1fr); }
-    .header-inner{ gap:20px; }
-    .brand-title{ font-size:44px; }
-    .signature{ font-size:36px; }
+
+    .food-grid{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .header-inner{
+        gap:20px;
+    }
+
+    .brand-title{
+        font-size:50px;
+    }
+
+    .signature{
+        font-size:40px;
+    }
+
 }
 
 @media(max-width:600px){
-    .header{ min-height:180px; padding:15px; }
-    .header-inner{ gap:14px; }
-    .logo{ width:90px; height:90px; }
-    .logo-icon{ font-size:24px; }
-    .logo h2{ font-size:11px; }
-    .logo small{ font-size:7px; }
-    .signature{ font-size:24px; }
-    .brand-title{ font-size:32px; }
-    .tagline{ font-size:8px; letter-spacing:2px; }
-    .subtag{ font-size:11px; }
-    .food-grid{ grid-template-columns:1fr 1fr; gap:10px; }
-    .section{ padding:18px 10px 5px; }
-    .food-img{ height:130px; }
-    .food-content{ padding:10px; }
-    .food-name{ font-size:13px; }
-    .price{ font-size:13px; }
-    .description{ font-size:11px; margin-bottom: 8px; }
-    .btn-3d{ height:35px; font-size:11px; }
-    .footer-inner{ grid-template-columns:1fr; text-align:center; }
-    .qr{ margin:auto; }
+
+    .header{
+        min-height:200px;
+        padding:15px;
+    }
+
+    .header-inner{
+        gap:14px;
+    }
+
+    .logo{
+        width:100px;
+        height:100px;
+    }
+
+    .logo-icon{
+        font-size:25px;
+    }
+
+    .logo h2{
+        font-size:12px;
+    }
+
+    .logo p,
+    .logo small{
+        font-size:7px;
+    }
+
+    .signature{
+        font-size:28px;
+    }
+
+    .brand-title{
+        font-size:38px;
+    }
+
+    .tagline{
+        font-size:8px;
+        letter-spacing:2px;
+    }
+
+    .subtag{
+        font-size:12px;
+    }
+
+    .food-grid{
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+    }
+
+    .section{
+        padding:20px 10px 5px;
+    }
+
+    .food-img{
+        height:135px;
+    }
+
+    .food-content{
+        padding:10px;
+    }
+
+    .food-name{
+        font-size:14px;
+    }
+
+    .price{
+        font-size:14px;
+    }
+
+    .description{
+        font-size:11px;
+    }
+
+    .btn{
+        height:37px;
+        font-size:11px;
+    }
+
+    .footer-inner{
+        grid-template-columns:1fr;
+        text-align:center;
+    }
+
+    .qr{
+        margin:auto;
+    }
+}
+
+
+.model-debug-note{
+  color:#888;font-size:11px;text-align:center;padding:6px 12px;
 }
 </style>
 
-<!-- Supabase SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient =
+  window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
 
 </head>
 
+
 <body>
 
-<!-- DYNAMIC HEADER -->
-<header class="header" id="restaurantHeader">
+
+<!-- ================= HEADER ================= -->
+
+<header class="header">
+
 <div class="header-inner">
-    <div class="logo" id="resLogoBox">
-        <div class="logo-fallback" id="resLogoFallback">
-            <div class="logo-icon">🍴</div>
-            <h2 id="resLogoText">URBAN PUNJAB</h2>
-            <small id="resSince">SINCE 1971</small>
-        </div>
+
+    <div class="logo">
+
+        <div class="logo-icon">🍴</div>
+
+        <h2>URBAN</h2>
+        <h2>PUNJAB</h2>
+
+        <p>RESTAURANT</p>
+
+        <small>SINCE 1971</small>
+
     </div>
+
+
     <div class="brand">
-        <div class="signature">Signature</div>
-        <div class="brand-title" id="resName">MENU</div>
-        <div class="tagline" id="resTagline">FAMILY • FOOD • RESTAURANT</div>
-        <div class="subtag" id="resSubtag">Authentic Flavours, Timeless Taste</div>
+
+        <div class="signature">
+            Signature
+        </div>
+
+        <div class="brand-title">
+            MENU
+        </div>
+
+        <div class="tagline">
+            FAMILY • FOOD • RESTAURANT
+        </div>
+
+        <div class="subtag">
+            Authentic Flavours, Timeless Taste
+        </div>
+
     </div>
+
 </div>
+
 </header>
 
-<!-- CATEGORY NAV -->
+
+
+<!-- ================= CATEGORY ================= -->
+
+
 <div class="category-wrap">
   <div class="categories" id="categoryNav">
     <button class="category active" onclick="filterCategory('all', event)">
@@ -576,68 +710,137 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
   </div>
 </div>
 
+
 <main class="container">
   <div id="menuLoading" style="padding:40px 20px;text-align:center;color:#aaa;">
-    Loading restaurant details & menu...
+    Loading menu...
   </div>
   <div id="menuError" style="display:none;padding:40px 20px;text-align:center;color:#ff8b8b;"></div>
   <div id="menuSections"></div>
 </main>
 
-<!-- FOOTER -->
+
+
+
+<!-- ================= FOOTER ================= -->
+
 <footer class="footer">
+
 <div class="footer-inner">
-    <div>
-        <div class="footer-title">ADDRESS</div>
-        <div class="footer-text" id="resAddress">C-207/208, Jhilmil Colony, Delhi - 110095</div>
-    </div>
-    <div>
-        <div class="footer-title">CONTACT</div>
-        <div class="footer-text" id="resContact">011-2214-4545<br>8447000853 | 8447000854</div>
-    </div>
-    <div>
-        <button class="ar-button" onclick="alert('Click ◈ 3D View on any featured dish, then tap Place on Table to view in AR!')">
-            ▣ &nbsp; Interactive AR Active
-        </button>
-    </div>
-    <div>
-        <div class="qr">
-            <img id="resQrCode" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://freemenu.in" alt="Scan QR">
-        </div>
-    </div>
+
+<div>
+
+<div class="footer-title">
+ADDRESS
 </div>
-<p style="text-align:center;color:#777;font-size:11px;margin-top:25px;">
-    Rate & items can be changed without prior notice
+
+<div class="footer-text">
+C-207/208, Jhilmil Colony<br>
+Delhi - 110095
+</div>
+
+</div>
+
+
+<div>
+
+<div class="footer-title">
+CONTACT
+</div>
+
+<div class="footer-text">
+011-2214-4545<br>
+8447000853 | 8447000854
+</div>
+
+</div>
+
+
+<div>
+
+<button class="ar-button"
+onclick="alert('Select any dish with ◈ 3D View and tap Place on Table to view in AR!')">
+
+▣ &nbsp; Interactive AR Active
+
+</button>
+
+</div>
+
+
+<div>
+
+<div class="qr">
+
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://freemenu.in">
+
+</div>
+
+</div>
+
+</div>
+
+<p style="
+text-align:center;
+color:#777;
+font-size:11px;
+margin-top:25px;
+">
+Rate & items can be changed without prior notice
 </p>
+
 </footer>
 
-<!-- 3D / AR MODAL -->
+
+
+<!-- ================= 3D / AR MODAL ================= -->
+
 <div class="modal" id="modal">
+
 <div class="modal-box">
-    <div class="modal-header">
-        <h3 id="modelTitle">3D Food Preview</h3>
-        <button class="close" onclick="close3D()">×</button>
-    </div>
-    <model-viewer
-        id="foodModel"
-        src=""
-        camera-controls
-        auto-rotate
-        rotation-per-second="30deg"
-        ar
-        ar-modes="webxr scene-viewer quick-look"
-        shadow-intensity="1.5"
-        environment-image="neutral"
-        alt="3D Dish Preview">
-        <button slot="ar-button" class="ar-view-btn">
-            📱 Place on Table (AR)
-        </button>
-    </model-viewer>
-    <div class="modal-tip">
-        Rotate & Zoom with fingers • Click "Place on Table" to view in Room
-    </div>
+
+<div class="modal-header">
+
+<h3 id="modelTitle">
+3D Food Preview
+</h3>
+
+<button class="close" onclick="close3D()">
+×
+</button>
+
 </div>
+
+
+<model-viewer
+id="foodModel"
+crossorigin="anonymous"
+src=""
+camera-controls
+auto-rotate
+rotation-per-second="30deg"
+ar
+ar-modes="webxr scene-viewer quick-look"
+shadow-intensity="1.5"
+environment-image="neutral"
+alt="3D Dish Preview">
+
+<button slot="ar-button" class="ar-view-btn">
+📱 Place on Table (AR)
+</button>
+
+</model-viewer>
+
+<div class="modal-tip">
+Rotate & Zoom with fingers • Click "Place on Table" to view in Room
 </div>
+
+</div>
+
+</div>
+
+
+
 
 <script>
 const params = new URLSearchParams(location.search);
@@ -661,18 +864,12 @@ function truthy(v){
   return v === true || v === 1 || String(v ?? "").toLowerCase() === "true";
 }
 
-/* ================= FRESH CACHE-BUSTING HANDLER ================= */
 function browser3DUrl(rawUrl){
   const raw = String(rawUrl || "").trim();
   if(!raw) return "";
 
-  try {
-    // Cache purge ke baad fresh R2 CORS fetch force karne ke liye timestamp query param
-    const separator = raw.includes("?") ? "&" : "?";
-    return `${raw}${separator}t=${Date.now()}`;
-  } catch(e) {
-    return raw;
-  }
+  // Cloudflare R2 CORS is configured, so model-viewer loads GLB directly.
+  return raw;
 }
 
 function has3D(item){
@@ -708,32 +905,9 @@ function iconFor(name){
   return "🍛";
 }
 
-function applyRestaurantData(restaurant){
-  document.title = `Signature Menu | ${restaurant.name || "Urban Punjab"}`;
-  if(restaurant.name) document.getElementById("resName").textContent = restaurant.name.toUpperCase();
-  if(restaurant.tagline) document.getElementById("resTagline").textContent = restaurant.tagline;
-  if(restaurant.subtag || restaurant.description) document.getElementById("resSubtag").textContent = restaurant.subtag || restaurant.description;
-
-  const logoUrl = restaurant.logo_url || restaurant.logo;
-  const logoBox = document.getElementById("resLogoBox");
-  if(logoUrl){
-    logoBox.innerHTML = `<img src="${esc(logoUrl)}" alt="${esc(restaurant.name)} Logo">`;
-  } else if(restaurant.name){
-    document.getElementById("resLogoText").textContent = restaurant.name.split(" ")[0].toUpperCase();
-    if(restaurant.established_year) document.getElementById("resSince").textContent = `SINCE ${restaurant.established_year}`;
-  }
-
-  const fullAddress = [restaurant.address, restaurant.city, restaurant.pincode].filter(Boolean).join(", ");
-  if(fullAddress) document.getElementById("resAddress").innerHTML = esc(fullAddress);
-
-  const contacts = [restaurant.phone, restaurant.mobile, restaurant.contact_number].filter(Boolean).join("<br>");
-  if(contacts) document.getElementById("resContact").innerHTML = contacts;
-
-  document.getElementById("resQrCode").src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.href)}`;
-}
-
 function renderMenu(items){
   const groups=new Map();
+
   items.forEach(item=>{
     const name=String(item.category||"Menu").trim()||"Menu";
     const key=name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"menu";
@@ -742,7 +916,11 @@ function renderMenu(items){
   });
 
   const list=[...groups.values()];
-  categoryNav.innerHTML = `<button class="category active" onclick="filterCategory('all', event)"><span>▦</span>All</button>`;
+
+  categoryNav.innerHTML = `
+    <button class="category active" onclick="filterCategory('all', event)">
+      <span>▦</span>All
+    </button>`;
 
   list.forEach(g=>{
     const b=document.createElement("button");
@@ -770,7 +948,8 @@ function renderMenu(items){
             ${image?`
             <div class="food-img">
               <img src="${esc(image)}" alt="${esc(item.name||"Dish")}" loading="lazy">
-              ${(truthy(item.is_veg)||String(item.item_type||"").toLowerCase()==="veg") ? `<div class="veg"></div>`:""}
+              ${(truthy(item.is_veg)||String(item.item_type||"").toLowerCase()==="veg")
+                ? `<div class="veg"></div>`:""}
             </div>`:""}
             <div class="food-content">
               <div class="food-name-row">
@@ -810,9 +989,9 @@ async function loadMenu(){
     .maybeSingle();
 
   if(rErr)throw rErr;
-  if(!restaurant)throw new Error(`Restaurant "${slug}" not found in database.`);
+  if(!restaurant)throw new Error(`Restaurant "${slug}" not found`);
 
-  applyRestaurantData(restaurant);
+  document.title=`Signature Menu | ${restaurant.name||"Restaurant"}`;
 
   const {data:items,error:iErr}=await supabaseClient
     .from("menu_items")
@@ -830,58 +1009,68 @@ async function loadMenu(){
 
   if(!allItems.length){
     menuError.style.display="block";
-    menuError.textContent="No menu items found for this restaurant.";
+    menuError.textContent="No menu items available.";
   }
 }
+
+/* ---------- 3D / AR ---------- */
 
 function setTip(text){
   const tip=document.querySelector(".modal-tip");
   if(tip)tip.textContent=text;
 }
 
-/* ================= 3D / AR VIEWER OPEN ================= */
-function open3D(name, modelURL, usdzURL = "") {
-  document.getElementById("modelTitle").innerText = name + " — 3D / AR";
+function open3D(name,modelURL,usdzURL=""){
+  document.getElementById("modelTitle").innerText=name+" — 3D / AR";
 
   viewer.removeAttribute("src");
   viewer.removeAttribute("ios-src");
-  setTip("Loading 3D model… Please wait");
+
+  setTip('Loading 3D model…');
+
+  if(usdzURL) viewer.setAttribute("ios-src",usdzURL);
+  if(modelURL) viewer.setAttribute("src",modelURL);
 
   document.getElementById("modal").classList.add("show");
-  document.body.style.overflow = "hidden";
-
-  if (usdzURL) viewer.setAttribute("ios-src", usdzURL);
-  if (modelURL) viewer.setAttribute("src", modelURL);
+  document.body.style.overflow="hidden";
 }
 
-function close3D() {
+function close3D(){
   document.getElementById("modal").classList.remove("show");
   viewer.removeAttribute("src");
   viewer.removeAttribute("ios-src");
-  document.body.style.overflow = "auto";
+  document.body.style.overflow="auto";
   setTip('Rotate & Zoom with fingers • Click "Place on Table" to view in Room');
 }
 
-document.getElementById("modal").addEventListener("click", function(e) {
-  if (e.target === this) close3D();
+document.getElementById("modal").addEventListener("click",function(e){
+  if(e.target===this)close3D();
 });
 
-viewer.addEventListener("load", () => {
+viewer.addEventListener("load",()=>{
   setTip('Rotate & Zoom with fingers • Click "Place on Table" to view in Room');
 });
 
-viewer.addEventListener("error", (e) => {
-  console.error("model-viewer load error details:", e);
-  setTip("3D model loading failed. Please verify CDN CORS.");
+viewer.addEventListener("error",(e)=>{
+  console.error("model-viewer error:",e);
+  setTip("3D model load failed. Please check the Cloudflare R2 GLB URL and CORS policy.");
 });
 
-loadMenu().catch(err => {
+/* Extra diagnostics in browser console */
+viewer.addEventListener("progress",(e)=>{
+  if(e?.detail?.totalProgress!=null){
+    console.log("3D load progress:",Math.round(e.detail.totalProgress*100)+"%");
+  }
+});
+
+loadMenu().catch(err=>{
   console.error(err);
-  menuLoading.style.display = "none";
-  menuError.style.display = "block";
-  menuError.textContent = "Menu load failed: " + (err?.message || String(err));
+  menuLoading.style.display="none";
+  menuError.style.display="block";
+  menuError.textContent="Menu load failed: "+(err?.message||String(err));
 });
 </script>
+
 
 </body>
 </html>
