@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Signature Menu | Digital 3D</title>
+<title>Signature Menu | Urban Punjab</title>
 
 <!-- Google Font -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -541,6 +541,7 @@ model-viewer{
 <script>
 const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+const SIGNATURE_3D_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/signature-3d-model-upload`;
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
 
@@ -554,8 +555,8 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
     <div class="logo" id="resLogoBox">
         <div class="logo-fallback" id="resLogoFallback">
             <div class="logo-icon">🍴</div>
-            <h2 id="resLogoText">RESTAURANT</h2>
-            <small id="resSince">SINCE 2024</small>
+            <h2 id="resLogoText">URBAN PUNJAB</h2>
+            <small id="resSince">SINCE 1971</small>
         </div>
     </div>
     <div class="brand">
@@ -589,11 +590,11 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 <div class="footer-inner">
     <div>
         <div class="footer-title">ADDRESS</div>
-        <div class="footer-text" id="resAddress">Loading address...</div>
+        <div class="footer-text" id="resAddress">C-207/208, Jhilmil Colony, Delhi - 110095</div>
     </div>
     <div>
         <div class="footer-title">CONTACT</div>
-        <div class="footer-text" id="resContact">Loading contact...</div>
+        <div class="footer-text" id="resContact">011-2214-4545<br>8447000853 | 8447000854</div>
     </div>
     <div>
         <button class="ar-button" onclick="alert('Click ◈ 3D View on any featured dish, then tap Place on Table to view in AR!')">
@@ -699,7 +700,7 @@ function iconFor(name){
 }
 
 function applyRestaurantData(restaurant){
-  document.title = `Signature Menu | ${restaurant.name || "Digital Menu"}`;
+  document.title = `Signature Menu | ${restaurant.name || "Urban Punjab"}`;
   if(restaurant.name) document.getElementById("resName").textContent = restaurant.name.toUpperCase();
   if(restaurant.tagline) document.getElementById("resTagline").textContent = restaurant.tagline;
   if(restaurant.subtag || restaurant.description) document.getElementById("resSubtag").textContent = restaurant.subtag || restaurant.description;
@@ -714,10 +715,10 @@ function applyRestaurantData(restaurant){
   }
 
   const fullAddress = [restaurant.address, restaurant.city, restaurant.pincode].filter(Boolean).join(", ");
-  document.getElementById("resAddress").innerHTML = esc(fullAddress || "Dine-in Available");
+  if(fullAddress) document.getElementById("resAddress").innerHTML = esc(fullAddress);
 
   const contacts = [restaurant.phone, restaurant.mobile, restaurant.contact_number].filter(Boolean).join("<br>");
-  document.getElementById("resContact").innerHTML = contacts || "Contact Staff for Assistance";
+  if(contacts) document.getElementById("resContact").innerHTML = contacts;
 
   document.getElementById("resQrCode").src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.href)}`;
 }
@@ -829,11 +830,10 @@ function setTip(text){
   if(tip)tip.textContent=text;
 }
 
-/* ================= 3D / AR BLOB FETCH HANDLER ================= */
-async function open3D(name, modelURL, usdzURL = "") {
+/* ================= 3D / AR VIEWER HANDLER ================= */
+function open3D(name, modelURL, usdzURL = "") {
   document.getElementById("modelTitle").innerText = name + " — 3D / AR";
 
-  // Purana source clear
   viewer.removeAttribute("src");
   viewer.removeAttribute("ios-src");
   setTip("Loading 3D model… Please wait");
@@ -841,33 +841,13 @@ async function open3D(name, modelURL, usdzURL = "") {
   document.getElementById("modal").classList.add("show");
   document.body.style.overflow = "hidden";
 
-  try {
-    // JavaScript Fetch se binary download karke local blob banaenge
-    const response = await fetch(modelURL);
-    if (!response.ok) {
-      throw new Error(`Server returned status ${response.status}`);
-    }
-
-    const blob = await response.blob();
-    const blobUrl = URL.createObjectURL(new Blob([blob], { type: "model/gltf-binary" }));
-
-    if (usdzURL) viewer.setAttribute("ios-src", usdzURL);
-    viewer.setAttribute("src", blobUrl);
-  } catch (err) {
-    console.error("3D Fetch Error:", err);
-    setTip("Model download failed: " + err.message);
-  }
+  // Direct load without JavaScript fetch to bypass CORS blocking
+  if (usdzURL) viewer.setAttribute("ios-src", usdzURL);
+  if (modelURL) viewer.setAttribute("src", modelURL);
 }
 
 function close3D() {
   document.getElementById("modal").classList.remove("show");
-
-  // Memory leak rokne ke liye blob revoke
-  const currentSrc = viewer.getAttribute("src");
-  if (currentSrc && currentSrc.startsWith("blob:")) {
-    URL.revokeObjectURL(currentSrc);
-  }
-
   viewer.removeAttribute("src");
   viewer.removeAttribute("ios-src");
   document.body.style.overflow = "auto";
@@ -884,7 +864,7 @@ viewer.addEventListener("load", () => {
 
 viewer.addEventListener("error", (e) => {
   console.error("model-viewer load error details:", e);
-  setTip("3D model rendering failed. Please check file format.");
+  setTip("3D model loading failed. Please verify CDN CORS.");
 });
 
 loadMenu().catch(err => {
