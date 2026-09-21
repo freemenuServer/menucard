@@ -470,7 +470,6 @@ body{
     color: #111;
 }
 
-/* crossorigin removed for seamless R2 CORS access */
 model-viewer{
     width:100%;
     flex: 1;
@@ -662,10 +661,8 @@ function truthy(v){
   return v === true || v === 1 || String(v ?? "").toLowerCase() === "true";
 }
 
-/* Direct URL handler without proxy redirects */
 function browser3DUrl(rawUrl){
-  const raw = String(rawUrl || "").trim();
-  return raw;
+  return String(rawUrl || "").trim();
 }
 
 function has3D(item){
@@ -832,47 +829,69 @@ function setTip(text){
   if(tip)tip.textContent=text;
 }
 
-function open3D(name,modelURL,usdzURL=""){
-  document.getElementById("modelTitle").innerText=name+" — 3D / AR";
+/* ================= 3D / AR BLOB FETCH HANDLER ================= */
+async function open3D(name, modelURL, usdzURL = "") {
+  document.getElementById("modelTitle").innerText = name + " — 3D / AR";
 
+  // Purana source clear
   viewer.removeAttribute("src");
   viewer.removeAttribute("ios-src");
-
-  setTip('Loading 3D model…');
-
-  if(usdzURL) viewer.setAttribute("ios-src",usdzURL);
-  if(modelURL) viewer.setAttribute("src",modelURL);
+  setTip("Loading 3D model… Please wait");
 
   document.getElementById("modal").classList.add("show");
-  document.body.style.overflow="hidden";
+  document.body.style.overflow = "hidden";
+
+  try {
+    // JavaScript Fetch se binary download karke local blob banaenge
+    const response = await fetch(modelURL);
+    if (!response.ok) {
+      throw new Error(`Server returned status ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(new Blob([blob], { type: "model/gltf-binary" }));
+
+    if (usdzURL) viewer.setAttribute("ios-src", usdzURL);
+    viewer.setAttribute("src", blobUrl);
+  } catch (err) {
+    console.error("3D Fetch Error:", err);
+    setTip("Model download failed: " + err.message);
+  }
 }
 
-function close3D(){
+function close3D() {
   document.getElementById("modal").classList.remove("show");
+
+  // Memory leak rokne ke liye blob revoke
+  const currentSrc = viewer.getAttribute("src");
+  if (currentSrc && currentSrc.startsWith("blob:")) {
+    URL.revokeObjectURL(currentSrc);
+  }
+
   viewer.removeAttribute("src");
   viewer.removeAttribute("ios-src");
-  document.body.style.overflow="auto";
+  document.body.style.overflow = "auto";
   setTip('Rotate & Zoom with fingers • Click "Place on Table" to view in Room');
 }
 
-document.getElementById("modal").addEventListener("click",function(e){
-  if(e.target===this)close3D();
+document.getElementById("modal").addEventListener("click", function(e) {
+  if (e.target === this) close3D();
 });
 
-viewer.addEventListener("load",()=>{
+viewer.addEventListener("load", () => {
   setTip('Rotate & Zoom with fingers • Click "Place on Table" to view in Room');
 });
 
-viewer.addEventListener("error",(e)=>{
+viewer.addEventListener("error", (e) => {
   console.error("model-viewer load error details:", e);
-  setTip("3D model loading failed. Please check file URL.");
+  setTip("3D model rendering failed. Please check file format.");
 });
 
-loadMenu().catch(err=>{
+loadMenu().catch(err => {
   console.error(err);
-  menuLoading.style.display="none";
-  menuError.style.display="block";
-  menuError.textContent="Menu load failed: "+(err?.message||String(err));
+  menuLoading.style.display = "none";
+  menuError.style.display = "block";
+  menuError.textContent = "Menu load failed: " + (err?.message || String(err));
 });
 </script>
 
