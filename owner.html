@@ -691,6 +691,7 @@ function publicUrl(){return new URL("menu.html?r="+encodeURIComponent(currentRes
 /* ---------- Navigation ---------- */
 const sections=["dashboard","restaurant","menu","categories","gallery","qr","preview","analytics","settings","orders","support"];
 function showSection(name){
+  if(currentRestaurantId) refreshOwnerPlan().catch(e=>console.warn("Plan refresh skipped:",e));
   activeSection=sections.includes(name)?name:"dashboard";
   sections.forEach(s=>$("section-"+s)?.classList.toggle("hidden",s!==activeSection));
   document.querySelectorAll(".navItem").forEach(a=>a.classList.toggle("active",a.dataset.section===activeSection));
@@ -965,6 +966,7 @@ async function init(afterLogin=false){
     }
     fillProfile();
     await loadCurrentPlan();
+    startRestaurantPlanRealtime();
     await loadItems();
     await loadMediaRules();
     $("loader")?.classList.add("hidden");
@@ -1026,7 +1028,45 @@ function fillProfile(){
   if(r.cover_url && $("fCover")) $("fCover").value=r.cover_url;
 }
 
+async function refreshCurrentRestaurantFromDB(){
+  if(!currentRestaurantId) return currentRestaurant;
+  const {data,error}=await supabaseClient
+    .from("restaurants")
+    .select("*")
+    .eq("id",currentRestaurantId)
+    .maybeSingle();
+  if(error){
+    console.warn("Restaurant refresh failed:",error.message);
+    return currentRestaurant;
+  }
+  if(data){
+    currentRestaurant=data;
+    currentRestaurantId=data.id;
+  }
+  return currentRestaurant;
+}
+
+let restaurantPlanRealtime=null;
+function startRestaurantPlanRealtime(){
+  if(restaurantPlanRealtime) return;
+  if(!currentRestaurantId) return;
+  restaurantPlanRealtime=supabaseClient
+    .channel("owner-restaurant-plan-"+currentRestaurantId)
+    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"restaurants",filter:"id=eq."+currentRestaurantId},async payload=>{
+      console.log("Restaurant updated from Admin:",payload.new?.plan_id);
+      currentRestaurant=payload.new||currentRestaurant;
+      await loadCurrentPlan();
+    })
+    .subscribe();
+}
+
+async function refreshOwnerPlan(){
+  await refreshCurrentRestaurantFromDB();
+  await loadCurrentPlan();
+}
+
 async function loadCurrentPlan(){
+  await refreshCurrentRestaurantFromDB();
   const nameEl=$("currentPlanName"), descEl=$("currentPlanDescription"), priceEl=$("currentPlanPrice"),
         statusEl=$("currentPlanStatus"), metricsEl=$("currentPlanMetrics"), featuresEl=$("currentPlanFeatures"), noteEl=$("currentPlanNote");
   if(!nameEl)return;
@@ -1548,6 +1588,16 @@ $("saveMedia").onclick=async()=>{
   if(error)return toast("Media save failed: "+error.message);
   currentRestaurant=data;fillProfile();toast("Image settings saved");
 };
+
+document.addEventListener("visibilitychange",()=>{
+  if(!document.hidden && currentRestaurantId) refreshOwnerPlan().catch(e=>console.warn("Plan refresh skipped:",e));
+});
+window.addEventListener("pageshow",()=>{
+  if(currentRestaurantId) refreshOwnerPlan().catch(e=>console.warn("Plan refresh skipped:",e));
+});
+setInterval(()=>{
+  if(!document.hidden && currentRestaurantId) refreshOwnerPlan().catch(e=>console.warn("Plan refresh skipped:",e));
+},30000);
 
 /* ---------- Logout ---------- */
 async function logout(){await supabaseClient.auth.signOut();showAuthChoice()}
