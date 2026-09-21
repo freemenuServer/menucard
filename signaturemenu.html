@@ -634,6 +634,54 @@ model-viewer{
 }
 
 </style>
+
+<style id="freemenu-image-toggle-fix">
+.food-img{position:relative!important;overflow:hidden!important;}
+.food-img-toggle{
+  position:absolute!important;
+  top:10px!important;
+  left:10px!important;
+  z-index:50!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:6px!important;
+  min-width:82px!important;
+  height:32px!important;
+  padding:0 11px!important;
+  border:1px solid rgba(255,255,255,.5)!important;
+  border-radius:999px!important;
+  background:rgba(0,0,0,.86)!important;
+  color:#f5cc68!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  line-height:1!important;
+  letter-spacing:.3px!important;
+  cursor:pointer!important;
+  box-shadow:0 4px 14px rgba(0,0,0,.45)!important;
+  opacity:1!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+}
+.food-img-toggle:hover{
+  background:#e5a735!important;
+  color:#111!important;
+}
+.food-img-toggle:active{transform:scale(.96);}
+.food-img.image-off img{display:none!important;}
+.food-img.image-off{
+  background:radial-gradient(circle,#292929,#0b0c0d 75%)!important;
+}
+.food-img-placeholder{
+  display:none!important;
+  position:absolute!important;
+  inset:0!important;
+  place-items:center!important;
+  color:#e5b74e!important;
+  font-size:38px!important;
+}
+.food-img.image-off .food-img-placeholder{display:grid!important;}
+</style>
 </head>
 
 
