@@ -8,7 +8,7 @@
 <style>
 *{box-sizing:border-box}html,body{margin:0;width:100%;min-height:100%}
 body{min-height:100vh;background:#f3f5f7;color:#151820;font-family:Inter,Arial,Helvetica,sans-serif;display:flex;justify-content:center;align-items:center;padding:18px}
-.page{width:100%;max-width:720px}.actions{display:flex;justify-content:center;gap:10px;margin-bottom:14px}
+.page{width:100%;max-width:720px}.actions{display:none;justify-content:center;gap:10px;margin-bottom:14px}
 .btn{border:0;border-radius:12px;padding:11px 17px;font-size:14px;font-weight:800;cursor:pointer}.print{background:#151820;color:#fff}.download{background:#fff;color:#151820;border:1px solid #ddd}
 .poster{position:relative;overflow:hidden;width:100%;background:#fff;border-radius:30px;box-shadow:0 22px 60px rgba(0,0,0,.12);padding:38px 38px 30px}
 .blob{position:absolute;pointer-events:none}.orange{width:230px;height:230px;left:-115px;top:-135px;background:#ffb52b;border-radius:50% 45% 65% 35%}.green{width:230px;height:190px;left:-100px;bottom:-125px;background:#4eb84a;border-radius:60% 40% 20% 80%}.red{width:225px;height:210px;right:-105px;bottom:-120px;background:#ff5358;border-radius:45% 55% 70% 30%}
@@ -52,111 +52,22 @@ const SUPABASE_ANON_KEY='sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const loading=document.getElementById('loading'),poster=document.getElementById('poster'),unassigned=document.getElementById('unassigned'),errorBox=document.getElementById('error'),errorText=document.getElementById('errorText'),restaurantName=document.getElementById('restaurantName'),unassignedCode=document.getElementById('unassignedCode'),qrContainer=document.getElementById('qrcode');
 let currentCode='',qrInstance=null;
-function getMenuUrl(slug){
-  return new URL('/menu.html?r='+encodeURIComponent(slug),window.location.origin).href;
-}
-function getPreprintedUrl(code){
-  return new URL('/qr.html?code='+encodeURIComponent(code),window.location.origin).href;
-}
+function getMenuUrl(slug){return new URL('/menu.html?r='+encodeURIComponent(slug),window.location.origin).href}
+function getDirectMenuUrl(slug){return new URL('/menu.html?r='+encodeURIComponent(slug),window.location.origin).href}
 function showUnassigned(code){loading.style.display='none';poster.style.display='none';errorBox.style.display='none';unassigned.style.display='block';unassignedCode.textContent=code;unassigned.querySelector('.state').style.display='block'}
 function showError(message){loading.style.display='none';poster.style.display='none';unassigned.style.display='none';errorBox.style.display='block';errorText.textContent=message||'We could not process this QR code.';errorBox.querySelector('.state').style.display='block'}
-function createQRTarget(scanURL){qrContainer.innerHTML='';qrInstance=new QRCodeStyling({width:390,height:390,type:'canvas',data:scanURL,margin:6,qrOptions:{typeNumber:0,mode:'Byte',errorCorrectionLevel:'H'},dotsOptions:{type:'dots',color:'#151820'},cornersSquareOptions:{type:'extra-rounded',color:'#ffad18'},cornersDotOptions:{type:'dot',color:'#151820'},backgroundOptions:{color:'#ffffff'}});qrInstance.append(qrContainer)}
+function createQR(slug){qrContainer.innerHTML='';const scanURL=getMenuUrl(slug);qrInstance=new QRCodeStyling({width:390,height:390,type:'canvas',data:scanURL,margin:6,qrOptions:{typeNumber:0,mode:'Byte',errorCorrectionLevel:'H'},dotsOptions:{type:'dots',color:'#151820'},cornersSquareOptions:{type:'extra-rounded',color:'#ffad18'},cornersDotOptions:{type:'dot',color:'#151820'},backgroundOptions:{color:'#ffffff'}});qrInstance.append(qrContainer)}
 function downloadQR(){if(!qrInstance){alert('QR is not ready yet.');return}qrInstance.download({name:'FreeMenu-'+(currentCode||'QR'),extension:'png'})}
-async function openQR(){
-  try{
-    if(!window.supabase) throw new Error('Supabase could not load.');
-
-    const params = new URLSearchParams(window.location.search);
-    const code = String(params.get('code') || '').trim();
-    const printMode = params.get('view') === 'print';
-
-    if(!code) throw new Error('QR code is missing.');
-    currentCode = code;
-
-    /*
-      PRE-PRINT MODE:
-      This QR is printed BEFORE restaurant assignment.
-      The QR itself always contains the permanent resolver:
-      /qr.html?code=FM-0001
-
-      Later, when FM-0001 is assigned, the resolver sends
-      the customer to that restaurant's menu.
-    */
-    if(printMode){
-      restaurantName.textContent = 'Pre-Printed Menu QR';
-      createQRTarget(getPreprintedUrl(code));
-
-      loading.style.display = 'none';
-      poster.style.display = 'block';
-      unassigned.style.display = 'none';
-      errorBox.style.display = 'none';
-
-      // Try to show the currently assigned restaurant name, but
-      // NEVER block printing if the lookup is unavailable.
-      db.from('qr_codes')
-        .select('restaurant_id,status')
-        .eq('code',code)
-        .maybeSingle()
-        .then(async ({data,error})=>{
-          if(error || !data || !data.restaurant_id) return;
-          const rr = await db.from('restaurants')
-            .select('name')
-            .eq('id',data.restaurant_id)
-            .maybeSingle();
-          if(!rr.error && rr.data?.name){
-            restaurantName.textContent = rr.data.name;
-          }
-        })
-        .catch(()=>{});
-
-      return;
-    }
-
-    /*
-      CUSTOMER SCAN MODE:
-      /qr.html?code=FM-0001
-      -> qr_codes
-      -> restaurant_id
-      -> restaurants.slug
-      -> /menu.html?r=slug
-    */
-    const qrResult = await db.from('qr_codes')
-      .select('restaurant_id,status,code')
-      .eq('code',code)
-      .maybeSingle();
-
-    if(qrResult.error) throw new Error(qrResult.error.message);
-
-    const qr = qrResult.data;
-    if(!qr) throw new Error('QR code '+code+' was not found.');
-
-    const status = String(qr.status || 'available').toLowerCase();
-
-    if(status !== 'assigned' || !qr.restaurant_id){
-      showUnassigned(code);
-      return;
-    }
-
-    const restaurantResult = await db.from('restaurants')
-      .select('name,slug')
-      .eq('id',qr.restaurant_id)
-      .maybeSingle();
-
-    if(restaurantResult.error)
-      throw new Error(restaurantResult.error.message);
-
-    const restaurant = restaurantResult.data;
-
-    if(!restaurant || !restaurant.slug)
-      throw new Error('Restaurant menu is not available.');
-
-    window.location.replace(getMenuUrl(restaurant.slug));
-
-  }catch(e){
-    console.error('FreeMenu QR Error:',e);
-    showError(e && e.message ? e.message : 'Unable to process this QR code.');
-  }
+// Normal QR scans resolve to the restaurant menu. Use ?view=print only for the QR poster/printing page.
+async function openQR(){try{if(!window.supabase)throw new Error('Menu service could not load. Please try again.');const code=String(new URLSearchParams(window.location.search).get('code')||'').trim();if(!code)throw new Error('QR code is missing.');currentCode=code;const qrResult=await db.from('qr_codes').select('restaurant_id,status,code').eq('code',code).maybeSingle();if(qrResult.error)throw new Error(qrResult.error.message);const qr=qrResult.data;if(!qr)throw new Error('QR code '+code+' was not found.');const status=String(qr.status||'available').toLowerCase();if(status!=='assigned'||!qr.restaurant_id){showUnassigned(code);return}const restaurantResult=await db.from('restaurants').select('name,slug').eq('id',qr.restaurant_id).maybeSingle();if(restaurantResult.error)throw new Error(restaurantResult.error.message);const restaurant=restaurantResult.data;if(!restaurant||!restaurant.slug)throw new Error('Restaurant menu is not available.');restaurantName.textContent=restaurant.name||'Restaurant Menu';
+const view=new URLSearchParams(window.location.search).get('view');
+if(view!=='print'){
+  window.location.replace(getDirectMenuUrl(restaurant.slug));
+  return;
 }
+const actions=document.querySelector('.actions');
+if(actions) actions.style.display='flex';
+createQR(restaurant.slug);loading.style.display='none';poster.style.display='block';unassigned.style.display='none';errorBox.style.display='none'}catch(e){console.error('FreeMenu QR Error:',e);showError(e&&e.message?e.message:'Unable to process this QR code.')}}
 openQR();
 </script>
 </body>
