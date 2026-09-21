@@ -1,890 +1,1371 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#0b0b0d">
-  <title>Signature Menu • FreeMenu</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script type="module"
-    src="https://unpkg.com/@google/model-viewer@4.0.0/dist/model-viewer.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<title>Signature Menu | Urban Punjab</title>
 
-  <style>
-    :root{
-      --bg:#09090b;
-      --panel:#111114;
-      --panel2:#17171b;
-      --line:rgba(255,255,255,.09);
-      --text:#f7f7f8;
-      --muted:#a6a6af;
-      --gold:#d7aa55;
-      --gold2:#f0cf84;
-      --green:#55c98a;
-      --danger:#ff7777;
-      --max:1120px;
+<!-- Google Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+<!-- 3D Model Viewer Library -->
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    background:#090a0b;
+    color:#fff;
+    font-family:Inter,Arial,sans-serif;
+}
+
+.container{
+    width:100%;
+    max-width:1200px;
+    margin:auto;
+}
+
+/* ================= HEADER ================= */
+
+.header{
+    min-height:230px;
+    padding:20px 25px;
+    position:relative;
+    overflow:hidden;
+
+    background:
+    linear-gradient(rgba(0,0,0,.68),rgba(0,0,0,.88)),
+    url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=85");
+
+    background-size:cover;
+    background-position:center;
+    border-bottom:1px solid #8e6723;
+}
+
+.header-inner{
+    max-width:1100px;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    gap:35px;
+}
+
+.logo{
+    width:175px;
+    height:175px;
+    border:3px solid #e6b84c;
+    border-radius:50%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+
+    background:#050505;
+    box-shadow:
+        0 0 25px rgba(229,177,65,.25),
+        inset 0 0 20px rgba(229,177,65,.12);
+}
+
+.logo-icon{
+    font-size:46px;
+    color:#e8bd58;
+    margin-bottom:5px;
+}
+
+.logo h2{
+    color:#e9bb50;
+    font-size:21px;
+    letter-spacing:2px;
+}
+
+.logo p{
+    color:#fff;
+    font-size:12px;
+    letter-spacing:2px;
+}
+
+.logo small{
+    color:#e9bb50;
+    margin-top:8px;
+}
+
+.brand{
+    flex:1;
+}
+
+.signature{
+    font-family:"Playfair Display",serif;
+    font-size:55px;
+    font-style:italic;
+    color:#e9bb50;
+}
+
+.brand-title{
+    font-family:"Playfair Display",serif;
+    font-size:68px;
+    line-height:.9;
+    color:#f5cc68;
+    letter-spacing:2px;
+}
+
+.tagline{
+    margin-top:12px;
+    font-size:14px;
+    letter-spacing:6px;
+    color:#fff;
+}
+
+.subtag{
+    margin-top:12px;
+    color:#e8bc54;
+    font-family:"Playfair Display",serif;
+    font-style:italic;
+    font-size:20px;
+}
+
+/* ================= CATEGORY NAV ================= */
+
+.category-wrap{
+    padding:12px 15px;
+    background:#0b0c0d;
+    position:sticky;
+    top:0;
+    z-index:20;
+}
+
+.categories{
+    max-width:1100px;
+    margin:auto;
+
+    display:flex;
+    overflow-x:auto;
+
+    border:1px solid #3c3c3c;
+    border-radius:20px;
+    background:#101112;
+}
+
+.categories::-webkit-scrollbar{
+    display:none;
+}
+
+.category{
+    min-width:115px;
+    padding:14px 17px;
+    border:0;
+    border-right:1px solid #333;
+    background:transparent;
+    color:#ddd;
+    cursor:pointer;
+    font-size:13px;
+    transition:.25s;
+}
+
+.category span{
+    display:block;
+    font-size:22px;
+    margin-bottom:4px;
+}
+
+.category.active{
+    background:linear-gradient(135deg,#ffe19a,#e7a832);
+    color:#111;
+    font-weight:800;
+    border-radius:17px;
+}
+
+/* ================= SECTION ================= */
+
+.section{
+    padding:25px 20px 5px;
+}
+
+.section-title{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:18px;
+}
+
+.section-title h2{
+    font-family:"Playfair Display",serif;
+    color:#f0ca6b;
+    font-size:28px;
+    white-space:nowrap;
+}
+
+.line{
+    height:1px;
+    background:linear-gradient(90deg,#dcae4c,transparent);
+    flex:1;
+}
+
+.view-all{
+    color:#e9bd5b;
+    font-size:14px;
+    white-space:nowrap;
+}
+
+/* ================= FOOD GRID ================= */
+
+.food-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+}
+
+.food-card{
+    background:#111314;
+    border:1px solid #393939;
+    border-radius:15px;
+    overflow:hidden;
+
+    box-shadow:
+    0 5px 20px rgba(0,0,0,.35);
+
+    transition:.25s;
+}
+
+.food-card:hover{
+    transform:translateY(-4px);
+    border-color:#d7a83d;
+}
+
+.food-img{
+    height:205px;
+    position:relative;
+    overflow:hidden;
+}
+
+.food-img img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    transition:.4s;
+}
+
+.food-card:hover .food-img img{
+    transform:scale(1.06);
+}
+
+.veg{
+    position:absolute;
+    right:10px;
+    top:10px;
+
+    width:21px;
+    height:21px;
+
+    background:#fff;
+    border:2px solid #1c9d4d;
+    border-radius:4px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.veg::after{
+    content:"";
+    width:9px;
+    height:9px;
+    background:#19a14a;
+    border-radius:50%;
+}
+
+.food-content{
+    padding:14px;
+}
+
+.food-name-row{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+}
+
+.food-name{
+    font-size:17px;
+    font-weight:700;
+}
+
+.price{
+    color:#f5c85c;
+    font-size:17px;
+    font-weight:800;
+    white-space:nowrap;
+}
+
+.description{
+    color:#aaa;
+    font-size:13px;
+    line-height:1.45;
+    min-height:38px;
+    margin:7px 0 12px;
+}
+
+/* ================= BUTTONS ================= */
+
+.actions{
+    display:flex;
+    gap:8px;
+}
+
+.btn{
+    height:42px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:700;
+    font-size:13px;
+    transition:.2s;
+}
+
+.btn-3d{
+    width: 100%;
+    background:#0b0c0d;
+    color:#f5cc68;
+    border:1px solid #e8b33f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    letter-spacing: 0.5px;
+}
+
+.btn-3d:hover{
+    background:linear-gradient(135deg, #ffe08c, #e5a735);
+    color:#111;
+    border-color: #ffe08c;
+    box-shadow: 0 0 15px rgba(232, 179, 63, 0.4);
+}
+
+/* ================= FOOTER ================= */
+
+.footer{
+    margin-top:30px;
+    padding:30px 20px;
+
+    border-top:1px solid #333;
+    background:#070809;
+}
+
+.footer-inner{
+    max-width:1100px;
+    margin:auto;
+
+    display:grid;
+    grid-template-columns:1.2fr 1fr 1fr 170px;
+    gap:25px;
+    align-items:center;
+}
+
+.footer-title{
+    color:#e8b950;
+    font-size:12px;
+    letter-spacing:2px;
+}
+
+.footer-text{
+    margin-top:7px;
+    color:#ddd;
+    font-size:13px;
+    line-height:1.6;
+}
+
+.ar-button{
+    height:52px;
+    padding:0 20px;
+
+    border:1px solid #e5b443;
+    border-radius:30px;
+
+    background:#111;
+    color:#f3c75d;
+
+    font-weight:700;
+    cursor:pointer;
+}
+
+.ar-button:hover{
+    background:#e5b443;
+    color:#111;
+}
+
+.qr{
+    width:110px;
+    height:110px;
+    background:#fff;
+    padding:6px;
+    border-radius:8px;
+}
+
+.qr img{
+    width:100%;
+    height:100%;
+}
+
+/* ================= 3D MODAL & AR ================= */
+
+.modal{
+    position:fixed;
+    inset:0;
+
+    background:rgba(0,0,0,.88);
+    backdrop-filter: blur(5px);
+
+    display:none;
+    align-items:center;
+    justify-content:center;
+
+    z-index:1000;
+    padding:20px;
+}
+
+.modal.show{
+    display:flex;
+}
+
+.modal-box{
+    width:min(550px,100%);
+    height:min(680px,88vh);
+
+    background:#101112;
+    border:1px solid #dbaa42;
+    border-radius:20px;
+
+    position:relative;
+    overflow:hidden;
+
+    box-shadow:0 0 50px rgba(225,174,62,.25);
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header{
+    height:60px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:0 20px;
+    border-bottom:1px solid #222;
+}
+
+.modal-header h3{
+    color:#efc25b;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.close{
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    border:1px solid #444;
+    background:#181919;
+    color:#fff;
+    cursor:pointer;
+    font-size:20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close:hover{
+    background: #e8b33f;
+    color: #111;
+}
+
+model-viewer{
+    width:100%;
+    flex: 1;
+    background: radial-gradient(circle,#252525,#090a0b 75%);
+}
+
+/* Native AR Placement Button */
+.ar-view-btn {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #ffe08c, #e5a735);
+    color: #111;
+    border: none;
+    padding: 11px 22px;
+    border-radius: 25px;
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.modal-tip {
+    text-align: center;
+    font-size: 11.5px;
+    color: #888;
+    padding: 10px;
+    background: #08090a;
+    border-top: 1px solid #1c1d1e;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:900px){
+
+    .food-grid{
+        grid-template-columns:repeat(2,1fr);
     }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{
-      margin:0;background:
-      radial-gradient(circle at 50% -10%,rgba(215,170,85,.13),transparent 38%),
-      var(--bg);color:var(--text);
-      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+
+    .header-inner{
+        gap:20px;
     }
-    button,input{font:inherit}
-    button{cursor:pointer}
-    .page{width:min(var(--max),calc(100% - 28px));margin:auto}
-    .top{
-      padding:22px 0 16px;
-      position:relative;
+
+    .brand-title{
+        font-size:50px;
     }
-    .brand{
-      display:flex;align-items:center;gap:13px;
-      min-width:0;
+
+    .signature{
+        font-size:40px;
     }
+
+}
+
+@media(max-width:600px){
+
+    .header{
+        min-height:200px;
+        padding:15px;
+    }
+
+    .header-inner{
+        gap:14px;
+    }
+
     .logo{
-      width:48px;height:48px;border-radius:15px;object-fit:cover;
-      border:1px solid var(--line);background:#19191d;
+        width:100px;
+        height:100px;
     }
-    .logoFallback{
-      width:48px;height:48px;border-radius:15px;
-      display:grid;place-items:center;background:#18181c;
-      border:1px solid var(--line);font-size:21px;
+
+    .logo-icon{
+        font-size:25px;
     }
-    .brandText{min-width:0}
-    .brandText h1{
-      margin:0;font-size:22px;line-height:1.1;
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+
+    .logo h2{
+        font-size:12px;
     }
-    .brandText p{
-      margin:5px 0 0;color:var(--muted);font-size:12px;
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+
+    .logo p,
+    .logo small{
+        font-size:7px;
     }
-    .hero{
-      margin-top:8px;border:1px solid var(--line);border-radius:26px;
-      overflow:hidden;background:linear-gradient(135deg,#19171a,#0e0e11);
-      box-shadow:0 22px 60px rgba(0,0,0,.28);
+
+    .signature{
+        font-size:28px;
     }
-    .heroImage{
-      width:100%;height:230px;object-fit:cover;display:block;
-      background:linear-gradient(135deg,#1c1711,#3b2a17);
+
+    .brand-title{
+        font-size:38px;
     }
-    .heroInfo{padding:20px}
-    .eyebrow{
-      color:var(--gold2);font-size:10px;font-weight:800;
-      letter-spacing:.16em;text-transform:uppercase;
+
+    .tagline{
+        font-size:8px;
+        letter-spacing:2px;
     }
-    .heroInfo h2{margin:7px 0 5px;font-size:30px;line-height:1.08}
-    .heroMeta{color:var(--muted);font-size:13px;line-height:1.6}
-    .actions{
-      display:flex;gap:9px;flex-wrap:wrap;margin-top:15px
+
+    .subtag{
+        font-size:12px;
     }
+
+    .food-grid{
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+    }
+
+    .section{
+        padding:20px 10px 5px;
+    }
+
+    .food-img{
+        height:135px;
+    }
+
+    .food-content{
+        padding:10px;
+    }
+
+    .food-name{
+        font-size:14px;
+    }
+
+    .price{
+        font-size:14px;
+    }
+
+    .description{
+        font-size:11px;
+    }
+
     .btn{
-      border:1px solid var(--line);background:#19191d;color:var(--text);
-      border-radius:12px;padding:10px 14px;font-weight:750;font-size:12px;
+        height:37px;
+        font-size:11px;
     }
-    .btn.gold{background:var(--gold);border-color:var(--gold);color:#15110a}
-    .btn:active{transform:translateY(1px)}
-    .sticky{
-      position:sticky;top:0;z-index:20;
-      margin:14px 0 18px;padding:10px 0;
-      background:rgba(9,9,11,.88);backdrop-filter:blur(14px);
+
+    .footer-inner{
+        grid-template-columns:1fr;
+        text-align:center;
     }
-    .search{
-      display:flex;align-items:center;gap:9px;
-      border:1px solid var(--line);background:#111114;border-radius:14px;
-      padding:0 13px;height:44px;
+
+    .qr{
+        margin:auto;
     }
-    .search span{color:#77777f}
-    .search input{
-      width:100%;border:0;outline:0;background:transparent;color:var(--text);
-      font-size:13px;
-    }
-    .cats{
-      display:flex;gap:8px;overflow:auto;padding:9px 1px 2px;
-      scrollbar-width:none;
-    }
-    .cats::-webkit-scrollbar{display:none}
-    .cat{
-      flex:0 0 auto;border:1px solid var(--line);background:#111114;
-      color:#c7c7cc;border-radius:999px;padding:8px 12px;font-size:11px;font-weight:750;
-    }
-    .cat.active{background:var(--gold);border-color:var(--gold);color:#17120a}
-    .section{margin:24px 0 0}
-    .sectionHead{
-      display:flex;align-items:end;justify-content:space-between;gap:12px;
-      margin-bottom:12px;
-    }
-    .sectionHead h3{margin:0;font-size:19px}
-    .sectionHead span{font-size:11px;color:var(--muted)}
-    .signatureGrid{
-      display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;
-    }
-    .sigCard{
-      background:linear-gradient(180deg,#151519,#101012);
-      border:1px solid var(--line);border-radius:22px;overflow:hidden;
-    }
-    .viewer{
-      position:relative;height:300px;background:
-        radial-gradient(circle at 50% 40%,rgba(215,170,85,.11),transparent 45%),
-        #0b0b0d;
-    }
-    model-viewer{
-      width:100%;height:100%;background:transparent;
-      --poster-color:transparent;
-      --progress-bar-color:var(--gold);
-      --progress-mask:rgba(255,255,255,.08);
-    }
-    .viewerTools{
-      position:absolute;left:10px;right:10px;bottom:10px;
-      display:flex;justify-content:space-between;gap:8px;pointer-events:none;
-    }
-    .viewerTools .tool{
-      pointer-events:auto;border:1px solid rgba(255,255,255,.13);
-      background:rgba(8,8,10,.78);color:#fff;border-radius:10px;
-      padding:8px 10px;font-size:10px;font-weight:800;backdrop-filter:blur(8px);
-    }
-    .loadState{
-      position:absolute;inset:0;display:grid;place-items:center;
-      padding:20px;text-align:center;pointer-events:none;
-      z-index:4;
-    }
-    .loadStateBox{
-      max-width:270px;padding:13px 15px;border:1px solid rgba(255,255,255,.10);
-      background:rgba(10,10,12,.72);border-radius:15px;
-      box-shadow:0 12px 30px rgba(0,0,0,.28);
-      backdrop-filter:blur(10px);
-    }
-    .errorState{border-color:rgba(255,119,119,.22)}
-    .loadState strong{display:block;font-size:12px;margin-bottom:5px}
-    .loadState small{display:block;color:var(--muted);font-size:10px;line-height:1.5}
-    .loadState a{
-      pointer-events:auto;display:inline-block;margin-top:10px;
-      color:var(--gold2);font-size:10px;font-weight:800;text-decoration:none
-    }
-    .sigInfo{padding:15px 16px 17px}
-    .sigTop{display:flex;justify-content:space-between;gap:10px;align-items:start}
-    .sigName{font-size:17px;font-weight:850;line-height:1.2}
-    .price{font-size:16px;font-weight:900;color:var(--gold2);white-space:nowrap}
-    .desc{color:var(--muted);font-size:11px;line-height:1.55;margin-top:7px}
-    .badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
-    .badge{
-      font-size:9px;font-weight:800;padding:5px 7px;border-radius:999px;
-      border:1px solid var(--line);color:#d4d4d8;background:#18181c
-    }
-    .badge.hot{color:#ffd991;border-color:rgba(215,170,85,.28)}
-    .menuList{display:grid;gap:8px}
-    .menuRow{
-      display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
-      padding:14px 0;border-bottom:1px solid var(--line)
-    }
-    .menuRow:last-child{border-bottom:0}
-    .rowMain{min-width:0}
-    .rowTitle{display:flex;gap:7px;align-items:center}
-    .dot{width:9px;height:9px;border-radius:50%;border:1px solid currentColor;flex:0 0 auto}
-    .dot.veg{color:#55c98a}.dot.nonveg{color:#ff6969}.dot.egg{color:#e5bd55}
-    .rowName{font-weight:800;font-size:14px}
-    .rowDesc{color:var(--muted);font-size:11px;line-height:1.45;margin-top:4px}
-    .rowPrice{text-align:right;font-weight:900;font-size:14px;white-space:nowrap}
-    .prices{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:4px}
-    .miniPrice{font-size:10px;color:#cfcfd3}
-    .state{
-      border:1px solid var(--line);background:#111114;border-radius:18px;
-      padding:30px;text-align:center;color:var(--muted);margin:30px 0
-    }
-    .footer{
-      text-align:center;color:#68686f;font-size:10px;padding:35px 0 50px
-    }
-    .toast{
-      position:fixed;left:50%;bottom:20px;transform:translateX(-50%) translateY(15px);
-      opacity:0;pointer-events:none;z-index:100;
-      background:#f4f4f5;color:#111;border-radius:12px;padding:10px 14px;
-      font-size:11px;font-weight:750;transition:.2s;
-      box-shadow:0 12px 35px rgba(0,0,0,.35)
-    }
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    @media(max-width:760px){
-      .page{width:min(100% - 18px,var(--max))}
-      .heroImage{height:185px}
-      .heroInfo h2{font-size:25px}
-      .signatureGrid{grid-template-columns:1fr}
-      .viewer{height:320px}
-    }
-    @media(min-width:1000px){
-      .hero{display:grid;grid-template-columns:1.15fr .85fr}
-      .heroImage{height:100%;min-height:250px}
-      .heroInfo{display:flex;flex-direction:column;justify-content:center}
-    }
-  </style>
+}
+
+</style>
 </head>
 
+
 <body>
-  <div class="page">
-    <header class="top">
-      <div class="brand">
-        <div id="logoBox" class="logoFallback">🍽</div>
-        <div class="brandText">
-          <h1 id="restaurantName">Signature Menu</h1>
-          <p id="restaurantMeta">Loading restaurant…</p>
-        </div>
-      </div>
-    </header>
 
-    <section class="hero">
-      <img id="heroImage" class="heroImage" alt="" style="display:none">
-      <div class="heroInfo">
-        <div class="eyebrow">Signature 3D Menu</div>
-        <h2 id="heroTitle">Explore the menu</h2>
-        <div id="heroMeta" class="heroMeta">3D dishes are loading…</div>
-        <div class="actions">
-          <button class="btn gold" id="shareBtn" type="button">Share Menu</button>
-          <button class="btn" id="callBtn" type="button" style="display:none">Call Restaurant</button>
-        </div>
-      </div>
-    </section>
 
-    <div class="sticky">
-      <div class="search">
-        <span>⌕</span>
-        <input id="searchInput" type="search" placeholder="Search dishes or categories…" autocomplete="off">
-      </div>
-      <div id="categoryChips" class="cats"></div>
+<!-- ================= HEADER ================= -->
+
+<header class="header">
+
+<div class="header-inner">
+
+    <div class="logo">
+
+        <div class="logo-icon">🍴</div>
+
+        <h2>URBAN</h2>
+        <h2>PUNJAB</h2>
+
+        <p>RESTAURANT</p>
+
+        <small>SINCE 1971</small>
+
     </div>
 
-    <main>
-      <section class="section" id="signatureSection" style="display:none">
-        <div class="sectionHead">
-          <div>
-            <div class="eyebrow">Interactive</div>
-            <h3>Signature 3D Dishes</h3>
-          </div>
-          <span id="signatureCount">0 dishes</span>
+
+    <div class="brand">
+
+        <div class="signature">
+            Signature
         </div>
-        <div id="signatureGrid" class="signatureGrid"></div>
-      </section>
 
-      <section class="section" id="regularSection">
-        <div class="sectionHead">
-          <div>
-            <div class="eyebrow">Menu</div>
-            <h3 id="menuHeading">Categories</h3>
-          </div>
-          <span id="menuCount"></span>
+        <div class="brand-title">
+            MENU
         </div>
-        <div id="menuSections"></div>
-      </section>
 
-      <div id="pageState" class="state" style="display:none"></div>
-    </main>
+        <div class="tagline">
+            FAMILY • FOOD • RESTAURANT
+        </div>
 
-    <footer class="footer">
-      Digital menu • Powered by FreeMenu.in
-    </footer>
-  </div>
+        <div class="subtag">
+            Authentic Flavours, Timeless Taste
+        </div>
 
-  <div id="toast" class="toast"></div>
+    </div>
+
+</div>
+
+</header>
+
+
+
+<!-- ================= CATEGORY ================= -->
+
+<div class="category-wrap">
+
+<div class="categories">
+
+<button class="category active" onclick="filterCategory('all', event)">
+<span>▦</span>
+All
+</button>
+
+<button class="category" onclick="filterCategory('starters', event)">
+<span>🌿</span>
+Starters
+</button>
+
+<button class="category" onclick="filterCategory('soups', event)">
+<span>🍲</span>
+Soups
+</button>
+
+<button class="category" onclick="filterCategory('main', event)">
+<span>🍛</span>
+Main Course
+</button>
+
+<button class="category" onclick="filterCategory('rice', event)">
+<span>🍚</span>
+Rice & Biryani
+</button>
+
+<button class="category" onclick="filterCategory('breads', event)">
+<span>🥖</span>
+Breads
+</button>
+
+<button class="category" onclick="filterCategory('salad', event)">
+<span>🥗</span>
+Salad & Raita
+</button>
+
+<button class="category" onclick="filterCategory('beverages', event)">
+<span>🥤</span>
+Beverages
+</button>
+
+</div>
+
+</div>
+
+
+
+<main class="container">
+
+
+<!-- ================= STARTERS ================= -->
+
+<section class="section food-section" data-category="starters">
+
+<div class="section-title">
+
+<h2>🌿 Starters</h2>
+
+<div class="line"></div>
+
+<div class="view-all">
+View All →
+</div>
+
+</div>
+
+
+<div class="food-grid">
+
+
+<!-- ITEM 1: Working 3D Enabled -->
+
+<div class="food-card">
+
+<div class="food-img">
+
+<img src="https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=85">
+
+<div class="veg"></div>
+
+</div>
+
+<div class="food-content">
+
+<div class="food-name-row">
+
+<div class="food-name">
+Paneer Tikka
+</div>
+
+<div class="price">
+₹280
+</div>
+
+</div>
+
+<div class="description">
+Soft paneer cubes marinated in spices and grilled to perfection.
+</div>
+
+<div class="actions">
+
+<!-- Working Verified 3D Model -->
+<button class="btn btn-3d"
+onclick="open3D('Paneer Tikka','https://modelviewer.dev/shared-assets/models/glTF-Sample-Assets/Models/SheenChair/glTF-Binary/SheenChair.glb')">
+◈ 3D View
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- ITEM 2: Working 3D Enabled -->
+
+<div class="food-card">
+
+<div class="food-img">
+
+<img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=85">
+
+<div class="veg"></div>
+
+</div>
+
+<div class="food-content">
+
+<div class="food-name-row">
+
+<div class="food-name">
+Tandoori Mushroom
+</div>
+
+<div class="price">
+₹260
+</div>
+
+</div>
+
+<div class="description">
+Juicy mushrooms marinated with special tandoori spices.
+</div>
+
+<div class="actions">
+
+<!-- Working Verified 3D Model -->
+<button class="btn btn-3d"
+onclick="open3D('Tandoori Mushroom','https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb')">
+◈ 3D View
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- ITEM 3: Regular Item (Preview Only) -->
+
+<div class="food-card">
+
+<div class="food-img">
+
+<img src="https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?auto=format&fit=crop&w=800&q=85">
+
+<div class="veg"></div>
+
+</div>
+
+<div class="food-content">
+
+<div class="food-name-row">
+
+<div class="food-name">
+Hara Bhara Kebab
+</div>
+
+<div class="price">
+₹240
+</div>
+
+</div>
+
+<div class="description">
+Healthy and tasty mix veg kebab with aromatic herbs.
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- ITEM 4: Regular Item -->
+
+<div class="food-card">
+
+<div class="food-img">
+
+<img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=800&q=85">
+
+<div class="veg"></div>
+
+</div>
+
+<div class="food-content">
+
+<div class="food-name-row">
+
+<div class="food-name">
+Crispy Corn
+</div>
+
+<div class="price">
+₹220
+</div>
+
+</div>
+
+<div class="description">
+Crispy golden corn tossed with Indo-Chinese spices.
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- ITEM 5: Regular Item -->
+
+<div class="food-card">
+
+<div class="food-img">
+
+<img src="https://images.unsplash.com/photo-1562967916-eb82221dfb36?auto=format&fit=crop&w=800&q=85">
+
+<div class="veg"></div>
+
+</div>
+
+<div class="food-content">
+
+<div class="food-name-row">
+
+<div class="food-name">
+Chilli Paneer
+</div>
+
+<div class="price">
+₹260
+</div>
+
+</div>
+
+<div class="description">
+Paneer cubes tossed in spicy chilli sauce with peppers.
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- ITEM 6: Regular Item -->
+
+<div class="food-card">
+
+<div class="food-img">
+
+<img src="https://images.unsplash.com/photo-1628294895950-9805252327bc?auto=format&fit=crop&w=800&q=85">
+
+<div class="veg"></div>
+
+</div>
+
+<div class="food-content">
+
+<div class="food-name-row">
+
+<div class="food-name">
+Honey Chilli Potato
+</div>
+
+<div class="price">
+₹220
+</div>
+
+</div>
+
+<div class="description">
+Crispy potatoes tossed in sweet and spicy honey chilli sauce.
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ================= SOUPS ================= -->
+
+<section class="section food-section" data-category="soups">
+
+<div class="section-title">
+
+<h2>🍲 Soups</h2>
+
+<div class="line"></div>
+
+<div class="view-all">
+View All →
+</div>
+
+</div>
+
+
+<div class="food-grid">
+
+
+<div class="food-card">
+
+<div class="food-img">
+
+<img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=85">
+
+<div class="veg"></div>
+
+</div>
+
+<div class="food-content">
+
+<div class="food-name-row">
+
+<div class="food-name">
+Hot & Sour Soup
+</div>
+
+<div class="price">
+₹140
+</div>
+
+</div>
+
+<div class="description">
+Spicy and tangy soup with vegetables and herbs.
+</div>
+
+</div>
+
+</div>
+
+
+
+<div class="food-card">
+
+<div class="food-img">
+
+<img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=85">
+
+<div class="veg"></div>
+
+</div>
+
+<div class="food-content">
+
+<div class="food-name-row">
+
+<div class="food-name">
+Manchow Soup
+</div>
+
+<div class="price">
+₹140
+</div>
+
+</div>
+
+<div class="description">
+Classic Indo-Chinese soup with a rich flavour.
+</div>
+
+</div>
+
+</div>
+
+
+
+<div class="food-card">
+
+<div class="food-img">
+
+<img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=85">
+
+<div class="veg"></div>
+
+</div>
+
+<div class="food-content">
+
+<div class="food-name-row">
+
+<div class="food-name">
+Sweet Corn Soup
+</div>
+
+<div class="price">
+₹140
+</div>
+
+</div>
+
+<div class="description">
+A creamy and comforting corn soup.
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer class="footer">
+
+<div class="footer-inner">
+
+<div>
+
+<div class="footer-title">
+ADDRESS
+</div>
+
+<div class="footer-text">
+C-207/208, Jhilmil Colony<br>
+Delhi - 110095
+</div>
+
+</div>
+
+
+<div>
+
+<div class="footer-title">
+CONTACT
+</div>
+
+<div class="footer-text">
+011-2214-4545<br>
+8447000853 | 8447000854
+</div>
+
+</div>
+
+
+<div>
+
+<button class="ar-button"
+onclick="alert('Select any dish with ◈ 3D View and tap Place on Table to view in AR!')">
+
+▣ &nbsp; Interactive AR Active
+
+</button>
+
+</div>
+
+
+<div>
+
+<div class="qr">
+
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://freemenu.in">
+
+</div>
+
+</div>
+
+</div>
+
+<p style="
+text-align:center;
+color:#777;
+font-size:11px;
+margin-top:25px;
+">
+Rate & items can be changed without prior notice
+</p>
+
+</footer>
+
+
+
+<!-- ================= 3D / AR MODAL ================= -->
+
+<div class="modal" id="modal">
+
+<div class="modal-box">
+
+<div class="modal-header">
+
+<h3 id="modelTitle">
+3D Food Preview
+</h3>
+
+<button class="close" onclick="close3D()">
+×
+</button>
+
+</div>
+
+
+<model-viewer
+id="foodModel"
+src=""
+camera-controls
+auto-rotate
+rotation-per-second="30deg"
+ar
+ar-modes="webxr scene-viewer quick-look"
+shadow-intensity="1.5"
+environment-image="neutral"
+alt="3D Dish Preview">
+
+<button slot="ar-button" class="ar-view-btn">
+📱 Place on Table (AR)
+</button>
+
+</model-viewer>
+
+<div class="modal-tip">
+Rotate & Zoom with fingers • Click "Place on Table" to view in Room
+</div>
+
+</div>
+
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
-  const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
-  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  let restaurant = null;
-  let allItems = [];
-  let signatureItems = [];
-  let currentCategory = "all";
-  let searchText = "";
-
-  const $ = id => document.getElementById(id);
-
-  function esc(value){
-    return String(value ?? "").replace(/[&<>"']/g, c => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-    }[c]));
-  }
-
-  function safeUrl(value){
-    const s = String(value || "").trim();
-    if(!s) return "";
-    try{
-      const u = new URL(s, location.origin);
-      if(u.protocol === "https:" || u.protocol === "http:") return u.href;
-    }catch(e){}
-    return "";
-  }
-
-  function categoryKey(value){
-    return String(value || "General").trim() || "General";
-  }
-
-  function sectionId(name){
-    return "cat-" + categoryKey(name).toLowerCase()
-      .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") || "general";
-  }
-
-  function itemType(item){
-    const t = String(item.item_type || "").toLowerCase();
-    if(t === "egg") return "egg";
-    if(t === "nonveg" || item.is_veg === false) return "nonveg";
-    return "veg";
-  }
-
-  function unavailable(item){
-    return item.is_available === false ||
-      item.available === false ||
-      item.status === "unavailable" ||
-      item.status === "out_of_stock";
-  }
-
-  function modelUrl(item){
-    return safeUrl(item.ar_model_url || item.model_url || item.glb_url || "");
-  }
-
-  function usdzUrl(item){
-    return safeUrl(item.ar_usdz_url || item.usdz_url || item.ios_src || item.ios_model_url || "");
-  }
-
-  function publicModelProxyUrl(url){
-    const value = String(url || "").trim();
-    if(!value) return "";
-    try{
-      const u = new URL(value, location.origin);
-      const marker = "/restaurants/";
-      const idx = u.pathname.indexOf(marker);
-      if(idx < 0) return value;
-      const key = u.pathname.slice(idx + 1);
-      if(!key.startsWith("restaurants/") || !key.includes("/signature-3d/")) return value;
-      return `${SUPABASE_URL}/functions/v1/signature-3d-model-upload?key=${encodeURIComponent(key)}`;
-    }catch(e){
-      return value;
-    }
-  }
-
-  function photoUrl(item){
-    return safeUrl(item.image_url || item.photo_url || item.image || item.photo || "");
-  }
-
-  function priceText(item){
-    const p = item.price_full ?? item.price;
-    return p !== null && p !== undefined && String(p).trim() !== ""
-      ? "₹" + esc(String(p).trim()) : "";
-  }
-
-  function priceVariants(item){
-    const out = [];
-    const q = String(item.price_quarter ?? "").trim();
-    const h = String(item.price_half ?? "").trim();
-    const f = String(item.price_full ?? item.price ?? "").trim();
-    if(q) out.push(`<span class="miniPrice">Quarter ₹${esc(q)}</span>`);
-    if(h) out.push(`<span class="miniPrice">Half ₹${esc(h)}</span>`);
-    if(f) out.push(`<span class="miniPrice">Full ₹${esc(f)}</span>`);
-    return out.join("");
-  }
-
-  function itemBadges(item){
-    const a = [];
-    if(item.is_bestseller === true || item.bestseller === true)
-      a.push(`<span class="badge hot">★ Bestseller</span>`);
-    if(item.is_recommended === true || item.recommended === true)
-      a.push(`<span class="badge">Recommended</span>`);
-    if(item.is_spicy === true || item.spicy === true)
-      a.push(`<span class="badge hot">🌶 Spicy</span>`);
-    if(unavailable(item))
-      a.push(`<span class="badge">Unavailable</span>`);
-    return a.join("");
-  }
-
-  function savedCategoryOrder(items){
-    const names = [...new Set(items.map(x => categoryKey(x.category)))];
-    const saved = Array.isArray(restaurant?.category_order)
-      ? restaurant.category_order.map(String) : [];
-    const rank = new Map(saved.map((x,i) => [x,i]));
-    return names.sort((a,b) =>
-      (rank.has(a) ? rank.get(a) : 999999) -
-      (rank.has(b) ? rank.get(b) : 999999) ||
-      a.localeCompare(b)
-    );
-  }
-
-  function filteredItems(items){
-    const q = searchText.trim().toLowerCase();
-    return items.filter(item => {
-      const category = categoryKey(item.category);
-      const categoryMatch = currentCategory === "all" || category === currentCategory;
-      const hay = `${item.name || ""} ${item.description || ""} ${category}`.toLowerCase();
-      return categoryMatch && (!q || hay.includes(q));
-    });
-  }
-
-  function renderCategories(){
-    const cats = savedCategoryOrder(allItems);
-    $("categoryChips").innerHTML =
-      `<button class="cat ${currentCategory === "all" ? "active" : ""}" data-category="all">All Menu</button>` +
-      cats.map(c =>
-        `<button class="cat ${currentCategory === c ? "active" : ""}" data-category="${esc(c)}">${esc(c)}</button>`
-      ).join("");
-  }
-
-  function renderSignature(){
-    const filtered = filteredItems(signatureItems);
-    $("signatureSection").style.display = filtered.length ? "" : "none";
-    $("signatureCount").textContent = `${filtered.length} dish${filtered.length === 1 ? "" : "es"}`;
-
-    $("signatureGrid").innerHTML = filtered.map((item, index) => {
-      const directSrc = modelUrl(item);
-      const proxySrc = publicModelProxyUrl(directSrc);
-      const usdzDirect = usdzUrl(item);
-      const usdzProxy = publicModelProxyUrl(usdzDirect);
-      const poster = photoUrl(item);
-      const modelId = `model-${index}-${String(item.id || item.name || "dish").replace(/[^a-zA-Z0-9_-]/g,"-")}`;
-
-      if(!directSrc){
-        return `
-          <article class="sigCard">
-            <div class="viewer">
-              ${poster ? `<img src="${esc(poster)}" alt="" style="width:100%;height:100%;object-fit:cover;opacity:.72">` : ""}
-              <div class="loadState"><div class="loadStateBox">
-                <strong>3D model unavailable</strong>
-                <small>No GLB model URL is stored for this dish.</small>
-              </div></div>
-            </div>
-            <div class="sigInfo">
-              <div class="sigTop"><div class="sigName">${esc(item.name || "Unnamed dish")}</div><div class="price">${priceText(item)}</div></div>
-              ${item.description ? `<div class="desc">${esc(item.description)}</div>` : ""}
-              <div class="badges">${itemBadges(item)}</div>
-            </div>
-          </article>`;
-      }
-
-      return `
-        <article class="sigCard">
-          <div class="viewer">
-            <model-viewer
-              id="${esc(modelId)}"
-              ${poster ? `poster="${esc(poster)}"` : ""}
-              camera-controls
-              touch-action="pan-y"
-              interaction-prompt="none"
-              auto-rotate
-              rotation-per-second="22deg"
-              ar
-              ar-modes="webxr scene-viewer quick-look"
-              shadow-intensity="1"
-              exposure="1"
-              loading="eager"
-              reveal="auto"
-              alt="${esc(item.name || "3D food model")}"
-              crossorigin="anonymous"
-              data-model-src="${esc(proxySrc)}"
-              data-direct-src="${esc(directSrc)}"
-              data-usdz-src="${esc(usdzProxy)}"
-              data-usdz-direct="${esc(usdzDirect)}">
-            </model-viewer>
-
-            <div class="loadState" id="${esc(modelId)}-state">
-              <div class="loadStateBox">
-                <strong>Loading 3D model…</strong>
-                <small>Preparing interactive 360° viewer…</small>
-                <a href="${esc(directSrc)}" target="_blank" rel="noopener noreferrer">Open 3D file</a>
-              </div>
-            </div>
-
-            <div class="viewerTools">
-              <button class="tool" type="button" data-rotate="${esc(modelId)}">↻ Rotate 360°</button>
-              <button class="tool" type="button" data-ar="${esc(modelId)}">View in AR</button>
-            </div>
-          </div>
-
-          <div class="sigInfo">
-            <div class="sigTop">
-              <div class="sigName">${esc(item.name || "Unnamed dish")}</div>
-              <div class="price">${priceText(item)}</div>
-            </div>
-            ${item.description ? `<div class="desc">${esc(item.description)}</div>` : ""}
-            ${priceVariants(item) ? `<div class="prices">${priceVariants(item)}</div>` : ""}
-            <div class="badges">${itemBadges(item)}</div>
-          </div>
-        </article>`;
-    }).join("");
-
-    document.querySelectorAll("model-viewer").forEach(viewer => {
-      const state = $(viewer.id + "-state");
-      const proxy = viewer.dataset.modelSrc || "";
-      const direct = viewer.dataset.directSrc || "";
-      const usdzProxy = viewer.dataset.usdzSrc || "";
-      const usdzDirect = viewer.dataset.usdzDirect || "";
-      let objectUrl = "";
-      let usdzObjectUrl = "";
-      let loaded = false;
-
-      const setState = (title, body, show = true) => {
-        if(!state) return;
-        state.style.display = show ? "grid" : "none";
-        const strong = state.querySelector("strong");
-        const small = state.querySelector("small");
-        if(strong) strong.textContent = title;
-        if(small) small.textContent = body;
-      };
-
-      viewer.addEventListener("load", () => {
-        loaded = true;
-        setState("", "", false);
-      });
-
-      viewer.addEventListener("progress", event => {
-        if(loaded) return;
-        const p = Math.round((event.detail?.totalProgress || 0) * 100);
-        const small = state?.querySelector("small");
-        if(small && p > 0) small.textContent = `Loading 3D model… ${p}%`;
-      });
-
-      viewer.addEventListener("error", () => {
-        if(loaded) return;
-        setState("3D model could not load", "The GLB could not be decoded. Open 3D file to verify the stored model.", true);
-      });
-
-      async function fetchModel(url, label){
-        if(!url) throw new Error(`${label} URL missing`);
-        // Public GET is intentionally JWT-free. Keep this request a simple CORS
-        // request so the browser does not trigger a preflight for `apikey`.
-        // If the gateway still asks for an API key, retry once with it.
-        let response = await fetch(url, {
-          mode:"cors",
-          credentials:"omit",
-          cache:"no-store"
-        });
-        if(response.status === 401 || response.status === 403){
-          response = await fetch(url, {
-            mode:"cors",
-            credentials:"omit",
-            cache:"no-store",
-            headers:{"apikey": SUPABASE_ANON_KEY}
-          });
-        }
-        if(!response.ok){
-          let detail = "";
-          try{ detail = (await response.text()).slice(0,320); }catch(e){}
-          throw new Error(`${label} HTTP ${response.status}${detail ? ` — ${detail}` : ""}`);
-        }
-
-        const buffer = await response.arrayBuffer();
-        if(!buffer.byteLength) throw new Error(`${label} is empty`);
-
-        if(label === "GLB") {
-          const head = new Uint8Array(buffer, 0, Math.min(4, buffer.byteLength));
-          const magic = String.fromCharCode(...head);
-          if(magic !== "glTF") throw new Error(`GLB response is not a valid GLB file (${magic || "no header"})`);
-        }
-
-        const mime = label === "USDZ" ? "model/vnd.usdz+zip" : "model/gltf-binary";
-        const blob = new Blob([buffer], {type:mime});
-        return URL.createObjectURL(blob);
-      }
-
-      (async () => {
-        try{
-          setState("Loading 3D model…", "Loading interactive 360° viewer…", true);
-
-          // Always use the same-origin-safe Edge Function first. The R2 custom
-          // domain is a separate origin and may be blocked by bucket CORS.
-          // The publishable key is sent in `apikey`, as required by Supabase.
-          try{
-            setState("Loading 3D model…", "Securely loading 3D asset…", true);
-            objectUrl = await fetchModel(proxy, "GLB");
-            viewer.src = objectUrl;
-
-            await new Promise((resolve, reject) => {
-              let done = false;
-              const ok = () => { if(!done){ done=true; cleanup(); resolve(); } };
-              const fail = () => { if(!done){ done=true; cleanup(); reject(new Error("Proxy GLB decode failed")); } };
-              const timer = setTimeout(fail, 15000);
-              const cleanup = () => {
-                clearTimeout(timer);
-                viewer.removeEventListener("load", ok);
-                viewer.removeEventListener("error", fail);
-              };
-              viewer.addEventListener("load", ok, {once:true});
-              viewer.addEventListener("error", fail, {once:true});
-            });
-          }catch(proxyError){
-            console.warn("Secure GLB delivery failed, trying direct R2 URL", proxyError);
-            if(!direct) throw proxyError;
-            setState("Loading 3D model…", "Trying direct 3D asset…", true);
-            viewer.src = direct;
-
-            await new Promise((resolve, reject) => {
-              let done = false;
-              const ok = () => { if(!done){ done=true; cleanup(); resolve(); } };
-              const fail = () => { if(!done){ done=true; cleanup(); reject(new Error("Direct GLB load failed — check R2 CORS")); } };
-              const timer = setTimeout(fail, 12000);
-              const cleanup = () => {
-                clearTimeout(timer);
-                viewer.removeEventListener("load", ok);
-                viewer.removeEventListener("error", fail);
-              };
-              viewer.addEventListener("load", ok, {once:true});
-              viewer.addEventListener("error", fail, {once:true});
-            });
-          }
-
-          // USDZ is fetched only for iOS AR, and is never allowed to block the GLB viewer.
-          if(usdzDirect || usdzProxy){
-            try{
-              usdzObjectUrl = await fetchModel(usdzDirect || usdzProxy, "USDZ");
-              viewer.setAttribute("ios-src", usdzObjectUrl);
-            }catch(e){
-              console.warn("USDZ optional load failed", e);
-            }
-          }
-        }catch(error){
-          console.error("3D model load failed", error);
-          const msg = String(error?.message || "Unknown 3D loading error");
-          setState("3D model could not load", msg.length > 180 ? msg.slice(0,180) + "…" : msg, true);
-        }
-      })();
-
-      viewer.addEventListener("load", () => {
-        if(objectUrl) viewer.dataset.objectUrl = objectUrl;
-        if(usdzObjectUrl) viewer.dataset.usdzObjectUrl = usdzObjectUrl;
-      }, {once:false});
-    });
-  }
-
-  function renderRegularMenu(){
-    const filtered = filteredItems(allItems);
-    $("menuCount").textContent = `${filtered.length} item${filtered.length === 1 ? "" : "s"}`;
-
-    if(!filtered.length){
-      $("menuSections").innerHTML =
-        `<div class="state">No dishes found. Try another search or category.</div>`;
-      return;
-    }
-
-    const grouped = {};
-    filtered.forEach(item => {
-      const c = categoryKey(item.category);
-      if(!grouped[c]) grouped[c] = [];
-      grouped[c].push(item);
-    });
-
-    const categories = savedCategoryOrder(Object.values(grouped).flat());
-
-    $("menuSections").innerHTML = categories.map(category => {
-      const items = grouped[category] || [];
-      items.sort((a,b) =>
-        Number(a.sort_order ?? a.position ?? 999999) -
-        Number(b.sort_order ?? b.position ?? 999999) ||
-        String(a.name || "").localeCompare(String(b.name || ""))
-      );
-
-      return `
-        <section class="section" id="${esc(sectionId(category))}">
-          <div class="sectionHead">
-            <div>
-              <div class="eyebrow">Category</div>
-              <h3>${esc(category)}</h3>
-            </div>
-            <span>${items.length} item${items.length === 1 ? "" : "s"}</span>
-          </div>
-          <div class="menuList">
-            ${items.map(item => `
-              <article class="menuRow">
-                <div class="rowMain">
-                  <div class="rowTitle">
-                    <span class="dot ${itemType(item)}"></span>
-                    <span class="rowName">${esc(item.name || "Unnamed item")}</span>
-                  </div>
-                  ${item.description ? `<div class="rowDesc">${esc(item.description)}</div>` : ""}
-                  ${itemBadges(item) ? `<div class="badges">${itemBadges(item)}</div>` : ""}
-                </div>
-                <div class="rowPrice">
-                  ${priceText(item)}
-                  ${priceVariants(item) ? `<div class="prices">${priceVariants(item)}</div>` : ""}
-                </div>
-              </article>
-            `).join("")}
-          </div>
-        </section>
-      `;
-    }).join("");
-  }
-
-  function renderAll(){
-    renderCategories();
-    renderSignature();
-    renderRegularMenu();
-
-    const hasAny = allItems.length > 0;
-    $("pageState").style.display = hasAny ? "none" : "";
-    if(!hasAny){
-      $("pageState").innerHTML =
-        `<strong>Menu is being prepared</strong><br><small>No menu items have been added yet.</small>`;
-    }
-  }
-
-  function renderRestaurant(){
-    const name = restaurant.name || "Restaurant";
-    document.title = `${name} • Signature Menu`;
-    $("restaurantName").textContent = name;
-    $("heroTitle").textContent = name;
-
-    const meta = [restaurant.address, restaurant.phone].filter(Boolean).join(" • ");
-    $("restaurantMeta").textContent = meta || "Digital menu";
-    $("heroMeta").textContent =
-      signatureItems.length
-        ? `${signatureItems.length} interactive 3D dish${signatureItems.length === 1 ? "" : "es"} • Rotate, zoom and view in AR`
-        : "Explore the restaurant menu";
-
-    const logo = safeUrl(restaurant.logo_url);
-    if(logo){
-      $("logoBox").outerHTML =
-        `<img id="logoBox" class="logo" src="${esc(logo)}" alt="${esc(name)} logo"
-          onerror="this.outerHTML='<div id=&quot;logoBox&quot; class=&quot;logoFallback&quot;>🍽</div>'">`;
-    }
-
-    const cover = safeUrl(restaurant.banner_url || restaurant.cover_url || restaurant.cover_image);
-    if(cover){
-      $("heroImage").src = cover;
-      $("heroImage").alt = name;
-      $("heroImage").style.display = "block";
-    }
-
-    if(restaurant.phone){
-      $("callBtn").style.display = "";
-      $("callBtn").onclick = () => location.href = `tel:${String(restaurant.phone).replace(/[^\d+]/g,"")}`;
-    }
-  }
-
-  async function loadMenu(){
-    const params = new URLSearchParams(location.search);
-    const slug = String(params.get("r") || "").trim().toLowerCase();
-
-    if(!slug){
-      $("pageState").style.display = "";
-      $("pageState").innerHTML = "<strong>Restaurant not found</strong><br><small>Missing menu slug.</small>";
-      return;
-    }
-
-    try{
-      const {data:rest,error:restError} = await supabaseClient
-        .from("restaurants")
-        .select("*")
-        .eq("slug",slug)
-        .limit(1)
-        .maybeSingle();
-
-      if(restError) throw restError;
-      if(!rest){
-        $("pageState").style.display = "";
-        $("pageState").innerHTML = "<strong>Restaurant not found</strong><br><small>Please check the menu link.</small>";
-        return;
-      }
-
-      restaurant = rest;
-
-      const {data:items,error:itemError} = await supabaseClient
-        .from("menu_items")
-        .select("*")
-        .eq("restaurant_id",rest.id);
-
-      if(itemError) throw itemError;
-
-      allItems = Array.isArray(items) ? items : [];
-      signatureItems = allItems.filter(item =>
-        item.ar_enabled === true &&
-        (item.signature_3d === true || !!modelUrl(item))
-      );
-
-      renderRestaurant();
-      renderAll();
-    }catch(error){
-      console.error("Signature menu load error:",error);
-      $("pageState").style.display = "";
-      $("pageState").innerHTML =
-        `<strong>Menu unavailable</strong><br><small>${esc(error?.message || "Please refresh and try again.")}</small>`;
-    }
-  }
-
-  $("categoryChips").addEventListener("click", event => {
-    const btn = event.target.closest("[data-category]");
-    if(!btn) return;
-    currentCategory = btn.dataset.category || "all";
-    renderAll();
-  });
-
-  $("searchInput").addEventListener("input", event => {
-    searchText = event.target.value || "";
-    renderAll();
-  });
-
-  $("shareBtn").onclick = async () => {
-    const shareData = {
-      title: `${restaurant?.name || "Restaurant"} • Signature Menu`,
-      text: `View the digital menu of ${restaurant?.name || "this restaurant"}.`,
-      url: location.href
-    };
-    try{
-      if(navigator.share) await navigator.share(shareData);
-      else{
-        await navigator.clipboard.writeText(location.href);
-        showToast("Menu link copied");
-      }
-    }catch(e){}
-  };
-
-  document.addEventListener("click", async event => {
-    const rotateBtn = event.target.closest("[data-rotate]");
-    if(rotateBtn){
-      const viewer = $(rotateBtn.dataset.rotate);
-      if(!viewer) return;
-      viewer.autoRotate = !viewer.autoRotate;
-      rotateBtn.textContent = viewer.autoRotate ? "↻ Rotate 360°" : "▶ Auto Rotate";
-      return;
-    }
-
-    const arBtn = event.target.closest("[data-ar]");
-    if(arBtn){
-      const viewer = $(arBtn.dataset.ar);
-      if(!viewer) return;
-
-      if(!viewer.loaded){
-        showToast("3D model abhi load ho raha hai. 2–3 seconds baad try karein.");
-        return;
-      }
-
-      if(typeof viewer.activateAR !== "function"){
-        showToast("AR is not supported on this browser/device.");
-        return;
-      }
-
-      try{
-        await viewer.activateAR();
-      }catch(e){
-        const ua = navigator.userAgent || "";
-        const isIOS = /iPhone|iPad|iPod/i.test(ua);
-        showToast(isIOS
-          ? "iPhone AR ke liye USDZ model upload hona chahiye."
-          : "AR is not available on this device/browser.");
-      }
-    }
-  });
-
-  function showToast(message){
-    $("toast").textContent = message;
-    $("toast").classList.add("show");
-    clearTimeout(window.__fmToast);
-    window.__fmToast = setTimeout(() => $("toast").classList.remove("show"),2200);
-  }
-
-  window.addEventListener("load",async () => {
-    try{
-      await customElements.whenDefined("model-viewer");
-    }catch(e){
-      console.warn("model-viewer custom element not ready",e);
-    }
-    await loadMenu();
-  });
+/* ================= FREE MENU CONFIG =================
+   Supabase browser key is the publishable/anon key only.
+   NEVER put Cloudflare R2 secret/access keys in this HTML.
+====================================================== */
+const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+
+/* Safe public Cloudflare R2/custom-domain values */
+const CLOUDFLARE_R2_PUBLIC_URL = "https://images.freemenu.in";
+const SIGNATURE_3D_FUNCTION_URL =
+  `${SUPABASE_URL}/functions/v1/signature-3d-model-upload`;
+
+const supabaseClient =
+  window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
+
+<script>
+/* ================= CATEGORY FILTER ================= */
+
+function filterCategory(category, e){
+
+    const sections =
+        document.querySelectorAll(".food-section");
+
+    const buttons =
+        document.querySelectorAll(".category");
+
+    buttons.forEach(btn=>{
+        btn.classList.remove("active");
+    });
+
+    if(e && e.currentTarget){
+        e.currentTarget.classList.add("active");
+    }
+
+    sections.forEach(section=>{
+
+        if(category === "all"){
+
+            section.style.display="block";
+
+        }
+        else{
+
+            if(section.dataset.category === category){
+
+                section.style.display="block";
+
+                section.scrollIntoView({
+                    behavior:"smooth",
+                    block:"start"
+                });
+
+            }
+            else{
+
+                section.style.display="none";
+
+            }
+
+        }
+
+    });
+
+}
+
+
+/* ================= 3D VIEW & AR ================= */
+
+function open3D(name, modelURL){
+
+    document.getElementById("modelTitle")
+        .innerText = name + " — 3D View";
+
+    const viewer =
+        document.getElementById("foodModel");
+
+    viewer.setAttribute("src", modelURL);
+
+    document
+        .getElementById("modal")
+        .classList.add("show");
+
+    document.body.style.overflow = "hidden"; // Stop background scroll
+}
+
+
+function close3D(){
+
+    const modal =
+        document.getElementById("modal");
+
+    modal.classList.remove("show");
+
+    const viewer = document.getElementById("foodModel");
+    viewer.removeAttribute("src"); // Clear WebGL buffer
+
+    document.body.style.overflow = "auto";
+}
+
+
+/* Close modal on backdrop click */
+
+document
+.getElementById("modal")
+.addEventListener("click",function(e){
+
+    if(e.target === this){
+
+        close3D();
+
+    }
+
+});
+
+</script>
+
 </body>
 </html>
