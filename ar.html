@@ -1,415 +1,1353 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Grand Feast - Digital 3D Menu</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Google ka Official WebAR Model Viewer Library -->
-  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+<title>Signature Menu | Urban Punjab</title>
 
-  <style>
-    :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --border: #e2e8f0;
+<!-- Google Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+<!-- 3D Model Viewer Library -->
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    background:#090a0b;
+    color:#fff;
+    font-family:Inter,Arial,sans-serif;
+}
+
+.container{
+    width:100%;
+    max-width:1200px;
+    margin:auto;
+}
+
+/* ================= HEADER ================= */
+
+.header{
+    min-height:230px;
+    padding:20px 25px;
+    position:relative;
+    overflow:hidden;
+
+    background:
+    linear-gradient(rgba(0,0,0,.68),rgba(0,0,0,.88)),
+    url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=85");
+
+    background-size:cover;
+    background-position:center;
+    border-bottom:1px solid #8e6723;
+}
+
+.header-inner{
+    max-width:1100px;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    gap:35px;
+}
+
+.logo{
+    width:175px;
+    height:175px;
+    border:3px solid #e6b84c;
+    border-radius:50%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+
+    background:#050505;
+    box-shadow:
+        0 0 25px rgba(229,177,65,.25),
+        inset 0 0 20px rgba(229,177,65,.12);
+}
+
+.logo-icon{
+    font-size:46px;
+    color:#e8bd58;
+    margin-bottom:5px;
+}
+
+.logo h2{
+    color:#e9bb50;
+    font-size:21px;
+    letter-spacing:2px;
+}
+
+.logo p{
+    color:#fff;
+    font-size:12px;
+    letter-spacing:2px;
+}
+
+.logo small{
+    color:#e9bb50;
+    margin-top:8px;
+}
+
+.brand{
+    flex:1;
+}
+
+.signature{
+    font-family:"Playfair Display",serif;
+    font-size:55px;
+    font-style:italic;
+    color:#e9bb50;
+}
+
+.brand-title{
+    font-family:"Playfair Display",serif;
+    font-size:68px;
+    line-height:.9;
+    color:#f5cc68;
+    letter-spacing:2px;
+}
+
+.tagline{
+    margin-top:12px;
+    font-size:14px;
+    letter-spacing:6px;
+    color:#fff;
+}
+
+.subtag{
+    margin-top:12px;
+    color:#e8bc54;
+    font-family:"Playfair Display",serif;
+    font-style:italic;
+    font-size:20px;
+}
+
+/* ================= CATEGORY NAV ================= */
+
+.category-wrap{
+    padding:12px 15px;
+    background:#0b0c0d;
+    position:sticky;
+    top:0;
+    z-index:20;
+}
+
+.categories{
+    max-width:1100px;
+    margin:auto;
+
+    display:flex;
+    overflow-x:auto;
+
+    border:1px solid #3c3c3c;
+    border-radius:20px;
+    background:#101112;
+}
+
+.categories::-webkit-scrollbar{
+    display:none;
+}
+
+.category{
+    min-width:115px;
+    padding:14px 17px;
+    border:0;
+    border-right:1px solid #333;
+    background:transparent;
+    color:#ddd;
+    cursor:pointer;
+    font-size:13px;
+    transition:.25s;
+}
+
+.category span{
+    display:block;
+    font-size:22px;
+    margin-bottom:4px;
+}
+
+.category.active{
+    background:linear-gradient(135deg,#ffe19a,#e7a832);
+    color:#111;
+    font-weight:800;
+    border-radius:17px;
+}
+
+/* ================= SECTION ================= */
+
+.section{
+    padding:25px 20px 5px;
+}
+
+.section-title{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:18px;
+}
+
+.section-title h2{
+    font-family:"Playfair Display",serif;
+    color:#f0ca6b;
+    font-size:28px;
+    white-space:nowrap;
+}
+
+.line{
+    height:1px;
+    background:linear-gradient(90deg,#dcae4c,transparent);
+    flex:1;
+}
+
+.view-all{
+    color:#e9bd5b;
+    font-size:14px;
+    white-space:nowrap;
+}
+
+/* ================= FOOD GRID ================= */
+
+.food-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+}
+
+.food-card{
+    background:#111314;
+    border:1px solid #393939;
+    border-radius:15px;
+    overflow:hidden;
+
+    box-shadow:
+    0 5px 20px rgba(0,0,0,.35);
+
+    transition:.25s;
+}
+
+.food-card:hover{
+    transform:translateY(-4px);
+    border-color:#d7a83d;
+}
+
+.food-img{
+    height:205px;
+    position:relative;
+    overflow:hidden;
+}
+
+.food-img img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    transition:.4s;
+}
+
+.food-card:hover .food-img img{
+    transform:scale(1.06);
+}
+
+.veg{
+    position:absolute;
+    right:10px;
+    top:10px;
+
+    width:21px;
+    height:21px;
+
+    background:#fff;
+    border:2px solid #1c9d4d;
+    border-radius:4px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.veg::after{
+    content:"";
+    width:9px;
+    height:9px;
+    background:#19a14a;
+    border-radius:50%;
+}
+
+.food-content{
+    padding:14px;
+}
+
+.food-name-row{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+}
+
+.food-name{
+    font-size:17px;
+    font-weight:700;
+}
+
+.price{
+    color:#f5c85c;
+    font-size:17px;
+    font-weight:800;
+    white-space:nowrap;
+}
+
+.description{
+    color:#aaa;
+    font-size:13px;
+    line-height:1.45;
+    min-height:38px;
+    margin:7px 0 12px;
+}
+
+/* ================= BUTTONS ================= */
+
+.actions{
+    display:flex;
+    gap:8px;
+}
+
+.btn{
+    height:42px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:700;
+    font-size:13px;
+    transition:.2s;
+}
+
+.btn-3d{
+    width: 100%;
+    background:#0b0c0d;
+    color:#f5cc68;
+    border:1px solid #e8b33f;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    letter-spacing: 0.5px;
+}
+
+.btn-3d:hover{
+    background:linear-gradient(135deg, #ffe08c, #e5a735);
+    color:#111;
+    border-color: #ffe08c;
+    box-shadow: 0 0 15px rgba(232, 179, 63, 0.4);
+}
+
+/* ================= FOOTER ================= */
+
+.footer{
+    margin-top:30px;
+    padding:30px 20px;
+
+    border-top:1px solid #333;
+    background:#070809;
+}
+
+.footer-inner{
+    max-width:1100px;
+    margin:auto;
+
+    display:grid;
+    grid-template-columns:1.2fr 1fr 1fr 170px;
+    gap:25px;
+    align-items:center;
+}
+
+.footer-title{
+    color:#e8b950;
+    font-size:12px;
+    letter-spacing:2px;
+}
+
+.footer-text{
+    margin-top:7px;
+    color:#ddd;
+    font-size:13px;
+    line-height:1.6;
+}
+
+.ar-button{
+    height:52px;
+    padding:0 20px;
+
+    border:1px solid #e5b443;
+    border-radius:30px;
+
+    background:#111;
+    color:#f3c75d;
+
+    font-weight:700;
+    cursor:pointer;
+}
+
+.ar-button:hover{
+    background:#e5b443;
+    color:#111;
+}
+
+.qr{
+    width:110px;
+    height:110px;
+    background:#fff;
+    padding:6px;
+    border-radius:8px;
+}
+
+.qr img{
+    width:100%;
+    height:100%;
+}
+
+/* ================= 3D MODAL & AR ================= */
+
+.modal{
+    position:fixed;
+    inset:0;
+
+    background:rgba(0,0,0,.88);
+    backdrop-filter: blur(5px);
+
+    display:none;
+    align-items:center;
+    justify-content:center;
+
+    z-index:1000;
+    padding:20px;
+}
+
+.modal.show{
+    display:flex;
+}
+
+.modal-box{
+    width:min(550px,100%);
+    height:min(680px,88vh);
+
+    background:#101112;
+    border:1px solid #dbaa42;
+    border-radius:20px;
+
+    position:relative;
+    overflow:hidden;
+
+    box-shadow:0 0 50px rgba(225,174,62,.25);
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-header{
+    height:60px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:0 20px;
+    border-bottom:1px solid #222;
+}
+
+.modal-header h3{
+    color:#efc25b;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.close{
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    border:1px solid #444;
+    background:#181919;
+    color:#fff;
+    cursor:pointer;
+    font-size:20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close:hover{
+    background: #e8b33f;
+    color: #111;
+}
+
+model-viewer{
+    width:100%;
+    flex: 1;
+    background: radial-gradient(circle,#252525,#090a0b 75%);
+}
+
+/* Native AR Placement Button */
+.ar-view-btn {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #ffe08c, #e5a735);
+    color: #111;
+    border: none;
+    padding: 11px 22px;
+    border-radius: 25px;
+    font-weight: 800;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.modal-tip {
+    text-align: center;
+    font-size: 11.5px;
+    color: #888;
+    padding: 10px;
+    background: #08090a;
+    border-top: 1px solid #1c1d1e;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:900px){
+
+    .food-grid{
+        grid-template-columns:repeat(2,1fr);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    .header-inner{
+        gap:20px;
     }
 
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      padding-bottom: 50px;
+    .brand-title{
+        font-size:50px;
     }
 
-    /* Restaurant Header */
-    .header {
-      background: var(--card-bg);
-      padding: 22px 16px;
-      text-align: center;
-      border-bottom: 1px solid var(--border);
-    }
-    .res-title {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-    }
-    .res-subtitle {
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 4px;
+    .signature{
+        font-size:40px;
     }
 
-    /* Category Navigation */
-    .cat-bar {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding: 12px 16px;
-      background: var(--card-bg);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      border-bottom: 1px solid var(--border);
-      scrollbar-width: none;
-    }
-    .cat-bar::-webkit-scrollbar { display: none; }
-    .cat-btn {
-      white-space: nowrap;
-      padding: 6px 14px;
-      border-radius: 20px;
-      border: 1px solid var(--border);
-      background: #f1f5f9;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      cursor: pointer;
-    }
-    .cat-btn.active {
-      background: var(--primary);
-      color: #fff;
-      border-color: var(--primary);
+}
+
+@media(max-width:600px){
+
+    .header{
+        min-height:200px;
+        padding:15px;
     }
 
-    /* Menu Container */
-    .menu-container {
-      max-width: 600px;
-      margin: 16px auto;
-      padding: 0 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
+    .header-inner{
+        gap:14px;
     }
 
-    /* Dish Card */
-    .dish-card {
-      background: var(--card-bg);
-      border-radius: 14px;
-      padding: 16px;
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      border: 1px solid var(--border);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    .logo{
+        width:100px;
+        height:100px;
     }
 
-    .dish-info {
-      flex: 1;
+    .logo-icon{
+        font-size:25px;
     }
 
-    /* Veg/Non-Veg Indicators */
-    .diet-icon {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border: 2px solid;
-      border-radius: 3px;
-      position: relative;
-      margin-bottom: 6px;
-    }
-    .diet-veg { border-color: #16a34a; }
-    .diet-veg::after {
-      content: '';
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      background: #16a34a;
-      border-radius: 50%;
-      top: 2px;
-      left: 2px;
-    }
-    .diet-nonveg { border-color: #dc2626; }
-    .diet-nonveg::after {
-      content: '';
-      position: absolute;
-      width: 6px;
-      height: 6px;
-      background: #dc2626;
-      border-radius: 50%;
-      top: 2px;
-      left: 2px;
+    .logo h2{
+        font-size:12px;
     }
 
-    .dish-name {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 4px;
+    .logo p,
+    .logo small{
+        font-size:7px;
     }
 
-    .dish-desc {
-      font-size: 12.5px;
-      color: var(--muted);
-      line-height: 1.4;
-      margin-bottom: 8px;
+    .signature{
+        font-size:28px;
     }
 
-    .dish-price {
-      font-size: 15px;
-      font-weight: 800;
+    .brand-title{
+        font-size:38px;
     }
 
-    /* Right Action Side */
-    .dish-action {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: flex-end;
+    .tagline{
+        font-size:8px;
+        letter-spacing:2px;
     }
 
-    /* 3D Button */
-    .btn-3d {
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
-      color: #ffffff;
-      border: none;
-      padding: 9px 14px;
-      border-radius: 10px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
-      transition: transform 0.15s;
-    }
-    .btn-3d:active {
-      transform: scale(0.96);
+    .subtag{
+        font-size:12px;
     }
 
-    /* Popup Modal for 3D/AR */
-    #ar-modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.75);
-      backdrop-filter: blur(4px);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-      padding: 16px;
+    .food-grid{
+        grid-template-columns:1fr 1fr;
+        gap:10px;
     }
 
-    .modal-box {
-      background: #ffffff;
-      width: 100%;
-      max-width: 440px;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
-      display: flex;
-      flex-direction: column;
+    .section{
+        padding:20px 10px 5px;
     }
 
-    .modal-header {
-      padding: 14px 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border);
+    .food-img{
+        height:135px;
     }
 
-    .modal-header h3 {
-      font-size: 16px;
-      font-weight: 700;
+    .food-content{
+        padding:10px;
     }
 
-    .modal-close-btn {
-      background: #f1f5f9;
-      border: none;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--muted);
-      cursor: pointer;
+    .food-name{
+        font-size:14px;
     }
 
-    /* Model Viewer */
-    model-viewer {
-      width: 100%;
-      height: 360px;
-      background-color: #f8fafc;
+    .price{
+        font-size:14px;
     }
 
-    /* Native AR Placement Button */
-    .ar-native-btn {
-      position: absolute;
-      bottom: 16px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #0f172a;
-      color: #ffffff;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 24px;
-      font-size: 13px;
-      font-weight: 700;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+    .description{
+        font-size:11px;
     }
 
-    .modal-footer {
-      padding: 12px;
-      text-align: center;
-      font-size: 12px;
-      color: var(--muted);
-      background: #fafafa;
+    .btn{
+        height:37px;
+        font-size:11px;
     }
-  </style>
+
+    .footer-inner{
+        grid-template-columns:1fr;
+        text-align:center;
+    }
+
+    .qr{
+        margin:auto;
+    }
+}
+
+</style>
 </head>
+
+
 <body>
 
-  <!-- Restaurant Header -->
-  <header class="header">
-    <h1 class="res-title">The Grand Feast</h1>
-    <p class="res-subtitle">Live 3D & Augmented Reality Digital Menu</p>
-  </header>
 
-  <!-- Categories -->
-  <nav class="cat-bar">
-    <button class="cat-btn active">All Items</button>
-    <button class="cat-btn">Signature Dishes</button>
-    <button class="cat-btn">Bakery & Breads</button>
-    <button class="cat-btn">Main Course</button>
-  </nav>
+<!-- ================= HEADER ================= -->
 
-  <!-- Menu Listing -->
-  <main class="menu-container">
+<header class="header">
 
-    <!-- Dish 1: 3D AR Enabled -->
-    <div class="dish-card">
-      <div class="dish-info">
-        <span class="diet-icon diet-veg"></span>
-        <h3 class="dish-name">Tandoori Stuffed Naan & Dip</h3>
-        <p class="dish-desc">Crisp clay-oven baked bread loaded with seasoned filling and served with signature dips.</p>
-        <div class="dish-price">₹180</div>
-      </div>
-      <div class="dish-action">
-        <button class="btn-3d" onclick="open3DModal('https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/SheenChair/glTF-Binary/SheenChair.glb', 'Tandoori Stuffed Naan')">
-          👓 3D View
-        </button>
-      </div>
+<div class="header-inner">
+
+    <div class="logo">
+
+        <div class="logo-icon">🍴</div>
+
+        <h2>URBAN</h2>
+        <h2>PUNJAB</h2>
+
+        <p>RESTAURANT</p>
+
+        <small>SINCE 1971</small>
+
     </div>
 
-    <!-- Dish 2: 3D AR Enabled -->
-    <div class="dish-card">
-      <div class="dish-info">
-        <span class="diet-icon diet-veg"></span>
-        <h3 class="dish-name">Artisan Ceramic Tea Cup</h3>
-        <p class="dish-desc">Freshly brewed herbal tea served in traditional handmade earthen ceramic pottery.</p>
-        <div class="dish-price">₹120</div>
-      </div>
-      <div class="dish-action">
-        <button class="btn-3d" onclick="open3DModal('https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/AntiqueCamera/glTF-Binary/AntiqueCamera.glb', 'Artisan Earthen Cup')">
-          👓 3D View
-        </button>
-      </div>
+
+    <div class="brand">
+
+        <div class="signature">
+            Signature
+        </div>
+
+        <div class="brand-title">
+            MENU
+        </div>
+
+        <div class="tagline">
+            FAMILY • FOOD • RESTAURANT
+        </div>
+
+        <div class="subtag">
+            Authentic Flavours, Timeless Taste
+        </div>
+
     </div>
 
-    <!-- Dish 3: Regular Item (Without 3D Model) -->
-    <div class="dish-card">
-      <div class="dish-info">
-        <span class="diet-icon diet-nonveg"></span>
-        <h3 class="dish-name">Murg Butter Masala</h3>
-        <p class="dish-desc">Tender boneless roasted chicken simmered in rich creamy tomato and cashew butter gravy.</p>
-        <div class="dish-price">₹360</div>
-      </div>
-      <div class="dish-action">
-        <!-- Normal items don't have 3D button -->
-      </div>
-    </div>
+</div>
 
-    <!-- Dish 4: Regular Item -->
-    <div class="dish-card">
-      <div class="dish-info">
-        <span class="diet-icon diet-veg"></span>
-        <h3 class="dish-name">Dal Makhani Special</h3>
-        <p class="diet-desc dish-desc">Slow-cooked black lentils overnight with fresh cream and clarified butter.</p>
-        <div class="dish-price">₹240</div>
-      </div>
-      <div class="dish-action">
-      </div>
-    </div>
+</header>
 
-  </main>
 
-  <!-- 3D WebAR Viewer Modal -->
-  <div id="ar-modal">
-    <div class="modal-box">
-      <!-- Modal Header -->
-      <div class="modal-header">
-        <h3 id="modal-dish-name">3D Preview</h3>
-        <button class="modal-close-btn" onclick="close3DModal()">✕</button>
-      </div>
 
-      <!-- Live 3D & WebAR Viewer -->
-      <div style="position: relative;">
-        <model-viewer id="dish-viewer"
-                      src=""
-                      ar
-                      ar-modes="webxr scene-viewer quick-look"
-                      camera-controls
-                      auto-rotate
-                      rotation-per-second="25deg"
-                      shadow-intensity="1.5"
-                      environment-image="neutral">
-          
-          <!-- Native AR Launch Button -->
-          <button slot="ar-button" class="ar-native-btn">
-            📱 Place on Table (AR)
-          </button>
-        </model-viewer>
-      </div>
+<!-- ================= CATEGORY ================= -->
 
-      <!-- Modal Footer Instructions -->
-      <div class="modal-footer">
-        👆 1-Finger se rotate karein • 2-Fingers se zoom karein • AR button se table par dekhein
-      </div>
-    </div>
-  </div>
+<div class="category-wrap">
 
-  <!-- Interactive JavaScript Logic -->
-  <script>
-    const modal = document.getElementById('ar-modal');
-    const viewer = document.getElementById('dish-viewer');
-    const dishNameHeader = document.getElementById('modal-dish-name');
+<div class="categories">
 
-    // 3D Modal Open Function
-    function open3DModal(glbUrl, dishTitle) {
-      dishNameHeader.innerText = dishTitle;
-      viewer.setAttribute('src', glbUrl);
-      modal.style.display = 'flex';
-      document.body.style.overflow = 'hidden'; // Stop background scroll
-    }
+<button class="category active" onclick="filterCategory('all', event)">
+<span>▦</span>
+All
+</button>
 
-    // 3D Modal Close Function
-    function close3DModal() {
-      viewer.setAttribute('src', ''); // Clear memory
-      modal.style.display = 'none';
-      document.body.style.overflow = 'auto'; // Restore scroll
-    }
+<button class="category" onclick="filterCategory('starters', event)">
+<span>🌿</span>
+Starters
+</button>
 
-    // Modal background click se close
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        close3DModal();
-      }
+<button class="category" onclick="filterCategory('soups', event)">
+<span>🍲</span>
+Soups
+</button>
+
+<button class="category" onclick="filterCategory('main', event)">
+<span>🍛</span>
+Main Course
+</button>
+
+<button class="category" onclick="filterCategory('rice', event)">
+<span>🍚</span>
+Rice & Biryani
+</button>
+
+<button class="category" onclick="filterCategory('breads', event)">
+<span>🥖</span>
+Breads
+</button>
+
+<button class="category" onclick="filterCategory('salad', event)">
+<span>🥗</span>
+Salad & Raita
+</button>
+
+<button class="category" onclick="filterCategory('beverages', event)">
+<span>🥤</span>
+Beverages
+</button>
+
+</div>
+
+</div>
+
+
+
+<main class="container">
+
+
+<!-- ================= STARTERS ================= -->
+
+<section class="section food-section" data-category="starters">
+
+<div class="section-title">
+
+<h2>🌿 Starters</h2>
+
+<div class="line"></div>
+
+<div class="view-all">
+View All →
+</div>
+
+</div>
+
+
+<div class="food-grid">
+
+
+<!-- ITEM 1: Working 3D Enabled -->
+
+<div class="food-card">
+
+<div class="food-img">
+
+<img src="https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=85">
+
+<div class="veg"></div>
+
+</div>
+
+<div class="food-content">
+
+<div class="food-name-row">
+
+<div class="food-name">
+Paneer Tikka
+</div>
+
+<div class="price">
+₹280
+</div>
+
+</div>
+
+<div class="description">
+Soft paneer cubes marinated in spices and grilled to perfection.
+</div>
+
+<div class="actions">
+
+<!-- Working Verified 3D Model -->
+<button class="btn btn-3d"
+onclick="open3D('Paneer Tikka','https://modelviewer.dev/shared-assets/models/glTF-Sample-Assets/Models/SheenChair/glTF-Binary/SheenChair.glb')">
+◈ 3D View
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- ITEM 2: Working 3D Enabled -->
+
+<div class="food-card">
+
+<div class="food-img">
+
+<img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=85">
+
+<div class="veg"></div>
+
+</div>
+
+<div class="food-content">
+
+<div class="food-name-row">
+
+<div class="food-name">
+Tandoori Mushroom
+</div>
+
+<div class="price">
+₹260
+</div>
+
+</div>
+
+<div class="description">
+Juicy mushrooms marinated with special tandoori spices.
+</div>
+
+<div class="actions">
+
+<!-- Working Verified 3D Model -->
+<button class="btn btn-3d"
+onclick="open3D('Tandoori Mushroom','https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb')">
+◈ 3D View
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- ITEM 3: Regular Item (Preview Only) -->
+
+<div class="food-card">
+
+<div class="food-img">
+
+<img src="https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?auto=format&fit=crop&w=800&q=85">
+
+<div class="veg"></div>
+
+</div>
+
+<div class="food-content">
+
+<div class="food-name-row">
+
+<div class="food-name">
+Hara Bhara Kebab
+</div>
+
+<div class="price">
+₹240
+</div>
+
+</div>
+
+<div class="description">
+Healthy and tasty mix veg kebab with aromatic herbs.
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- ITEM 4: Regular Item -->
+
+<div class="food-card">
+
+<div class="food-img">
+
+<img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=800&q=85">
+
+<div class="veg"></div>
+
+</div>
+
+<div class="food-content">
+
+<div class="food-name-row">
+
+<div class="food-name">
+Crispy Corn
+</div>
+
+<div class="price">
+₹220
+</div>
+
+</div>
+
+<div class="description">
+Crispy golden corn tossed with Indo-Chinese spices.
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- ITEM 5: Regular Item -->
+
+<div class="food-card">
+
+<div class="food-img">
+
+<img src="https://images.unsplash.com/photo-1562967916-eb82221dfb36?auto=format&fit=crop&w=800&q=85">
+
+<div class="veg"></div>
+
+</div>
+
+<div class="food-content">
+
+<div class="food-name-row">
+
+<div class="food-name">
+Chilli Paneer
+</div>
+
+<div class="price">
+₹260
+</div>
+
+</div>
+
+<div class="description">
+Paneer cubes tossed in spicy chilli sauce with peppers.
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- ITEM 6: Regular Item -->
+
+<div class="food-card">
+
+<div class="food-img">
+
+<img src="https://images.unsplash.com/photo-1628294895950-9805252327bc?auto=format&fit=crop&w=800&q=85">
+
+<div class="veg"></div>
+
+</div>
+
+<div class="food-content">
+
+<div class="food-name-row">
+
+<div class="food-name">
+Honey Chilli Potato
+</div>
+
+<div class="price">
+₹220
+</div>
+
+</div>
+
+<div class="description">
+Crispy potatoes tossed in sweet and spicy honey chilli sauce.
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ================= SOUPS ================= -->
+
+<section class="section food-section" data-category="soups">
+
+<div class="section-title">
+
+<h2>🍲 Soups</h2>
+
+<div class="line"></div>
+
+<div class="view-all">
+View All →
+</div>
+
+</div>
+
+
+<div class="food-grid">
+
+
+<div class="food-card">
+
+<div class="food-img">
+
+<img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=85">
+
+<div class="veg"></div>
+
+</div>
+
+<div class="food-content">
+
+<div class="food-name-row">
+
+<div class="food-name">
+Hot & Sour Soup
+</div>
+
+<div class="price">
+₹140
+</div>
+
+</div>
+
+<div class="description">
+Spicy and tangy soup with vegetables and herbs.
+</div>
+
+</div>
+
+</div>
+
+
+
+<div class="food-card">
+
+<div class="food-img">
+
+<img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=85">
+
+<div class="veg"></div>
+
+</div>
+
+<div class="food-content">
+
+<div class="food-name-row">
+
+<div class="food-name">
+Manchow Soup
+</div>
+
+<div class="price">
+₹140
+</div>
+
+</div>
+
+<div class="description">
+Classic Indo-Chinese soup with a rich flavour.
+</div>
+
+</div>
+
+</div>
+
+
+
+<div class="food-card">
+
+<div class="food-img">
+
+<img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=85">
+
+<div class="veg"></div>
+
+</div>
+
+<div class="food-content">
+
+<div class="food-name-row">
+
+<div class="food-name">
+Sweet Corn Soup
+</div>
+
+<div class="price">
+₹140
+</div>
+
+</div>
+
+<div class="description">
+A creamy and comforting corn soup.
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer class="footer">
+
+<div class="footer-inner">
+
+<div>
+
+<div class="footer-title">
+ADDRESS
+</div>
+
+<div class="footer-text">
+C-207/208, Jhilmil Colony<br>
+Delhi - 110095
+</div>
+
+</div>
+
+
+<div>
+
+<div class="footer-title">
+CONTACT
+</div>
+
+<div class="footer-text">
+011-2214-4545<br>
+8447000853 | 8447000854
+</div>
+
+</div>
+
+
+<div>
+
+<button class="ar-button"
+onclick="alert('Select any dish with ◈ 3D View and tap Place on Table to view in AR!')">
+
+▣ &nbsp; Interactive AR Active
+
+</button>
+
+</div>
+
+
+<div>
+
+<div class="qr">
+
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://freemenu.in">
+
+</div>
+
+</div>
+
+</div>
+
+<p style="
+text-align:center;
+color:#777;
+font-size:11px;
+margin-top:25px;
+">
+Rate & items can be changed without prior notice
+</p>
+
+</footer>
+
+
+
+<!-- ================= 3D / AR MODAL ================= -->
+
+<div class="modal" id="modal">
+
+<div class="modal-box">
+
+<div class="modal-header">
+
+<h3 id="modelTitle">
+3D Food Preview
+</h3>
+
+<button class="close" onclick="close3D()">
+×
+</button>
+
+</div>
+
+
+<model-viewer
+id="foodModel"
+src=""
+camera-controls
+auto-rotate
+rotation-per-second="30deg"
+ar
+ar-modes="webxr scene-viewer quick-look"
+shadow-intensity="1.5"
+environment-image="neutral"
+alt="3D Dish Preview">
+
+<button slot="ar-button" class="ar-view-btn">
+📱 Place on Table (AR)
+</button>
+
+</model-viewer>
+
+<div class="modal-tip">
+Rotate & Zoom with fingers • Click "Place on Table" to view in Room
+</div>
+
+</div>
+
+</div>
+
+
+
+<script>
+
+/* ================= CATEGORY FILTER ================= */
+
+function filterCategory(category, e){
+
+    const sections =
+        document.querySelectorAll(".food-section");
+
+    const buttons =
+        document.querySelectorAll(".category");
+
+    buttons.forEach(btn=>{
+        btn.classList.remove("active");
     });
-  </script>
+
+    if(e && e.currentTarget){
+        e.currentTarget.classList.add("active");
+    }
+
+    sections.forEach(section=>{
+
+        if(category === "all"){
+
+            section.style.display="block";
+
+        }
+        else{
+
+            if(section.dataset.category === category){
+
+                section.style.display="block";
+
+                section.scrollIntoView({
+                    behavior:"smooth",
+                    block:"start"
+                });
+
+            }
+            else{
+
+                section.style.display="none";
+
+            }
+
+        }
+
+    });
+
+}
+
+
+/* ================= 3D VIEW & AR ================= */
+
+function open3D(name, modelURL){
+
+    document.getElementById("modelTitle")
+        .innerText = name + " — 3D View";
+
+    const viewer =
+        document.getElementById("foodModel");
+
+    viewer.setAttribute("src", modelURL);
+
+    document
+        .getElementById("modal")
+        .classList.add("show");
+
+    document.body.style.overflow = "hidden"; // Stop background scroll
+}
+
+
+function close3D(){
+
+    const modal =
+        document.getElementById("modal");
+
+    modal.classList.remove("show");
+
+    const viewer = document.getElementById("foodModel");
+    viewer.removeAttribute("src"); // Clear WebGL buffer
+
+    document.body.style.overflow = "auto";
+}
+
+
+/* Close modal on backdrop click */
+
+document
+.getElementById("modal")
+.addEventListener("click",function(e){
+
+    if(e.target === this){
+
+        close3D();
+
+    }
+
+});
+
+</script>
 
 </body>
 </html>
