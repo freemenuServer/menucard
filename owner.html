@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Owner Dashboard — Digital Menu</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
@@ -167,12 +166,6 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .authCombinedForm .loginCard.active{display:block!important}
 @media(max-width:760px){.ownerAuthSplit{grid-template-columns:1fr!important}.freemenu-login-brand{display:block!important;min-height:250px}.freemenu-login-brand-inner{padding:28px}.freemenu-login-brand h1{font-size:36px}.authRightPanel{min-height:auto!important;padding:28px 22px!important}}
 </style>
-
-<style>
-.signature3dBox{margin-top:18px;border:1px solid #ead8b0;border-radius:16px;background:linear-gradient(135deg,#fffaf0,#fff);padding:16px;box-shadow:0 8px 24px rgba(83,54,18,.06)}
-.signature3dHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.signature3dTitle{font-weight:900;color:#6b4310}.signature3dBadge{font-size:10px;font-weight:900;padding:5px 8px;border-radius:999px;background:#f3e8c8;color:#76520e}.signature3dLocked{font-size:12px;color:#7a5b1a;background:#fff7df;border:1px solid #f0d58e;border-radius:10px;padding:10px}.signature3dFields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.signature3dField label{display:block;font-size:10px;font-weight:900;color:#667085;margin-bottom:6px}.signature3dField input[type=file]{width:100%;font-size:11px}.signature3dStatus{margin-top:7px;font-size:10px;color:#667085}.signature3dLimit{margin-top:10px;font-size:10px;font-weight:800;color:#7a5b1a}.signature3dProgress{height:7px;border-radius:99px;background:#eee7d7;margin-top:7px;overflow:hidden}.signature3dProgress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#d8ad62,#8e5d18);transition:width .25s}
-@media(max-width:680px){.signature3dFields{grid-template-columns:1fr}}
-</style>
 </head>
 
 <body>
@@ -296,7 +289,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     <a class="navItem" href="#analytics" data-section="analytics"><i class="fa-solid fa-chart-column"></i> Analytics</a>
     <a class="navItem" href="#settings" data-section="settings"><i class="fa-solid fa-gear"></i> Settings</a>
     <a class="navItem" href="#support" data-section="support"><i class="fa-regular fa-circle-question"></i> Help & Support</a>
-    <a class="navItem" href="/owner/plans.html" id="plansNavLink"><i class="fa-solid fa-crown"></i> Plans & Pricing</a>
+    <a class="navItem" href="/plans.html" id="plansNavLink"><i class="fa-solid fa-crown"></i> Plans & Pricing</a>
   </nav>
   <div class="sidePromo">
     <i class="fa-solid fa-crown"></i><strong>Grow Your Business</strong>
@@ -355,7 +348,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     </div>
     <div class="planFeatureList" id="currentPlanFeatures"></div>
     <div class="planSummaryActions">
-      <a class="btn sm" href="/owner/plans.html"><i class="fa-solid fa-list"></i> View Plans & Pricing</a>
+      <a class="btn sm" href="/plans.html"><i class="fa-solid fa-list"></i> View Plans & Pricing</a>
       <span class="muted" id="currentPlanNote" style="font-size:10px">Plan details are controlled by FreeMenu Super Admin.</span>
     </div>
   </div>
@@ -623,18 +616,36 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
    <input class="input" type="number" id="mHalf" placeholder="Half ₹" min="0">
    <input class="input" type="number" id="mFull" placeholder="Full ₹" min="0">
   </div>
-  <div class="signature3dBox" id="signature3dBox">
-   <div class="signature3dHead"><div class="signature3dTitle">♛ Signature 3D / AR</div><span class="signature3dBadge" id="signature3dPlanBadge">PLAN CHECKING…</span></div>
-   <div id="signature3dLocked" class="signature3dLocked" style="display:none"></div>
-   <div id="signature3dControls">
-    <div class="signature3dFields">
-     <div class="signature3dField"><label>GLB 3D MODEL • CLOUDFLARE R2</label><input type="file" id="mGlbFile" accept=".glb,model/gltf-binary"><div class="signature3dStatus" id="mGlbStatus">No new GLB selected</div></div>
-     <div class="signature3dField"><label>USDZ • iPHONE AR OPTIONAL</label><input type="file" id="mUsdzFile" accept=".usdz,model/vnd.usdz+zip"><div class="signature3dStatus" id="mUsdzStatus">No new USDZ selected</div></div>
+  <div class="photoUploadBox" id="menuPhotoBox">
+    <label style="display:block;font-size:11px;font-weight:800;color:#64748b;margin-bottom:6px">Food Photo <span class="planBadgeInline planBadgePhotos">GROWTH • PHOTOS</span></label>
+    <div style="display:flex;gap:7px;align-items:center">
+      <input class="input" id="mPhotoUrl" placeholder="Food photo URL" readonly>
+      <input type="file" id="mPhotoFile" accept="image/*" hidden>
+      <button type="button" class="fileBtn" id="chooseMenuPhoto">Choose</button>
+      <button type="button" class="btn blue" id="uploadMenuPhoto">Upload</button>
     </div>
-    <div class="signature3dLimit" id="signature3dLimitText">Signature 3D is available only on eligible plans.</div>
-    <div class="signature3dProgress"><i id="signature3dProgressBar"></i></div>
-   </div>
+    <img id="mPhotoPreview" class="photoPreview" alt="Food photo preview">
+    <div class="muted" id="menuPhotoPlanText" style="font-size:9px;margin-top:5px">Growth plan required for food photos.</div>
   </div>
+
+  <div class="arUploadBox" id="signature3DBox">
+    <label style="display:block;font-size:11px;font-weight:800;color:#64748b;margin-bottom:4px">Signature 3D / AR <span class="planBadgeInline planBadge3d">SIGNATURE 3D</span></label>
+    <div id="signature3DPlanText" class="muted" style="font-size:10px">Checking current plan…</div>
+    <div class="arUploadGrid" style="margin-top:9px">
+      <div>
+        <input type="file" id="mGlbFile" accept=".glb,model/gltf-binary" hidden>
+        <button type="button" class="fileBtn" id="chooseGlbFile">Choose GLB</button>
+        <div class="arFileName" id="glbFileName">No GLB selected</div>
+      </div>
+      <div>
+        <input type="file" id="mUsdzFile" accept=".usdz,model/vnd.usdz+zip" hidden>
+        <button type="button" class="fileBtn" id="chooseUsdzFile">Choose USDZ</button>
+        <div class="arFileName" id="usdzFileName">No USDZ selected</div>
+      </div>
+    </div>
+    <div class="muted" style="font-size:9px;margin-top:7px">GLB is used for 3D viewer/WebAR. USDZ is used by compatible iPhone/iPad Quick Look.</div>
+  </div>
+
   <div class="formGroup" style="margin-top:16px"><label>Menu Item Status</label><button type="button" class="menuStatusBtn on" id="mAvailableSwitch"><span class="dot"></span><span id="mAvailableText">ON • Visible</span></button></div>
   <div style="margin-top:18px;display:flex;justify-content:flex-end;gap:8px"><button class="btn" data-close="itemModal">Cancel</button><button class="btn primary" id="saveItem"><i class="fa-solid fa-floppy-disk"></i> Save Item</button></div>
  </div>
@@ -665,10 +676,10 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 
 let session=null,currentRestaurant=null,currentRestaurantId=null,items=[],activeSection="dashboard";
 let mediaRules={max_mb:1,logo_enabled:true,banner_enabled:true,gallery_paid_enabled:false};
-let isPremiumRestaurant=false;
 let currentPlan=null;
 let signature3dLimit=0;
 let signature3dCount=0;
+let isPremiumRestaurant=false;
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
@@ -1026,6 +1037,7 @@ async function loadCurrentPlan(){
     return x.startsWith("/")?x:"/ "+x.replace(/^\/\s*/,"");
   };
   const renderNoPlan=()=>{
+    currentPlan=null; signature3dLimit=0; signature3dCount=0; updateSignature3DUI();
     nameEl.textContent="No plan assigned";
     descEl.textContent="Ask Super Admin to assign a plan to this restaurant.";
     priceEl.innerHTML='—';
@@ -1066,7 +1078,9 @@ async function loadCurrentPlan(){
 
   currentPlan=plan;
   signature3dLimit=Math.max(0,Number(plan.signature_3d_dishes_max||0));
+  await refreshSignature3DCount();
   updateSignature3DUI();
+
   nameEl.textContent=plan.name||"Current Plan";
   descEl.textContent=plan.description||"";
   priceEl.innerHTML=`${money(plan.monthly_price)} <small>${esc(period(plan.period_label))}</small>`;
@@ -1092,29 +1106,32 @@ async function loadCurrentPlan(){
 }
 
 function isSignature3DPlan(){
-  return signature3dLimit>0;
+  return signature3dLimit>0 || /signature|full.*3d/i.test(`${currentPlan?.slug||""} ${currentPlan?.name||""}`);
+}
+async function refreshSignature3DCount(){
+  signature3dCount=0;
+  if(!currentRestaurantId || !signature3dLimit)return;
+  const {count,error}=await supabaseClient.from("menu_items").select("id",{count:"exact",head:true}).eq("restaurant_id",currentRestaurantId).eq("ar_enabled",true);
+  if(!error)signature3dCount=Number(count||0);
 }
 function updateSignature3DUI(){
-  const box=$("signature3dBox"), badge=$("signature3dPlanBadge"), locked=$("signature3dLocked"), controls=$("signature3dControls");
-  if(!box)return;
-  if(!isSignature3DPlan()){
-    badge.textContent="LOCKED"; badge.style.background="#f2f4f7"; badge.style.color="#667085";
-    locked.style.display="block"; locked.innerHTML='🔒 Signature 3D is available on the <b>Signature 3D</b> and <b>Full 3D Experience</b> plans. <a href="/owner/plans.html" style="font-weight:900;color:#7a4f10">View Plans</a>';
-    controls.style.display="none";
-  }else{
-    badge.textContent=`${signature3dCount}/${signature3dLimit} AR DISHES`;
-    badge.style.background="#ecfdf3"; badge.style.color="#067647";
-    locked.style.display="none"; controls.style.display="block";
-    $("signature3dLimitText").textContent=`${signature3dCount} of ${signature3dLimit} Signature 3D dishes used. Uploading a GLB to a new item uses 1 slot.`;
-    const pct=signature3dLimit?Math.min(100,(signature3dCount/signature3dLimit)*100):0;
-    if($("signature3dProgressBar"))$("signature3dProgressBar").style.width=pct+"%";
+  const box=$("signature3DBox"),txt=$("signature3DPlanText");
+  const allowed=isSignature3DPlan();
+  if(box)box.classList.toggle("locked",!allowed);
+  if(txt){
+    if(allowed)txt.innerHTML=`<b>${esc(currentPlan?.name||"Signature 3D")}</b> • ${signature3dCount}/${signature3dLimit} Signature 3D dishes used.`;
+    else txt.textContent="Signature 3D / Full 3D plan required for AR model uploads.";
   }
 }
-function resetSignature3DInputs(item){
-  if($("mGlbFile"))$("mGlbFile").value="";
-  if($("mUsdzFile"))$("mUsdzFile").value="";
-  if($("mGlbStatus"))$("mGlbStatus").textContent=item?.ar_model_url?"Existing GLB is already connected. Choose a new file to replace it.":"No new GLB selected";
-  if($("mUsdzStatus"))$("mUsdzStatus").textContent=item?.ar_usdz_url?"Existing USDZ is already connected. Choose a new file to replace it.":"No new USDZ selected";
+function isGrowthPhotoPlan(){
+  const key=`${currentPlan?.slug||""} ${currentPlan?.name||""}`.toLowerCase();
+  return key.includes("growth") || key.includes("signature") || key.includes("full 3d") || key.includes("3d-experience");
+}
+function updateMenuPhotoUI(){
+  const allowed=isGrowthPhotoPlan();
+  if($("chooseMenuPhoto"))$("chooseMenuPhoto").disabled=!allowed;
+  if($("uploadMenuPhoto"))$("uploadMenuPhoto").disabled=!allowed;
+  if($("menuPhotoPlanText"))$("menuPhotoPlanText").textContent=allowed?"Photo upload is available on Growth / Signature 3D / Full 3D plans.":"Growth (Photos) or higher plan required for food photos.";
 }
 async function uploadSignature3DAsset(file,itemId,assetType){
   if(!file)throw new Error(`Choose a ${assetType.toUpperCase()} file first.`);
@@ -1131,24 +1148,32 @@ async function uploadSignature3DAsset(file,itemId,assetType){
   const response=await fetch(`${SUPABASE_URL}/functions/v1/signature-3d-model-upload`,{method:"POST",headers:{Authorization:`Bearer ${activeSession.access_token}`,apikey:SUPABASE_ANON_KEY},body:fd});
   let result={}; try{result=await response.json()}catch(e){}
   if(!response.ok)throw new Error(result?.error||`3D R2 upload failed (${response.status})`);
-  // Some versions of the upload function return object_key/key instead of url.
-  // Build the public Cloudflare R2 URL from that key so Save does not fail.
-  const returnedUrl = String(result?.url || result?.public_url || result?.publicUrl || "").trim();
-  const returnedKey = String(result?.object_key || result?.key || result?.path || "").trim();
+  const returnedUrl=String(result?.url||result?.public_url||result?.publicUrl||"").trim();
+  const returnedKey=String(result?.object_key||result?.key||result?.path||"").trim();
   if(returnedUrl)return returnedUrl;
-  if(returnedKey){
-    const publicBase="https://images.freemenu.in";
-    return `${publicBase}/${returnedKey.replace(/^\/+/,"")}`;
-  }
-  throw new Error(result?.message || "Cloudflare R2 uploaded the model but returned neither a public URL nor an object key.");
+  if(returnedKey)return `https://images.freemenu.in/${returnedKey.replace(/^\/+/,"")}`;
+  throw new Error(result?.message||"Cloudflare R2 uploaded the model but returned no public URL.");
+}
+async function uploadMenuPhoto(){
+  if(!isGrowthPhotoPlan())return toast("Growth (Photos) plan or higher is required for food photos.");
+  const file=$("mPhotoFile")?.files?.[0];
+  if(!file)return toast("Choose a food photo first.");
+  if(!file.type.startsWith("image/"))return toast("Only image files are allowed.");
+  if(file.size>10*1024*1024)return toast("Food photo must be 10 MB or smaller.");
+  try{
+    $("uploadMenuPhoto").disabled=true;$("uploadMenuPhoto").textContent="Uploading...";
+    const url=await uploadToR2(file,"menu-items");
+    $("mPhotoUrl").value=url;
+    if($("mPhotoPreview")){ $("mPhotoPreview").src=url; $("mPhotoPreview").style.display="block"; }
+    toast("Food photo uploaded to Cloudflare R2");
+  }catch(error){console.error("Menu photo upload error:",error);toast("Food photo upload failed: "+(error?.message||"Unknown error"));}
+  finally{ $("uploadMenuPhoto").disabled=!isGrowthPhotoPlan(); $("uploadMenuPhoto").textContent="Upload"; }
 }
 
 async function loadItems(){
   const {data,error}=await supabaseClient.from("menu_items").select("*").eq("restaurant_id",currentRestaurantId).order("id",{ascending:false});
   if(error){toast(error.message);return}
   items=data||[];renderAll();
-  signature3dCount=items.filter(i=>i?.ar_enabled===true && (i?.ar_model_url||i?.signature_3d)).length;
-  updateSignature3DUI();
 }
 
 /* ---------- Rendering ---------- */
@@ -1175,11 +1200,11 @@ function filtered(source,search,cat,type){
 function rowActions(i){return `<div class="actions"><button class="btn blue sm editItem" data-id="${i.id}"><i class="fa-solid fa-pen"></i></button><button class="btn danger sm deleteItem" data-id="${i.id}"><i class="fa-solid fa-trash"></i></button></div>`}
 function renderDashboardTable(){
  const list=filtered(items,$("menuSearch").value,$("menuCategoryFilter").value,$("menuTypeFilter").value);
- $("dashboardItems").innerHTML=list.length?list.slice(0,8).map(i=>`<tr><td><div class="foodName">${esc(i.name)}</div><div class="foodCat">${esc(i.category||"General")}</div></td><td>${typeCell(i)}</td><td class="pricesMini">${esc(priceText(i))}</td><td><button type="button" class="menuStatusBtn ${i.is_available!==false?"on":"off"}" data-status="${i.id}" title="Click to turn menu item ${i.is_available!==false?"OFF":"ON"}"><span class="dot"></span><span>${i.is_available!==false?"ON • Visible":"OFF • Hidden"}</span></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="5" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
+ $("dashboardItems").innerHTML=list.length?list.slice(0,8).map(i=>`<tr><td><div class="foodName">${esc(i.name)} ${i.ar_enabled&&i.ar_model_url?`<span class="planBadgeInline planBadge3d">3D AR</span>`:""}</div><div class="foodCat">${esc(i.category||"General")}${i.image_url?` • Photo`:""}</div></td><td>${typeCell(i)}</td><td class="pricesMini">${esc(priceText(i))}</td><td><button type="button" class="menuStatusBtn ${i.is_available!==false?"on":"off"}" data-status="${i.id}" title="Click to turn menu item ${i.is_available!==false?"OFF":"ON"}"><span class="dot"></span><span>${i.is_available!==false?"ON • Visible":"OFF • Hidden"}</span></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="5" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
 }
 function renderFullTable(){
  const list=filtered(items,$("fullSearch").value,$("fullCatFilter").value,$("fullTypeFilter").value);
- $("fullItems").innerHTML=list.length?list.map(i=>`<tr><td><div class="foodName">${esc(i.name)}</div><div class="foodCat">${esc(i.description||"")}</div></td><td>${esc(i.category||"General")}</td><td>${typeCell(i)}</td><td>${i.price??"—"}</td><td>${i.price_quarter??"—"}</td><td>${i.price_half??"—"}</td><td>${i.price_full??"—"}</td><td><button type="button" class="menuStatusBtn ${i.is_available!==false?"on":"off"}" data-status="${i.id}" title="Click to turn menu item ${i.is_available!==false?"OFF":"ON"}"><span class="dot"></span><span>${i.is_available!==false?"ON • Visible":"OFF • Hidden"}</span></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="9" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
+ $("fullItems").innerHTML=list.length?list.map(i=>`<tr><td><div class="foodName">${esc(i.name)} ${i.ar_enabled&&i.ar_model_url?`<span class="planBadgeInline planBadge3d">3D AR</span>`:""}</div><div class="foodCat">${esc(i.description||"")}${i.image_url?` • Photo`:""}</div></td><td>${esc(i.category||"General")}</td><td>${typeCell(i)}</td><td>${i.price??"—"}</td><td>${i.price_quarter??"—"}</td><td>${i.price_half??"—"}</td><td>${i.price_full??"—"}</td><td><button type="button" class="menuStatusBtn ${i.is_available!==false?"on":"off"}" data-status="${i.id}" title="Click to turn menu item ${i.is_available!==false?"OFF":"ON"}"><span class="dot"></span><span>${i.is_available!==false?"ON • Visible":"OFF • Hidden"}</span></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="9" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
 }
 function renderCategories(){
  const html=categories().map(c=>{
@@ -1202,6 +1227,12 @@ function openItem(id=null){
  $("mAvailable").value=String(i?.is_available!==false);
  $("mAvailableSwitch").className=`switch ${i?.is_available!==false?"on":""}`;
  $("mAvailableText").textContent=i?.is_available!==false?"ON — Visible":"OFF — Hidden";
+ $("mPhotoUrl").value=i?.image_url||i?.photo_url||i?.image||i?.photo||"";
+ if($("mPhotoPreview")){const u=$("mPhotoUrl").value;$("mPhotoPreview").src=u;$("mPhotoPreview").style.display=u?"block":"none";}
+ $("mPhotoFile").value="";$("mGlbFile").value="";$("mUsdzFile").value="";
+ $("glbFileName").textContent=i?.ar_model_url?"Existing GLB linked — choose a new file to replace":"No GLB selected";
+ $("usdzFileName").textContent=i?.ar_usdz_url?"Existing USDZ linked — choose a new file to replace":"No USDZ selected";
+ updateSignature3DUI();updateMenuPhotoUI();
  $("itemModal").classList.add("show");
 }
 async function saveItem(){
@@ -1209,44 +1240,34 @@ async function saveItem(){
  if(!name)return toast("Item name is required");
  const glbFile=$("mGlbFile")?.files?.[0]||null;
  const usdzFile=$("mUsdzFile")?.files?.[0]||null;
+ const photoUrl=$("mPhotoUrl")?.value.trim()||null;
  const existing=id?items.find(x=>String(x.id)===String(id)):null;
- if((glbFile||usdzFile) && !isSignature3DPlan())return toast("Signature 3D plan is required for 3D/AR uploads.");
- if(glbFile && !existing && signature3dCount>=signature3dLimit)return toast(`Signature 3D limit reached (${signature3dLimit} dishes).`);
+ if((glbFile||usdzFile)&&!isSignature3DPlan())return toast("Signature 3D plan is required for 3D/AR uploads.");
+ if((glbFile||usdzFile)&&!existing&&signature3dCount>=signature3dLimit)return toast(`Signature 3D limit reached (${signature3dLimit} dishes).`);
  const payload={name,category,description,item_type,is_veg:item_type==="veg",price:cleanNum($("mPrice").value),price_quarter:cleanNum($("mQtr").value),price_half:cleanNum($("mHalf").value),price_full:cleanNum($("mFull").value),is_available:$("mAvailable").value!=="false"};
+ if(photoUrl)payload.image_url=photoUrl;
  $("saveItem").disabled=true;$("saveItem").textContent="Saving...";
  try{
-   let savedId=id;
-   if(id){
-     const res=await supabaseClient.from("menu_items").update(payload).eq("id",id).eq("restaurant_id",currentRestaurantId).select("id").single();
-     if(res.error)throw res.error;
-     savedId=res.data.id;
-   }else{
-     const res=await supabaseClient.from("menu_items").insert([{restaurant_id:currentRestaurantId,...payload}]).select("id").single();
-     if(res.error)throw res.error;
-     savedId=res.data.id;
-   }
-   let arModelUrl=existing?.ar_model_url||null, arUsdzUrl=existing?.ar_usdz_url||null;
-   if(glbFile){
-     $("saveItem").textContent="Uploading GLB to Cloudflare...";
-     arModelUrl=await uploadSignature3DAsset(glbFile,savedId,"glb");
-   }
-   if(usdzFile){
-     $("saveItem").textContent="Uploading USDZ to Cloudflare...";
-     arUsdzUrl=await uploadSignature3DAsset(usdzFile,savedId,"usdz");
-   }
-   if(glbFile||usdzFile){
-     const arUpdate={ar_enabled:true,signature_3d:true,ar_model_url:arModelUrl,ar_usdz_url:arUsdzUrl,ar_storage_provider:"cloudflare-r2"};
-     const arRes=await supabaseClient.from("menu_items").update(arUpdate).eq("id",savedId).eq("restaurant_id",currentRestaurantId);
-     if(arRes.error)throw arRes.error;
-   }
-   $("itemModal").classList.remove("show");toast(id?"Item updated":"Item added");await loadItems();
- }catch(e){
-   console.error(e);toast("Save failed: "+(e?.message||e));
- }finally{
-   $("saveItem").disabled=false;$("saveItem").innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Item';
- }
+  let savedId=id;
+  if(id){
+    const res=await supabaseClient.from("menu_items").update(payload).eq("id",id).eq("restaurant_id",currentRestaurantId).select("id").single();
+    if(res.error)throw res.error;savedId=res.data.id;
+  }else{
+    const res=await supabaseClient.from("menu_items").insert([{restaurant_id:currentRestaurantId,...payload}]).select("id").single();
+    if(res.error)throw res.error;savedId=res.data.id;
+  }
+  let arModelUrl=existing?.ar_model_url||null,arUsdzUrl=existing?.ar_usdz_url||null;
+  if(glbFile){$("saveItem").textContent="Uploading GLB to Cloudflare...";arModelUrl=await uploadSignature3DAsset(glbFile,savedId,"glb");}
+  if(usdzFile){$("saveItem").textContent="Uploading USDZ to Cloudflare...";arUsdzUrl=await uploadSignature3DAsset(usdzFile,savedId,"usdz");}
+  if(glbFile||usdzFile){
+    const arUpdate={ar_enabled:true,signature_3d:true,ar_model_url:arModelUrl,ar_usdz_url:arUsdzUrl,ar_storage_provider:"cloudflare-r2"};
+    const arRes=await supabaseClient.from("menu_items").update(arUpdate).eq("id",savedId).eq("restaurant_id",currentRestaurantId);
+    if(arRes.error)throw arRes.error;
+  }
+  $("itemModal").classList.remove("show");toast(id?"Item updated":"Item added");await loadItems();await refreshSignature3DCount();updateSignature3DUI();
+ }catch(e){console.error(e);toast("Save failed: "+(e?.message||e));}
+ finally{$("saveItem").disabled=false;$("saveItem").innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Item';}
 }
-
 async function deleteItem(id){
  if(!confirm("Delete this menu item?"))return;
  const {error}=await supabaseClient.from("menu_items").delete().eq("id",id).eq("restaurant_id",currentRestaurantId);
@@ -1272,15 +1293,15 @@ document.addEventListener("click",e=>{
  if(status)toggleAvailability(status.dataset.status,status);
 });
 $("saveItem").onclick=saveItem;$("openAdd").onclick=()=>openItem();$("openAdd2").onclick=()=>openItem();
+$("chooseMenuPhoto").onclick=()=>$("mPhotoFile").click();
+$("mPhotoFile").onchange=()=>{const f=$("mPhotoFile").files[0];if(f){$("mPhotoUrl").value="";$("mPhotoPreview").style.display="none";$("menuPhotoPlanText").textContent=f.name}};
+$("uploadMenuPhoto").onclick=uploadMenuPhoto;
+$("chooseGlbFile").onclick=()=>$("mGlbFile").click();
+$("mGlbFile").onchange=()=>{$("glbFileName").textContent=$("mGlbFile").files[0]?.name||"No GLB selected"};
+$("chooseUsdzFile").onclick=()=>$("mUsdzFile").click();
+$("mUsdzFile").onchange=()=>{$("usdzFileName").textContent=$("mUsdzFile").files[0]?.name||"No USDZ selected"};
 $("menuSearch").oninput=renderDashboardTable;$("menuCategoryFilter").onchange=renderDashboardTable;$("menuTypeFilter").onchange=renderDashboardTable;
 $("fullSearch").oninput=renderFullTable;$("fullCatFilter").onchange=renderFullTable;$("fullTypeFilter").onchange=renderFullTable;
-
-$("mGlbFile")?.addEventListener("change",()=>{
- const f=$("mGlbFile").files?.[0]; if($("mGlbStatus"))$("mGlbStatus").textContent=f?`${f.name} • ${(f.size/1024/1024).toFixed(1)} MB`:"No new GLB selected";
-});
-$("mUsdzFile")?.addEventListener("change",()=>{
- const f=$("mUsdzFile").files?.[0]; if($("mUsdzStatus"))$("mUsdzStatus").textContent=f?`${f.name} • ${(f.size/1024/1024).toFixed(1)} MB`:"No new USDZ selected";
-});
 
 /* ---------- Profile ---------- */
 $("saveProfile").onclick=async()=>{
@@ -1345,7 +1366,7 @@ $("downloadQR").onclick=()=>{const a=document.createElement("a");a.href=$("qrBox
 /* ---------- Public menu ---------- */
 function openPublic(){window.open(publicUrl(),"_blank","noopener")}
 ["publicTop","sidePublicBtn","quickPreview","openPublic2"].forEach(id=>$(id).onclick=openPublic);
-$("sidePlansBtn").onclick=()=>{window.location.href="/owner/plans.html"};
+$("sidePlansBtn").onclick=()=>{window.location.href="/plans.html"};
 
 /* ---------- Theme preview ---------- */
 function updateTheme(){
@@ -1429,6 +1450,7 @@ async function refreshMediaPolicyUI(){
     }
   }
   renderGalleryList();
+  updateSignature3DUI();updateMenuPhotoUI();
 }
 function validateMediaFile(file){
   if(!file)return "Choose an image first.";
