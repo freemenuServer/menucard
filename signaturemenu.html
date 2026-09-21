@@ -989,6 +989,7 @@ Rate & items can be changed without prior notice
 
 <model-viewer
 id="foodModel"
+crossorigin="anonymous"
 src=""
 camera-controls
 auto-rotate
@@ -1083,12 +1084,34 @@ function is3D(item){
   );
 }
 
+function r2BrowserUrl(rawUrl){
+  const raw=String(rawUrl||"").trim();
+  if(!raw) return "";
+
+  // Cloudflare R2 custom-domain objects can download directly, but the
+  // browser/model-viewer also needs a CORS-readable response. Route our
+  // Signature 3D objects through the public Supabase Edge Function proxy.
+  try{
+    const u=new URL(raw,location.origin);
+    const host=(u.hostname||"").toLowerCase();
+    const isFreemenuR2 = host === "images.freemenu.in";
+    const isSignatureObject = u.pathname.includes("/signature-3d/");
+    if(isFreemenuR2 && isSignatureObject){
+      const key=u.pathname.replace(/^\//,"");
+      return `${SIGNATURE_3D_FUNCTION_URL}?key=${encodeURIComponent(key)}`;
+    }
+  }catch(e){
+    console.warn("3D URL parse failed",e);
+  }
+  return raw;
+}
+
 function modelUrl(item){
-  return String(item.ar_model_url || "").trim();
+  return r2BrowserUrl(item.ar_model_url);
 }
 
 function usdzUrl(item){
-  return String(item.ar_usdz_url || "").trim();
+  return r2BrowserUrl(item.ar_usdz_url);
 }
 
 function setRestaurantBrand(rest){
