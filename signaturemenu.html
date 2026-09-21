@@ -1,1103 +1,1900 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Signature Menu | Urban Punjab</title>
-
-<!-- Google Font -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
-
-<!-- 3D Model Viewer Library -->
-<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-
-<style>
-
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-}
-
-body{
-    background:#090a0b;
-    color:#fff;
-    font-family:Inter,Arial,sans-serif;
-}
-
-.container{
-    width:100%;
-    max-width:1200px;
-    margin:auto;
-}
-
-/* ================= HEADER ================= */
-
-.header{
-    min-height:230px;
-    padding:20px 25px;
-    position:relative;
-    overflow:hidden;
-
-    background:
-    linear-gradient(rgba(0,0,0,.68),rgba(0,0,0,.88)),
-    url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=85");
-
-    background-size:cover;
-    background-position:center;
-    border-bottom:1px solid #8e6723;
-}
-
-.header-inner{
-    max-width:1100px;
-    margin:auto;
-    display:flex;
-    align-items:center;
-    gap:35px;
-}
-
-.logo{
-    width:175px;
-    height:175px;
-    border:3px solid #e6b84c;
-    border-radius:50%;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    flex-shrink:0;
-
-    background:#050505;
-    box-shadow:
-        0 0 25px rgba(229,177,65,.25),
-        inset 0 0 20px rgba(229,177,65,.12);
-}
-
-.logo-icon{
-    font-size:46px;
-    color:#e8bd58;
-    margin-bottom:5px;
-}
-
-.logo h2{
-    color:#e9bb50;
-    font-size:21px;
-    letter-spacing:2px;
-}
-
-.logo p{
-    color:#fff;
-    font-size:12px;
-    letter-spacing:2px;
-}
-
-.logo small{
-    color:#e9bb50;
-    margin-top:8px;
-}
-
-.brand{
-    flex:1;
-}
-
-.signature{
-    font-family:"Playfair Display",serif;
-    font-size:55px;
-    font-style:italic;
-    color:#e9bb50;
-}
-
-.brand-title{
-    font-family:"Playfair Display",serif;
-    font-size:68px;
-    line-height:.9;
-    color:#f5cc68;
-    letter-spacing:2px;
-}
-
-.tagline{
-    margin-top:12px;
-    font-size:14px;
-    letter-spacing:6px;
-    color:#fff;
-}
-
-.subtag{
-    margin-top:12px;
-    color:#e8bc54;
-    font-family:"Playfair Display",serif;
-    font-style:italic;
-    font-size:20px;
-}
-
-/* ================= CATEGORY NAV ================= */
-
-.category-wrap{
-    padding:12px 15px;
-    background:#0b0c0d;
-    position:sticky;
-    top:0;
-    z-index:20;
-}
-
-.categories{
-    max-width:1100px;
-    margin:auto;
-
-    display:flex;
-    overflow-x:auto;
-
-    border:1px solid #3c3c3c;
-    border-radius:20px;
-    background:#101112;
-}
-
-.categories::-webkit-scrollbar{
-    display:none;
-}
-
-.category{
-    min-width:115px;
-    padding:14px 17px;
-    border:0;
-    border-right:1px solid #333;
-    background:transparent;
-    color:#ddd;
-    cursor:pointer;
-    font-size:13px;
-    transition:.25s;
-}
-
-.category span{
-    display:block;
-    font-size:22px;
-    margin-bottom:4px;
-}
-
-.category.active{
-    background:linear-gradient(135deg,#ffe19a,#e7a832);
-    color:#111;
-    font-weight:800;
-    border-radius:17px;
-}
-
-/* ================= SECTION ================= */
-
-.section{
-    padding:25px 20px 5px;
-}
-
-.section-title{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    margin-bottom:18px;
-}
-
-.section-title h2{
-    font-family:"Playfair Display",serif;
-    color:#f0ca6b;
-    font-size:28px;
-    white-space:nowrap;
-}
-
-.line{
-    height:1px;
-    background:linear-gradient(90deg,#dcae4c,transparent);
-    flex:1;
-}
-
-.view-all{
-    color:#e9bd5b;
-    font-size:14px;
-    white-space:nowrap;
-}
-
-/* ================= FOOD GRID ================= */
-
-.food-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:16px;
-}
-
-.food-card{
-    background:#111314;
-    border:1px solid #393939;
-    border-radius:15px;
-    overflow:hidden;
-
-    box-shadow:
-    0 5px 20px rgba(0,0,0,.35);
-
-    transition:.25s;
-}
-
-.food-card:hover{
-    transform:translateY(-4px);
-    border-color:#d7a83d;
-}
-
-.food-img{
-    height:205px;
-    position:relative;
-    overflow:hidden;
-}
-
-.food-img img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    transition:.4s;
-}
-
-.food-card:hover .food-img img{
-    transform:scale(1.06);
-}
-
-.veg{
-    position:absolute;
-    right:10px;
-    top:10px;
-
-    width:21px;
-    height:21px;
-
-    background:#fff;
-    border:2px solid #1c9d4d;
-    border-radius:4px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-
-.veg::after{
-    content:"";
-    width:9px;
-    height:9px;
-    background:#19a14a;
-    border-radius:50%;
-}
-
-.food-content{
-    padding:14px;
-}
-
-.food-name-row{
-    display:flex;
-    justify-content:space-between;
-    gap:8px;
-}
-
-.food-name{
-    font-size:17px;
-    font-weight:700;
-}
-
-.price{
-    color:#f5c85c;
-    font-size:17px;
-    font-weight:800;
-    white-space:nowrap;
-}
-
-.description{
-    color:#aaa;
-    font-size:13px;
-    line-height:1.45;
-    min-height:38px;
-    margin:7px 0 12px;
-}
-
-/* ================= BUTTONS ================= */
-
-.actions{
-    display:flex;
-    gap:8px;
-}
-
-.btn{
-    height:42px;
-    border-radius:10px;
-    cursor:pointer;
-    font-weight:700;
-    font-size:13px;
-    transition:.2s;
-}
-
-.btn-3d{
-    width: 100%;
-    background:#0b0c0d;
-    color:#f5cc68;
-    border:1px solid #e8b33f;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    letter-spacing: 0.5px;
-}
-
-.btn-3d:hover{
-    background:linear-gradient(135deg, #ffe08c, #e5a735);
-    color:#111;
-    border-color: #ffe08c;
-    box-shadow: 0 0 15px rgba(232, 179, 63, 0.4);
-}
-
-/* ================= FOOTER ================= */
-
-.footer{
-    margin-top:30px;
-    padding:30px 20px;
-
-    border-top:1px solid #333;
-    background:#070809;
-}
-
-.footer-inner{
-    max-width:1100px;
-    margin:auto;
-
-    display:grid;
-    grid-template-columns:1.2fr 1fr 1fr 170px;
-    gap:25px;
-    align-items:center;
-}
-
-.footer-title{
-    color:#e8b950;
-    font-size:12px;
-    letter-spacing:2px;
-}
-
-.footer-text{
-    margin-top:7px;
-    color:#ddd;
-    font-size:13px;
-    line-height:1.6;
-}
-
-.ar-button{
-    height:52px;
-    padding:0 20px;
-
-    border:1px solid #e5b443;
-    border-radius:30px;
-
-    background:#111;
-    color:#f3c75d;
-
-    font-weight:700;
-    cursor:pointer;
-}
-
-.ar-button:hover{
-    background:#e5b443;
-    color:#111;
-}
-
-.qr{
-    width:110px;
-    height:110px;
-    background:#fff;
-    padding:6px;
-    border-radius:8px;
-}
-
-.qr img{
-    width:100%;
-    height:100%;
-}
-
-/* ================= 3D MODAL & AR ================= */
-
-.modal{
-    position:fixed;
-    inset:0;
-
-    background:rgba(0,0,0,.88);
-    backdrop-filter: blur(5px);
-
-    display:none;
-    align-items:center;
-    justify-content:center;
-
-    z-index:1000;
-    padding:20px;
-}
-
-.modal.show{
-    display:flex;
-}
-
-.modal-box{
-    width:min(550px,100%);
-    height:min(680px,88vh);
-
-    background:#101112;
-    border:1px solid #dbaa42;
-    border-radius:20px;
-
-    position:relative;
-    overflow:hidden;
-
-    box-shadow:0 0 50px rgba(225,174,62,.25);
-    display: flex;
-    flex-direction: column;
-}
-
-.modal-header{
-    height:60px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-
-    padding:0 20px;
-    border-bottom:1px solid #222;
-}
-
-.modal-header h3{
-    color:#efc25b;
-    font-size: 17px;
-    font-weight: 700;
-}
-
-.close{
-    width:36px;
-    height:36px;
-    border-radius:50%;
-    border:1px solid #444;
-    background:#181919;
-    color:#fff;
-    cursor:pointer;
-    font-size:20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.close:hover{
-    background: #e8b33f;
-    color: #111;
-}
-
-model-viewer{
-    width:100%;
-    flex: 1;
-    background: radial-gradient(circle,#252525,#090a0b 75%);
-}
-
-/* Native AR Placement Button */
-.ar-view-btn {
-    position: absolute;
-    bottom: 50px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, #ffe08c, #e5a735);
-    color: #111;
-    border: none;
-    padding: 11px 22px;
-    border-radius: 25px;
-    font-weight: 800;
-    font-size: 13px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-}
-
-.modal-tip {
-    text-align: center;
-    font-size: 11.5px;
-    color: #888;
-    padding: 10px;
-    background: #08090a;
-    border-top: 1px solid #1c1d1e;
-}
-
-/* ================= RESPONSIVE ================= */
-
-@media(max-width:900px){
-
-    .food-grid{
-        grid-template-columns:repeat(2,1fr);
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#7b1e16" />
+  <title>Digital Menu</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #7b1e16;
+      --primary-dark: #5a140f;
+      --primary-soft: #fff4e8;
+      --accent: #c8943e;
+      --bg: #f5eee5;
+      --surface: #fffaf2;
+      --surface-2: #f7eee4;
+      --text: #4a281a;
+      --muted: #7d6558;
+      --border: #d9c39a;
+      --veg: #16a34a;
+      --nonveg: #dc2626;
+      --egg: #d97706;
+      --danger: #dc2626;
+      --radius: 18px;
+      --shadow: 0 10px 30px rgba(15, 23, 42, .06);
+      --font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    .header-inner{
-        gap:20px;
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-family);
+      background: var(--bg);
+      color: var(--text);
+      padding-bottom: calc(24px + env(safe-area-inset-bottom));
     }
 
-    .brand-title{
-        font-size:50px;
+    button, input { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+    img { display: block; max-width: 100%; }
+
+    .app-shell {
+      width: min(100%, 820px);
+      margin: 0 auto;
     }
 
-    .signature{
-        font-size:40px;
+    /* HERO */
+    .hero {
+      position: relative;
+      min-height: 190px;
+      background:
+        linear-gradient(135deg, color-mix(in srgb, var(--primary) 94%, black 6%), var(--primary-dark));
+      overflow: hidden;
+      color: #fff;
     }
 
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      pointer-events: none;
+    }
+    .hero::before { width: 190px; height: 190px; right: -70px; top: -65px; }
+    .hero::after { width: 120px; height: 120px; left: -40px; bottom: -55px; }
+
+    .hero-cover {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: .22;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.44));
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      min-height: 190px;
+      display: flex;
+      align-items: flex-end;
+      gap: 14px;
+      padding: 22px 16px 18px;
+    }
+
+    .logo-wrap {
+      width: 68px;
+      height: 68px;
+      border-radius: 18px;
+      flex: 0 0 auto;
+      background: rgba(255,255,255,.96);
+      border: 3px solid rgba(255,255,255,.65);
+      box-shadow: 0 8px 24px rgba(0,0,0,.2);
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      color: var(--primary);
+    }
+
+    .logo-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .logo-fallback svg { width: 30px; height: 30px; }
+
+    .hero-info { min-width: 0; flex: 1; }
+    .restaurant-name {
+      margin: 0;
+      font-size: clamp(22px, 5vw, 30px);
+      line-height: 1.1;
+      font-weight: 850;
+      letter-spacing: -.5px;
+      text-shadow: 0 2px 10px rgba(0,0,0,.2);
+    }
+
+    .restaurant-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      margin-top: 8px;
+      font-size: 12.5px;
+      color: rgba(255,255,255,.9);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.16);
+      backdrop-filter: blur(8px);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; }
+    .status-badge.closed .status-dot { background: #f87171; }
+
+    .hero-action {
+      flex: 0 0 auto;
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(255,255,255,.32);
+      border-radius: 14px;
+      background: rgba(255,255,255,.16);
+      color: #fff;
+      display: none;
+      place-items: center;
+      text-decoration: none;
+      backdrop-filter: blur(10px);
+    }
+
+    /* STICKY CONTROL AREA */
+    .sticky-panel {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: color-mix(in srgb, var(--bg) 90%, transparent);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+      padding: 10px 12px 8px;
+    }
+
+    .search-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(15,23,42,.04);
+      overflow: hidden;
+    }
+
+    .search-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      flex: 0 0 auto;
+    }
+
+    #menu-search {
+      width: 100%;
+      height: 44px;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text);
+      padding: 0 12px 0 0;
+      font-size: 14px;
+    }
+    #menu-search::placeholder { color: #9ca3af; }
+
+    .category-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-top: 9px;
+      scrollbar-width: none;
+      overscroll-behavior-inline: contain;
+    }
+    .category-scroll::-webkit-scrollbar { display: none; }
+
+    .cat-chip {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      min-height: 34px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      white-space: nowrap;
+      font-size: 12.5px;
+      font-weight: 750;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+    .cat-chip.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 5px 14px color-mix(in srgb, var(--primary) 22%, transparent);
+    }
+
+    /* CONTENT */
+    .menu-wrap { padding: 14px 12px 30px; }
+
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 2px 2px 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .category-section {
+      scroll-margin-top: 110px;
+      margin-bottom: 20px;
+    }
+
+    .category-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0 2px 9px;
+    }
+
+    .category-title {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+      font-weight: 850;
+      letter-spacing: -.2px;
+    }
+    .item-count {
+      color: var(--muted);
+      font-size: 11.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .items-list {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .menu-item {
+      position: relative;
+      display: flex;
+      gap: 13px;
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+      transition: background .2s ease;
+    }
+    .menu-item:last-child { border-bottom: 0; }
+    .menu-item:active { background: var(--surface-2); }
+    .menu-item.unavailable { opacity: .58; }
+
+    .item-content { flex: 1; min-width: 0; }
+    .item-main-row { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
+    .item-info { flex: 1; min-width: 0; }
+    .item-topline { display: flex; align-items: flex-start; gap: 7px; }
+
+    /* Menu-style right-aligned portion columns */
+    .item-price-area {
+      flex: 0 0 158px;
+      width: 158px;
+      align-self: flex-start;
+      margin-left: auto;
+    }
+    .price-header {
+      display: grid;
+      grid-template-columns: repeat(3, 45px);
+      gap: 5px;
+      justify-content: end;
+      margin-bottom: 5px;
+      color: var(--text);
+      font-size: 10px;
+      line-height: 1;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .45px;
+      text-align: center;
+    }
+    .price-header.single { grid-template-columns: 58px; }
+    .portion-prices {
+      display: grid;
+      grid-template-columns: repeat(3, 45px);
+      gap: 5px;
+      justify-content: end;
+      align-items: center;
+    }
+    .portion-price {
+      width: 45px;
+      min-width: 45px;
+      padding: 2px 0;
+      text-align: center;
+      border: 0;
+      background: transparent;
+      border-radius: 0;
+      color: var(--primary);
+      font-weight: 850;
+    }
+    .portion-price.empty {
+      background: transparent;
+      border: 0;
+      color: #cbbdaf;
+    }
+    .portion-price .label { display: none; }
+    .portion-price .amount {
+      margin-top: 0;
+      font-size: 13px;
+      line-height: 1.25;
+      white-space: nowrap;
+    }
+    .single-price-area { display: flex; justify-content: flex-end; }
+    .single-price {
+      margin-top: 0;
+      width: 58px;
+      padding: 2px 0;
+      border: 0;
+      background: transparent;
+      border-radius: 0;
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 850;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .food-symbol {
+      width: 15px;
+      height: 15px;
+      margin-top: 2px;
+      border-radius: 3px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+    }
+    .food-symbol::after { content: ""; width: 7px; height: 7px; border-radius: 50%; }
+    .food-symbol.veg { border: 1.6px solid var(--veg); }
+    .food-symbol.veg::after { background: var(--veg); }
+    .food-symbol.nonveg { border: 1.6px solid var(--nonveg); }
+    .food-symbol.nonveg::after { background: var(--nonveg); border-radius: 1px; transform: rotate(45deg); width: 6px; height: 6px; }
+    .food-symbol.egg { border: 1.6px solid var(--egg); }
+    .food-symbol.egg::after { background: var(--egg); }
+
+    .item-name {
+      margin: 0;
+      font-size: 15.5px;
+      line-height: 1.25;
+      font-weight: 790;
+      color: var(--text);
+    }
+
+    .item-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 7px;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 20px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      font-size: 10px;
+      line-height: 1;
+      font-weight: 800;
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+    }
+    .tag.out { background: #fef2f2; color: #b91c1c; }
+    .tag.hot { background: #fff7ed; color: #c2410c; }
+
+    .item-desc {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .item-image-wrap {
+      position: relative;
+      width: 92px;
+      height: 92px;
+      flex: 0 0 92px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+    }
+    .item-image { width: 100%; height: 100%; object-fit: cover; }
+    .img-placeholder {
+      width: 100%; height: 100%;
+      display: grid; place-items: center;
+      color: #9ca3af;
+      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    }
+    .img-placeholder svg { width: 26px; height: 26px; }
+
+    /* Warm printed-menu card styling */
+    .category-section { margin-bottom: 18px; }
+    .category-heading {
+      margin: 0;
+      padding: 11px 14px;
+      background: var(--primary);
+      border-radius: 15px 15px 0 0;
+      color: #fffaf2;
+    }
+    .category-title {
+      color: #fffaf2;
+      font-size: 17px;
+      text-transform: uppercase;
+      letter-spacing: .35px;
+    }
+    .item-count { color: rgba(255,250,242,.78); }
+    .items-list {
+      border: 1px solid var(--border);
+      border-top: 0;
+      border-radius: 0 0 15px 15px;
+      background: var(--surface);
+      box-shadow: 0 4px 12px rgba(90,20,15,.07);
+    }
+    .menu-item {
+      padding: 11px 13px;
+      border-bottom: 1px dashed #e2cda9;
+      background: var(--surface);
+    }
+    .menu-item:last-child { border-bottom: 0; }
+    .item-name { color: #6b174b; font-size: 14.5px; }
+    .item-desc { color: #8a7668; }
+    .price-header { color: #5a321e; }
+    .summary-line { color: var(--muted); }
+
+    @media (max-width: 560px) {
+      .menu-item { padding: 10px 10px; gap: 8px; }
+      .item-main-row { gap: 6px; }
+      .item-price-area { flex-basis: 151px; width: 151px; }
+      .price-header, .portion-prices { grid-template-columns: repeat(3, 43px); gap: 4px; }
+      .portion-price { width: 43px; min-width: 43px; }
+      .price-header.single { grid-template-columns: 55px; }
+      .single-price { width: 55px; }
+      .item-name { font-size: 14px; }
+      .portion-price .amount, .single-price { font-size: 12px; }
+    }
+
+    /* STATES */
+    .state-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 34px 20px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      color: var(--muted);
+    }
+    .state-card strong { display: block; color: var(--text); font-size: 17px; margin-bottom: 5px; }
+
+    .skeleton {
+      overflow: hidden;
+      position: relative;
+      background: #e9edf2;
+      border-radius: 10px;
+    }
+    .skeleton::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.65), transparent);
+      animation: shimmer 1.25s infinite;
+    }
+    @keyframes shimmer { 100% { transform: translateX(100%); } }
+
+    .loading-list {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .loading-row { display: flex; gap: 12px; padding: 14px; border-bottom: 1px solid var(--border); }
+    .loading-row:last-child { border-bottom: 0; }
+    .sk-line { height: 12px; margin-bottom: 8px; }
+    .sk-title { width: 58%; height: 15px; }
+    .sk-text { width: 85%; }
+    .sk-price { width: 35%; }
+    .sk-img { width: 90px; height: 90px; flex: 0 0 90px; }
+
+    .footer-note {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 11px;
+      padding: 8px 16px 0;
+    }
+
+    @media (min-width: 640px) {
+      body { padding-top: 18px; }
+      .app-shell {
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(15,23,42,.08);
+      }
+      .hero, .hero-content { min-height: 220px; }
+      .hero-content { padding: 28px 24px 22px; }
+      .sticky-panel { padding-inline: 18px; }
+      .menu-wrap { padding-inline: 18px; }
+      .menu-item { padding: 16px; }
+      .item-image-wrap { width: 110px; height: 100px; flex-basis: 110px; }
+    }
+  
+    .hero-welcome{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-size:18px;color:var(--accent,#d8ad62);margin-bottom:2px}
+    .hero-tagline{font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(28px,6vw,48px);line-height:.98;text-transform:uppercase;letter-spacing:1px;margin:0;color:#fff}
+    .hero-subtitle{font-size:12px;font-weight:800;letter-spacing:2px;margin-top:7px;color:rgba(255,255,255,.94)}
+    .hero-features{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:13px;font-size:12px;color:#fff}
+    .hero-feature{display:inline-flex;align-items:center;gap:5px}
+    .hero-slogans{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-size:19px;line-height:.98;margin-top:18px;color:#fff}
+    .hero-slogans div:last-child{padding-left:45px;margin-top:3px}
+    .service-strip{background:#fff;color:#111827;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;font-size:12px}
+    .service-left{display:flex;align-items:center;gap:13px;flex-wrap:wrap}
+    .open-pill{background:#12964e;color:#fff;border-radius:999px;padding:8px 13px;font-weight:800}
+    .service-time{font-weight:700}
+    .services{display:flex;align-items:center;gap:15px;flex-wrap:wrap;font-weight:700}
+    .service{display:inline-flex;align-items:center;gap:5px}
+    @media(max-width:640px){
+      .hero-features{gap:7px 10px}.hero-slogans{font-size:17px}
+      .service-strip{align-items:flex-start;flex-direction:column}.services{gap:10px}
+    }
+
+
+    /* ===== Modern restaurant menu refresh ===== */
+    .app-shell{background:var(--bg);}
+    .hero{
+      min-height:330px;
+      border-radius:0 0 28px 28px;
+      isolation:isolate;
+      box-shadow:0 14px 40px rgba(30,20,10,.16);
+    }
+    .hero-cover{opacity:.48;filter:saturate(1.05) contrast(1.04);transform:scale(1.02);}
+    .hero-overlay{
+      background:
+        linear-gradient(180deg,rgba(8,8,8,.05) 0%,rgba(8,8,8,.18) 40%,rgba(8,8,8,.82) 100%),
+        linear-gradient(135deg,rgba(0,0,0,.18),transparent 60%);
+    }
+    .hero::before{width:260px;height:260px;right:-120px;top:-110px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12)}
+    .hero::after{width:180px;height:180px;left:-90px;bottom:-110px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10)}
+    .hero-content{min-height:330px;align-items:flex-end;padding:24px 18px 20px;gap:14px;}
+    .logo-wrap{
+      width:78px;height:78px;border-radius:22px;border:4px solid rgba(255,255,255,.9);
+      box-shadow:0 12px 28px rgba(0,0,0,.28);background:#fff;
+    }
+    .hero-info{padding-bottom:2px;}
+    .hero-welcome{font-size:17px;opacity:.94}
+    .hero-tagline{font-size:clamp(30px,8vw,52px);text-shadow:0 3px 18px rgba(0,0,0,.25)}
+    .hero-subtitle{font-size:11px;letter-spacing:2.4px;opacity:.94}
+    .hero-features{gap:7px;margin-top:12px}
+    .hero-feature{padding:5px 9px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.10);border-radius:999px;backdrop-filter:blur(10px)}
+    .hero-slogans{margin-top:14px;font-size:18px}
+    .hero-action{display:grid;align-self:flex-end;width:44px;height:44px;border-radius:15px;box-shadow:0 10px 24px rgba(0,0,0,.2)}
+
+    .service-strip{
+      margin:-14px 12px 0;position:relative;z-index:4;border:1px solid rgba(255,255,255,.8);
+      border-radius:18px;box-shadow:0 10px 26px rgba(20,20,20,.10);padding:12px 14px;
+    }
+    .open-pill{padding:7px 11px;font-size:11px}
+    .services{font-size:11px;gap:9px;color:#4b5563}
+    .service{padding:4px 7px;background:#f8fafc;border-radius:999px}
+
+    .sticky-panel{
+      top:0;margin-top:10px;padding:10px 12px 7px;background:linear-gradient(180deg,rgba(245,238,229,.97),rgba(245,238,229,.82));
+      border-bottom:0;
+    }
+    .search-wrap{border-radius:17px;box-shadow:0 10px 24px rgba(0,0,0,.07);background:rgba(255,255,255,.9)}
+    .search-icon{width:46px;height:46px;color:var(--primary)}
+    #menu-search{height:46px;font-size:14px}
+    .category-scroll{gap:9px;padding:10px 1px 5px;margin-bottom:12px}
+    .cat-chip{border-radius:999px!important;padding:9px 14px!important;font-weight:800!important;box-shadow:0 3px 10px rgba(0,0,0,.05)}
+
+    .menu-wrap{padding:8px 12px 18px}
+    .summary-line{font-size:11px;font-weight:700;padding:3px 3px 10px}
+    .category-section{margin-bottom:20px}
+    .category-heading{
+      padding:13px 15px;border-radius:18px 18px 0 0;box-shadow:0 5px 16px rgba(60,20,10,.12);position:relative;overflow:hidden;
+    }
+    .category-heading::after{content:"";position:absolute;right:-15px;top:-24px;width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.09)}
+    .category-title{font-size:15px;letter-spacing:.8px}
+    .items-list{border-radius:0 0 18px 18px;box-shadow:0 8px 22px rgba(30,20,10,.08);}
+    .menu-item{padding:14px 13px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,250,242,.94));}
+    .menu-item + .menu-item{background:rgba(255,250,242,.92)}
+    .menu-item:active{transform:scale(.997);background:var(--surface-2)}
+    .item-main-row{align-items:center}
+    .item-topline{align-items:center}
+    .item-name{font-size:15.5px;letter-spacing:-.1px}
+    .item-desc{font-size:12px;line-height:1.5;margin-top:6px}
+    .item-tags{margin-top:7px}
+    .tag{padding:4px 8px;font-size:9.5px}
+    .item-price-area{flex-basis:156px;width:156px}
+    .price-header{font-size:9px;opacity:.7}
+    .portion-price .amount,.single-price{font-size:13.5px}
+    .food-symbol{width:16px;height:16px}
+
+    .footer-note{padding:12px 16px 22px;font-size:10px}
+    @media(max-width:560px){
+      .hero{min-height:300px}
+      .hero-content{min-height:300px;padding:20px 14px 18px}
+      .logo-wrap{width:70px;height:70px;border-radius:19px}
+      .service-strip{margin-top:-12px}
+      .menu-wrap{padding-inline:10px}
+      .item-price-area{flex-basis:144px;width:144px}
+      .price-header,.portion-prices{grid-template-columns:repeat(3,41px);gap:3px}
+      .portion-price{width:41px;min-width:41px}
+      .price-header.single{grid-template-columns:52px}.single-price{width:52px}
+      .item-name{font-size:14.2px}
+    }
+    @media(min-width:640px){
+      .app-shell{border-radius:28px;overflow:visible}
+      .hero{border-radius:28px}
+      .service-strip{margin-inline:18px}
+      .sticky-panel{padding-inline:18px}
+      .menu-wrap{padding-inline:18px}
+    }
+
+
+    /* ===== Official restaurant website look ===== */
+    body{
+      background:
+        radial-gradient(circle at 10% 0%, rgba(180,130,60,.08), transparent 28%),
+        linear-gradient(180deg,#f7f7f5 0%,#f4f4f2 100%);
+      color:var(--text);
+    }
+    .app-shell{max-width:1180px;width:calc(100% - 28px);}
+    .site-nav{
+      height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px;
+      padding:0 8px;margin:0 0 14px;border-bottom:1px solid rgba(0,0,0,.07);
+    }
+    .site-brand{display:flex;align-items:center;gap:10px;min-width:0;}
+    .site-brand-mark{width:40px;height:40px;border-radius:12px;background:var(--primary);display:grid;place-items:center;color:#fff;box-shadow:0 8px 18px rgba(0,0,0,.10);overflow:hidden}
+    .site-brand-mark img{width:100%;height:100%;object-fit:cover}
+    .site-brand-name{font-weight:850;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .site-nav-links{display:flex;gap:8px;align-items:center}
+    .site-nav-link{border:0;background:transparent;color:var(--muted);font-weight:750;font-size:12px;padding:10px 12px;border-radius:10px;cursor:pointer}
+    .site-nav-link:hover{background:#fff;color:var(--text)}
+    .hero{border-radius:28px;box-shadow:0 18px 50px rgba(28,25,23,.13);min-height:460px}
+    .hero-cover{opacity:.72;filter:saturate(1.04) contrast(1.03);}
+    .hero-overlay{background:linear-gradient(180deg,rgba(12,10,8,.10) 10%,rgba(12,10,8,.18) 35%,rgba(12,10,8,.72) 100%)}
+    .hero-content{min-height:460px;padding:34px 38px 34px;align-items:flex-end}
+    .logo-wrap{width:110px;height:110px;border-radius:28px;border:5px solid rgba(255,255,255,.9);box-shadow:0 14px 34px rgba(0,0,0,.24)}
+    .hero-info{padding-bottom:4px}
+    .hero-welcome{font-size:18px;letter-spacing:.2px}
+    .hero-tagline{font-size:clamp(34px,6vw,64px);letter-spacing:-1.5px;line-height:.95}
+    .hero-subtitle{font-size:12px;letter-spacing:3px;margin-top:10px}
+    .hero-features{margin-top:16px}
+    .hero-feature{padding:7px 11px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.20);border-radius:999px}
+    .hero-slogans{font-size:21px;margin-top:18px}
+    .hero-action{width:48px;height:48px;border-radius:16px}
+    .service-strip{
+      margin:14px 0 0;padding:14px 18px;background:#fff;border:1px solid rgba(0,0,0,.07);
+      border-radius:18px;box-shadow:0 10px 28px rgba(0,0,0,.05);
+    }
+    .sticky-panel{margin-top:14px;border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:12px 14px 10px;background:rgba(255,255,255,.91);box-shadow:0 10px 28px rgba(0,0,0,.05)}
+    .search-wrap{height:52px;border-radius:15px;box-shadow:none;background:#f7f7f5}
+    #menu-search{height:50px;font-size:14px}
+    .menu-wrap{padding:24px 4px 40px}
+    .category-section{margin-bottom:28px}
+    .category-heading{background:transparent;border-radius:0;padding:0 2px 10px;margin:0}
+    .category-title{color:var(--text);font-size:22px;text-transform:none;letter-spacing:-.3px}
+    .item-count{color:#8c8c86}
+    .items-list{border:1px solid rgba(0,0,0,.075);border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.045)}
+    .menu-item{padding:17px 18px;background:#fff;border-bottom:1px solid #efefec}
+    .menu-item + .menu-item{background:#fff}
+    .menu-item:hover{background:#fcfcfb}
+    .item-name{color:var(--text);font-size:15px}
+    .item-desc{color:#7c7d77}
+    .portion-price,.single-price{color:var(--primary)}
+    .footer-note{text-align:center;color:#a0a09b;padding:18px 16px 32px}
+    @media (max-width:900px){
+      .app-shell{width:calc(100% - 20px)}
+      .hero{min-height:410px}.hero-content{min-height:410px;padding:28px 24px}
+    }
+    @media (max-width:640px){
+      .app-shell{width:100%}.site-nav{padding:0 14px;height:62px;margin-bottom:10px}.site-nav-links{display:none}
+      .hero{border-radius:0;min-height:380px;box-shadow:none}.hero-content{min-height:380px;padding:22px 18px}
+      .logo-wrap{width:82px;height:82px;border-radius:22px}
+      .service-strip,.sticky-panel{border-radius:0;margin-top:10px}.menu-wrap{padding:20px 12px 32px}.category-title{font-size:20px}
+    }
+
+  </style>
+
+<style id="freemenu-no-banner-header">
+.hero{background:var(--surface)!important;color:var(--text)!important;min-height:0!important;border-radius:0 0 18px 18px!important;box-shadow:0 6px 24px rgba(0,0,0,.06)!important}
+.hero-cover,.hero-overlay{display:none!important}
+.hero-content{padding:22px 28px!important;min-height:0!important}
+.hero-info{color:var(--text)!important}
+.hero-welcome{color:var(--primary)!important}
+.hero-tagline,.hero-subtitle,.hero-slogans,.hero-feature{color:var(--text)!important}
+.hero-feature{background:rgba(0,0,0,.045)!important;border-color:rgba(0,0,0,.08)!important}
+.hero-action{position:static!important;margin-left:auto!important}
+.logo-wrap{background:#fff!important}
+@media(max-width:650px){.hero-content{padding:16px!important;gap:12px!important}.hero-slogans,.hero-features{display:none!important}}
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style id="freemenu-price-ruler-fix">
+:root{
+  --fm-price-col:72px;
+  --fm-price-gap:8px;
+  --fm-price-width:232px;
 }
 
-@media(max-width:600px){
-
-    .header{
-        min-height:200px;
-        padding:15px;
-    }
-
-    .header-inner{
-        gap:14px;
-    }
-
-    .logo{
-        width:100px;
-        height:100px;
-    }
-
-    .logo-icon{
-        font-size:25px;
-    }
-
-    .logo h2{
-        font-size:12px;
-    }
-
-    .logo p,
-    .logo small{
-        font-size:7px;
-    }
-
-    .signature{
-        font-size:28px;
-    }
-
-    .brand-title{
-        font-size:38px;
-    }
-
-    .tagline{
-        font-size:8px;
-        letter-spacing:2px;
-    }
-
-    .subtag{
-        font-size:12px;
-    }
-
-    .food-grid{
-        grid-template-columns:1fr 1fr;
-        gap:10px;
-    }
-
-    .section{
-        padding:20px 10px 5px;
-    }
-
-    .food-img{
-        height:135px;
-    }
-
-    .food-content{
-        padding:10px;
-    }
-
-    .food-name{
-        font-size:14px;
-    }
-
-    .price{
-        font-size:14px;
-    }
-
-    .description{
-        font-size:11px;
-    }
-
-    .btn{
-        height:37px;
-        font-size:11px;
-    }
-
-    .footer-inner{
-        grid-template-columns:1fr;
-        text-align:center;
-    }
-
-    .qr{
-        margin:auto;
-    }
+/* Both heading and every menu row use EXACTLY the same ruler */
+.categoryPriceSwitch,
+.three-price-area{
+  width:var(--fm-price-width)!important;
+  min-width:var(--fm-price-width)!important;
+  max-width:var(--fm-price-width)!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,var(--fm-price-col))!important;
+  column-gap:var(--fm-price-gap)!important;
+  align-items:center!important;
+  justify-content:end!important;
+  margin-left:auto!important;
+  flex:0 0 var(--fm-price-width)!important;
+  box-sizing:border-box!important;
 }
 
+.categoryPriceSwitch span,
+.three-price-cell{
+  width:var(--fm-price-col)!important;
+  min-width:var(--fm-price-col)!important;
+  max-width:var(--fm-price-col)!important;
+  text-align:center!important;
+  box-sizing:border-box!important;
+}
 
-.model-debug-note{
-  color:#888;font-size:11px;text-align:center;padding:6px 12px;
+.categoryPriceSwitch span{
+  font-family:Arial,sans-serif!important;
+  font-size:11px!important;
+  line-height:1.2!important;
+  font-weight:800!important;
+  color:#5f554f!important;
+  letter-spacing:.15px!important;
+}
+
+.three-price-cell{
+  font-family:Arial,sans-serif!important;
+  font-size:13px!important;
+  line-height:1.2!important;
+  font-weight:900!important;
+  color:#171412!important;
+  font-variant-numeric:tabular-nums!important;
+}
+
+/* Ensure item text does not push price ruler out of alignment */
+.menu-item,
+.food-item{
+  display:flex!important;
+  align-items:center!important;
+}
+
+.menu-item > :not(.three-price-area),
+.food-item > :not(.three-price-area){
+  min-width:0!important;
+}
+
+@media(max-width:700px){
+  :root{
+    --fm-price-col:52px;
+    --fm-price-gap:4px;
+    --fm-price-width:164px;
+  }
+  .categoryPriceSwitch span{font-size:9px!important;font-weight:800!important}
+  .three-price-cell{font-size:11px!important;font-weight:900!important}
+}
+
+@media(max-width:430px){
+  :root{
+    --fm-price-col:45px;
+    --fm-price-gap:3px;
+    --fm-price-width:141px;
+  }
+  .categoryPriceSwitch span{font-size:8.5px!important}
+  .three-price-cell{font-size:10.5px!important}
 }
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
-const SIGNATURE_3D_FUNCTION_URL =
-  `${SUPABASE_URL}/functions/v1/signature-3d-model-upload`;
 
-const supabaseClient =
-  window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-</script>
 
+
+
+<style id="freemenu-image-style-v2">
+/* ===== Dark premium digital-menu design ===== */
+:root{
+  --fm-dark:#0b0e0f;
+  --fm-panel:#111516;
+  --fm-panel-2:#151a1b;
+  --fm-gold:#d9aa62;
+  --fm-gold-soft:#b98b4d;
+  --fm-cream:#f6f0e7;
+}
+body{
+  background:#e9e4dc!important;
+  color:#f5f1ea!important;
+  padding-bottom:30px!important;
+}
+.app-shell{
+  width:min(100%,1180px)!important;
+  margin:22px auto 0!important;
+  background:var(--fm-dark)!important;
+  border:1px solid rgba(217,170,98,.18)!important;
+  border-radius:24px!important;
+  overflow:hidden!important;
+  box-shadow:0 22px 70px rgba(0,0,0,.24)!important;
+}
+
+/* Header: logo + restaurant name centered, like the reference image */
+.hero{
+  min-height:178px!important;
+  border-radius:0!important;
+  background:
+    radial-gradient(circle at 18% 0%,rgba(217,170,98,.13),transparent 28%),
+    radial-gradient(circle at 84% 20%,rgba(217,170,98,.08),transparent 24%),
+    linear-gradient(180deg,#0d1112,#080b0c)!important;
+  border-bottom:1px solid rgba(217,170,98,.20)!important;
+  box-shadow:none!important;
+}
+.hero::before{width:250px!important;height:250px!important;right:-100px!important;top:-150px!important;background:rgba(217,170,98,.06)!important}
+.hero::after{width:180px!important;height:180px!important;left:-90px!important;bottom:-130px!important;background:rgba(217,170,98,.045)!important}
+.hero-cover,.hero-overlay{display:none!important}
+.hero-content{
+  min-height:178px!important;
+  padding:24px 32px 20px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  gap:7px!important;
+}
+.logo-wrap{
+  width:58px!important;
+  height:58px!important;
+  border-radius:50%!important;
+  border:1px solid var(--fm-gold)!important;
+  background:#101314!important;
+  box-shadow:0 7px 22px rgba(0,0,0,.35)!important;
+}
+.logo-wrap img{object-fit:cover!important}
+.hero-info{
+  width:100%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  min-width:0!important;
+}
+.hero-welcome{
+  order:0!important;
+  margin:0!important;
+  color:var(--fm-gold)!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-style:italic!important;
+  font-size:13px!important;
+}
+.restaurant-name,.hero .restaurant-name{
+  order:1!important;
+  margin:0!important;
+  color:#f5efe6!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-size:clamp(30px,5vw,46px)!important;
+  line-height:1.03!important;
+  letter-spacing:2px!important;
+  font-weight:700!important;
+  text-transform:uppercase!important;
+  text-shadow:none!important;
+}
+.hero-subtitle{
+  order:2!important;
+  color:#d4c8b8!important;
+  font-size:10px!important;
+  font-weight:800!important;
+  letter-spacing:3px!important;
+  text-transform:uppercase!important;
+}
+.hero-features,.hero-slogans{display:flex!important}
+.hero-features{
+  order:3!important;
+  justify-content:center!important;
+  gap:7px!important;
+  margin-top:3px!important;
+}
+.hero-feature{
+  background:transparent!important;
+  border:1px solid rgba(217,170,98,.38)!important;
+  color:#d9c8b0!important;
+  box-shadow:none!important;
+  border-radius:999px!important;
+  padding:4px 9px!important;
+  font-size:9px!important;
+}
+.hero-slogans{
+  order:4!important;
+  justify-content:center!important;
+  gap:10px!important;
+  margin-top:2px!important;
+  color:#b8aa9b!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-style:italic!important;
+  font-size:12px!important;
+}
+.hero-action{display:none!important}
+.restaurant-meta{order:5!important;margin-top:2px!important}
+.status-badge{
+  background:rgba(255,255,255,.07)!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  color:#ddd5cc!important;
+}
+
+/* Service strip becomes a clean dark information bar */
+.service-strip{
+  margin:0!important;
+  padding:11px 24px!important;
+  border:0!important;
+  border-bottom:1px solid rgba(217,170,98,.16)!important;
+  border-radius:0!important;
+  background:#0d1112!important;
+  box-shadow:none!important;
+}
+.service-left,.services{
+  color:#d8d0c7!important;
+}
+.open-pill{
+  background:#118447!important;
+  color:#fff!important;
+  box-shadow:none!important;
+}
+.service{
+  background:rgba(255,255,255,.045)!important;
+  border:1px solid rgba(255,255,255,.07)!important;
+  color:#d9d1c7!important;
+}
+
+/* Search + category navigation */
+.sticky-panel{
+  position:sticky!important;
+  top:0!important;
+  margin:0!important;
+  padding:16px 24px 12px!important;
+  background:rgba(11,14,15,.96)!important;
+  border:0!important;
+  border-bottom:1px solid rgba(217,170,98,.15)!important;
+  backdrop-filter:blur(14px)!important;
+}
+.search-wrap{
+  max-width:720px!important;
+  margin:0 auto 12px!important;
+  height:46px!important;
+  background:#14191a!important;
+  border:1px solid rgba(217,170,98,.30)!important;
+  border-radius:12px!important;
+  box-shadow:none!important;
+}
+.search-icon{color:#d9aa62!important}
+#menu-search{
+  height:44px!important;
+  background:transparent!important;
+  color:#f2ece3!important;
+}
+#menu-search::placeholder{color:#81786f!important}
+.category-scroll{
+  display:flex!important;
+  justify-content:center!important;
+  gap:8px!important;
+  overflow-x:auto!important;
+  scrollbar-width:none!important;
+}
+.category-scroll::-webkit-scrollbar{display:none!important}
+.cat-chip{
+  flex:0 0 auto!important;
+  border:1px solid rgba(217,170,98,.34)!important;
+  background:#101415!important;
+  color:#d8d0c8!important;
+  border-radius:999px!important;
+  padding:8px 15px!important;
+  font-size:11px!important;
+  font-weight:800!important;
+}
+.cat-chip.active{
+  background:var(--fm-gold)!important;
+  border-color:var(--fm-gold)!important;
+  color:#111!important;
+}
+
+/* Menu: two-column desktop layout like the reference */
+.menu-wrap{
+  padding:22px 24px 34px!important;
+  background:#0b0e0f!important;
+}
+.summary-line{
+  color:#968b81!important;
+  padding:0 2px 14px!important;
+}
+#menu-sections{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:14px!important;
+  align-items:start!important;
+}
+.category-section{
+  margin:0!important;
+  background:linear-gradient(180deg,#121718,#0f1314)!important;
+  border:1px solid rgba(217,170,98,.22)!important;
+  border-radius:15px!important;
+  overflow:hidden!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.16)!important;
+}
+.category-heading,.categoryHeadWithPrices{
+  background:transparent!important;
+  color:#f4eee5!important;
+  border-bottom:1px solid rgba(217,170,98,.18)!important;
+  padding:13px 15px!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.category-title{
+  color:#f4eee5!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-size:21px!important;
+  font-weight:700!important;
+  letter-spacing:.1px!important;
+}
+.item-count{color:#8f857c!important}
+.categoryPriceSwitch{
+  width:232px!important;
+  grid-template-columns:repeat(3,72px)!important;
+  gap:8px!important;
+}
+.categoryPriceSwitch span{
+  color:#c9bcae!important;
+  font-size:9px!important;
+  text-transform:uppercase!important;
+  letter-spacing:.5px!important;
+}
+.items-list{border:0!important;background:transparent!important}
+.menu-item{
+  background:transparent!important;
+  border-bottom:1px solid rgba(255,255,255,.07)!important;
+  padding:12px 14px!important;
+}
+.menu-item:last-child{border-bottom:0!important}
+.item-name{
+  color:#f5f0e9!important;
+  font-size:13px!important;
+  font-weight:800!important;
+}
+.item-desc{
+  color:#8f8983!important;
+  font-size:10px!important;
+  line-height:1.45!important;
+}
+.food-symbol{flex:0 0 auto!important}
+.three-price-cell{
+  color:#f2c77e!important;
+  font-size:12px!important;
+  font-weight:900!important;
+}
+.item-price-area{
+  flex:0 0 232px!important;
+  width:232px!important;
+  min-width:232px!important;
+}
+
+/* No dish photos in this design */
+.item-image-wrap,.item-image,.menu-item img:not(.logo-wrap img){display:none!important}
+
+/* Premium, restrained footer */
+.footer-note{
+  color:#746b63!important;
+  padding:22px 12px 8px!important;
+}
+
+/* Mobile */
+@media(max-width:800px){
+  .app-shell{
+    width:100%!important;
+    margin:0 auto!important;
+    border-radius:0!important;
+    border-left:0!important;
+    border-right:0!important;
+  }
+  #menu-sections{grid-template-columns:1fr!important}
+  .hero-content{padding:22px 16px 18px!important}
+  .menu-wrap{padding:18px 12px 28px!important}
+  .sticky-panel{padding:12px 12px 10px!important}
+}
+@media(max-width:560px){
+  .restaurant-name{font-size:30px!important;letter-spacing:1.2px!important}
+  .hero-features{display:none!important}
+  .service-strip{padding:9px 12px!important}
+  .service-left{font-size:10px!important}
+  .services{gap:4px!important}
+  .service{font-size:9px!important;padding:4px 6px!important}
+  .category-heading,.categoryHeadWithPrices{padding:11px 12px!important}
+  .category-title{font-size:19px!important}
+  .menu-item{padding:11px 12px!important}
+  .item-price-area{
+    flex-basis:164px!important;width:164px!important;min-width:164px!important;
+  }
+  .three-price-area,.categoryPriceSwitch{
+    width:164px!important;min-width:164px!important;
+    grid-template-columns:repeat(3,52px)!important;gap:4px!important;
+  }
+  .three-price-cell,.categoryPriceSwitch span{width:52px!important}
+}
+</style>
+
+
+<style id="freemenu-final-grid-fix">
+/* Equal-height category rows: the blank area between two category cards is filled. */
+#menu-sections{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:14px!important;
+  align-items:stretch!important;
+}
+.category-section{
+  height:100%!important;
+  min-width:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  margin:0!important;
+}
+.category-section .items-list{
+  flex:1 1 auto!important;
+}
+
+/* Exact price ruler shared by category headings and every item. */
+.categoryHeadWithPrices{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 232px!important;
+  align-items:center!important;
+  column-gap:10px!important;
+}
+.categoryPriceSwitch,
+.menu-item .three-price-area{
+  width:232px!important;
+  min-width:232px!important;
+  max-width:232px!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,72px)!important;
+  column-gap:8px!important;
+  justify-self:end!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+}
+.categoryPriceSwitch span,
+.menu-item .three-price-cell{
+  width:72px!important;
+  min-width:72px!important;
+  max-width:72px!important;
+  box-sizing:border-box!important;
+  text-align:center!important;
+}
+.categoryPriceSwitch span{
+  color:#c9bcae!important;
+  font:800 9px/1.2 Arial,sans-serif!important;
+  text-transform:uppercase!important;
+  letter-spacing:.5px!important;
+}
+.menu-item{
+  display:block!important;
+}
+.menu-item .item-content{
+  width:100%!important;
+}
+.menu-item .item-main-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 232px!important;
+  align-items:center!important;
+  column-gap:10px!important;
+  width:100%!important;
+}
+.menu-item .item-info{
+  min-width:0!important;
+}
+.menu-item .item-price-area{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  width:232px!important;
+  min-width:232px!important;
+  max-width:232px!important;
+  justify-self:end!important;
+  align-self:center!important;
+}
+.menu-item .three-price-cell{
+  display:block!important;
+  color:#f2c77e!important;
+  font:900 13px/18px Arial,sans-serif!important;
+  font-variant-numeric:tabular-nums!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+@media(max-width:800px){
+  #menu-sections{grid-template-columns:1fr!important}
+}
+@media(max-width:560px){
+  .categoryHeadWithPrices{
+    grid-template-columns:minmax(0,1fr) 164px!important;
+  }
+  .categoryPriceSwitch,
+  .menu-item .three-price-area{
+    width:164px!important;min-width:164px!important;max-width:164px!important;
+    grid-template-columns:repeat(3,52px)!important;column-gap:4px!important;
+  }
+  .categoryPriceSwitch span,
+  .menu-item .three-price-cell{
+    width:52px!important;min-width:52px!important;max-width:52px!important;
+  }
+  .menu-item .item-main-row{
+    grid-template-columns:minmax(0,1fr) 164px!important;
+  }
+  .menu-item .item-price-area{
+    width:164px!important;min-width:164px!important;max-width:164px!important;
+  }
+}
+@media(max-width:430px){
+  .categoryHeadWithPrices{
+    grid-template-columns:minmax(0,1fr) 141px!important;
+  }
+  .categoryPriceSwitch,
+  .menu-item .three-price-area{
+    width:141px!important;min-width:141px!important;max-width:141px!important;
+    grid-template-columns:repeat(3,45px)!important;column-gap:3px!important;
+  }
+  .categoryPriceSwitch span,
+  .menu-item .three-price-cell{
+    width:45px!important;min-width:45px!important;max-width:45px!important;
+  }
+  .menu-item .item-main-row{
+    grid-template-columns:minmax(0,1fr) 141px!important;
+  }
+  .menu-item .item-price-area{
+    width:141px!important;min-width:141px!important;max-width:141px!important;
+  }
+}
+</style>
+
+
+<style>
+.ar3d-btn{margin-top:10px;border:1px solid rgba(212,175,55,.55);background:linear-gradient(135deg,#fff8df,#f4df9a);color:#5c4100;border-radius:10px;padding:8px 12px;font-size:11px;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(83,54,18,.08)}
+.ar3d-btn:active{transform:scale(.98)}
+.ar3d-modal{position:fixed;inset:0;background:rgba(10,10,10,.72);display:none;align-items:center;justify-content:center;z-index:9999;padding:16px}.ar3d-modal.show{display:flex}.ar3d-box{width:min(720px,100%);background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 25px 80px rgba(0,0,0,.35)}.ar3d-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #eee}.ar3d-head strong{font-size:15px}.ar3d-close{border:0;background:#f2f4f7;border-radius:10px;width:36px;height:36px;font-size:22px;cursor:pointer}.ar3d-viewer{width:100%;height:min(68vh,560px);background:#f7f7f5}.ar3d-tip{padding:11px 15px;font-size:11px;color:#667085;text-align:center}.ar3d-fail{display:none;padding:20px;text-align:center;color:#b42318;font-size:12px}
+</style>
 </head>
-
-
 <body>
+  <div class="app-shell">
 
 
-<!-- ================= HEADER ================= -->
-
-<header class="header">
-
-<div class="header-inner">
-
-    <div class="logo">
-
-        <div class="logo-icon">🍴</div>
-
-        <h2>URBAN</h2>
-        <h2>PUNJAB</h2>
-
-        <p>RESTAURANT</p>
-
-        <small>SINCE 1971</small>
-
-    </div>
 
 
-    <div class="brand">
+    <header class="hero" id="hero">
+      <img id="rest-cover" class="hero-cover" alt="" style="display:none;" />
+      <div class="hero-overlay"></div>
 
-        <div class="signature">
-            Signature
+      <div class="hero-content">
+        <div class="logo-wrap" id="logo-container">
+          <div class="logo-fallback" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/>
+            </svg>
+          </div>
         </div>
 
-        <div class="brand-title">
-            MENU
+        <div class="hero-info">
+          <div id="rest-welcome" class="hero-welcome" style="display:none"></div>
+          <h1 id="rest-name" class="hero-tagline restaurant-name">Loading Menu...</h1>
+          <div id="rest-subtitle" class="hero-subtitle" style="display:none"></div>
+          <div id="rest-features" class="hero-features" style="display:none">
+            <span id="rest-feature1" class="hero-feature"></span>
+            <span id="rest-feature2" class="hero-feature"></span>
+            <span id="rest-feature3" class="hero-feature"></span>
+          </div>
+          <div id="rest-slogans" class="hero-slogans" style="display:none">
+            <div id="rest-slogan1"></div>
+            <div id="rest-slogan2"></div>
+          </div>
+          <div class="restaurant-meta" style="margin-top:11px">
+            <span id="rest-address" style="display:none;"></span>
+            <a id="rest-phone" href="#" style="display:none;color:inherit;text-decoration:none"></a>
+          </div>
         </div>
 
-        <div class="tagline">
-            FAMILY • FOOD • RESTAURANT
-        </div>
-
-        <div class="subtag">
-            Authentic Flavours, Timeless Taste
-        </div>
-
-    </div>
-
-</div>
-
-</header>
-
-
-
-<!-- ================= CATEGORY ================= -->
-
-
-<div class="category-wrap">
-  <div class="categories" id="categoryNav">
-    <button class="category active" onclick="filterCategory('all', event)">
-      <span>▦</span>All
-    </button>
-  </div>
-</div>
-
-
-<main class="container">
-  <div id="menuLoading" style="padding:40px 20px;text-align:center;color:#aaa;">
-    Loading menu...
-  </div>
-  <div id="menuError" style="display:none;padding:40px 20px;text-align:center;color:#ff8b8b;"></div>
-  <div id="menuSections"></div>
-</main>
-
-
-
-
-<!-- ================= FOOTER ================= -->
-
-<footer class="footer">
-
-<div class="footer-inner">
-
-<div>
-
-<div class="footer-title">
-ADDRESS
-</div>
-
-<div class="footer-text">
-C-207/208, Jhilmil Colony<br>
-Delhi - 110095
-</div>
-
-</div>
-
-
-<div>
-
-<div class="footer-title">
-CONTACT
-</div>
-
-<div class="footer-text">
-011-2214-4545<br>
-8447000853 | 8447000854
-</div>
-
-</div>
-
-
-<div>
-
-<button class="ar-button"
-onclick="alert('Select any dish with ◈ 3D View and tap Place on Table to view in AR!')">
-
-▣ &nbsp; Interactive AR Active
-
-</button>
-
-</div>
-
-
-<div>
-
-<div class="qr">
-
-<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://freemenu.in">
-
-</div>
-
-</div>
-
-</div>
-
-<p style="
-text-align:center;
-color:#777;
-font-size:11px;
-margin-top:25px;
-">
-Rate & items can be changed without prior notice
-</p>
-
-</footer>
-
-
-
-<!-- ================= 3D / AR MODAL ================= -->
-
-<div class="modal" id="modal">
-
-<div class="modal-box">
-
-<div class="modal-header">
-
-<h3 id="modelTitle">
-3D Food Preview
-</h3>
-
-<button class="close" onclick="close3D()">
-×
-</button>
-
-</div>
-
-
-<model-viewer
-id="foodModel"
-crossorigin="anonymous"
-src=""
-camera-controls
-auto-rotate
-rotation-per-second="30deg"
-ar
-ar-modes="webxr scene-viewer quick-look"
-shadow-intensity="1.5"
-environment-image="neutral"
-alt="3D Dish Preview">
-
-<button slot="ar-button" class="ar-view-btn">
-📱 Place on Table (AR)
-</button>
-
-</model-viewer>
-
-<div class="modal-tip">
-Rotate & Zoom with fingers • Click "Place on Table" to view in Room
-</div>
-
-</div>
-
-</div>
-
-
-
-
-<script>
-const params = new URLSearchParams(location.search);
-const slug = params.get("r") || "urbanpunjab";
-
-let allItems = [];
-
-const menuLoading = document.getElementById("menuLoading");
-const menuError = document.getElementById("menuError");
-const menuSections = document.getElementById("menuSections");
-const categoryNav = document.getElementById("categoryNav");
-const viewer = document.getElementById("foodModel");
-
-function esc(v){
-  return String(v ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[c]));
-}
-
-function truthy(v){
-  return v === true || v === 1 || String(v ?? "").toLowerCase() === "true";
-}
-
-function browser3DUrl(rawUrl){
-  const raw = String(rawUrl || "").trim();
-  if(!raw) return "";
-
-  try{
-    const u = new URL(raw, location.origin);
-
-    // Already-proxied model URL.
-    if(
-      u.hostname.endsWith("supabase.co") &&
-      u.pathname.includes("/functions/v1/signature-3d-model-upload")
-    ){
-      return raw;
-    }
-
-    // Existing database records contain the public R2 custom-domain URL.
-    // Convert only Signature 3D objects to the public binary proxy.
-    if(
-      u.hostname.toLowerCase() === "images.freemenu.in" &&
-      u.pathname.includes("/signature-3d/")
-    ){
-      const key = u.pathname.replace(/^\/+/, "");
-      return `${SIGNATURE_3D_FUNCTION_URL}?key=${encodeURIComponent(key)}`;
-    }
-
-    return raw;
-  }catch(error){
-    console.warn("3D URL parse failed:", error);
-    return raw;
-  }
-}
-
-function has3D(item){
-  return (truthy(item.ar_enabled) || truthy(item.signature_3d)) &&
-    !!(item.ar_model_url || item.ar_usdz_url);
-}
-
-function imgOf(item){
-  return item.image_url || item.photo_url || item.image || item.photo || "";
-}
-
-function priceOf(item){
-  const q=item.price_quarter, h=item.price_half, f=item.price_full ?? item.price;
-  if(q!=null || h!=null){
-    const p=[];
-    if(q!=null && String(q)!=="")p.push(`Q ₹${q}`);
-    if(h!=null && String(h)!=="")p.push(`H ₹${h}`);
-    if(f!=null && String(f)!=="")p.push(`F ₹${f}`);
-    return p.join(" • ");
-  }
-  return f!=null && String(f)!=="" ? `₹${f}` : "";
-}
-
-function iconFor(name){
-  const n=String(name||"").toLowerCase();
-  if(n.includes("starter"))return "🌿";
-  if(n.includes("soup"))return "🍲";
-  if(n.includes("rice")||n.includes("biryani"))return "🍚";
-  if(n.includes("bread")||n.includes("naan")||n.includes("roti"))return "🥖";
-  if(n.includes("salad")||n.includes("raita"))return "🥗";
-  if(n.includes("beverage")||n.includes("drink"))return "🥤";
-  if(n.includes("dessert")||n.includes("sweet"))return "🍨";
-  return "🍛";
-}
-
-function renderMenu(items){
-  const groups=new Map();
-
-  items.forEach(item=>{
-    const name=String(item.category||"Menu").trim()||"Menu";
-    const key=name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"menu";
-    if(!groups.has(key))groups.set(key,{key,name,items:[]});
-    groups.get(key).items.push(item);
-  });
-
-  const list=[...groups.values()];
-
-  categoryNav.innerHTML = `
-    <button class="category active" onclick="filterCategory('all', event)">
-      <span>▦</span>All
-    </button>`;
-
-  list.forEach(g=>{
-    const b=document.createElement("button");
-    b.className="category";
-    b.innerHTML=`<span>${iconFor(g.name)}</span>${esc(g.name)}`;
-    b.onclick=e=>filterCategory(g.key,e);
-    categoryNav.appendChild(b);
-  });
-
-  menuSections.innerHTML=list.map(g=>`
-    <section class="section food-section" data-category="${esc(g.key)}">
-      <div class="section-title">
-        <h2>${iconFor(g.name)} ${esc(g.name)}</h2>
-        <div class="line"></div>
-        <div class="view-all">View All →</div>
+        <a id="rest-call-btn" class="hero-action" href="#" aria-label="Call restaurant">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24c1.12.37 2.33.57 3.57.57A1 1 0 0121 16.5V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1.02l-2.2 2.2z"/>
+          </svg>
+        </a>
       </div>
-      <div class="food-grid">
-        ${g.items.map(item=>{
-          const image=imgOf(item);
-          const glb=browser3DUrl(item.ar_model_url);
-          const usdz=browser3DUrl(item.ar_usdz_url);
+    </header>
 
-          return `
-          <div class="food-card">
-            ${image?`
-            <div class="food-img">
-              <img src="${esc(image)}" alt="${esc(item.name||"Dish")}" loading="lazy">
-              ${(truthy(item.is_veg)||String(item.item_type||"").toLowerCase()==="veg")
-                ? `<div class="veg"></div>`:""}
-            </div>`:""}
-            <div class="food-content">
-              <div class="food-name-row">
-                <div class="food-name">${esc(item.name||"Unnamed Dish")}</div>
-                <div class="price">${esc(priceOf(item))}</div>
-              </div>
-              <div class="description">${esc(item.description||"")}</div>
-              ${has3D(item)?`
-              <div class="actions">
-                <button class="btn btn-3d"
-                  onclick='open3D(${JSON.stringify(item.name||"3D Dish")},${JSON.stringify(glb)},${JSON.stringify(usdz)})'>
-                  ◈ 3D / AR View
-                </button>
-              </div>`:""}
-            </div>
-          </div>`;
-        }).join("")}
+
+    <section class="service-strip" id="service-strip">
+      <div class="service-left">
+        <span id="rest-open-pill" class="open-pill">● Open Now</span>
+        <span id="rest-hours" class="service-time" style="display:none"></span>
+      </div>
+      <div class="services">
+        <span id="svc-dine" class="service">🍴 Dine In</span>
+        <span id="svc-take" class="service">🛍 Takeaway</span>
+        <span id="svc-delivery" class="service">🛵 Home Delivery</span>
       </div>
     </section>
-  `).join("");
-}
 
-function filterCategory(category,e){
-  document.querySelectorAll(".category").forEach(b=>b.classList.remove("active"));
-  if(e?.currentTarget)e.currentTarget.classList.add("active");
+    <section class="sticky-panel">
+      <div class="search-wrap">
+        <div class="search-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-3.5-3.5"></path>
+          </svg>
+        </div>
+        <input id="menu-search" type="search" placeholder="Search food or category..." autocomplete="off" />
+      </div>
+      <div class="category-scroll" id="category-chips"></div>
+    </section>
 
-  document.querySelectorAll(".food-section").forEach(s=>{
-    s.style.display = category==="all" || s.dataset.category===category ? "block" : "none";
+    <main class="menu-wrap">
+      <div id="summary-line" class="summary-line" style="display:none;"></div>
+      <div id="menu-sections"></div>
+      <div class="footer-note">Digital menu • Prices may be subject to change</div>
+    </main>
+  </div>
+
+  <script>
+    /* =========================================================
+       SUPABASE CONFIG
+       Keep RLS enabled in Supabase. An anon/public key is safe to
+       expose only when your database policies are configured correctly.
+    ========================================================== */
+    const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let restaurant = null;
+    let allItems = [];
+    let currentCategory = "all";
+    let searchText = "";
+
+    const $ = (id) => document.getElementById(id);
+
+    function escapeHTML(value = "") {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function safeUrl(value) {
+      if (!value) return "";
+      try {
+        const url = new URL(value, window.location.origin);
+        if (["http:", "https:"].includes(url.protocol)) return url.href;
+      } catch (_) {}
+      return "";
+    }
+
+    function cssColor(value, fallback) {
+      if (!value) return fallback;
+      const test = document.createElement("span");
+      test.style.color = "";
+      test.style.color = value;
+      return test.style.color ? value : fallback;
+    }
+
+    function applyRestaurantTheme(rest) {
+      const root = document.documentElement.style;
+
+      // These fields are OPTIONAL. If your table does not have them,
+      // the fallback colors below will be used automatically.
+      const primary = cssColor(rest.primary_color || rest.theme_primary, "#0f766e");
+      const primaryDark = cssColor(rest.primary_dark || rest.theme_primary_dark, "#115e59");
+      const bg = cssColor(rest.background_color || rest.theme_background, "#f6f7f9");
+      const surface = cssColor(rest.card_color || rest.theme_card, "#ffffff");
+      const text = cssColor(rest.text_color || rest.theme_text, "#111827");
+
+      root.setProperty("--primary", primary);
+      root.setProperty("--primary-dark", primaryDark);
+      root.setProperty("--bg", bg);
+      root.setProperty("--surface", surface);
+      root.setProperty("--text", text);
+
+      const radius = Number(rest.card_radius || rest.theme_radius);
+      if (Number.isFinite(radius) && radius >= 0 && radius <= 40) {
+        root.setProperty("--radius", `${radius}px`);
+      }
+
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) metaTheme.setAttribute("content", primary);
+    }
+
+    function showLoading() {
+      $("menu-sections").innerHTML = `
+        <div class="loading-list" aria-label="Loading menu">
+          ${[1,2,3,4].map(() => `
+            <div class="loading-row">
+              <div style="flex:1; padding-top:4px;">
+                <div class="skeleton sk-title sk-line"></div>
+                <div class="skeleton sk-text sk-line"></div>
+                <div class="skeleton sk-price sk-line"></div>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function showState(title, message) {
+      $("menu-sections").innerHTML = `
+        <div class="state-card">
+          <strong>${escapeHTML(title)}</strong>
+          <span>${escapeHTML(message)}</span>
+        </div>
+      `;
+    }
+
+    function logoFallback() {
+      return `
+        <div class="logo-fallback" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/>
+          </svg>
+        </div>
+      `;
+    }
+
+
+    function getItemType(item) {
+      if (String(item.item_type || "").toLowerCase() === "egg") return "egg";
+      if (String(item.item_type || "").toLowerCase() === "nonveg" || item.is_veg === false) return "nonveg";
+      return "veg";
+    }
+
+    function isUnavailable(item) {
+      return item.is_available === false || item.available === false || item.status === "unavailable" || item.status === "out_of_stock";
+    }
+
+    function renderPrice(item, category) {
+      const clean = v => (v !== null && v !== undefined && String(v).trim() !== "") ? String(v).trim() : "";
+      const q = clean(item.price_quarter);
+      const h = clean(item.price_half);
+      const f = clean(item.price_full) || clean(item.price);
+
+      return `<div class="three-price-area">
+        <span class="three-price-cell">${q ? "₹" + escapeHTML(q) : ""}</span>
+        <span class="three-price-cell">${h ? "₹" + escapeHTML(h) : ""}</span>
+        <span class="three-price-cell">${f ? "₹" + escapeHTML(f) : ""}</span>
+      </div>`;
+    }
+
+    function renderTags(item) {
+      const tags = [];
+      if (item.is_bestseller === true || item.bestseller === true) tags.push(`<span class="tag hot">★ Bestseller</span>`);
+      if (item.is_recommended === true || item.recommended === true) tags.push(`<span class="tag">Recommended</span>`);
+      if (item.is_spicy === true || item.spicy === true) tags.push(`<span class="tag hot">🌶 Spicy</span>`);
+      if (isUnavailable(item)) tags.push(`<span class="tag out">Unavailable</span>`);
+      return tags.length ? `<div class="item-tags">${tags.join("")}</div>` : "";
+    }
+
+    function renderItem(item) {
+      const type = getItemType(item);
+      const unavailable = isUnavailable(item);
+
+      return `
+        <article class="menu-item ${unavailable ? "unavailable" : ""}" data-name="${escapeHTML((item.name || "").toLowerCase())}">
+          <div class="item-content">
+            <div class="item-main-row">
+              <div class="item-info">
+                <div class="item-topline">
+                  <span class="food-symbol ${type}" aria-label="${type}"></span>
+                  <h3 class="item-name">${escapeHTML(item.name || "Unnamed item")}</h3>
+                </div>
+                ${renderTags(item)}
+                ${item.description ? `<p class="item-desc">${escapeHTML(item.description)}</p>` : ""}
+                ${item.ar_model_url && item.ar_enabled !== false ? `<button type="button" class="ar3d-btn" onclick="open3D(${JSON.stringify(item.name || "Dish")},${JSON.stringify(item.ar_model_url || "")},${JSON.stringify(item.ar_usdz_url || "")})">◈ 3D / AR View</button>` : ""}
+              </div>
+              <div class="item-price-area">
+                ${renderPrice(item, categoryKey(item.category))}
+              </div>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function directR2Url(raw){
+      return safeUrl(raw);
+    }
+    function open3D(name, modelURL, usdzURL=""){
+      const viewer=$("foodModel"), modal=$("ar3dModal"), fail=$("ar3dFail");
+      const glb=directR2Url(modelURL), usdz=directR2Url(usdzURL);
+      if(!viewer||!modal||!glb)return;
+      $("ar3dTitle").textContent=(name||"Dish")+" — 3D / AR";
+      if(fail)fail.style.display="none";
+      viewer.removeAttribute("src");
+      viewer.removeAttribute("ios-src");
+      viewer.setAttribute("src",glb);
+      if(usdz)viewer.setAttribute("ios-src",usdz);
+      modal.classList.add("show");
+      modal.setAttribute("aria-hidden","false");
+      document.body.style.overflow="hidden";
+    }
+    function close3D(){
+      const modal=$("ar3dModal"),viewer=$("foodModel");
+      if(modal){modal.classList.remove("show");modal.setAttribute("aria-hidden","true");}
+      if(viewer){viewer.removeAttribute("src");viewer.removeAttribute("ios-src");}
+      document.body.style.overflow="";
+    }
+    $("ar3dModal")?.addEventListener("click",e=>{if(e.target===$("ar3dModal"))close3D();});
+    $("foodModel")?.addEventListener("error",()=>{if($("ar3dFail"))$("ar3dFail").style.display="block";});
+
+    function categoryKey(category) {
+      return String(category || "General").trim() || "General";
+    }
+
+    function sectionId(name) {
+      return `cat-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "general"}`;
+    }
+
+
+/* FreeMenu owner-controlled menu ordering */
+function getSavedCategoryOrder(rest, items) {
+  const names = [...new Set(items.map(item => categoryKey(item.category)))];
+  const saved = Array.isArray(rest?.category_order) ? rest.category_order.map(String) : [];
+  const rank = new Map(saved.map((x,i)=>[x,i]));
+  return names.sort((a,b)=>{
+    const ar=rank.has(a)?rank.get(a):999999, br=rank.has(b)?rank.get(b):999999;
+    return ar-br || a.localeCompare(b);
   });
 }
 
-async function loadMenu(){
-  const {data:restaurant,error:rErr}=await supabaseClient
-    .from("restaurants")
-    .select("*")
-    .eq("slug",slug)
-    .maybeSingle();
+    function getCategories(items) {
+      const categories = [];
+      const seen = new Set();
+      items.forEach(item => {
+        const category = categoryKey(item.category);
+        if (!seen.has(category)) {
+          seen.add(category);
+          categories.push(category);
+        }
+      });
+      return categories;
+    }
 
-  if(rErr)throw rErr;
-  if(!restaurant)throw new Error(`Restaurant "${slug}" not found`);
+    function renderCategoryChips() {
+      const categories = getSavedCategoryOrder(restaurant, allItems);
+      $("category-chips").innerHTML = [
+        `<button class="cat-chip ${currentCategory === "all" ? "active" : ""}" data-category="all">All Menu</button>`,
+        ...categories.map(category => `
+          <button class="cat-chip ${currentCategory === category ? "active" : ""}" data-category="${escapeHTML(category)}">
+            ${escapeHTML(category)}
+          </button>
+        `)
+      ].join("");
+    }
 
-  document.title=`Signature Menu | ${restaurant.name||"Restaurant"}`;
+    function getFilteredItems() {
+      const q = searchText.trim().toLowerCase();
+      return allItems.filter(item => {
+        const category = categoryKey(item.category);
+        const categoryMatch = currentCategory === "all" || category === currentCategory;
+        const haystack = `${item.name || ""} ${item.description || ""} ${category}`.toLowerCase();
+        const searchMatch = !q || haystack.includes(q);
+        return categoryMatch && searchMatch;
+      });
+    }
 
-  const {data:items,error:iErr}=await supabaseClient
-    .from("menu_items")
-    .select("*")
-    .eq("restaurant_id",restaurant.id)
-    .neq("is_available",false)
-    .order("category",{ascending:true})
-    .order("name",{ascending:true});
+    function renderMenu() {
+      const filtered = getFilteredItems();
+      const grouped = {};
+      filtered.forEach(item => {
+        const category = categoryKey(item.category);
+        if (!grouped[category]) grouped[category] = [];
+        grouped[category].push(item);
+      });
+      const orderedCategories = getSavedCategoryOrder(restaurant, Object.values(grouped).flat());
+      orderedCategories.forEach(category => {
+        if (grouped[category]) {
+          grouped[category].sort((a,b) => {
+            const ao = Number(a.sort_order ?? a.position ?? 999999);
+            const bo = Number(b.sort_order ?? b.position ?? 999999);
+            return ao - bo || String(a.name||"").localeCompare(String(b.name||""));
+          });
+        }
+      });
 
-  if(iErr)throw iErr;
+      $("summary-line").style.display = "flex";
+      $("summary-line").innerHTML = `
+        <span>${filtered.length} item${filtered.length === 1 ? "" : "s"}</span>
+        ${searchText ? `<span>Search: “${escapeHTML(searchText)}”</span>` : ""}
+      `;
 
-  allItems=items||[];
-  renderMenu(allItems);
-  menuLoading.style.display="none";
+      if (!filtered.length) {
+        showState("Nothing found", "Try another search or category.");
+        return;
+      }
 
-  if(!allItems.length){
-    menuError.style.display="block";
-    menuError.textContent="No menu items available.";
-  }
-}
+      $("menu-sections").innerHTML = orderedCategories.filter(category => grouped[category]).map(category => {
+        const items = grouped[category];
+        return `
+        <section class="category-section" id="${sectionId(category)}" data-category="${escapeHTML(category)}">
+          <div class="category-heading categoryHeadWithPrices">
+            <div style="display:flex;align-items:center;gap:9px;min-width:0">
+              <h2 class="category-title">${escapeHTML(category)}</h2>
+              <span class="item-count">${items.length} item${items.length === 1 ? "" : "s"}</span>
+            </div>
+            <div class="categoryPriceSwitch" aria-label="Prices">
+  ${(() => {
+    const hasQ = items.some(x => String(x.price_quarter ?? "").trim() !== "");
+    const hasH = items.some(x => String(x.price_half ?? "").trim() !== "");
+    const hasF = items.some(x => String(x.price_full ?? x.price ?? "").trim() !== "");
+    return `<span>${hasQ ? "Quarter" : ""}</span><span>${hasH ? "Half" : ""}</span><span>${hasF ? "Full" : ""}</span>`;
+  })()}
+</div>
+          </div>
+          <div class="items-list">
+            ${items.map(renderItem).join("")}
+          </div>
+        </section>
+      `}).join("");
+    }
 
-/* ---------- 3D / AR ---------- */
+    function renderRestaurant(rest) {
+      restaurant = rest;
+      applyRestaurantTheme(rest);
 
-function setTip(text){
-  const tip=document.querySelector(".modal-tip");
-  if(tip)tip.textContent=text;
-}
+      const restaurantName = rest.name || "Restaurant";
+      // Optional restaurant information is shown ONLY when the owner has entered it.
+      // No hard-coded fallback text is used here.
+      const setOptionalText = (id, value, displayMode = "block") => {
+        const el = $(id);
+        if (!el) return false;
+        const text = value == null ? "" : String(value).trim();
+        el.textContent = text;
+        el.style.display = text ? displayMode : "none";
+        return !!text;
+      };
 
-function open3D(name,modelURL,usdzURL=""){
-  document.getElementById("modelTitle").innerText=name+" — 3D / AR";
+      setOptionalText("rest-welcome", rest.welcome_text);
+      $("rest-name").textContent = restaurantName;
+      setOptionalText("rest-subtitle", rest.tagline || rest.subtitle_text);
 
-  viewer.removeAttribute("src");
-  viewer.removeAttribute("ios-src");
+      let hasFeature = false;
+      ["rest-feature1","rest-feature2","rest-feature3"].forEach((id, i) => {
+        hasFeature = setOptionalText(id, rest[`feature_${i+1}`], "inline-flex") || hasFeature;
+      });
+      const features = $("rest-features");
+      if (features) features.style.display = hasFeature ? "flex" : "none";
 
-  setTip('Loading 3D model…');
+      const hasSlogan1 = setOptionalText("rest-slogan1", rest.slogan_1);
+      const hasSlogan2 = setOptionalText("rest-slogan2", rest.slogan_2);
+      const slogans = $("rest-slogans");
+      if (slogans) slogans.style.display = (hasSlogan1 || hasSlogan2) ? "flex" : "none";
 
-  if(usdzURL) viewer.setAttribute("ios-src",usdzURL);
-  if(modelURL) viewer.setAttribute("src",modelURL);
+      document.title = `${restaurantName} • Menu`;
 
-  document.getElementById("modal").classList.add("show");
-  document.body.style.overflow="hidden";
-}
+      const logoUrl = safeUrl(rest.logo_url);
+      const brandMark = null;
+      $("logo-container").innerHTML = logoUrl
+        ? `<img src="${escapeHTML(logoUrl)}" alt="${escapeHTML(rest.name || "Restaurant")} logo" onerror="this.parentElement.innerHTML=logoFallback()" />`
+        : logoFallback();
+      if (brandMark) {
+        brandMark.innerHTML = logoUrl
+          ? `<img src="${escapeHTML(logoUrl)}" alt="" onerror="this.parentElement.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/></svg>'" />`
+          : `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/></svg>`;
+      }
 
-function close3D(){
-  document.getElementById("modal").classList.remove("show");
-  viewer.removeAttribute("src");
-  viewer.removeAttribute("ios-src");
-  document.body.style.overflow="auto";
-  setTip('Rotate & Zoom with fingers • Click "Place on Table" to view in Room');
-}
+      const coverUrl = safeUrl(rest.banner_url || rest.cover_url || rest.cover_image);
+      const dummyBanner = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520">
+          <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#6b1f1a"/><stop offset="0.55" stop-color="#9f5a32"/><stop offset="1" stop-color="#d8a84e"/></linearGradient></defs>
+          <rect width="1200" height="520" fill="url(#g)"/>
+          <circle cx="960" cy="110" r="160" fill="rgba(255,255,255,.10)"/>
+          <circle cx="180" cy="470" r="220" fill="rgba(255,255,255,.08)"/>
+          <path d="M0 390 C260 280 420 480 650 350 S1020 260 1200 360 L1200 520 L0 520Z" fill="rgba(0,0,0,.16)"/>
+          <text x="600" y="270" text-anchor="middle" font-family="Georgia,serif" font-size="54" font-weight="700" fill="white" opacity=".95">YOUR RESTAURANT</text>
+          <text x="600" y="315" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" letter-spacing="6" fill="white" opacity=".78">FOOD • FLAVOUR • EXPERIENCE</text>
+        </svg>`)} `;
+      $("rest-cover").src = coverUrl || dummyBanner;
+      $("rest-cover").style.display = "block";
 
-document.getElementById("modal").addEventListener("click",function(e){
-  if(e.target===this)close3D();
-});
+      // Contact details: show only values actually available in Supabase.
+      const phoneEl = $("rest-phone");
+      const phoneRaw = rest.phone == null ? "" : String(rest.phone).trim();
+      if (phoneEl && phoneRaw) {
+        const phone = phoneRaw.replace(/[^+\d]/g, "");
+        phoneEl.href = `tel:${phone}`;
+        phoneEl.textContent = `• ${phoneRaw}`;
+        phoneEl.style.display = "inline";
+      } else if (phoneEl) {
+        phoneEl.style.display = "none";
+        phoneEl.textContent = "";
+      }
 
-viewer.addEventListener("load",()=>{
-  setTip('Rotate & Zoom with fingers • Click "Place on Table" to view in Room');
-});
+      const callBtn = $("rest-call-btn");
+      if (callBtn && phoneRaw) {
+        const phone = phoneRaw.replace(/[^+\d]/g, "");
+        callBtn.href = `tel:${phone}`;
+        callBtn.style.display = "grid";
+        const callText = rest.call_button_text ? String(rest.call_button_text).trim() : "";
+        callBtn.setAttribute("aria-label", callText || "Call restaurant");
+        callBtn.title = callText || phoneRaw;
+      } else if (callBtn) {
+        callBtn.style.display = "none";
+      }
 
-viewer.addEventListener("error",(e)=>{
-  console.error("model-viewer error:",e);
-  setTip("3D model load failed. Please check the Signature 3D proxy response and GLB file.");
-});
+      const address = rest.address == null ? "" : String(rest.address).trim();
+      const addressEl = $("rest-address");
+      if (addressEl && address) {
+        addressEl.textContent = `• ${address}`;
+        addressEl.style.display = "inline";
+      } else if (addressEl) {
+        addressEl.style.display = "none";
+        addressEl.textContent = "";
+      }
 
-/* Extra diagnostics in browser console */
-viewer.addEventListener("progress",(e)=>{
-  if(e?.detail?.totalProgress!=null){
-    console.log("3D load progress:",Math.round(e.detail.totalProgress*100)+"%");
-  }
-});
+      const isOpen = rest.is_open !== false && rest.status !== "closed" && rest.is_active !== false;
+      const statusEl = $("rest-status");
+      statusEl.classList.toggle("closed", !isOpen);
+      statusEl.querySelector("span:last-child").textContent = isOpen ? "Open" : "Closed";
+      const openPill = $("rest-open-pill");
+      if(openPill){
+        openPill.textContent = isOpen ? "● Open Now" : "● Closed";
+        openPill.style.background = isOpen ? "#12964e" : "#b4232e";
+      }
+      const fmtTime = (v)=>{
+        if(!v) return "";
+        const parts=String(v).split(":");
+        let h=Number(parts[0]),m=Number(parts[1]||0),suffix=h>=12?"PM":"AM";
+        h=h%12||12;
+        return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")} ${suffix}`;
+      };
+      const opening = fmtTime(rest.opening_time);
+      const closing = fmtTime(rest.closing_time);
+      const hoursEl = $("rest-hours");
+      if (hoursEl) {
+        hoursEl.textContent = opening && closing ? `${opening} – ${closing}` : "";
+        hoursEl.style.display = opening && closing ? "inline-flex" : "none";
+      }
+      if($("svc-dine")) $("svc-dine").style.display=rest.dine_in===false?"none":"inline-flex";
+      if($("svc-take")) $("svc-take").style.display=rest.takeaway===false?"none":"inline-flex";
+      if($("svc-delivery")) $("svc-delivery").style.display=rest.home_delivery===false?"none":"inline-flex";
+    }
 
-loadMenu().catch(err=>{
-  console.error(err);
-  menuLoading.style.display="none";
-  menuError.style.display="block";
-  menuError.textContent="Menu load failed: "+(err?.message||String(err));
-});
-</script>
+    async function loadPublicMenu() {
+      showLoading();
 
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const slug = (params.get("r") || "").trim().toLowerCase();
+
+        let query = supabaseClient.from("restaurants").select("*");
+        if (slug) query = query.eq("slug", slug);
+
+        const { data: restaurants, error: restError } = await query.limit(1);
+        if (restError) throw restError;
+
+        if (!restaurants || !restaurants.length) {
+          $("rest-name").textContent = "Restaurant Not Found";
+          $("category-chips").innerHTML = "";
+          $("summary-line").style.display = "none";
+          showState("Restaurant not found", "Please check the menu link and try again.");
+          return;
+        }
+
+        const rest = restaurants[0];
+        renderRestaurant(rest);
+
+        const { data: items, error: itemsError } = await supabaseClient
+          .from("menu_items")
+          .select("*")
+          .eq("restaurant_id", rest.id);
+
+        if (itemsError) throw itemsError;
+
+        allItems = Array.isArray(items) ? items : [];
+
+        // Optional sorting if you later add sort_order fields.
+        allItems.sort((a, b) => {
+          const aOrder = Number(a.sort_order ?? a.position ?? 999999);
+          const bOrder = Number(b.sort_order ?? b.position ?? 999999);
+          return aOrder - bOrder;
+        });
+
+        if (!allItems.length) {
+          $("category-chips").innerHTML = "";
+          $("summary-line").style.display = "none";
+          showState("Menu is being prepared", "No menu items have been added yet.");
+          return;
+        }
+
+        renderCategoryChips();
+        renderMenu();
+      } catch (error) {
+        console.error("Menu load error:", error);
+        $("rest-name").textContent = "Menu Unavailable";
+        $("category-chips").innerHTML = "";
+        $("summary-line").style.display = "none";
+        showState("Unable to load menu", "Please refresh the page or try again shortly.");
+      }
+    }
+
+    $("menu-search").addEventListener("input", (event) => {
+      searchText = event.target.value || "";
+      renderMenu();
+    });
+
+    $("category-chips").addEventListener("click", (event) => {
+      const btn = event.target.closest(".cat-chip");
+      if (!btn) return;
+
+      currentCategory = btn.dataset.category || "all";
+      renderCategoryChips();
+      renderMenu();
+
+      window.scrollTo({
+        top: document.querySelector(".sticky-panel").offsetTop,
+        behavior: "smooth"
+      });
+    });
+
+    window.addEventListener("load", loadPublicMenu);
+  </script>
+
+<div class="ar3d-modal" id="ar3dModal" aria-hidden="true">
+  <div class="ar3d-box" role="dialog" aria-modal="true" aria-labelledby="ar3dTitle">
+    <div class="ar3d-head"><strong id="ar3dTitle">3D Food Preview</strong><button class="ar3d-close" type="button" onclick="close3D()">×</button></div>
+    <model-viewer id="foodModel" class="ar3d-viewer" src="" ios-src="" camera-controls auto-rotate rotation-per-second="30deg" ar ar-modes="webxr scene-viewer quick-look" shadow-intensity="1.5" environment-image="neutral" crossorigin="anonymous" alt="3D Dish Preview">
+      <button slot="ar-button" class="ar3d-btn">📱 Place on Table (AR)</button>
+    </model-viewer>
+    <div class="ar3d-tip">Rotate & zoom the dish. On supported phones, tap <b>Place on Table (AR)</b>.</div>
+    <div class="ar3d-fail" id="ar3dFail">3D model load failed. Check the Cloudflare R2 public URL and CORS settings.</div>
+  </div>
+</div>
 
 </body>
 </html>
