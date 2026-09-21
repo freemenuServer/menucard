@@ -661,17 +661,15 @@ function truthy(v){
   return v === true || v === 1 || String(v ?? "").toLowerCase() === "true";
 }
 
-/* ================= CORS-SAFE URL HANDLER ================= */
+/* ================= FRESH CACHE-BUSTING HANDLER ================= */
 function browser3DUrl(rawUrl){
   const raw = String(rawUrl || "").trim();
   if(!raw) return "";
 
   try {
-    // Cloudflare CDN origin block ko bypass karne ke liye CORS proxy routing
-    if (raw.includes("images.freemenu.in")) {
-      return `https://corsproxy.io/?url=${encodeURIComponent(raw)}`;
-    }
-    return raw;
+    // Cache purge ke baad fresh R2 CORS fetch force karne ke liye timestamp query param
+    const separator = raw.includes("?") ? "&" : "?";
+    return `${raw}${separator}t=${Date.now()}`;
   } catch(e) {
     return raw;
   }
@@ -841,7 +839,7 @@ function setTip(text){
   if(tip)tip.textContent=text;
 }
 
-/* ================= 3D / AR VIEWER HANDLER ================= */
+/* ================= 3D / AR VIEWER OPEN ================= */
 function open3D(name, modelURL, usdzURL = "") {
   document.getElementById("modelTitle").innerText = name + " — 3D / AR";
 
