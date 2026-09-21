@@ -7,6 +7,7 @@
   <title>Digital Menu</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
   <style>
     :root {
@@ -1297,10 +1298,10 @@ body{
 </style>
 
 
-<style id="freemenu-ads-style">
-.fm-ad-wrap{grid-column:1/-1;display:flex;justify-content:center;align-items:center;min-height:90px;margin:2px 0 14px;padding:8px 0;overflow:hidden}
-.fm-ad-wrap ins{display:block;max-width:100%;width:100%;min-height:50px}
-@media(max-width:800px){.fm-ad-wrap{min-height:70px;margin-bottom:10px}}
+<style>
+.ar3d-btn{margin-top:10px;border:1px solid rgba(212,175,55,.55);background:linear-gradient(135deg,#fff8df,#f4df9a);color:#5c4100;border-radius:10px;padding:8px 12px;font-size:11px;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(83,54,18,.08)}
+.ar3d-btn:active{transform:scale(.98)}
+.ar3d-modal{position:fixed;inset:0;background:rgba(10,10,10,.72);display:none;align-items:center;justify-content:center;z-index:9999;padding:16px}.ar3d-modal.show{display:flex}.ar3d-box{width:min(720px,100%);background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 25px 80px rgba(0,0,0,.35)}.ar3d-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #eee}.ar3d-head strong{font-size:15px}.ar3d-close{border:0;background:#f2f4f7;border-radius:10px;width:36px;height:36px;font-size:22px;cursor:pointer}.ar3d-viewer{width:100%;height:min(68vh,560px);background:#f7f7f5}.ar3d-tip{padding:11px 15px;font-size:11px;color:#667085;text-align:center}.ar3d-fail{display:none;padding:20px;text-align:center;color:#b42318;font-size:12px}
 </style>
 </head>
 <body>
@@ -1336,6 +1337,10 @@ body{
             <div id="rest-slogan2"></div>
           </div>
           <div class="restaurant-meta" style="margin-top:11px">
+            <span id="rest-status" class="status-badge">
+              <span class="status-dot"></span>
+              <span>Open</span>
+            </span>
             <span id="rest-address" style="display:none;"></span>
             <a id="rest-phone" href="#" style="display:none;color:inherit;text-decoration:none"></a>
           </div>
@@ -1436,14 +1441,10 @@ body{
       const surface = cssColor(rest.card_color || rest.theme_card, "#ffffff");
       const text = cssColor(rest.text_color || rest.theme_text, "#111827");
 
-      const accent = cssColor(rest.accent_color || rest.theme_accent, "#c8943e");
       root.setProperty("--primary", primary);
       root.setProperty("--primary-dark", primaryDark);
-      root.setProperty("--accent", accent);
-      root.setProperty("--primary-soft", `color-mix(in srgb, ${primary} 10%, white)`);
       root.setProperty("--bg", bg);
       root.setProperty("--surface", surface);
-      root.setProperty("--surface-2", `color-mix(in srgb, ${surface} 92%, ${primary} 8%)`);
       root.setProperty("--text", text);
 
       const radius = Number(rest.card_radius || rest.theme_radius);
@@ -1538,6 +1539,7 @@ body{
                 </div>
                 ${renderTags(item)}
                 ${item.description ? `<p class="item-desc">${escapeHTML(item.description)}</p>` : ""}
+                ${item.ar_model_url && item.ar_enabled !== false ? `<button type="button" class="ar3d-btn" onclick="open3D(${JSON.stringify(item.name || "Dish")},${JSON.stringify(item.ar_model_url || "")},${JSON.stringify(item.ar_usdz_url || "")})">◈ 3D / AR View</button>` : ""}
               </div>
               <div class="item-price-area">
                 ${renderPrice(item, categoryKey(item.category))}
@@ -1547,6 +1549,60 @@ body{
         </article>
       `;
     }
+
+    // Public GLB proxy. This keeps browser/model-viewer loading away from
+    // Cloudflare R2 CORS issues while the Owner still stores the real R2 URL.
+    const SIGNATURE_3D_FUNCTION_URL =
+      `${SUPABASE_URL}/functions/v1/signature-3d-model-upload`;
+
+    function resolveSignature3DGlb(raw){
+      const direct = safeUrl(raw);
+      if(!direct) return "";
+
+      // Already proxied: use it as-is.
+      if(direct.startsWith(SIGNATURE_3D_FUNCTION_URL)) return direct;
+
+      // Convert the public R2 URL into ?key=... for the public proxy.
+      try{
+        const u = new URL(direct);
+        const path = u.pathname.replace(/^\/+/, "");
+        if(path.startsWith("restaurants/") && path.includes("/signature-3d/") && /\.glb$/i.test(path)){
+          return `${SIGNATURE_3D_FUNCTION_URL}?key=${encodeURIComponent(path)}`;
+        }
+      }catch(_){}
+
+      return direct;
+    }
+
+    function directR2Url(raw){
+      return safeUrl(raw);
+    }
+
+    function open3D(name, modelURL, usdzURL=""){
+      const viewer=$("foodModel"), modal=$("ar3dModal"), fail=$("ar3dFail");
+      const glb=resolveSignature3DGlb(modelURL), usdz=directR2Url(usdzURL);
+      if(!viewer||!modal||!glb)return;
+      $("ar3dTitle").textContent=(name||"Dish")+" — 3D / AR";
+      if(fail)fail.style.display="none";
+      viewer.removeAttribute("src");
+      viewer.removeAttribute("ios-src");
+      viewer.setAttribute("src",glb);
+      if(usdz)viewer.setAttribute("ios-src",usdz);
+      modal.classList.add("show");
+      modal.setAttribute("aria-hidden","false");
+      document.body.style.overflow="hidden";
+    }
+    function close3D(){
+      const modal=$("ar3dModal"),viewer=$("foodModel");
+      if(modal){modal.classList.remove("show");modal.setAttribute("aria-hidden","true");}
+      if(viewer){viewer.removeAttribute("src");viewer.removeAttribute("ios-src");}
+      document.body.style.overflow="";
+    }
+    $("ar3dModal")?.addEventListener("click",e=>{if(e.target===$("ar3dModal"))close3D();});
+    $("foodModel")?.addEventListener("error",(event)=>{
+      console.error("Signature 3D model load error:", event);
+      if($("ar3dFail"))$("ar3dFail").style.display="block";
+    });
 
     function categoryKey(category) {
       return String(category || "General").trim() || "General";
@@ -1634,11 +1690,9 @@ function getSavedCategoryOrder(rest, items) {
         return;
       }
 
-      const visibleCategories = orderedCategories.filter(category => grouped[category]);
-      const parts = [];
-      visibleCategories.forEach((category, categoryIndex) => {
+      $("menu-sections").innerHTML = orderedCategories.filter(category => grouped[category]).map(category => {
         const items = grouped[category];
-        parts.push(`
+        return `
         <section class="category-section" id="${sectionId(category)}" data-category="${escapeHTML(category)}">
           <div class="category-heading categoryHeadWithPrices">
             <div style="display:flex;align-items:center;gap:9px;min-width:0">
@@ -1658,13 +1712,7 @@ function getSavedCategoryOrder(rest, items) {
             ${items.map(renderItem).join("")}
           </div>
         </section>
-      `);
-        // Put one responsive ad after every two menu categories.
-        if (fmAdConfig && categoryIndex < visibleCategories.length - 1 && ((fmAdConfig.position === "after_1_category") || (fmAdConfig.position !== "after_1_category" && (categoryIndex + 1) % 2 === 0))) {
-          parts.push(renderMenuAd());
-        }
-      });
-      $("menu-sections").innerHTML = parts.join("");
+      `}).join("");
     }
 
     function renderRestaurant(rest) {
@@ -1762,13 +1810,11 @@ function getSavedCategoryOrder(rest, items) {
       }
 
       const isOpen = rest.is_open !== false && rest.status !== "closed" && rest.is_active !== false;
-      // The old top status element was removed; keep only the service-strip pill.
-      // Optional legacy status element; the current design uses #rest-open-pill.
       const statusEl = $("rest-status");
-      if (statusEl) {
+      if(statusEl){
         statusEl.classList.toggle("closed", !isOpen);
         const statusText = statusEl.querySelector("span:last-child");
-        if (statusText) statusText.textContent = isOpen ? "Open" : "Closed";
+        if(statusText) statusText.textContent = isOpen ? "Open" : "Closed";
       }
       const openPill = $("rest-open-pill");
       if(openPill){
@@ -1794,97 +1840,6 @@ function getSavedCategoryOrder(rest, items) {
       if($("svc-delivery")) $("svc-delivery").style.display=rest.home_delivery===false?"none":"inline-flex";
     }
 
-    // ==================== FreeMenu Google AdSense ====================
-    // Super Admin controls these values in platform_settings.
-    // No arbitrary HTML is accepted from the admin panel.
-    let fmAdConfig = null;
-
-    function fmSettingValue(rows, key, fallback = "") {
-      const row = (rows || []).find(x => x.key === key);
-      return row ? row.value : fallback;
-    }
-
-    function fmBool(value, fallback = false) {
-      if (value === true || value === false) return value;
-      if (value == null || value === "") return fallback;
-      return String(value).toLowerCase() === "true";
-    }
-
-    async function loadFreeMenuAdConfig(rest) {
-      try {
-        const settingsResult = await supabaseClient
-          .from("platform_settings")
-          .select("key,value")
-          .in("key", ["adsense_client_id", "ads_default_slot", "free_plan_ads", "premium_plan_ads", "ads_position"]);
-
-        if (settingsResult.error) {
-          console.warn("Ad settings unavailable; ads hidden.", settingsResult.error.message);
-          return null;
-        }
-
-        const rows = settingsResult.data || [];
-        const client = String(fmSettingValue(rows, "adsense_client_id", "")).trim();
-        const slot = String(fmSettingValue(rows, "ads_default_slot", "")).trim();
-        const freeAds = fmBool(fmSettingValue(rows, "free_plan_ads", true), true);
-        const premiumAds = fmBool(fmSettingValue(rows, "premium_plan_ads", false), false);
-        const plan = String(rest.plan || "free").toLowerCase();
-
-        // If restaurant is premium and its subscription table is available,
-        // require an active premium subscription before suppressing ads.
-        let activePremium = false;
-        const subResult = await supabaseClient
-          .from("subscriptions")
-          .select("plan,status,expiry_date")
-          .eq("restaurant_id", rest.id)
-          .eq("status", "active");
-
-        if (!subResult.error && Array.isArray(subResult.data)) {
-          activePremium = subResult.data.some(s => {
-            if (String(s.plan || "").toLowerCase() !== "premium") return false;
-            if (!s.expiry_date) return true;
-            const expiry = new Date(s.expiry_date);
-            return Number.isNaN(expiry.getTime()) || expiry >= new Date();
-          });
-        }
-
-        const shouldShow = activePremium ? premiumAds : (plan === "premium" ? premiumAds : freeAds);
-        if (!shouldShow) return null;
-        if (!/^ca-pub-\d{6,}$/.test(client) || !/^\d{4,}$/.test(slot)) return null;
-        return { client, slot, position: String(fmSettingValue(rows, "ads_position", "after_2_categories")) };
-      } catch (e) {
-        console.warn("Ad configuration error; ads hidden.", e);
-        return null;
-      }
-    }
-
-    function ensureAdSenseScript(client) {
-      if (!client || document.querySelector('script[data-freemenu-adsense="1"]')) return;
-      const script = document.createElement("script");
-      script.async = true;
-      script.crossOrigin = "anonymous";
-      script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" + encodeURIComponent(client);
-      script.setAttribute("data-freemenu-adsense", "1");
-      document.head.appendChild(script);
-    }
-
-    function renderMenuAd() {
-      if (!fmAdConfig) return "";
-      const id = "fm-ad-" + Math.random().toString(36).slice(2, 9);
-      setTimeout(() => {
-        const wrap = document.getElementById(id);
-        if (!wrap) return;
-        const ins = wrap.querySelector("ins");
-        if (!ins) return;
-        ins.setAttribute("data-ad-client", fmAdConfig.client);
-        ins.setAttribute("data-ad-slot", fmAdConfig.slot);
-        ins.setAttribute("data-ad-format", "auto");
-        ins.setAttribute("data-full-width-responsive", "true");
-        try { (window.adsbygoogle = window.adsbygoogle || []).push({}); }
-        catch (e) { console.warn("AdSense render skipped", e); }
-      }, 50);
-      return `<div id="${id}" class="fm-ad-wrap" aria-label="Advertisement"><ins class="adsbygoogle"></ins></div>`;
-    }
-
     async function loadPublicMenu() {
       showLoading();
 
@@ -1907,51 +1862,7 @@ function getSavedCategoryOrder(rest, items) {
         }
 
         const rest = restaurants[0];
-
-        // PLAN -> PUBLIC MENU TEMPLATE ROUTING
-        // Super Admin assigns restaurants.plan_id. The assigned plan decides
-        // which public menu template the restaurant receives.
-        if (rest.plan_id) {
-          const { data: assignedPlan, error: planError } = await supabaseClient
-            .from("plans")
-            .select("id,name,slug,is_active")
-            .eq("id", rest.plan_id)
-            .maybeSingle();
-
-          if (!planError && assignedPlan && assignedPlan.is_active !== false) {
-            const planKey = `${assignedPlan.slug || ""} ${assignedPlan.name || ""}`.toLowerCase().trim();
-
-            const isSignature3D =
-              planKey.includes("signature 3d") ||
-              planKey.includes("signature-3d") ||
-              planKey.includes("signature_3d") ||
-              (planKey.includes("signature") && planKey.includes("3d"));
-
-            if (isSignature3D) {
-              const signatureUrl = new URL("/signaturemenu.html", window.location.origin);
-              signatureUrl.searchParams.set("r", rest.slug);
-              window.location.replace(signatureUrl.href);
-              return;
-            }
-
-            const isGrowthPhotos =
-              planKey.includes("growth") ||
-              planKey.includes("growth-photos") ||
-              planKey.includes("growth photos") ||
-              planKey.includes("photo_menu_v1");
-
-            if (isGrowthPhotos) {
-              const growthUrl = new URL("/menugrowth.html", window.location.origin);
-              growthUrl.searchParams.set("r", rest.slug);
-              window.location.replace(growthUrl.href);
-              return;
-            }
-          }
-        }
-
         renderRestaurant(rest);
-        fmAdConfig = await loadFreeMenuAdConfig(rest);
-        if (fmAdConfig) ensureAdSenseScript(fmAdConfig.client);
 
         const { data: items, error: itemsError } = await supabaseClient
           .from("menu_items")
@@ -1980,11 +1891,16 @@ function getSavedCategoryOrder(rest, items) {
         renderMenu();
       } catch (error) {
         console.error("Menu load error:", error);
-        const nameEl = $("rest-name");
-        if (nameEl) nameEl.textContent = "Menu Unavailable";
+        restaurant = null;
+        allItems = [];
+        currentCategory = "all";
+        $("rest-name").textContent = "Menu Unavailable";
         $("category-chips").innerHTML = "";
         $("summary-line").style.display = "none";
-        showState("Unable to load menu", "Please refresh the page or try again shortly.");
+        showState(
+          "Unable to load menu",
+          error?.message ? `Please refresh the page or try again shortly. (${error.message})` : "Please refresh the page or try again shortly."
+        );
       }
     }
 
@@ -2009,6 +1925,17 @@ function getSavedCategoryOrder(rest, items) {
 
     window.addEventListener("load", loadPublicMenu);
   </script>
+
+<div class="ar3d-modal" id="ar3dModal" aria-hidden="true">
+  <div class="ar3d-box" role="dialog" aria-modal="true" aria-labelledby="ar3dTitle">
+    <div class="ar3d-head"><strong id="ar3dTitle">3D Food Preview</strong><button class="ar3d-close" type="button" onclick="close3D()">×</button></div>
+    <model-viewer id="foodModel" class="ar3d-viewer" src="" ios-src="" camera-controls auto-rotate rotation-per-second="30deg" ar ar-modes="webxr scene-viewer quick-look" shadow-intensity="1.5" environment-image="neutral" crossorigin="anonymous" alt="3D Dish Preview">
+      <button slot="ar-button" class="ar3d-btn">📱 Place on Table (AR)</button>
+    </model-viewer>
+    <div class="ar3d-tip">Rotate & zoom the dish. On supported phones, tap <b>Place on Table (AR)</b>.</div>
+    <div class="ar3d-fail" id="ar3dFail">3D model load failed. Check the Cloudflare R2 public URL and CORS settings.</div>
+  </div>
+</div>
 
 </body>
 </html>
