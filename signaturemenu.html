@@ -682,11 +682,51 @@ model-viewer{
 }
 .food-img.image-off .food-img-placeholder{display:grid!important;}
 </style>
+
+<style id="freemenu-global-image-toggle">
+.global-image-toggle{
+  position:fixed!important;
+  top:14px!important;
+  right:14px!important;
+  z-index:9999!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  min-width:112px!important;
+  height:36px!important;
+  padding:0 13px!important;
+  border:1px solid rgba(255,255,255,.55)!important;
+  border-radius:999px!important;
+  background:rgba(0,0,0,.9)!important;
+  color:#f5cc68!important;
+  font-size:10px!important;
+  font-weight:900!important;
+  letter-spacing:.4px!important;
+  cursor:pointer!important;
+  box-shadow:0 5px 18px rgba(0,0,0,.5)!important;
+  backdrop-filter:blur(8px)!important;
+}
+.global-image-toggle:hover{background:#e5a735!important;color:#111!important;}
+.global-image-toggle.off{background:#e5a735!important;color:#111!important;}
+.food-img.image-off img{display:none!important;}
+.food-img.image-off{background:radial-gradient(circle,#292929,#0b0c0d 75%)!important;}
+.food-img-placeholder{display:none!important;position:absolute!important;inset:0!important;place-items:center!important;color:#e5b74e!important;font-size:38px!important;}
+.food-img.image-off .food-img-placeholder{display:grid!important;}
+@media(max-width:560px){
+  .global-image-toggle{top:9px!important;right:9px!important;min-width:98px!important;height:32px!important;font-size:9px!important;padding:0 10px!important;}
+}
+</style>
+
 </head>
 
 
 <body>
 
+<button type="button" id="globalImageToggle" class="global-image-toggle" onclick="toggleAllFoodImages()" aria-label="Toggle all food images">
+  <span id="globalImageToggleIcon">◉</span>
+  <span id="globalImageToggleText">IMAGES ON</span>
+</button>
 
 <!-- ================= HEADER ================= -->
 
@@ -1064,13 +1104,6 @@ function renderCategories(){
           <div class="food-img" data-image-item="${escapeHtml(item.id || item.name || "")}">
             ${imageHtml}
             <div class="food-img-placeholder">🍽</div>
-            <button type="button"
-              class="food-img-toggle"
-              aria-label="Toggle food image"
-              onclick="toggleFoodImage(this, event)">
-              <span class="img-toggle-icon">◉</span>
-              <span class="img-toggle-text">IMG ON</span>
-            </button>
             ${veg ? '<div class="veg"></div>' : ''}
           </div>
           <div class="food-content">
@@ -1190,42 +1223,30 @@ async function loadDatabaseMenu(){
   }
 }
 
-function toggleFoodImage(button, event){
-  event?.stopPropagation();
+function setAllFoodImages(off){
+  const wraps=document.querySelectorAll('.food-img[data-image-item]');
+  wraps.forEach(wrap=>{
+    wrap.classList.toggle('image-off',off);
+  });
 
-  const wrap = button.closest(".food-img");
-  if(!wrap) return;
+  const btn=document.getElementById('globalImageToggle');
+  const text=document.getElementById('globalImageToggleText');
+  const icon=document.getElementById('globalImageToggleIcon');
+  if(btn) btn.classList.toggle('off',off);
+  if(text) text.textContent=off ? 'IMAGES OFF' : 'IMAGES ON';
+  if(icon) icon.textContent=off ? '○' : '◉';
 
-  const key = `freemenu_img_${wrap.dataset.imageItem || ""}`;
-  const isOff = !wrap.classList.contains("image-off");
+  localStorage.setItem('freemenu_all_images',off ? 'off' : 'on');
+}
 
-  wrap.classList.toggle("image-off", isOff);
-
-  const textEl = button.querySelector(".img-toggle-text");
-  const iconEl = button.querySelector(".img-toggle-icon");
-
-  if(isOff){
-    if(textEl) textEl.textContent = "IMG OFF";
-    if(iconEl) iconEl.textContent = "○";
-    localStorage.setItem(key, "off");
-  }else{
-    if(textEl) textEl.textContent = "IMG ON";
-    if(iconEl) iconEl.textContent = "◉";
-    localStorage.setItem(key, "on");
-  }
+function toggleAllFoodImages(){
+  const currentlyOff=localStorage.getItem('freemenu_all_images') === 'off';
+  setAllFoodImages(!currentlyOff);
 }
 
 function restoreFoodImageStates(){
-  document.querySelectorAll(".food-img[data-image-item]").forEach(wrap => {
-    const key = `freemenu_img_${wrap.dataset.imageItem || ""}`;
-    if(localStorage.getItem(key) === "off"){
-      wrap.classList.add("image-off");
-      const textEl = wrap.querySelector(".img-toggle-text");
-      const iconEl = wrap.querySelector(".img-toggle-icon");
-      if(textEl) textEl.textContent = "IMG OFF";
-      if(iconEl) iconEl.textContent = "○";
-    }
-  });
+  const off=localStorage.getItem('freemenu_all_images') === 'off';
+  setAllFoodImages(off);
 }
 
 /* ================= 3D VIEW & AR ================= */
