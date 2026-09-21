@@ -643,6 +643,9 @@ model-viewer{
 <script>
 const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+const SIGNATURE_3D_FUNCTION_URL =
+  `${SUPABASE_URL}/functions/v1/signature-3d-model-upload`;
+
 const supabaseClient =
   window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
@@ -868,8 +871,32 @@ function browser3DUrl(rawUrl){
   const raw = String(rawUrl || "").trim();
   if(!raw) return "";
 
-  // Cloudflare R2 CORS is configured, so model-viewer loads GLB directly.
-  return raw;
+  try{
+    const u = new URL(raw, location.origin);
+
+    // Already-proxied model URL.
+    if(
+      u.hostname.endsWith("supabase.co") &&
+      u.pathname.includes("/functions/v1/signature-3d-model-upload")
+    ){
+      return raw;
+    }
+
+    // Existing database records contain the public R2 custom-domain URL.
+    // Convert only Signature 3D objects to the public binary proxy.
+    if(
+      u.hostname.toLowerCase() === "images.freemenu.in" &&
+      u.pathname.includes("/signature-3d/")
+    ){
+      const key = u.pathname.replace(/^\/+/, "");
+      return `${SIGNATURE_3D_FUNCTION_URL}?key=${encodeURIComponent(key)}`;
+    }
+
+    return raw;
+  }catch(error){
+    console.warn("3D URL parse failed:", error);
+    return raw;
+  }
 }
 
 function has3D(item){
@@ -1053,7 +1080,7 @@ viewer.addEventListener("load",()=>{
 
 viewer.addEventListener("error",(e)=>{
   console.error("model-viewer error:",e);
-  setTip("3D model load failed. Please check the Cloudflare R2 GLB URL and CORS policy.");
+  setTip("3D model load failed. Please check the Signature 3D proxy response and GLB file.");
 });
 
 /* Extra diagnostics in browser console */
