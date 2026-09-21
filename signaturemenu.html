@@ -635,149 +635,21 @@ model-viewer{
 
 </style>
 
-<style id="freemenu-image-toggle-fix">
-.food-img{position:relative!important;overflow:hidden!important;}
-.food-img-toggle{
-  position:absolute!important;
-  top:10px!important;
-  left:10px!important;
-  z-index:50!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  gap:6px!important;
-  min-width:82px!important;
-  height:32px!important;
-  padding:0 11px!important;
-  border:1px solid rgba(255,255,255,.5)!important;
-  border-radius:999px!important;
-  background:rgba(0,0,0,.86)!important;
-  color:#f5cc68!important;
-  font-size:10px!important;
-  font-weight:900!important;
-  line-height:1!important;
-  letter-spacing:.3px!important;
-  cursor:pointer!important;
-  box-shadow:0 4px 14px rgba(0,0,0,.45)!important;
-  opacity:1!important;
-  visibility:visible!important;
-  pointer-events:auto!important;
-}
-.food-img-toggle:hover{
-  background:#e5a735!important;
-  color:#111!important;
-}
-.food-img-toggle:active{transform:scale(.96);}
-.food-img.image-off img{display:none!important;}
-.food-img.image-off{
-  background:radial-gradient(circle,#292929,#0b0c0d 75%)!important;
-}
-.food-img-placeholder{
-  display:none!important;
-  position:absolute!important;
-  inset:0!important;
-  place-items:center!important;
-  color:#e5b74e!important;
-  font-size:38px!important;
-}
-.food-img.image-off .food-img-placeholder{display:grid!important;}
-</style>
-
-<style id="freemenu-global-image-toggle">
-.global-image-toggle{
-  position:fixed!important;
-  top:14px!important;
-  right:14px!important;
-  z-index:9999!important;
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  gap:7px!important;
-  min-width:112px!important;
-  height:36px!important;
-  padding:0 13px!important;
-  border:1px solid rgba(255,255,255,.55)!important;
-  border-radius:999px!important;
-  background:rgba(0,0,0,.9)!important;
-  color:#f5cc68!important;
-  font-size:10px!important;
-  font-weight:900!important;
-  letter-spacing:.4px!important;
-  cursor:pointer!important;
-  box-shadow:0 5px 18px rgba(0,0,0,.5)!important;
-  backdrop-filter:blur(8px)!important;
-}
-.global-image-toggle:hover{background:#e5a735!important;color:#111!important;}
-.global-image-toggle.off{background:#e5a735!important;color:#111!important;}
-.food-img.image-off img{display:none!important;}
-.food-img.image-off{background:radial-gradient(circle,#292929,#0b0c0d 75%)!important;}
-.food-img-placeholder{display:none!important;position:absolute!important;inset:0!important;place-items:center!important;color:#e5b74e!important;font-size:38px!important;}
-.food-img.image-off .food-img-placeholder{display:grid!important;}
-@media(max-width:560px){
-  .global-image-toggle{top:9px!important;right:9px!important;min-width:98px!important;height:32px!important;font-size:9px!important;padding:0 10px!important;}
-}
-</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+const SIGNATURE_3D_FUNCTION_URL =
+  `${SUPABASE_URL}/functions/v1/signature-3d-model-upload`;
+const supabaseClient =
+  window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+</script>
 
 
-<style id="freemenu-text-menu-mode">
-/* When images are OFF, switch the entire menu into a clean text/printed-menu layout. */
-body.text-menu-mode .food-grid{
-  display:block!important;
-}
-body.text-menu-mode .food-card{
-  display:flex!important;
-  align-items:center!important;
-  gap:0!important;
-  min-height:72px!important;
-  border:0!important;
-  border-bottom:1px dashed #3a3a3a!important;
-  border-radius:0!important;
-  background:transparent!important;
-  box-shadow:none!important;
-  transform:none!important;
-}
-body.text-menu-mode .food-card:last-child{border-bottom:0!important;}
-body.text-menu-mode .food-card:hover{
-  transform:none!important;
-  border-color:transparent!important;
-  background:rgba(255,255,255,.025)!important;
-}
-body.text-menu-mode .food-img{display:none!important;}
-body.text-menu-mode .food-content{
-  width:100%!important;
-  padding:12px 2px!important;
-}
-body.text-menu-mode .food-name{
-  font-size:15px!important;
-  font-weight:800!important;
-  color:#f3eee7!important;
-}
-body.text-menu-mode .price{
-  font-size:15px!important;
-  color:#f5cc68!important;
-}
-body.text-menu-mode .description{
-  min-height:0!important;
-  margin:5px 0 0!important;
-  font-size:11px!important;
-  color:#aaa!important;
-}
-body.text-menu-mode .section{
-  padding-top:20px!important;
-}
-body.text-menu-mode .section-title{
-  margin-bottom:8px!important;
-}
-body.text-menu-mode .food-section{
-  margin-bottom:10px!important;
-}
-body.text-menu-mode .actions{
-  margin-top:8px!important;
-}
-@media(max-width:700px){
-  body.text-menu-mode .food-name-row{gap:12px!important;}
-  body.text-menu-mode .food-name{font-size:14px!important;}
-  body.text-menu-mode .price{font-size:14px!important;}
+<style>
+.db-brand-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:600px){
+  .db-brand-name{font-size:15px!important;max-width:210px}
 }
 </style>
 
@@ -786,10 +658,6 @@ body.text-menu-mode .actions{
 
 <body>
 
-<button type="button" id="globalImageToggle" class="global-image-toggle" onclick="toggleAllFoodImages()" aria-label="Toggle all food images">
-  <span id="globalImageToggleIcon">◉</span>
-  <span id="globalImageToggleText">IMAGES ON</span>
-</button>
 
 <!-- ================= HEADER ================= -->
 
@@ -839,61 +707,27 @@ body.text-menu-mode .actions{
 
 <!-- ================= CATEGORY ================= -->
 
+
 <div class="category-wrap">
-
-<div class="categories">
-
-<button class="category active" onclick="filterCategory('all', event)">
-<span>▦</span>
-All
-</button>
-
-<button class="category" onclick="filterCategory('starters', event)">
-<span>🌿</span>
-Starters
-</button>
-
-<button class="category" onclick="filterCategory('soups', event)">
-<span>🍲</span>
-Soups
-</button>
-
-<button class="category" onclick="filterCategory('main', event)">
-<span>🍛</span>
-Main Course
-</button>
-
-<button class="category" onclick="filterCategory('rice', event)">
-<span>🍚</span>
-Rice & Biryani
-</button>
-
-<button class="category" onclick="filterCategory('breads', event)">
-<span>🥖</span>
-Breads
-</button>
-
-<button class="category" onclick="filterCategory('salad', event)">
-<span>🥗</span>
-Salad & Raita
-</button>
-
-<button class="category" onclick="filterCategory('beverages', event)">
-<span>🥤</span>
-Beverages
-</button>
-
+  <div class="categories" id="categoryNav">
+    <button class="category active" data-category="all" onclick="filterCategory('all', event)">
+      <span>▦</span>All
+    </button>
+  </div>
 </div>
 
-</div>
+
 
 
 
 <main class="container">
-  <div id="menuLoading" style="padding:60px 20px;text-align:center;color:#aaa">Loading menu...</div>
-  <div id="menuError" style="display:none;padding:60px 20px;text-align:center;color:#ffb4b4"></div>
+  <div id="menuLoading" style="padding:40px 20px;text-align:center;color:#aaa;">
+    Loading menu...
+  </div>
+  <div id="menuError" style="display:none;padding:40px 20px;text-align:center;color:#ff8b8b;"></div>
   <div id="menuSections"></div>
 </main>
+
 
 
 
@@ -1016,335 +850,286 @@ Rotate & Zoom with fingers • Click "Place on Table" to view in Room
 
 
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-/* ================= FREE MENU CONFIG =================
-   Supabase browser key is the publishable/anon key only.
-   NEVER put Cloudflare R2 secret/access keys in this HTML.
-====================================================== */
-const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+/* ================= SUPABASE + DYNAMIC SIGNATURE MENU ================= */
 
-/* Safe public Cloudflare R2/custom-domain values */
-const CLOUDFLARE_R2_PUBLIC_URL = "https://images.freemenu.in";
-const SIGNATURE_3D_FUNCTION_URL =
-  `${SUPABASE_URL}/functions/v1/signature-3d-model-upload`;
+const params = new URLSearchParams(location.search);
+const slug = params.get("r") || "urbanpunjab";
 
-const supabaseClient =
-  window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-</script>
+let currentRestaurant = null;
+let allItems = [];
 
-<script>
-/* ================= DATABASE MENU ================= */
+const menuLoading = document.getElementById("menuLoading");
+const menuError = document.getElementById("menuError");
+const menuSections = document.getElementById("menuSections");
+const categoryNav = document.getElementById("categoryNav");
 
-const escapeHtml = (value) => String(value ?? "")
-  .replace(/&/g,"&amp;")
-  .replace(/</g,"&lt;")
-  .replace(/>/g,"&gt;")
-  .replace(/"/g,"&quot;")
-  .replace(/'/g,"&#039;");
-
-let dbRestaurant = null;
-let dbItems = [];
-let activeCategory = "all";
-
-function getSlug(){
-  const params = new URLSearchParams(window.location.search);
-  return String(params.get("r") || "urbanpunjab").trim().toLowerCase();
+function esc(value){
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[ch]));
 }
 
-function itemImage(item){
-  return item.image_url || item.photo_url || item.image || item.photo || "";
-}
-
-function itemPrice(item){
-  const values = [
-    ["Full", item.price_full],
-    ["Half", item.price_half],
-    ["Single", item.price]
-  ];
-  const found = values.find(([,v]) => v !== null && v !== undefined && v !== "");
-  return found ? `₹${found[1]}` : "Price on request";
-}
-
-function itemPrices(item){
-  const parts = [];
-  if(item.price !== null && item.price !== undefined && item.price !== "") parts.push(`₹${item.price}`);
-  if(item.price_quarter !== null && item.price_quarter !== undefined && item.price_quarter !== "") parts.push(`Qtr ₹${item.price_quarter}`);
-  if(item.price_half !== null && item.price_half !== undefined && item.price_half !== "") parts.push(`Half ₹${item.price_half}`);
-  if(item.price_full !== null && item.price_full !== undefined && item.price_full !== "") parts.push(`Full ₹${item.price_full}`);
-  return parts.join("  ");
+function boolValue(v){
+  return v === true || v === 1 || String(v ?? "").toLowerCase() === "true";
 }
 
 function is3D(item){
-  return Boolean(
-    (item.ar_enabled === true || item.signature_3d === true) &&
-    (item.ar_model_url || item.ar_usdz_url)
-  );
+  return (boolValue(item?.ar_enabled) || boolValue(item?.signature_3d)) &&
+    Boolean(item?.ar_model_url || item?.ar_usdz_url);
 }
 
-function r2BrowserUrl(rawUrl){
-  const raw=String(rawUrl||"").trim();
+/*
+  IMPORTANT:
+  R2 public objects are routed through the Supabase Edge Function so the
+  browser gets CORS headers and the correct GLB/USDZ content type.
+*/
+function browserModelUrl(rawUrl){
+  const raw = String(rawUrl || "").trim();
   if(!raw) return "";
 
-  // Cloudflare R2 custom-domain objects can download directly, but the
-  // browser/model-viewer also needs a CORS-readable response. Route our
-  // Signature 3D objects through the public Supabase Edge Function proxy.
   try{
-    const u=new URL(raw,location.origin);
-    const host=(u.hostname||"").toLowerCase();
-    const isFreemenuR2 = host === "images.freemenu.in";
-    const isSignatureObject = u.pathname.includes("/signature-3d/");
-    if(isFreemenuR2 && isSignatureObject){
-      const key=u.pathname.replace(/^\//,"");
+    const u = new URL(raw, location.origin);
+    const host = u.hostname.toLowerCase();
+
+    if(host === "images.freemenu.in" && u.pathname.includes("/signature-3d/")){
+      const key = u.pathname.replace(/^\/+/, "");
       return `${SIGNATURE_3D_FUNCTION_URL}?key=${encodeURIComponent(key)}`;
     }
+
+    // If the DB already contains the Edge Function URL, use it unchanged.
+    if(u.hostname.toLowerCase().includes("supabase.co") &&
+       u.pathname.includes("/functions/v1/signature-3d-model-upload")){
+      return raw;
+    }
+
+    return raw;
   }catch(e){
-    console.warn("3D URL parse failed",e);
+    return raw;
   }
-  return raw;
 }
 
 function modelUrl(item){
-  return r2BrowserUrl(item.ar_model_url);
+  return browserModelUrl(item?.ar_model_url);
 }
 
 function usdzUrl(item){
-  return r2BrowserUrl(item.ar_usdz_url);
+  return browserModelUrl(item?.ar_usdz_url);
 }
 
-function setRestaurantBrand(rest){
-  const name = String(rest.name || "Signature Menu");
-  document.title = `${name} | Signature Menu`;
+function priceText(item){
+  const full = item?.price_full ?? item?.price;
+  const half = item?.price_half;
+  const quarter = item?.price_quarter;
 
-  const titleParts = name.trim().split(/\s+/);
-  const logo = document.querySelector(".logo");
-  if(logo){
-    const h2s = logo.querySelectorAll("h2");
-    if(h2s.length >= 2){
-      h2s[0].textContent = titleParts[0] || "RESTAURANT";
-      h2s[1].textContent = titleParts.slice(1).join(" ") || "";
+  if(full != null && String(full) !== ""){
+    if(half != null || quarter != null){
+      const parts = [];
+      if(quarter != null && String(quarter) !== "") parts.push(`Q ₹${quarter}`);
+      if(half != null && String(half) !== "") parts.push(`H ₹${half}`);
+      parts.push(`F ₹${full}`);
+      return parts.join(" • ");
     }
+    return `₹${full}`;
   }
+  return "";
+}
+
+function itemImage(item){
+  return item?.image_url || item?.photo_url || item?.image || item?.photo || "";
+}
+
+function categoryName(raw){
+  const value = String(raw || "Menu").trim();
+  return value || "Menu";
+}
+
+function categoryIcon(name){
+  const n = name.toLowerCase();
+  if(n.includes("starter")) return "🌿";
+  if(n.includes("soup")) return "🍲";
+  if(n.includes("rice") || n.includes("biryani")) return "🍚";
+  if(n.includes("bread") || n.includes("roti") || n.includes("naan")) return "🥖";
+  if(n.includes("salad") || n.includes("raita")) return "🥗";
+  if(n.includes("beverage") || n.includes("drink")) return "🥤";
+  if(n.includes("dessert") || n.includes("sweet")) return "🍨";
+  return "🍛";
+}
+
+function renderCategories(groups){
+  categoryNav.innerHTML = `
+    <button class="category active" data-category="all"
+      onclick="filterCategory('all', event)">
+      <span>▦</span>All
+    </button>
+  `;
+
+  groups.forEach(group => {
+    const key = group.key.replace(/'/g, "\\'");
+    const button = document.createElement("button");
+    button.className = "category";
+    button.dataset.category = group.key;
+    button.onclick = event => filterCategory(group.key, event);
+    button.innerHTML = `<span>${categoryIcon(group.name)}</span>${esc(group.name)}`;
+    categoryNav.appendChild(button);
+  });
+}
+
+function renderItems(items){
+  const groupsMap = new Map();
+
+  items.forEach(item => {
+    const name = categoryName(item.category);
+    const key = name.toLowerCase().replace(/\s+/g, "-");
+    if(!groupsMap.has(key)){
+      groupsMap.set(key, {key, name, items:[]});
+    }
+    groupsMap.get(key).items.push(item);
+  });
+
+  const groups = [...groupsMap.values()];
+  renderCategories(groups);
+
+  menuSections.innerHTML = groups.map(group => `
+    <section class="section food-section" data-category="${esc(group.key)}">
+      <div class="section-title">
+        <h2>${categoryIcon(group.name)} ${esc(group.name)}</h2>
+        <div class="line"></div>
+        <div class="view-all">View All →</div>
+      </div>
+      <div class="food-grid">
+        ${group.items.map(item => {
+          const img = itemImage(item);
+          const price = priceText(item);
+          const threeD = is3D(item);
+          const glb = modelUrl(item);
+          const usdz = usdzUrl(item);
+
+          const imageHtml = img
+            ? `<div class="food-img">
+                 <img src="${esc(img)}" alt="${esc(item.name || "Dish")}" loading="lazy">
+                 ${boolValue(item.is_veg) || String(item.item_type||"").toLowerCase()==="veg"
+                    ? `<div class="veg"></div>` : ""}
+               </div>`
+            : "";
+
+          const buttonHtml = threeD
+            ? `<div class="actions">
+                 <button class="btn btn-3d"
+                   onclick='open3D(${JSON.stringify(item.name || "3D Dish")},${JSON.stringify(glb)},${JSON.stringify(usdz)})'>
+                   ◈ 3D View
+                 </button>
+               </div>`
+            : "";
+
+          return `
+            <div class="food-card">
+              ${imageHtml}
+              <div class="food-content">
+                <div class="food-name-row">
+                  <div class="food-name">${esc(item.name || "Unnamed Dish")}</div>
+                  <div class="price">${esc(price)}</div>
+                </div>
+                <div class="description">${esc(item.description || "")}</div>
+                ${buttonHtml}
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </section>
+  `).join("");
+}
+
+async function loadRestaurant(){
+  menuLoading.style.display = "block";
+  menuError.style.display = "none";
+
+  const {data:restaurant,error:restaurantError} =
+    await supabaseClient
+      .from("restaurants")
+      .select("*")
+      .eq("slug", slug)
+      .maybeSingle();
+
+  if(restaurantError) throw restaurantError;
+  if(!restaurant) throw new Error(`Restaurant "${slug}" not found.`);
+
+  currentRestaurant = restaurant;
+
+  // Use database branding when available; original Signature styling stays intact.
+  const title = restaurant.name || "Signature Menu";
+  document.title = `Signature Menu | ${title}`;
 
   const brandTitle = document.querySelector(".brand-title");
   if(brandTitle) brandTitle.textContent = "MENU";
 
-  const subtag = document.querySelector(".subtag");
-  if(subtag && rest.tagline) subtag.textContent = rest.tagline;
-
-  const footerText = document.querySelector(".footer-text");
-  if(footerText && rest.address) footerText.innerHTML = escapeHtml(rest.address);
-
-  const contact = document.querySelectorAll(".footer-text")[1];
-  if(contact && rest.phone) contact.innerHTML = escapeHtml(rest.phone);
-}
-
-function renderCategories(){
-  const container = document.getElementById("menuSections");
-  const groups = new Map();
-
-  dbItems
-    .filter(item => item.is_available !== false)
-    .forEach(item => {
-      const category = String(item.category || "General").trim() || "General";
-      if(!groups.has(category)) groups.set(category, []);
-      groups.get(category).push(item);
-    });
-
-  if(!groups.size){
-    container.innerHTML = `
-      <div style="padding:70px 20px;text-align:center;color:#aaa">
-        No menu items found for this restaurant.
-      </div>`;
-    return;
+  const brandTitleParent = document.querySelector(".brand");
+  if(brandTitleParent){
+    const existing = brandTitleParent.querySelector(".db-brand-name");
+    if(existing) existing.remove();
+    if(restaurant.name){
+      const nameEl = document.createElement("div");
+      nameEl.className = "db-brand-name";
+      nameEl.style.cssText =
+        "font-family:'Playfair Display',serif;font-size:24px;color:#fff;margin-top:10px;";
+      nameEl.textContent = restaurant.name;
+      brandTitleParent.appendChild(nameEl);
+    }
   }
 
-  const html = [...groups.entries()].map(([category, items], index) => {
-    const cards = items.map(item => {
-      const name = escapeHtml(item.name || "Menu Item");
-      const desc = escapeHtml(item.description || "");
-      const price = escapeHtml(itemPrice(item));
-      const prices = escapeHtml(itemPrices(item));
-      const image = itemImage(item);
-      const type = String(item.item_type || "").toLowerCase();
-      const veg = item.is_veg === true || type === "veg";
+  const {data:items,error:itemError} =
+    await supabaseClient
+      .from("menu_items")
+      .select("*")
+      .eq("restaurant_id", restaurant.id)
+      .neq("is_available", false)
+      .order("category", {ascending:true})
+      .order("name", {ascending:true});
 
-      const imageHtml = image
-        ? `<img src="${escapeHtml(image)}" alt="${name}" loading="lazy"
-             onerror="this.style.display='none'">`
-        : `<div style="width:100%;height:100%;display:grid;place-items:center;background:radial-gradient(circle,#282828,#0d0e0f);color:#e5b74e;font-size:42px">🍽</div>`;
+  if(itemError) throw itemError;
 
-      const threeD = is3D(item)
-        ? `<div class="actions">
-             <button class="btn btn-3d"
-               onclick='open3D(${JSON.stringify(item.name || "3D Dish")},${JSON.stringify(modelUrl(item))},${JSON.stringify(usdzUrl(item))})'>
-               ◈ 3D View
-             </button>
-           </div>`
-        : "";
+  allItems = items || [];
+  renderItems(allItems);
 
-      return `
-        <div class="food-card">
-          <div class="food-img" data-image-item="${escapeHtml(item.id || item.name || "")}">
-            ${imageHtml}
-            <div class="food-img-placeholder">🍽</div>
-            ${veg ? '<div class="veg"></div>' : ''}
-          </div>
-          <div class="food-content">
-            <div class="food-name-row">
-              <div class="food-name">${name}</div>
-              <div class="price">${price}</div>
-            </div>
-            <div class="description">${desc}</div>
-            ${prices ? `<div style="font-size:11px;color:#bdbdbd;margin-bottom:10px">${prices}</div>` : ""}
-            ${threeD}
-          </div>
-        </div>`;
-    }).join("");
+  menuLoading.style.display = "none";
 
-    return `
-      <section class="section food-section" data-category="${escapeHtml(category)}">
-        <div class="section-title">
-          <h2>🍽 ${escapeHtml(category)}</h2>
-          <div class="line"></div>
-          <div class="view-all">${items.length} item${items.length === 1 ? "" : "s"}</div>
-        </div>
-        <div class="food-grid">${cards}</div>
-      </section>`;
-  }).join("");
-
-  container.innerHTML = html;
-}
-
-function renderCategoryNav(){
-  const nav = document.querySelector(".categories");
-  if(!nav) return;
-
-  const categories = [...new Set(
-    dbItems
-      .filter(item => item.is_available !== false)
-      .map(item => String(item.category || "General").trim() || "General")
-  )];
-
-  nav.innerHTML = `
-    <button class="category active" onclick="filterCategory('all', event)">
-      <span>▦</span>All
-    </button>
-    ${categories.map(category => `
-      <button class="category"
-        onclick='filterCategory(${JSON.stringify(category)}, event)'>
-        <span>🍽</span>${escapeHtml(category)}
-      </button>
-    `).join("")}`;
+  if(!allItems.length){
+    menuError.style.display = "block";
+    menuError.textContent = "No menu items available.";
+  }
 }
 
 function filterCategory(category, e){
-  activeCategory = category;
+  const sections = document.querySelectorAll(".food-section");
+  const buttons = document.querySelectorAll(".category");
 
-  document.querySelectorAll(".category").forEach(btn => btn.classList.remove("active"));
-  if(e?.currentTarget) e.currentTarget.classList.add("active");
+  buttons.forEach(btn => btn.classList.remove("active"));
+  if(e && e.currentTarget) e.currentTarget.classList.add("active");
 
-  document.querySelectorAll(".food-section").forEach(section => {
-    const match = category === "all" || section.dataset.category === category;
-    section.style.display = match ? "block" : "none";
+  sections.forEach(section => {
+    if(category === "all"){
+      section.style.display = "block";
+    }else{
+      section.style.display =
+        section.dataset.category === category ? "block" : "none";
+    }
   });
 
   if(category !== "all"){
-    const section = [...document.querySelectorAll(".food-section")]
-      .find(s => s.dataset.category === category);
-    section?.scrollIntoView({behavior:"smooth", block:"start"});
+    const target = [...sections].find(s => s.dataset.category === category);
+    if(target) target.scrollIntoView({behavior:"smooth",block:"start"});
   }
-}
-
-async function loadDatabaseMenu(){
-  const loading = document.getElementById("menuLoading");
-  const errorBox = document.getElementById("menuError");
-
-  try{
-    const slug = getSlug();
-
-    const {data: restaurant, error: restaurantError} =
-      await supabaseClient
-        .from("restaurants")
-        .select("*")
-        .eq("slug", slug)
-        .maybeSingle();
-
-    if(restaurantError) throw restaurantError;
-    if(!restaurant) throw new Error(`Restaurant "${slug}" was not found.`);
-
-    dbRestaurant = restaurant;
-    setRestaurantBrand(restaurant);
-
-    const {data: items, error: itemsError} =
-      await supabaseClient
-        .from("menu_items")
-        .select("*")
-        .eq("restaurant_id", restaurant.id)
-        .order("category", {ascending:true})
-        .order("name", {ascending:true});
-
-    if(itemsError) throw itemsError;
-
-    dbItems = Array.isArray(items) ? items : [];
-
-    renderCategoryNav();
-    renderCategories();
-    restoreFoodImageStates();
-
-    loading.style.display = "none";
-    errorBox.style.display = "none";
-
-  }catch(error){
-    console.error("Signature Menu Supabase error:", error);
-    loading.style.display = "none";
-    errorBox.style.display = "block";
-    errorBox.innerHTML = `
-      <strong>Menu could not load</strong>
-      <div style="margin-top:8px;color:#aaa">
-        ${escapeHtml(error?.message || "Supabase menu error")}
-      </div>`;
-  }
-}
-
-function setAllFoodImages(off){
-  const wraps=document.querySelectorAll('.food-img[data-image-item]');
-  wraps.forEach(wrap=>{
-    wrap.classList.toggle('image-off',off);
-  });
-
-  // OFF means the complete menu changes from photo cards to a clean text menu.
-  document.body.classList.toggle('text-menu-mode',off);
-
-  const btn=document.getElementById('globalImageToggle');
-  const text=document.getElementById('globalImageToggleText');
-  const icon=document.getElementById('globalImageToggleIcon');
-  if(btn) btn.classList.toggle('off',off);
-  if(text) text.textContent=off ? 'IMAGES OFF' : 'IMAGES ON';
-  if(icon) icon.textContent=off ? '○' : '◉';
-
-  localStorage.setItem('freemenu_all_images',off ? 'off' : 'on');
-}
-
-function toggleAllFoodImages(){
-  const currentlyOff=localStorage.getItem('freemenu_all_images') === 'off';
-  setAllFoodImages(!currentlyOff);
-}
-
-function restoreFoodImageStates(){
-  const off=localStorage.getItem('freemenu_all_images') === 'off';
-  setAllFoodImages(off);
 }
 
 /* ================= 3D VIEW & AR ================= */
 
-function open3D(name, modelURL, usdzURL = ""){
+function open3D(name, modelURL, usdzURL=""){
   const modal = document.getElementById("modal");
   const viewer = document.getElementById("foodModel");
 
-  document.getElementById("modelTitle").innerText = `${name} — 3D View`;
+  document.getElementById("modelTitle").innerText = name + " — 3D View";
 
   viewer.removeAttribute("src");
   viewer.removeAttribute("ios-src");
@@ -1353,27 +1138,45 @@ function open3D(name, modelURL, usdzURL = ""){
     viewer.setAttribute("ios-src", usdzURL);
   }
 
-  viewer.setAttribute("src", modelURL);
+  if(modelURL){
+    viewer.setAttribute("src", modelURL);
+  }
+
   modal.classList.add("show");
   document.body.style.overflow = "hidden";
 }
 
 function close3D(){
   const modal = document.getElementById("modal");
-  const viewer = document.getElementById("foodModel");
-
   modal.classList.remove("show");
+
+  const viewer = document.getElementById("foodModel");
   viewer.removeAttribute("src");
   viewer.removeAttribute("ios-src");
 
   document.body.style.overflow = "auto";
 }
 
-document.getElementById("modal").addEventListener("click", function(e){
+document.getElementById("modal").addEventListener("click",function(e){
   if(e.target === this) close3D();
 });
 
-loadDatabaseMenu();</script>
+document.getElementById("foodModel").addEventListener("error",function(){
+  const tip = document.querySelector(".modal-tip");
+  if(tip){
+    tip.textContent =
+      "3D model load failed. Check the GLB URL / R2 Edge Function.";
+  }
+});
+
+loadRestaurant().catch(error => {
+  console.error("Signature Menu load failed:", error);
+  menuLoading.style.display = "none";
+  menuError.style.display = "block";
+  menuError.textContent = "Menu load failed: " + (error?.message || error);
+});
+</script>
+
 
 </body>
 </html>
