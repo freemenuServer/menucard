@@ -480,6 +480,7 @@ body{
     color: #111;
 }
 
+/* crossorigin hata diya gaya hai */
 model-viewer{
     width:100%;
     flex: 1;
@@ -652,9 +653,9 @@ const supabaseClient =
         <button class="close" onclick="close3D()">×</button>
     </div>
 
+    <!-- crossorigin attribute removed to prevent CORS blocking -->
     <model-viewer
         id="foodModel"
-        crossorigin="anonymous"
         src=""
         camera-controls
         auto-rotate
@@ -679,7 +680,7 @@ const supabaseClient =
 
 <script>
 const params = new URLSearchParams(location.search);
-const slug = params.get("r") || "urbanpunjab"; // default slug
+const slug = params.get("r") || "urbanpunjab";
 
 let allItems = [];
 
@@ -699,33 +700,27 @@ function truthy(v){
   return v === true || v === 1 || String(v ?? "").toLowerCase() === "true";
 }
 
+/* Clean URL Resolver */
 function browser3DUrl(rawUrl){
   const raw = String(rawUrl || "").trim();
   if(!raw) return "";
 
-  try{
-    const u = new URL(raw, location.origin);
-
-    if(
-      u.hostname.endsWith("supabase.co") &&
-      u.pathname.includes("/functions/v1/signature-3d-model-upload")
-    ){
-      return raw;
+  // Agar direct HTTP/HTTPS valid URL hai aur usme koi legacy domain rewrite nahi chahiye
+  if(raw.startsWith("http://") || raw.startsWith("https://")){
+    if(raw.includes("images.freemenu.in") && raw.includes("/signature-3d/")){
+      try {
+        const u = new URL(raw);
+        const key = u.pathname.replace(/^\/+/, "");
+        return `${SIGNATURE_3D_FUNCTION_URL}?key=${encodeURIComponent(key)}`;
+      } catch(e) {
+        return raw;
+      }
     }
-
-    if(
-      u.hostname === "images.freemenu.in" &&
-      u.pathname.includes("/signature-3d/")
-    ){
-      const key = u.pathname.replace(/^\/+/, "");
-      return `${SIGNATURE_3D_FUNCTION_URL}?key=${encodeURIComponent(key)}`;
-    }
-
-    return raw;
-  }catch(e){
-    console.warn("Invalid 3D URL:", raw, e);
     return raw;
   }
+
+  // Agar sirf key bhej rahe hain (jaise 'signature-3d/model.glb')
+  return `${SIGNATURE_3D_FUNCTION_URL}?key=${encodeURIComponent(raw)}`;
 }
 
 function has3D(item){
@@ -761,16 +756,14 @@ function iconFor(name){
   return "🍛";
 }
 
-/* ================= APPLY RESTAURANT BRANDING ================= */
+/* Dynamic Restaurant Branding */
 function applyRestaurantData(restaurant){
   document.title = `Signature Menu | ${restaurant.name || "Digital Menu"}`;
 
-  // Restaurant Name
   if(restaurant.name){
     document.getElementById("resName").textContent = restaurant.name.toUpperCase();
   }
 
-  // Taglines
   if(restaurant.tagline){
     document.getElementById("resTagline").textContent = restaurant.tagline;
   }
@@ -778,7 +771,6 @@ function applyRestaurantData(restaurant){
     document.getElementById("resSubtag").textContent = restaurant.subtag || restaurant.description;
   }
 
-  // Logo Image or Fallback Text
   const logoUrl = restaurant.logo_url || restaurant.logo;
   const logoBox = document.getElementById("resLogoBox");
   if(logoUrl){
@@ -790,20 +782,17 @@ function applyRestaurantData(restaurant){
     }
   }
 
-  // Address
   const fullAddress = [restaurant.address, restaurant.city, restaurant.pincode].filter(Boolean).join(", ");
   document.getElementById("resAddress").innerHTML = esc(fullAddress || "Dine-in Available");
 
-  // Contact
   const contacts = [restaurant.phone, restaurant.mobile, restaurant.contact_number].filter(Boolean).join("<br>");
   document.getElementById("resContact").innerHTML = contacts || "Contact Staff for Assistance";
 
-  // Dynamic QR Code for current menu link
   const currentMenuUrl = window.location.href;
   document.getElementById("resQrCode").src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(currentMenuUrl)}`;
 }
 
-/* ================= RENDER MENU ITEMS ================= */
+/* Dynamic Menu Items Rendering */
 function renderMenu(items){
   const groups=new Map();
 
@@ -858,7 +847,7 @@ function renderMenu(items){
               <div class="description">${esc(item.description||"")}</div>
               ${has3D(item)?`
               <div class="actions">
-                <button class="btn-3d"
+                <button class="btn btn-3d"
                   onclick='open3D(${JSON.stringify(item.name||"3D Dish")},${JSON.stringify(glb)},${JSON.stringify(usdz)})'>
                   ◈ 3D / AR View
                 </button>
@@ -880,7 +869,7 @@ function filterCategory(category,e){
   });
 }
 
-/* ================= LOAD FROM SUPABASE ================= */
+/* Supabase Fetching */
 async function loadMenu(){
   const {data:restaurant,error:rErr}=await supabaseClient
     .from("restaurants")
@@ -891,7 +880,6 @@ async function loadMenu(){
   if(rErr)throw rErr;
   if(!restaurant)throw new Error(`Restaurant "${slug}" not found in database.`);
 
-  // Apply real DB restaurant information
   applyRestaurantData(restaurant);
 
   const {data:items,error:iErr}=await supabaseClient
@@ -914,7 +902,7 @@ async function loadMenu(){
   }
 }
 
-/* ================= 3D / AR HANDLERS ================= */
+/* 3D / AR Handlers */
 function setTip(text){
   const tip=document.querySelector(".modal-tip");
   if(tip)tip.textContent=text;
@@ -952,8 +940,8 @@ viewer.addEventListener("load",()=>{
 });
 
 viewer.addEventListener("error",(e)=>{
-  console.error("model-viewer error:",e);
-  setTip("3D model loading failed. Please check GLB URL or Edge Function.");
+  console.error("model-viewer load error details:", e);
+  setTip("3D model loading failed. Please check console (F12).");
 });
 
 loadMenu().catch(err=>{
