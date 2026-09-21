@@ -633,6 +633,10 @@ model-viewer{
     }
 }
 
+
+.model-debug-note{
+  color:#888;font-size:11px;text-align:center;padding:6px 12px;
+}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -644,14 +648,6 @@ const SIGNATURE_3D_FUNCTION_URL =
 const supabaseClient =
   window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
-
-
-<style>
-.db-brand-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-@media(max-width:600px){
-  .db-brand-name{font-size:15px!important;max-width:210px}
-}
-</style>
 
 </head>
 
@@ -710,14 +706,11 @@ const supabaseClient =
 
 <div class="category-wrap">
   <div class="categories" id="categoryNav">
-    <button class="category active" data-category="all" onclick="filterCategory('all', event)">
+    <button class="category active" onclick="filterCategory('all', event)">
       <span>▦</span>All
     </button>
   </div>
 </div>
-
-
-
 
 
 <main class="container">
@@ -852,328 +845,254 @@ Rotate & Zoom with fingers • Click "Place on Table" to view in Room
 
 
 <script>
-/* ================= SUPABASE + DYNAMIC SIGNATURE MENU ================= */
-
 const params = new URLSearchParams(location.search);
 const slug = params.get("r") || "urbanpunjab";
 
-let currentRestaurant = null;
 let allItems = [];
 
 const menuLoading = document.getElementById("menuLoading");
 const menuError = document.getElementById("menuError");
 const menuSections = document.getElementById("menuSections");
 const categoryNav = document.getElementById("categoryNav");
+const viewer = document.getElementById("foodModel");
 
-function esc(value){
-  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+function esc(v){
+  return String(v ?? "").replace(/[&<>"']/g, c => ({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[ch]));
+  }[c]));
 }
 
-function boolValue(v){
+function truthy(v){
   return v === true || v === 1 || String(v ?? "").toLowerCase() === "true";
 }
 
-function is3D(item){
-  return (boolValue(item?.ar_enabled) || boolValue(item?.signature_3d)) &&
-    Boolean(item?.ar_model_url || item?.ar_usdz_url);
-}
-
-/*
-  IMPORTANT:
-  R2 public objects are routed through the Supabase Edge Function so the
-  browser gets CORS headers and the correct GLB/USDZ content type.
-*/
-function browserModelUrl(rawUrl){
+function browser3DUrl(rawUrl){
   const raw = String(rawUrl || "").trim();
   if(!raw) return "";
 
   try{
     const u = new URL(raw, location.origin);
-    const host = u.hostname.toLowerCase();
 
-    if(host === "images.freemenu.in" && u.pathname.includes("/signature-3d/")){
+    // Already using our public Supabase model endpoint.
+    if(
+      u.hostname.endsWith("supabase.co") &&
+      u.pathname.includes("/functions/v1/signature-3d-model-upload")
+    ){
+      return raw;
+    }
+
+    // Old DB records may still contain the raw R2 custom-domain URL.
+    if(
+      u.hostname === "images.freemenu.in" &&
+      u.pathname.includes("/signature-3d/")
+    ){
       const key = u.pathname.replace(/^\/+/, "");
       return `${SIGNATURE_3D_FUNCTION_URL}?key=${encodeURIComponent(key)}`;
     }
 
-    // If the DB already contains the Edge Function URL, use it unchanged.
-    if(u.hostname.toLowerCase().includes("supabase.co") &&
-       u.pathname.includes("/functions/v1/signature-3d-model-upload")){
-      return raw;
-    }
-
     return raw;
   }catch(e){
+    console.warn("Invalid 3D URL:", raw, e);
     return raw;
   }
 }
 
-function modelUrl(item){
-  return browserModelUrl(item?.ar_model_url);
+function has3D(item){
+  return (truthy(item.ar_enabled) || truthy(item.signature_3d)) &&
+    !!(item.ar_model_url || item.ar_usdz_url);
 }
 
-function usdzUrl(item){
-  return browserModelUrl(item?.ar_usdz_url);
+function imgOf(item){
+  return item.image_url || item.photo_url || item.image || item.photo || "";
 }
 
-function priceText(item){
-  const full = item?.price_full ?? item?.price;
-  const half = item?.price_half;
-  const quarter = item?.price_quarter;
-
-  if(full != null && String(full) !== ""){
-    if(half != null || quarter != null){
-      const parts = [];
-      if(quarter != null && String(quarter) !== "") parts.push(`Q ₹${quarter}`);
-      if(half != null && String(half) !== "") parts.push(`H ₹${half}`);
-      parts.push(`F ₹${full}`);
-      return parts.join(" • ");
-    }
-    return `₹${full}`;
+function priceOf(item){
+  const q=item.price_quarter, h=item.price_half, f=item.price_full ?? item.price;
+  if(q!=null || h!=null){
+    const p=[];
+    if(q!=null && String(q)!=="")p.push(`Q ₹${q}`);
+    if(h!=null && String(h)!=="")p.push(`H ₹${h}`);
+    if(f!=null && String(f)!=="")p.push(`F ₹${f}`);
+    return p.join(" • ");
   }
-  return "";
+  return f!=null && String(f)!=="" ? `₹${f}` : "";
 }
 
-function itemImage(item){
-  return item?.image_url || item?.photo_url || item?.image || item?.photo || "";
-}
-
-function categoryName(raw){
-  const value = String(raw || "Menu").trim();
-  return value || "Menu";
-}
-
-function categoryIcon(name){
-  const n = name.toLowerCase();
-  if(n.includes("starter")) return "🌿";
-  if(n.includes("soup")) return "🍲";
-  if(n.includes("rice") || n.includes("biryani")) return "🍚";
-  if(n.includes("bread") || n.includes("roti") || n.includes("naan")) return "🥖";
-  if(n.includes("salad") || n.includes("raita")) return "🥗";
-  if(n.includes("beverage") || n.includes("drink")) return "🥤";
-  if(n.includes("dessert") || n.includes("sweet")) return "🍨";
+function iconFor(name){
+  const n=String(name||"").toLowerCase();
+  if(n.includes("starter"))return "🌿";
+  if(n.includes("soup"))return "🍲";
+  if(n.includes("rice")||n.includes("biryani"))return "🍚";
+  if(n.includes("bread")||n.includes("naan")||n.includes("roti"))return "🥖";
+  if(n.includes("salad")||n.includes("raita"))return "🥗";
+  if(n.includes("beverage")||n.includes("drink"))return "🥤";
+  if(n.includes("dessert")||n.includes("sweet"))return "🍨";
   return "🍛";
 }
 
-function renderCategories(groups){
+function renderMenu(items){
+  const groups=new Map();
+
+  items.forEach(item=>{
+    const name=String(item.category||"Menu").trim()||"Menu";
+    const key=name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"menu";
+    if(!groups.has(key))groups.set(key,{key,name,items:[]});
+    groups.get(key).items.push(item);
+  });
+
+  const list=[...groups.values()];
+
   categoryNav.innerHTML = `
-    <button class="category active" data-category="all"
-      onclick="filterCategory('all', event)">
+    <button class="category active" onclick="filterCategory('all', event)">
       <span>▦</span>All
-    </button>
-  `;
+    </button>`;
 
-  groups.forEach(group => {
-    const key = group.key.replace(/'/g, "\\'");
-    const button = document.createElement("button");
-    button.className = "category";
-    button.dataset.category = group.key;
-    button.onclick = event => filterCategory(group.key, event);
-    button.innerHTML = `<span>${categoryIcon(group.name)}</span>${esc(group.name)}`;
-    categoryNav.appendChild(button);
-  });
-}
-
-function renderItems(items){
-  const groupsMap = new Map();
-
-  items.forEach(item => {
-    const name = categoryName(item.category);
-    const key = name.toLowerCase().replace(/\s+/g, "-");
-    if(!groupsMap.has(key)){
-      groupsMap.set(key, {key, name, items:[]});
-    }
-    groupsMap.get(key).items.push(item);
+  list.forEach(g=>{
+    const b=document.createElement("button");
+    b.className="category";
+    b.innerHTML=`<span>${iconFor(g.name)}</span>${esc(g.name)}`;
+    b.onclick=e=>filterCategory(g.key,e);
+    categoryNav.appendChild(b);
   });
 
-  const groups = [...groupsMap.values()];
-  renderCategories(groups);
-
-  menuSections.innerHTML = groups.map(group => `
-    <section class="section food-section" data-category="${esc(group.key)}">
+  menuSections.innerHTML=list.map(g=>`
+    <section class="section food-section" data-category="${esc(g.key)}">
       <div class="section-title">
-        <h2>${categoryIcon(group.name)} ${esc(group.name)}</h2>
+        <h2>${iconFor(g.name)} ${esc(g.name)}</h2>
         <div class="line"></div>
         <div class="view-all">View All →</div>
       </div>
       <div class="food-grid">
-        ${group.items.map(item => {
-          const img = itemImage(item);
-          const price = priceText(item);
-          const threeD = is3D(item);
-          const glb = modelUrl(item);
-          const usdz = usdzUrl(item);
-
-          const imageHtml = img
-            ? `<div class="food-img">
-                 <img src="${esc(img)}" alt="${esc(item.name || "Dish")}" loading="lazy">
-                 ${boolValue(item.is_veg) || String(item.item_type||"").toLowerCase()==="veg"
-                    ? `<div class="veg"></div>` : ""}
-               </div>`
-            : "";
-
-          const buttonHtml = threeD
-            ? `<div class="actions">
-                 <button class="btn btn-3d"
-                   onclick='open3D(${JSON.stringify(item.name || "3D Dish")},${JSON.stringify(glb)},${JSON.stringify(usdz)})'>
-                   ◈ 3D View
-                 </button>
-               </div>`
-            : "";
+        ${g.items.map(item=>{
+          const image=imgOf(item);
+          const glb=browser3DUrl(item.ar_model_url);
+          const usdz=browser3DUrl(item.ar_usdz_url);
 
           return `
-            <div class="food-card">
-              ${imageHtml}
-              <div class="food-content">
-                <div class="food-name-row">
-                  <div class="food-name">${esc(item.name || "Unnamed Dish")}</div>
-                  <div class="price">${esc(price)}</div>
-                </div>
-                <div class="description">${esc(item.description || "")}</div>
-                ${buttonHtml}
+          <div class="food-card">
+            ${image?`
+            <div class="food-img">
+              <img src="${esc(image)}" alt="${esc(item.name||"Dish")}" loading="lazy">
+              ${(truthy(item.is_veg)||String(item.item_type||"").toLowerCase()==="veg")
+                ? `<div class="veg"></div>`:""}
+            </div>`:""}
+            <div class="food-content">
+              <div class="food-name-row">
+                <div class="food-name">${esc(item.name||"Unnamed Dish")}</div>
+                <div class="price">${esc(priceOf(item))}</div>
               </div>
+              <div class="description">${esc(item.description||"")}</div>
+              ${has3D(item)?`
+              <div class="actions">
+                <button class="btn btn-3d"
+                  onclick='open3D(${JSON.stringify(item.name||"3D Dish")},${JSON.stringify(glb)},${JSON.stringify(usdz)})'>
+                  ◈ 3D / AR View
+                </button>
+              </div>`:""}
             </div>
-          `;
+          </div>`;
         }).join("")}
       </div>
     </section>
   `).join("");
 }
 
-async function loadRestaurant(){
-  menuLoading.style.display = "block";
-  menuError.style.display = "none";
+function filterCategory(category,e){
+  document.querySelectorAll(".category").forEach(b=>b.classList.remove("active"));
+  if(e?.currentTarget)e.currentTarget.classList.add("active");
 
-  const {data:restaurant,error:restaurantError} =
-    await supabaseClient
-      .from("restaurants")
-      .select("*")
-      .eq("slug", slug)
-      .maybeSingle();
+  document.querySelectorAll(".food-section").forEach(s=>{
+    s.style.display = category==="all" || s.dataset.category===category ? "block" : "none";
+  });
+}
 
-  if(restaurantError) throw restaurantError;
-  if(!restaurant) throw new Error(`Restaurant "${slug}" not found.`);
+async function loadMenu(){
+  const {data:restaurant,error:rErr}=await supabaseClient
+    .from("restaurants")
+    .select("*")
+    .eq("slug",slug)
+    .maybeSingle();
 
-  currentRestaurant = restaurant;
+  if(rErr)throw rErr;
+  if(!restaurant)throw new Error(`Restaurant "${slug}" not found`);
 
-  // Use database branding when available; original Signature styling stays intact.
-  const title = restaurant.name || "Signature Menu";
-  document.title = `Signature Menu | ${title}`;
+  document.title=`Signature Menu | ${restaurant.name||"Restaurant"}`;
 
-  const brandTitle = document.querySelector(".brand-title");
-  if(brandTitle) brandTitle.textContent = "MENU";
+  const {data:items,error:iErr}=await supabaseClient
+    .from("menu_items")
+    .select("*")
+    .eq("restaurant_id",restaurant.id)
+    .neq("is_available",false)
+    .order("category",{ascending:true})
+    .order("name",{ascending:true});
 
-  const brandTitleParent = document.querySelector(".brand");
-  if(brandTitleParent){
-    const existing = brandTitleParent.querySelector(".db-brand-name");
-    if(existing) existing.remove();
-    if(restaurant.name){
-      const nameEl = document.createElement("div");
-      nameEl.className = "db-brand-name";
-      nameEl.style.cssText =
-        "font-family:'Playfair Display',serif;font-size:24px;color:#fff;margin-top:10px;";
-      nameEl.textContent = restaurant.name;
-      brandTitleParent.appendChild(nameEl);
-    }
-  }
+  if(iErr)throw iErr;
 
-  const {data:items,error:itemError} =
-    await supabaseClient
-      .from("menu_items")
-      .select("*")
-      .eq("restaurant_id", restaurant.id)
-      .neq("is_available", false)
-      .order("category", {ascending:true})
-      .order("name", {ascending:true});
-
-  if(itemError) throw itemError;
-
-  allItems = items || [];
-  renderItems(allItems);
-
-  menuLoading.style.display = "none";
+  allItems=items||[];
+  renderMenu(allItems);
+  menuLoading.style.display="none";
 
   if(!allItems.length){
-    menuError.style.display = "block";
-    menuError.textContent = "No menu items available.";
+    menuError.style.display="block";
+    menuError.textContent="No menu items available.";
   }
 }
 
-function filterCategory(category, e){
-  const sections = document.querySelectorAll(".food-section");
-  const buttons = document.querySelectorAll(".category");
+/* ---------- 3D / AR ---------- */
 
-  buttons.forEach(btn => btn.classList.remove("active"));
-  if(e && e.currentTarget) e.currentTarget.classList.add("active");
-
-  sections.forEach(section => {
-    if(category === "all"){
-      section.style.display = "block";
-    }else{
-      section.style.display =
-        section.dataset.category === category ? "block" : "none";
-    }
-  });
-
-  if(category !== "all"){
-    const target = [...sections].find(s => s.dataset.category === category);
-    if(target) target.scrollIntoView({behavior:"smooth",block:"start"});
-  }
+function setTip(text){
+  const tip=document.querySelector(".modal-tip");
+  if(tip)tip.textContent=text;
 }
 
-/* ================= 3D VIEW & AR ================= */
-
-function open3D(name, modelURL, usdzURL=""){
-  const modal = document.getElementById("modal");
-  const viewer = document.getElementById("foodModel");
-
-  document.getElementById("modelTitle").innerText = name + " — 3D View";
+function open3D(name,modelURL,usdzURL=""){
+  document.getElementById("modelTitle").innerText=name+" — 3D / AR";
 
   viewer.removeAttribute("src");
   viewer.removeAttribute("ios-src");
 
-  if(usdzURL){
-    viewer.setAttribute("ios-src", usdzURL);
-  }
+  setTip('Loading 3D model…');
 
-  if(modelURL){
-    viewer.setAttribute("src", modelURL);
-  }
+  if(usdzURL) viewer.setAttribute("ios-src",usdzURL);
+  if(modelURL) viewer.setAttribute("src",modelURL);
 
-  modal.classList.add("show");
-  document.body.style.overflow = "hidden";
+  document.getElementById("modal").classList.add("show");
+  document.body.style.overflow="hidden";
 }
 
 function close3D(){
-  const modal = document.getElementById("modal");
-  modal.classList.remove("show");
-
-  const viewer = document.getElementById("foodModel");
+  document.getElementById("modal").classList.remove("show");
   viewer.removeAttribute("src");
   viewer.removeAttribute("ios-src");
-
-  document.body.style.overflow = "auto";
+  document.body.style.overflow="auto";
+  setTip('Rotate & Zoom with fingers • Click "Place on Table" to view in Room');
 }
 
 document.getElementById("modal").addEventListener("click",function(e){
-  if(e.target === this) close3D();
+  if(e.target===this)close3D();
 });
 
-document.getElementById("foodModel").addEventListener("error",function(){
-  const tip = document.querySelector(".modal-tip");
-  if(tip){
-    tip.textContent =
-      "3D model load failed. Check the GLB URL / R2 Edge Function.";
+viewer.addEventListener("load",()=>{
+  setTip('Rotate & Zoom with fingers • Click "Place on Table" to view in Room');
+});
+
+viewer.addEventListener("error",(e)=>{
+  console.error("model-viewer error:",e);
+  setTip("3D model load failed. Please check Edge Function / GLB response.");
+});
+
+/* Extra diagnostics in browser console */
+viewer.addEventListener("progress",(e)=>{
+  if(e?.detail?.totalProgress!=null){
+    console.log("3D load progress:",Math.round(e.detail.totalProgress*100)+"%");
   }
 });
 
-loadRestaurant().catch(error => {
-  console.error("Signature Menu load failed:", error);
-  menuLoading.style.display = "none";
-  menuError.style.display = "block";
-  menuError.textContent = "Menu load failed: " + (error?.message || error);
+loadMenu().catch(err=>{
+  console.error(err);
+  menuLoading.style.display="none";
+  menuError.style.display="block";
+  menuError.textContent="Menu load failed: "+(err?.message||String(err));
 });
 </script>
 
