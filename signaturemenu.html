@@ -1013,8 +1013,16 @@ function renderCategories(){
 
       return `
         <div class="food-card">
-          <div class="food-img">
+          <div class="food-img" data-image-item="${escapeHtml(item.id || item.name || "")}">
             ${imageHtml}
+            <div class="food-img-placeholder">🍽</div>
+            <button type="button"
+              class="food-img-toggle"
+              aria-label="Toggle food image"
+              onclick="toggleFoodImage(this, event)">
+              <span class="img-toggle-icon">◉</span>
+              <span class="img-toggle-text">IMG ON</span>
+            </button>
             ${veg ? '<div class="veg"></div>' : ''}
           </div>
           <div class="food-content">
@@ -1117,6 +1125,7 @@ async function loadDatabaseMenu(){
 
     renderCategoryNav();
     renderCategories();
+    restoreFoodImageStates();
 
     loading.style.display = "none";
     errorBox.style.display = "none";
@@ -1131,6 +1140,44 @@ async function loadDatabaseMenu(){
         ${escapeHtml(error?.message || "Supabase menu error")}
       </div>`;
   }
+}
+
+function toggleFoodImage(button, event){
+  event?.stopPropagation();
+
+  const wrap = button.closest(".food-img");
+  if(!wrap) return;
+
+  const key = `freemenu_img_${wrap.dataset.imageItem || ""}`;
+  const isOff = !wrap.classList.contains("image-off");
+
+  wrap.classList.toggle("image-off", isOff);
+
+  const textEl = button.querySelector(".img-toggle-text");
+  const iconEl = button.querySelector(".img-toggle-icon");
+
+  if(isOff){
+    if(textEl) textEl.textContent = "IMG OFF";
+    if(iconEl) iconEl.textContent = "○";
+    localStorage.setItem(key, "off");
+  }else{
+    if(textEl) textEl.textContent = "IMG ON";
+    if(iconEl) iconEl.textContent = "◉";
+    localStorage.setItem(key, "on");
+  }
+}
+
+function restoreFoodImageStates(){
+  document.querySelectorAll(".food-img[data-image-item]").forEach(wrap => {
+    const key = `freemenu_img_${wrap.dataset.imageItem || ""}`;
+    if(localStorage.getItem(key) === "off"){
+      wrap.classList.add("image-off");
+      const textEl = wrap.querySelector(".img-toggle-text");
+      const iconEl = wrap.querySelector(".img-toggle-icon");
+      if(textEl) textEl.textContent = "IMG OFF";
+      if(iconEl) iconEl.textContent = "○";
+    }
+  });
 }
 
 /* ================= 3D VIEW & AR ================= */
