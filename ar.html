@@ -2,1352 +2,199 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Signature Menu | Urban Punjab</title>
-
-<!-- Google Font -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
-
-<!-- 3D Model Viewer Library -->
-<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FreeMenu • Signature 3D Upload</title>
 <style>
-
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-}
-
-body{
-    background:#090a0b;
-    color:#fff;
-    font-family:Inter,Arial,sans-serif;
-}
-
-.container{
-    width:100%;
-    max-width:1200px;
-    margin:auto;
-}
-
-/* ================= HEADER ================= */
-
-.header{
-    min-height:230px;
-    padding:20px 25px;
-    position:relative;
-    overflow:hidden;
-
-    background:
-    linear-gradient(rgba(0,0,0,.68),rgba(0,0,0,.88)),
-    url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1600&q=85");
-
-    background-size:cover;
-    background-position:center;
-    border-bottom:1px solid #8e6723;
-}
-
-.header-inner{
-    max-width:1100px;
-    margin:auto;
-    display:flex;
-    align-items:center;
-    gap:35px;
-}
-
-.logo{
-    width:175px;
-    height:175px;
-    border:3px solid #e6b84c;
-    border-radius:50%;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    flex-shrink:0;
-
-    background:#050505;
-    box-shadow:
-        0 0 25px rgba(229,177,65,.25),
-        inset 0 0 20px rgba(229,177,65,.12);
-}
-
-.logo-icon{
-    font-size:46px;
-    color:#e8bd58;
-    margin-bottom:5px;
-}
-
-.logo h2{
-    color:#e9bb50;
-    font-size:21px;
-    letter-spacing:2px;
-}
-
-.logo p{
-    color:#fff;
-    font-size:12px;
-    letter-spacing:2px;
-}
-
-.logo small{
-    color:#e9bb50;
-    margin-top:8px;
-}
-
-.brand{
-    flex:1;
-}
-
-.signature{
-    font-family:"Playfair Display",serif;
-    font-size:55px;
-    font-style:italic;
-    color:#e9bb50;
-}
-
-.brand-title{
-    font-family:"Playfair Display",serif;
-    font-size:68px;
-    line-height:.9;
-    color:#f5cc68;
-    letter-spacing:2px;
-}
-
-.tagline{
-    margin-top:12px;
-    font-size:14px;
-    letter-spacing:6px;
-    color:#fff;
-}
-
-.subtag{
-    margin-top:12px;
-    color:#e8bc54;
-    font-family:"Playfair Display",serif;
-    font-style:italic;
-    font-size:20px;
-}
-
-/* ================= CATEGORY NAV ================= */
-
-.category-wrap{
-    padding:12px 15px;
-    background:#0b0c0d;
-    position:sticky;
-    top:0;
-    z-index:20;
-}
-
-.categories{
-    max-width:1100px;
-    margin:auto;
-
-    display:flex;
-    overflow-x:auto;
-
-    border:1px solid #3c3c3c;
-    border-radius:20px;
-    background:#101112;
-}
-
-.categories::-webkit-scrollbar{
-    display:none;
-}
-
-.category{
-    min-width:115px;
-    padding:14px 17px;
-    border:0;
-    border-right:1px solid #333;
-    background:transparent;
-    color:#ddd;
-    cursor:pointer;
-    font-size:13px;
-    transition:.25s;
-}
-
-.category span{
-    display:block;
-    font-size:22px;
-    margin-bottom:4px;
-}
-
-.category.active{
-    background:linear-gradient(135deg,#ffe19a,#e7a832);
-    color:#111;
-    font-weight:800;
-    border-radius:17px;
-}
-
-/* ================= SECTION ================= */
-
-.section{
-    padding:25px 20px 5px;
-}
-
-.section-title{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    margin-bottom:18px;
-}
-
-.section-title h2{
-    font-family:"Playfair Display",serif;
-    color:#f0ca6b;
-    font-size:28px;
-    white-space:nowrap;
-}
-
-.line{
-    height:1px;
-    background:linear-gradient(90deg,#dcae4c,transparent);
-    flex:1;
-}
-
-.view-all{
-    color:#e9bd5b;
-    font-size:14px;
-    white-space:nowrap;
-}
-
-/* ================= FOOD GRID ================= */
-
-.food-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:16px;
-}
-
-.food-card{
-    background:#111314;
-    border:1px solid #393939;
-    border-radius:15px;
-    overflow:hidden;
-
-    box-shadow:
-    0 5px 20px rgba(0,0,0,.35);
-
-    transition:.25s;
-}
-
-.food-card:hover{
-    transform:translateY(-4px);
-    border-color:#d7a83d;
-}
-
-.food-img{
-    height:205px;
-    position:relative;
-    overflow:hidden;
-}
-
-.food-img img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    transition:.4s;
-}
-
-.food-card:hover .food-img img{
-    transform:scale(1.06);
-}
-
-.veg{
-    position:absolute;
-    right:10px;
-    top:10px;
-
-    width:21px;
-    height:21px;
-
-    background:#fff;
-    border:2px solid #1c9d4d;
-    border-radius:4px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-
-.veg::after{
-    content:"";
-    width:9px;
-    height:9px;
-    background:#19a14a;
-    border-radius:50%;
-}
-
-.food-content{
-    padding:14px;
-}
-
-.food-name-row{
-    display:flex;
-    justify-content:space-between;
-    gap:8px;
-}
-
-.food-name{
-    font-size:17px;
-    font-weight:700;
-}
-
-.price{
-    color:#f5c85c;
-    font-size:17px;
-    font-weight:800;
-    white-space:nowrap;
-}
-
-.description{
-    color:#aaa;
-    font-size:13px;
-    line-height:1.45;
-    min-height:38px;
-    margin:7px 0 12px;
-}
-
-/* ================= BUTTONS ================= */
-
-.actions{
-    display:flex;
-    gap:8px;
-}
-
-.btn{
-    height:42px;
-    border-radius:10px;
-    cursor:pointer;
-    font-weight:700;
-    font-size:13px;
-    transition:.2s;
-}
-
-.btn-3d{
-    width: 100%;
-    background:#0b0c0d;
-    color:#f5cc68;
-    border:1px solid #e8b33f;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    letter-spacing: 0.5px;
-}
-
-.btn-3d:hover{
-    background:linear-gradient(135deg, #ffe08c, #e5a735);
-    color:#111;
-    border-color: #ffe08c;
-    box-shadow: 0 0 15px rgba(232, 179, 63, 0.4);
-}
-
-/* ================= FOOTER ================= */
-
-.footer{
-    margin-top:30px;
-    padding:30px 20px;
-
-    border-top:1px solid #333;
-    background:#070809;
-}
-
-.footer-inner{
-    max-width:1100px;
-    margin:auto;
-
-    display:grid;
-    grid-template-columns:1.2fr 1fr 1fr 170px;
-    gap:25px;
-    align-items:center;
-}
-
-.footer-title{
-    color:#e8b950;
-    font-size:12px;
-    letter-spacing:2px;
-}
-
-.footer-text{
-    margin-top:7px;
-    color:#ddd;
-    font-size:13px;
-    line-height:1.6;
-}
-
-.ar-button{
-    height:52px;
-    padding:0 20px;
-
-    border:1px solid #e5b443;
-    border-radius:30px;
-
-    background:#111;
-    color:#f3c75d;
-
-    font-weight:700;
-    cursor:pointer;
-}
-
-.ar-button:hover{
-    background:#e5b443;
-    color:#111;
-}
-
-.qr{
-    width:110px;
-    height:110px;
-    background:#fff;
-    padding:6px;
-    border-radius:8px;
-}
-
-.qr img{
-    width:100%;
-    height:100%;
-}
-
-/* ================= 3D MODAL & AR ================= */
-
-.modal{
-    position:fixed;
-    inset:0;
-
-    background:rgba(0,0,0,.88);
-    backdrop-filter: blur(5px);
-
-    display:none;
-    align-items:center;
-    justify-content:center;
-
-    z-index:1000;
-    padding:20px;
-}
-
-.modal.show{
-    display:flex;
-}
-
-.modal-box{
-    width:min(550px,100%);
-    height:min(680px,88vh);
-
-    background:#101112;
-    border:1px solid #dbaa42;
-    border-radius:20px;
-
-    position:relative;
-    overflow:hidden;
-
-    box-shadow:0 0 50px rgba(225,174,62,.25);
-    display: flex;
-    flex-direction: column;
-}
-
-.modal-header{
-    height:60px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-
-    padding:0 20px;
-    border-bottom:1px solid #222;
-}
-
-.modal-header h3{
-    color:#efc25b;
-    font-size: 17px;
-    font-weight: 700;
-}
-
-.close{
-    width:36px;
-    height:36px;
-    border-radius:50%;
-    border:1px solid #444;
-    background:#181919;
-    color:#fff;
-    cursor:pointer;
-    font-size:20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.close:hover{
-    background: #e8b33f;
-    color: #111;
-}
-
-model-viewer{
-    width:100%;
-    flex: 1;
-    background: radial-gradient(circle,#252525,#090a0b 75%);
-}
-
-/* Native AR Placement Button */
-.ar-view-btn {
-    position: absolute;
-    bottom: 50px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(135deg, #ffe08c, #e5a735);
-    color: #111;
-    border: none;
-    padding: 11px 22px;
-    border-radius: 25px;
-    font-weight: 800;
-    font-size: 13px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    white-space: nowrap;
-}
-
-.modal-tip {
-    text-align: center;
-    font-size: 11.5px;
-    color: #888;
-    padding: 10px;
-    background: #08090a;
-    border-top: 1px solid #1c1d1e;
-}
-
-/* ================= RESPONSIVE ================= */
-
-@media(max-width:900px){
-
-    .food-grid{
-        grid-template-columns:repeat(2,1fr);
-    }
-
-    .header-inner{
-        gap:20px;
-    }
-
-    .brand-title{
-        font-size:50px;
-    }
-
-    .signature{
-        font-size:40px;
-    }
-
-}
-
-@media(max-width:600px){
-
-    .header{
-        min-height:200px;
-        padding:15px;
-    }
-
-    .header-inner{
-        gap:14px;
-    }
-
-    .logo{
-        width:100px;
-        height:100px;
-    }
-
-    .logo-icon{
-        font-size:25px;
-    }
-
-    .logo h2{
-        font-size:12px;
-    }
-
-    .logo p,
-    .logo small{
-        font-size:7px;
-    }
-
-    .signature{
-        font-size:28px;
-    }
-
-    .brand-title{
-        font-size:38px;
-    }
-
-    .tagline{
-        font-size:8px;
-        letter-spacing:2px;
-    }
-
-    .subtag{
-        font-size:12px;
-    }
-
-    .food-grid{
-        grid-template-columns:1fr 1fr;
-        gap:10px;
-    }
-
-    .section{
-        padding:20px 10px 5px;
-    }
-
-    .food-img{
-        height:135px;
-    }
-
-    .food-content{
-        padding:10px;
-    }
-
-    .food-name{
-        font-size:14px;
-    }
-
-    .price{
-        font-size:14px;
-    }
-
-    .description{
-        font-size:11px;
-    }
-
-    .btn{
-        height:37px;
-        font-size:11px;
-    }
-
-    .footer-inner{
-        grid-template-columns:1fr;
-        text-align:center;
-    }
-
-    .qr{
-        margin:auto;
-    }
-}
-
+*{box-sizing:border-box}body{margin:0;background:#080909;color:#fff;font-family:Inter,Arial,sans-serif}
+.wrap{max-width:720px;margin:40px auto;padding:20px}
+.card{background:#121415;border:1px solid #343434;border-radius:18px;padding:24px;box-shadow:0 20px 50px #0008}
+h1{margin:0 0 6px;color:#f3c65d;font-size:25px}.sub{color:#999;font-size:13px;margin-bottom:24px}
+label{display:block;font-size:12px;font-weight:700;color:#ccc;margin:16px 0 7px}
+select,input[type=file]{width:100%;height:46px;border:1px solid #444;border-radius:10px;background:#0b0c0d;color:#fff;padding:0 12px}
+input[type=file]{padding:11px}
+button{width:100%;height:48px;border:0;border-radius:11px;background:linear-gradient(135deg,#ffe08c,#e5a735);color:#111;font-weight:800;cursor:pointer;margin-top:18px}
+button:disabled{opacity:.45;cursor:not-allowed}
+.status{margin-top:16px;padding:13px;border-radius:10px;background:#0c0d0e;color:#aaa;font-size:13px;line-height:1.5;white-space:pre-wrap}
+.preview{margin-top:18px;display:none}.preview model-viewer{width:100%;height:360px;background:#090a0b;border-radius:12px}
+.small{font-size:11px;color:#777;margin-top:8px}.url{word-break:break-all;color:#e9bd5b}
 </style>
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-
-
 <body>
+<div class="wrap">
+<div class="card">
+<h1>♛ Signature 3D — GLB Upload</h1>
+<div class="sub">GLB file direct select karo. File Cloudflare R2 mein save hogi; browser mein secret R2 key expose nahi hogi.</div>
 
+<label>Restaurant</label>
+<select id="restaurantSelect"><option value="">Loading restaurants…</option></select>
 
-<!-- ================= HEADER ================= -->
+<label>Menu Item</label>
+<select id="itemSelect" disabled><option value="">Select restaurant first</option></select>
 
-<header class="header">
+<label>GLB 3D Model</label>
+<input id="glbFile" type="file" accept=".glb,model/gltf-binary">
+<div class="small">Maximum 20 MB • Only .glb</div>
 
-<div class="header-inner">
+<button id="uploadBtn" disabled>Upload GLB to Cloudflare R2</button>
+<div id="status" class="status">Login check…</div>
 
-    <div class="logo">
-
-        <div class="logo-icon">🍴</div>
-
-        <h2>URBAN</h2>
-        <h2>PUNJAB</h2>
-
-        <p>RESTAURANT</p>
-
-        <small>SINCE 1971</small>
-
-    </div>
-
-
-    <div class="brand">
-
-        <div class="signature">
-            Signature
-        </div>
-
-        <div class="brand-title">
-            MENU
-        </div>
-
-        <div class="tagline">
-            FAMILY • FOOD • RESTAURANT
-        </div>
-
-        <div class="subtag">
-            Authentic Flavours, Timeless Taste
-        </div>
-
-    </div>
-
-</div>
-
-</header>
-
-
-
-<!-- ================= CATEGORY ================= -->
-
-<div class="category-wrap">
-
-<div class="categories">
-
-<button class="category active" onclick="filterCategory('all', event)">
-<span>▦</span>
-All
-</button>
-
-<button class="category" onclick="filterCategory('starters', event)">
-<span>🌿</span>
-Starters
-</button>
-
-<button class="category" onclick="filterCategory('soups', event)">
-<span>🍲</span>
-Soups
-</button>
-
-<button class="category" onclick="filterCategory('main', event)">
-<span>🍛</span>
-Main Course
-</button>
-
-<button class="category" onclick="filterCategory('rice', event)">
-<span>🍚</span>
-Rice & Biryani
-</button>
-
-<button class="category" onclick="filterCategory('breads', event)">
-<span>🥖</span>
-Breads
-</button>
-
-<button class="category" onclick="filterCategory('salad', event)">
-<span>🥗</span>
-Salad & Raita
-</button>
-
-<button class="category" onclick="filterCategory('beverages', event)">
-<span>🥤</span>
-Beverages
-</button>
-
-</div>
-
-</div>
-
-
-
-<main class="container">
-
-
-<!-- ================= STARTERS ================= -->
-
-<section class="section food-section" data-category="starters">
-
-<div class="section-title">
-
-<h2>🌿 Starters</h2>
-
-<div class="line"></div>
-
-<div class="view-all">
-View All →
-</div>
-
-</div>
-
-
-<div class="food-grid">
-
-
-<!-- ITEM 1: Working 3D Enabled -->
-
-<div class="food-card">
-
-<div class="food-img">
-
-<img src="https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=800&q=85">
-
-<div class="veg"></div>
-
-</div>
-
-<div class="food-content">
-
-<div class="food-name-row">
-
-<div class="food-name">
-Paneer Tikka
-</div>
-
-<div class="price">
-₹280
-</div>
-
-</div>
-
-<div class="description">
-Soft paneer cubes marinated in spices and grilled to perfection.
-</div>
-
-<div class="actions">
-
-<!-- Working Verified 3D Model -->
-<button class="btn btn-3d"
-onclick="open3D('Paneer Tikka','https://modelviewer.dev/shared-assets/models/glTF-Sample-Assets/Models/SheenChair/glTF-Binary/SheenChair.glb')">
-◈ 3D View
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-
-
-<!-- ITEM 2: Working 3D Enabled -->
-
-<div class="food-card">
-
-<div class="food-img">
-
-<img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=85">
-
-<div class="veg"></div>
-
-</div>
-
-<div class="food-content">
-
-<div class="food-name-row">
-
-<div class="food-name">
-Tandoori Mushroom
-</div>
-
-<div class="price">
-₹260
-</div>
-
-</div>
-
-<div class="description">
-Juicy mushrooms marinated with special tandoori spices.
-</div>
-
-<div class="actions">
-
-<!-- Working Verified 3D Model -->
-<button class="btn btn-3d"
-onclick="open3D('Tandoori Mushroom','https://modelviewer.dev/shared-assets/models/NeilArmstrong.glb')">
-◈ 3D View
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-
-
-<!-- ITEM 3: Regular Item (Preview Only) -->
-
-<div class="food-card">
-
-<div class="food-img">
-
-<img src="https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?auto=format&fit=crop&w=800&q=85">
-
-<div class="veg"></div>
-
-</div>
-
-<div class="food-content">
-
-<div class="food-name-row">
-
-<div class="food-name">
-Hara Bhara Kebab
-</div>
-
-<div class="price">
-₹240
-</div>
-
-</div>
-
-<div class="description">
-Healthy and tasty mix veg kebab with aromatic herbs.
-</div>
-
-</div>
-
-</div>
-
-
-
-<!-- ITEM 4: Regular Item -->
-
-<div class="food-card">
-
-<div class="food-img">
-
-<img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=800&q=85">
-
-<div class="veg"></div>
-
-</div>
-
-<div class="food-content">
-
-<div class="food-name-row">
-
-<div class="food-name">
-Crispy Corn
-</div>
-
-<div class="price">
-₹220
-</div>
-
-</div>
-
-<div class="description">
-Crispy golden corn tossed with Indo-Chinese spices.
-</div>
-
-</div>
-
-</div>
-
-
-
-<!-- ITEM 5: Regular Item -->
-
-<div class="food-card">
-
-<div class="food-img">
-
-<img src="https://images.unsplash.com/photo-1562967916-eb82221dfb36?auto=format&fit=crop&w=800&q=85">
-
-<div class="veg"></div>
-
-</div>
-
-<div class="food-content">
-
-<div class="food-name-row">
-
-<div class="food-name">
-Chilli Paneer
-</div>
-
-<div class="price">
-₹260
-</div>
-
-</div>
-
-<div class="description">
-Paneer cubes tossed in spicy chilli sauce with peppers.
-</div>
-
-</div>
-
-</div>
-
-
-
-<!-- ITEM 6: Regular Item -->
-
-<div class="food-card">
-
-<div class="food-img">
-
-<img src="https://images.unsplash.com/photo-1628294895950-9805252327bc?auto=format&fit=crop&w=800&q=85">
-
-<div class="veg"></div>
-
-</div>
-
-<div class="food-content">
-
-<div class="food-name-row">
-
-<div class="food-name">
-Honey Chilli Potato
-</div>
-
-<div class="price">
-₹220
-</div>
-
-</div>
-
-<div class="description">
-Crispy potatoes tossed in sweet and spicy honey chilli sauce.
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</section>
-
-
-
-<!-- ================= SOUPS ================= -->
-
-<section class="section food-section" data-category="soups">
-
-<div class="section-title">
-
-<h2>🍲 Soups</h2>
-
-<div class="line"></div>
-
-<div class="view-all">
-View All →
-</div>
-
-</div>
-
-
-<div class="food-grid">
-
-
-<div class="food-card">
-
-<div class="food-img">
-
-<img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=85">
-
-<div class="veg"></div>
-
-</div>
-
-<div class="food-content">
-
-<div class="food-name-row">
-
-<div class="food-name">
-Hot & Sour Soup
-</div>
-
-<div class="price">
-₹140
-</div>
-
-</div>
-
-<div class="description">
-Spicy and tangy soup with vegetables and herbs.
-</div>
-
-</div>
-
-</div>
-
-
-
-<div class="food-card">
-
-<div class="food-img">
-
-<img src="https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=85">
-
-<div class="veg"></div>
-
-</div>
-
-<div class="food-content">
-
-<div class="food-name-row">
-
-<div class="food-name">
-Manchow Soup
-</div>
-
-<div class="price">
-₹140
-</div>
-
-</div>
-
-<div class="description">
-Classic Indo-Chinese soup with a rich flavour.
-</div>
-
-</div>
-
-</div>
-
-
-
-<div class="food-card">
-
-<div class="food-img">
-
-<img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=800&q=85">
-
-<div class="veg"></div>
-
-</div>
-
-<div class="food-content">
-
-<div class="food-name-row">
-
-<div class="food-name">
-Sweet Corn Soup
-</div>
-
-<div class="price">
-₹140
-</div>
-
-</div>
-
-<div class="description">
-A creamy and comforting corn soup.
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</section>
-
-</main>
-
-
-
-<!-- ================= FOOTER ================= -->
-
-<footer class="footer">
-
-<div class="footer-inner">
-
-<div>
-
-<div class="footer-title">
-ADDRESS
-</div>
-
-<div class="footer-text">
-C-207/208, Jhilmil Colony<br>
-Delhi - 110095
-</div>
-
-</div>
-
-
-<div>
-
-<div class="footer-title">
-CONTACT
-</div>
-
-<div class="footer-text">
-011-2214-4545<br>
-8447000853 | 8447000854
-</div>
-
-</div>
-
-
-<div>
-
-<button class="ar-button"
-onclick="alert('Select any dish with ◈ 3D View and tap Place on Table to view in AR!')">
-
-▣ &nbsp; Interactive AR Active
-
-</button>
-
-</div>
-
-
-<div>
-
-<div class="qr">
-
-<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://freemenu.in">
-
-</div>
-
-</div>
-
-</div>
-
-<p style="
-text-align:center;
-color:#777;
-font-size:11px;
-margin-top:25px;
-">
-Rate & items can be changed without prior notice
-</p>
-
-</footer>
-
-
-
-<!-- ================= 3D / AR MODAL ================= -->
-
-<div class="modal" id="modal">
-
-<div class="modal-box">
-
-<div class="modal-header">
-
-<h3 id="modelTitle">
-3D Food Preview
-</h3>
-
-<button class="close" onclick="close3D()">
-×
-</button>
-
-</div>
-
-
-<model-viewer
-id="foodModel"
-src=""
-camera-controls
-auto-rotate
-rotation-per-second="30deg"
-ar
-ar-modes="webxr scene-viewer quick-look"
-shadow-intensity="1.5"
-environment-image="neutral"
-alt="3D Dish Preview">
-
-<button slot="ar-button" class="ar-view-btn">
-📱 Place on Table (AR)
-</button>
-
-</model-viewer>
-
-<div class="modal-tip">
-Rotate & Zoom with fingers • Click "Place on Table" to view in Room
+<div id="preview" class="preview">
+<model-viewer id="viewer" camera-controls auto-rotate ar ar-modes="webxr scene-viewer quick-look" shadow-intensity="1.5" environment-image="neutral"></model-viewer>
+<div class="small">Uploaded GLB preview</div>
 </div>
-
 </div>
-
 </div>
-
-
 
 <script>
+const SUPABASE_URL="https://pfsrpowopbrevocwsuii.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+const FUNCTION_URL=`${SUPABASE_URL}/functions/v1/signature-3d-model-upload`;
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 
-/* ================= CATEGORY FILTER ================= */
+const restaurantSelect=document.getElementById("restaurantSelect");
+const itemSelect=document.getElementById("itemSelect");
+const glbFile=document.getElementById("glbFile");
+const uploadBtn=document.getElementById("uploadBtn");
+const status=document.getElementById("status");
+const preview=document.getElementById("preview");
+const viewer=document.getElementById("viewer");
 
-function filterCategory(category, e){
+let session=null;
 
-    const sections =
-        document.querySelectorAll(".food-section");
+function setStatus(text){status.textContent=text}
 
-    const buttons =
-        document.querySelectorAll(".category");
+async function init(){
+  const {data,error}=await db.auth.getSession();
+  if(error||!data.session){
+    setStatus("Please login first from FreeMenu Owner dashboard.");
+    return;
+  }
+  session=data.session;
+  setStatus("Logged in. Loading your restaurants…");
 
-    buttons.forEach(btn=>{
-        btn.classList.remove("active");
-    });
+  const {data:restaurants,error:rError}=await db
+    .from("restaurants")
+    .select("id,name,owner_id,user_id")
+    .order("name");
 
-    if(e && e.currentTarget){
-        e.currentTarget.classList.add("active");
-    }
+  if(rError){setStatus("Restaurant load failed: "+rError.message);return}
 
-    sections.forEach(section=>{
-
-        if(category === "all"){
-
-            section.style.display="block";
-
-        }
-        else{
-
-            if(section.dataset.category === category){
-
-                section.style.display="block";
-
-                section.scrollIntoView({
-                    behavior:"smooth",
-                    block:"start"
-                });
-
-            }
-            else{
-
-                section.style.display="none";
-
-            }
-
-        }
-
-    });
-
+  restaurantSelect.innerHTML='<option value="">Select restaurant</option>';
+  (restaurants||[]).forEach(r=>{
+    const o=document.createElement("option");
+    o.value=r.id;o.textContent=r.name||r.id;
+    restaurantSelect.appendChild(o);
+  });
+  setStatus("Select restaurant → select menu item → choose GLB → upload.");
 }
 
+async function loadItems(){
+  itemSelect.disabled=true;
+  itemSelect.innerHTML='<option value="">Loading menu items…</option>';
+  const rid=restaurantSelect.value;
+  if(!rid){itemSelect.innerHTML='<option value="">Select restaurant first</option>';return}
 
-/* ================= 3D VIEW & AR ================= */
+  const {data,error}=await db
+    .from("menu_items")
+    .select("id,name,ar_enabled,signature_3d,ar_model_url")
+    .eq("restaurant_id",rid)
+    .order("name");
 
-function open3D(name, modelURL){
+  if(error){itemSelect.innerHTML='<option value="">Failed to load items</option>';setStatus("Menu item load failed: "+error.message);return}
 
-    document.getElementById("modelTitle")
-        .innerText = name + " — 3D View";
-
-    const viewer =
-        document.getElementById("foodModel");
-
-    viewer.setAttribute("src", modelURL);
-
-    document
-        .getElementById("modal")
-        .classList.add("show");
-
-    document.body.style.overflow = "hidden"; // Stop background scroll
+  itemSelect.innerHTML='<option value="">Select menu item</option>';
+  (data||[]).forEach(item=>{
+    const o=document.createElement("option");
+    o.value=item.id;
+    o.textContent=(item.name||"Unnamed")+" — "+(item.ar_model_url?"3D uploaded":"No 3D");
+    itemSelect.appendChild(o);
+  });
+  itemSelect.disabled=false;
+  updateButton();
 }
 
-
-function close3D(){
-
-    const modal =
-        document.getElementById("modal");
-
-    modal.classList.remove("show");
-
-    const viewer = document.getElementById("foodModel");
-    viewer.removeAttribute("src"); // Clear WebGL buffer
-
-    document.body.style.overflow = "auto";
+function updateButton(){
+  uploadBtn.disabled=!(
+    session &&
+    restaurantSelect.value &&
+    itemSelect.value &&
+    glbFile.files[0]
+  );
 }
 
-
-/* Close modal on backdrop click */
-
-document
-.getElementById("modal")
-.addEventListener("click",function(e){
-
-    if(e.target === this){
-
-        close3D();
-
-    }
-
+restaurantSelect.addEventListener("change",loadItems);
+itemSelect.addEventListener("change",updateButton);
+glbFile.addEventListener("change",()=>{
+  const file=glbFile.files[0];
+  if(file && !file.name.toLowerCase().endsWith(".glb")){
+    glbFile.value="";
+    setStatus("Only .glb file allowed.");
+  }else if(file && file.size>20*1024*1024){
+    glbFile.value="";
+    setStatus("GLB must be 20 MB or smaller.");
+  }else if(file){
+    setStatus(`${file.name} selected (${(file.size/1024/1024).toFixed(2)} MB). Ready to upload.`);
+  }
+  updateButton();
 });
 
-</script>
+uploadBtn.addEventListener("click",async()=>{
+  const file=glbFile.files[0];
+  if(!file)return;
 
+  uploadBtn.disabled=true;
+  setStatus("Uploading GLB to Cloudflare R2…");
+
+  try{
+    const {data:{session:latest},error:sessionError}=await db.auth.getSession();
+    if(sessionError||!latest?.access_token)throw new Error("Login session expired. Please login again.");
+
+    const fd=new FormData();
+    fd.append("file",file);
+    fd.append("restaurant_id",restaurantSelect.value);
+    fd.append("menu_item_id",itemSelect.value);
+    fd.append("asset_type","glb");
+
+    const response=await fetch(FUNCTION_URL,{
+      method:"POST",
+      headers:{
+        Authorization:`Bearer ${latest.access_token}`,
+        apikey:SUPABASE_ANON_KEY
+      },
+      body:fd
+    });
+
+    let result={};
+    try{result=await response.json()}catch(e){}
+
+    if(!response.ok)throw new Error(result.error||`Upload failed (${response.status})`);
+
+    if(!result.url)throw new Error("Upload succeeded but no model URL was returned.");
+
+    viewer.removeAttribute("src");
+    viewer.setAttribute("src",result.url);
+    preview.style.display="block";
+
+    setStatus(
+      "✓ GLB uploaded successfully.\n\n"+
+      "Saved in Cloudflare R2.\n"+
+      "Menu item database updated.\n\n"+
+      "Model URL:\n"+result.url
+    );
+
+    await loadItems();
+    itemSelect.value=itemSelect.value || "";
+    glbFile.value="";
+  }catch(error){
+    setStatus("✕ "+(error?.message||String(error)));
+  }finally{
+    updateButton();
+  }
+});
+
+init();
+</script>
 </body>
 </html>
