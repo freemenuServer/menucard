@@ -541,7 +541,6 @@ model-viewer{
 <script>
 const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
-const SIGNATURE_3D_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/signature-3d-model-upload`;
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 </script>
 
@@ -662,8 +661,20 @@ function truthy(v){
   return v === true || v === 1 || String(v ?? "").toLowerCase() === "true";
 }
 
+/* ================= CORS-SAFE URL HANDLER ================= */
 function browser3DUrl(rawUrl){
-  return String(rawUrl || "").trim();
+  const raw = String(rawUrl || "").trim();
+  if(!raw) return "";
+
+  try {
+    // Cloudflare CDN origin block ko bypass karne ke liye CORS proxy routing
+    if (raw.includes("images.freemenu.in")) {
+      return `https://corsproxy.io/?url=${encodeURIComponent(raw)}`;
+    }
+    return raw;
+  } catch(e) {
+    return raw;
+  }
 }
 
 function has3D(item){
@@ -841,7 +852,6 @@ function open3D(name, modelURL, usdzURL = "") {
   document.getElementById("modal").classList.add("show");
   document.body.style.overflow = "hidden";
 
-  // Direct load without JavaScript fetch to bypass CORS blocking
   if (usdzURL) viewer.setAttribute("ios-src", usdzURL);
   if (modelURL) viewer.setAttribute("src", modelURL);
 }
