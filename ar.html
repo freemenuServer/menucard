@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Grand Feast - Digital 3D Menu</title>
+
+  <!-- Google ka Official WebAR Model Viewer Library -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding-bottom: 50px;
+    }
+
+    /* Restaurant Header */
+    .header {
+      background: var(--card-bg);
+      padding: 22px 16px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .res-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .res-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Category Navigation */
+    .cat-bar {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 12px 16px;
+      background: var(--card-bg);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--border);
+      scrollbar-width: none;
+    }
+    .cat-bar::-webkit-scrollbar { display: none; }
+    .cat-btn {
+      white-space: nowrap;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: #f1f5f9;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+    }
+    .cat-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* Menu Container */
+    .menu-container {
+      max-width: 600px;
+      margin: 16px auto;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Dish Card */
+    .dish-card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+
+    .dish-info {
+      flex: 1;
+    }
+
+    /* Veg/Non-Veg Indicators */
+    .diet-icon {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid;
+      border-radius: 3px;
+      position: relative;
+      margin-bottom: 6px;
+    }
+    .diet-veg { border-color: #16a34a; }
+    .diet-veg::after {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #16a34a;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+    }
+    .diet-nonveg { border-color: #dc2626; }
+    .diet-nonveg::after {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #dc2626;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+    }
+
+    .dish-name {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .dish-desc {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .dish-price {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    /* Right Action Side */
+    .dish-action {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-end;
+    }
+
+    /* 3D Button */
+    .btn-3d {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      border: none;
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
+      transition: transform 0.15s;
+    }
+    .btn-3d:active {
+      transform: scale(0.96);
+    }
+
+    /* Popup Modal for 3D/AR */
+    #ar-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .modal-box {
+      background: #ffffff;
+      width: 100%;
+      max-width: 440px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .modal-close-btn {
+      background: #f1f5f9;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    /* Model Viewer */
+    model-viewer {
+      width: 100%;
+      height: 360px;
+      background-color: #f8fafc;
+    }
+
+    /* Native AR Placement Button */
+    .ar-native-btn {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      color: #ffffff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .modal-footer {
+      padding: 12px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      background: #fafafa;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Restaurant Header -->
+  <header class="header">
+    <h1 class="res-title">The Grand Feast</h1>
+    <p class="res-subtitle">Live 3D & Augmented Reality Digital Menu</p>
+  </header>
+
+  <!-- Categories -->
+  <nav class="cat-bar">
+    <button class="cat-btn active">All Items</button>
+    <button class="cat-btn">Signature Dishes</button>
+    <button class="cat-btn">Bakery & Breads</button>
+    <button class="cat-btn">Main Course</button>
+  </nav>
+
+  <!-- Menu Listing -->
+  <main class="menu-container">
+
+    <!-- Dish 1: 3D AR Enabled -->
+    <div class="dish-card">
+      <div class="dish-info">
+        <span class="diet-icon diet-veg"></span>
+        <h3 class="dish-name">Tandoori Stuffed Naan & Dip</h3>
+        <p class="dish-desc">Crisp clay-oven baked bread loaded with seasoned filling and served with signature dips.</p>
+        <div class="dish-price">₹180</div>
+      </div>
+      <div class="dish-action">
+        <button class="btn-3d" onclick="open3DModal('https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/SheenChair/glTF-Binary/SheenChair.glb', 'Tandoori Stuffed Naan')">
+          👓 3D View
+        </button>
+      </div>
+    </div>
+
+    <!-- Dish 2: 3D AR Enabled -->
+    <div class="dish-card">
+      <div class="dish-info">
+        <span class="diet-icon diet-veg"></span>
+        <h3 class="dish-name">Artisan Ceramic Tea Cup</h3>
+        <p class="dish-desc">Freshly brewed herbal tea served in traditional handmade earthen ceramic pottery.</p>
+        <div class="dish-price">₹120</div>
+      </div>
+      <div class="dish-action">
+        <button class="btn-3d" onclick="open3DModal('https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/AntiqueCamera/glTF-Binary/AntiqueCamera.glb', 'Artisan Earthen Cup')">
+          👓 3D View
+        </button>
+      </div>
+    </div>
+
+    <!-- Dish 3: Regular Item (Without 3D Model) -->
+    <div class="dish-card">
+      <div class="dish-info">
+        <span class="diet-icon diet-nonveg"></span>
+        <h3 class="dish-name">Murg Butter Masala</h3>
+        <p class="dish-desc">Tender boneless roasted chicken simmered in rich creamy tomato and cashew butter gravy.</p>
+        <div class="dish-price">₹360</div>
+      </div>
+      <div class="dish-action">
+        <!-- Normal items don't have 3D button -->
+      </div>
+    </div>
+
+    <!-- Dish 4: Regular Item -->
+    <div class="dish-card">
+      <div class="dish-info">
+        <span class="diet-icon diet-veg"></span>
+        <h3 class="dish-name">Dal Makhani Special</h3>
+        <p class="diet-desc dish-desc">Slow-cooked black lentils overnight with fresh cream and clarified butter.</p>
+        <div class="dish-price">₹240</div>
+      </div>
+      <div class="dish-action">
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 3D WebAR Viewer Modal -->
+  <div id="ar-modal">
+    <div class="modal-box">
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h3 id="modal-dish-name">3D Preview</h3>
+        <button class="modal-close-btn" onclick="close3DModal()">✕</button>
+      </div>
+
+      <!-- Live 3D & WebAR Viewer -->
+      <div style="position: relative;">
+        <model-viewer id="dish-viewer"
+                      src=""
+                      ar
+                      ar-modes="webxr scene-viewer quick-look"
+                      camera-controls
+                      auto-rotate
+                      rotation-per-second="25deg"
+                      shadow-intensity="1.5"
+                      environment-image="neutral">
+          
+          <!-- Native AR Launch Button -->
+          <button slot="ar-button" class="ar-native-btn">
+            📱 Place on Table (AR)
+          </button>
+        </model-viewer>
+      </div>
+
+      <!-- Modal Footer Instructions -->
+      <div class="modal-footer">
+        👆 1-Finger se rotate karein • 2-Fingers se zoom karein • AR button se table par dekhein
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive JavaScript Logic -->
+  <script>
+    const modal = document.getElementById('ar-modal');
+    const viewer = document.getElementById('dish-viewer');
+    const dishNameHeader = document.getElementById('modal-dish-name');
+
+    // 3D Modal Open Function
+    function open3DModal(glbUrl, dishTitle) {
+      dishNameHeader.innerText = dishTitle;
+      viewer.setAttribute('src', glbUrl);
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden'; // Stop background scroll
+    }
+
+    // 3D Modal Close Function
+    function close3DModal() {
+      viewer.setAttribute('src', ''); // Clear memory
+      modal.style.display = 'none';
+      document.body.style.overflow = 'auto'; // Restore scroll
+    }
+
+    // Modal background click se close
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        close3DModal();
+      }
+    });
+  </script>
+
+</body>
+</html>
