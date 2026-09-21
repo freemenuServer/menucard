@@ -470,6 +470,7 @@ body{
     color: #111;
 }
 
+/* crossorigin removed for seamless R2 CORS access */
 model-viewer{
     width:100%;
     flex: 1;
@@ -611,7 +612,7 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 </p>
 </footer>
 
-<!-- 3D / AR MODAL (crossorigin attribute removed) -->
+<!-- 3D / AR MODAL -->
 <div class="modal" id="modal">
 <div class="modal-box">
     <div class="modal-header">
@@ -661,7 +662,7 @@ function truthy(v){
   return v === true || v === 1 || String(v ?? "").toLowerCase() === "true";
 }
 
-/* Bypass unwanted redirects to return pure URL */
+/* Direct URL handler without proxy redirects */
 function browser3DUrl(rawUrl){
   const raw = String(rawUrl || "").trim();
   return raw;
