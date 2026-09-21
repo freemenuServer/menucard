@@ -718,6 +718,69 @@ model-viewer{
 }
 </style>
 
+
+<style id="freemenu-text-menu-mode">
+/* When images are OFF, switch the entire menu into a clean text/printed-menu layout. */
+body.text-menu-mode .food-grid{
+  display:block!important;
+}
+body.text-menu-mode .food-card{
+  display:flex!important;
+  align-items:center!important;
+  gap:0!important;
+  min-height:72px!important;
+  border:0!important;
+  border-bottom:1px dashed #3a3a3a!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  transform:none!important;
+}
+body.text-menu-mode .food-card:last-child{border-bottom:0!important;}
+body.text-menu-mode .food-card:hover{
+  transform:none!important;
+  border-color:transparent!important;
+  background:rgba(255,255,255,.025)!important;
+}
+body.text-menu-mode .food-img{display:none!important;}
+body.text-menu-mode .food-content{
+  width:100%!important;
+  padding:12px 2px!important;
+}
+body.text-menu-mode .food-name{
+  font-size:15px!important;
+  font-weight:800!important;
+  color:#f3eee7!important;
+}
+body.text-menu-mode .price{
+  font-size:15px!important;
+  color:#f5cc68!important;
+}
+body.text-menu-mode .description{
+  min-height:0!important;
+  margin:5px 0 0!important;
+  font-size:11px!important;
+  color:#aaa!important;
+}
+body.text-menu-mode .section{
+  padding-top:20px!important;
+}
+body.text-menu-mode .section-title{
+  margin-bottom:8px!important;
+}
+body.text-menu-mode .food-section{
+  margin-bottom:10px!important;
+}
+body.text-menu-mode .actions{
+  margin-top:8px!important;
+}
+@media(max-width:700px){
+  body.text-menu-mode .food-name-row{gap:12px!important;}
+  body.text-menu-mode .food-name{font-size:14px!important;}
+  body.text-menu-mode .price{font-size:14px!important;}
+}
+</style>
+
 </head>
 
 
@@ -1228,6 +1291,9 @@ function setAllFoodImages(off){
   wraps.forEach(wrap=>{
     wrap.classList.toggle('image-off',off);
   });
+
+  // OFF means the complete menu changes from photo cards to a clean text menu.
+  document.body.classList.toggle('text-menu-mode',off);
 
   const btn=document.getElementById('globalImageToggle');
   const text=document.getElementById('globalImageToggleText');
