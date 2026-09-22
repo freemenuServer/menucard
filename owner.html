@@ -448,7 +448,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
     <!-- REORDER CONTROLS BANNER -->
     <div id="reorderControls" class="reorderBanner hidden">
-      <div><i class="fa-solid fa-circle-info"></i> Drag categories to change their order, or drag items inside their category. (Items cannot be dropped into other categories).</div>
+      <div><i class="fa-solid fa-circle-info"></i> Drag categories to change sequence, or drag items within their category. (Items cannot be dropped into other categories).</div>
       <div class="actions">
         <button class="btn sm" id="cancelReorderBtn">Cancel</button>
         <button class="btn primary sm" id="saveReorderBtn"><i class="fa-solid fa-floppy-disk"></i> Save Order</button>
@@ -507,7 +507,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
         <label class="serviceBtn"><input type="checkbox" id="fDelivery" checked> 🛵 Home Delivery</label>
       </div>
       <button class="btn primary" id="saveHeroInfo" style="margin-top:15px"><i class="fa-solid fa-floppy-disk"></i> Save Public Information</button>
-      <p class="muted" style="font-size:10px;margin:10px 0 0">These fields require the accompanying FreeMenu SQL migration before Supabase can store them.</p>
+      <p class="muted" style="font-size:10px;margin-top:10px">These fields require the accompanying FreeMenu SQL migration before Supabase can store them.</p>
     </div>
 
   </div>
@@ -746,35 +746,35 @@ window.addEventListener("hashchange",()=>showSection(location.hash.slice(1)||"da
 $("mobileMenu").onclick=()=>$("sidebar").classList.toggle("open");
 
 function showOwnerLogin(){
-  $("loader").classList.add("hidden");
-  $("ownerAuth").classList.add("show");
-  $("authChoiceCard").style.display="grid";
+  $("loader")?.classList.add("hidden");
+  $("ownerAuth")?.classList.add("show");
+  if($("authChoiceCard")) $("authChoiceCard").style.display="grid";
   showLoginForm();
 }
 function hideOwnerLogin(){
-  $("ownerAuth").classList.remove("show");
+  $("ownerAuth")?.classList.remove("show");
 }
 function showLoginForm(){
-  $("ownerAuth").classList.add("show");
-  $("authChoiceCard").style.display="grid";
-  $("loginCard").classList.add("active");
-  $("signupCard").classList.remove("active");
-  $("loginCard").style.display="block";
-  $("signupCard").style.display="none";
+  $("ownerAuth")?.classList.add("show");
+  if($("authChoiceCard")) $("authChoiceCard").style.display="grid";
+  $("loginCard")?.classList.add("active");
+  $("signupCard")?.classList.remove("active");
+  if($("loginCard")) $("loginCard").style.display="block";
+  if($("signupCard")) $("signupCard").style.display="none";
   $("authLoginTab")?.classList.add("active");
   $("authSignupTab")?.classList.remove("active");
 }
 function showSignupForm(){
-  $("ownerAuth").classList.add("show");
-  $("authChoiceCard").style.display="grid";
-  $("loginCard").classList.remove("active");
-  $("signupCard").classList.add("active");
-  $("loginCard").style.display="none";
-  $("signupCard").style.display="block";
+  $("ownerAuth")?.classList.add("show");
+  if($("authChoiceCard")) $("authChoiceCard").style.display="grid";
+  $("loginCard")?.classList.remove("active");
+  $("signupCard")?.classList.add("active");
+  if($("loginCard")) $("loginCard").style.display="none";
+  if($("signupCard")) $("signupCard").style.display="block";
   $("authLoginTab")?.classList.remove("active");
   $("authSignupTab")?.classList.add("active");
 }
-function showAuthChoice(){ showLoginForm(); }
+function showAuthChoice(){ showOwnerLogin(); }
 $("authLoginTab")?.addEventListener("click",showLoginForm);
 $("authSignupTab")?.addEventListener("click",showSignupForm);
 function setAuthMsg(id,msg,ok=false){
@@ -807,7 +807,7 @@ async function ownerLogin(){
       return;
     }
     hideOwnerLogin();
-    $("loader").classList.remove("hidden");
+    $("loader")?.classList.remove("hidden");
     await init(true);
     return;
   }catch(e){
@@ -907,8 +907,8 @@ async function ownerSignup(){
     setAuthMsg("signupSuccessNew","Account and restaurant created. Opening Owner Dashboard...",true);
     setTimeout(async()=>{
       hideOwnerLogin();
-      $("loader").classList.remove("hidden");
-      await init();
+      $("loader")?.classList.remove("hidden");
+      await init(true);
     },500);
   }else{
     setAuthMsg("signupSuccessNew","Account created. Please verify your email, then login to open your Owner Dashboard.",true);
@@ -935,14 +935,14 @@ async function init(afterLogin=false){
     ]);
     session=result?.data?.session||null;
     if(!session?.user){
-      showAuthChoice();
+      showOwnerLogin();
       return;
     }
 
     const adminRestaurantId=new URLSearchParams(location.search).get("admin_restaurant");
 
     if(!afterLogin && !adminRestaurantId){
-      showAuthChoice();
+      showOwnerLogin();
       return;
     }
     let superAdminMode=false;
@@ -1260,7 +1260,6 @@ async function uploadMenuPhoto(){
 }
 
 async function loadItems(){
-  // Load using sort_order then id
   const {data,error}=await supabaseClient
     .from("menu_items")
     .select("*")
@@ -1333,7 +1332,6 @@ function startReordering(){
   $("reorderControls").classList.remove("hidden");
   $("toggleReorderBtn").classList.add("hidden");
 
-  // Deep copy category list and items by category
   reorderCategoryList=[...categories()];
   reorderItemsByCategory={};
   reorderCategoryList.forEach(c=>{
@@ -1391,7 +1389,6 @@ function renderReorderView(){
 }
 
 function attachReorderDragEvents(){
-  // 1. Category drag & drop
   const catBlocks=document.querySelectorAll(".reorderCategoryBlock");
   catBlocks.forEach(block=>{
     const handle=block.querySelector(".catDragHandle");
@@ -1436,7 +1433,6 @@ function attachReorderDragEvents(){
     });
   });
 
-  // 2. Strict In-Category Item drag & drop
   const itemRows=document.querySelectorAll(".reorderItemRow");
   itemRows.forEach(row=>{
     row.addEventListener("dragstart",e=>{
@@ -1457,7 +1453,6 @@ function attachReorderDragEvents(){
 
     row.addEventListener("dragover",e=>{
       if(!draggedItem) return;
-      // RESTRICTION: Do not allow dragging across different categories
       if(draggedItem.cat !== row.dataset.cat) return;
       e.preventDefault();
       row.classList.add("drag-over");
@@ -1469,7 +1464,6 @@ function attachReorderDragEvents(){
 
     row.addEventListener("drop",e=>{
       if(!draggedItem) return;
-      // RESTRICTION: Drop blocked if categories do not match
       if(draggedItem.cat !== row.dataset.cat) return;
       e.preventDefault();
       row.classList.remove("drag-over");
@@ -1493,7 +1487,6 @@ async function saveMenuOrder(){
   saveBtn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
 
   try{
-    // 1. Update restaurant category_order
     const {error:catError}=await supabaseClient
       .from("restaurants")
       .update({category_order:reorderCategoryList})
@@ -1501,7 +1494,6 @@ async function saveMenuOrder(){
 
     if(catError) throw catError;
 
-    // 2. Batch update menu_items.sort_order
     const updates=[];
     reorderCategoryList.forEach(cat=>{
       const catItems=reorderItemsByCategory[cat]||[];
@@ -1881,7 +1873,7 @@ setInterval(()=>{
 },30000);
 
 /* ---------- Logout ---------- */
-async function logout(){await supabaseClient.auth.signOut();showAuthChoice()}
+async function logout(){await supabaseClient.auth.signOut();showOwnerLogin()}
 $("logoutBtn").onclick=logout;$("logout2").onclick=logout;
 
 /* ---------- Modal close ---------- */
@@ -1896,24 +1888,26 @@ supabaseClient.auth.onAuthStateChange((event, newSession)=>{
     showOwnerLogin();
   }
 });
+
+/* ---------- Application Startup (Fixed Loader Issue) ---------- */
 window.addEventListener("load",async()=>{
   try{
     if(!window.supabase){
-      throw new Error("Supabase library could not be loaded. Check your internet connection.");
+      throw new Error("Supabase library load nahi ho payi. Internet connection check karein.");
     }
     const adminRestaurantId=new URLSearchParams(location.search).get("admin_restaurant");
-    if(adminRestaurantId){
-      await init(false);
-      return;
+    const {data:{session:existingSession}}=await supabaseClient.auth.getSession();
+
+    if(existingSession?.user || adminRestaurantId){
+      await init(true);
+    } else {
+      $("loader")?.classList.add("hidden");
+      showOwnerLogin();
     }
-    showAuthChoice();
   }catch(e){
     console.error("Owner page startup failed:",e);
-    const loader=$("loader");
-    if(loader){
-      loader.classList.remove("hidden");
-      loader.innerHTML=`<div style="text-align:center;padding:25px"><h3>Unable to load Owner Login</h3><p>${esc(e?.message||"Unexpected startup error")}</p><button class="btn" onclick="location.reload()">Retry</button></div>`;
-    }
+    $("loader")?.classList.add("hidden");
+    showOwnerLogin();
   }
 });
 </script>
