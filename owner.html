@@ -1095,13 +1095,39 @@ async function loadCurrentPlan(){
   descEl.textContent="";featuresEl.innerHTML="";
   let plan=null, error=null;
 
+  /* Primary source: Super Admin assignment via restaurants.plan_id. */
   if(currentRestaurant?.plan_id){
     const res=await supabaseClient.from("plans").select("*").eq("id",currentRestaurant.plan_id).maybeSingle();
-    plan=res.data;error=res.error;
-  }else if(String(currentRestaurant?.plan||"").toLowerCase()==="free"){
-    const res=await supabaseClient.from("plans").select("*").eq("slug","free-starter").maybeSingle();
-    plan=res.data;error=res.error;
-  }else{
+    plan=res.data||null;error=res.error||null;
+  }
+
+  /* Backward compatibility: older admin records may only have restaurants.plan.
+     Resolve every known plan value to the real plans row before ever falling back to Free. */
+  if(!plan){
+    const legacy=String(currentRestaurant?.plan||"").trim().toLowerCase();
+    const legacySlugMap={
+      "free":"free-starter",
+      "starter":"free-starter",
+      "free-starter":"free-starter",
+      "growth":"growth-photos",
+      "premium":"growth-photos",
+      "growth-photos":"growth-photos",
+      "signature":"signature-3d",
+      "signature-3d":"signature-3d",
+      "signature_3d":"signature-3d",
+      "full-3d":"full-3d-experience",
+      "full_3d":"full-3d-experience",
+      "full-3d-experience":"full-3d-experience"
+    };
+    const slug=legacySlugMap[legacy]||legacy;
+    if(slug){
+      const res=await supabaseClient.from("plans").select("*").eq("slug",slug).maybeSingle();
+      if(!res.error && res.data) plan=res.data;
+      else if(res.error) error=res.error;
+    }
+  }
+
+  if(!plan){
     renderNoPlan();
     return;
   }
@@ -1120,6 +1146,14 @@ async function loadCurrentPlan(){
   }
 
   currentPlan=plan;
+  console.log("FreeMenu current restaurant plan:",{
+    restaurantId:currentRestaurant?.id,
+    plan_id:currentRestaurant?.plan_id,
+    legacy_plan:currentRestaurant?.plan,
+    resolved_plan_id:plan?.id,
+    resolved_plan_slug:plan?.slug,
+    signature_3d_dishes_max:plan?.signature_3d_dishes_max
+  });
   signature3dLimit=Math.max(0,Number(plan.signature_3d_dishes_max||0));
   await refreshSignature3DCount();
   updateSignature3DUI();
