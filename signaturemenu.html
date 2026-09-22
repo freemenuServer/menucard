@@ -1,808 +1,1900 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Urban Punjab Jhilmil • Signature Menu</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#7b1e16" />
+  <title>Digital Menu</title>
 
-<!-- 3D / AR engine -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
-<style>
-*{box-sizing:border-box}
-html,body{margin:0;background:#020202;color:#f7efe2;font-family:Arial,Helvetica,sans-serif}
-body{min-height:100vh}
-button,input{font:inherit}
-button{cursor:pointer}
+  <style>
+    :root {
+      --primary: #7b1e16;
+      --primary-dark: #5a140f;
+      --primary-soft: #fff4e8;
+      --accent: #c8943e;
+      --bg: #f5eee5;
+      --surface: #fffaf2;
+      --surface-2: #f7eee4;
+      --text: #4a281a;
+      --muted: #7d6558;
+      --border: #d9c39a;
+      --veg: #16a34a;
+      --nonveg: #dc2626;
+      --egg: #d97706;
+      --danger: #dc2626;
+      --radius: 18px;
+      --shadow: 0 10px 30px rgba(15, 23, 42, .06);
+      --font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
 
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-family);
+      background: var(--bg);
+      color: var(--text);
+      padding-bottom: calc(24px + env(safe-area-inset-bottom));
+    }
+
+    button, input { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
+    img { display: block; max-width: 100%; }
+
+    .app-shell {
+      width: min(100%, 820px);
+      margin: 0 auto;
+    }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      min-height: 190px;
+      background:
+        linear-gradient(135deg, color-mix(in srgb, var(--primary) 94%, black 6%), var(--primary-dark));
+      overflow: hidden;
+      color: #fff;
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      pointer-events: none;
+    }
+    .hero::before { width: 190px; height: 190px; right: -70px; top: -65px; }
+    .hero::after { width: 120px; height: 120px; left: -40px; bottom: -55px; }
+
+    .hero-cover {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: .22;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.44));
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      min-height: 190px;
+      display: flex;
+      align-items: flex-end;
+      gap: 14px;
+      padding: 22px 16px 18px;
+    }
+
+    .logo-wrap {
+      width: 68px;
+      height: 68px;
+      border-radius: 18px;
+      flex: 0 0 auto;
+      background: rgba(255,255,255,.96);
+      border: 3px solid rgba(255,255,255,.65);
+      box-shadow: 0 8px 24px rgba(0,0,0,.2);
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      color: var(--primary);
+    }
+
+    .logo-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .logo-fallback svg { width: 30px; height: 30px; }
+
+    .hero-info { min-width: 0; flex: 1; }
+    .restaurant-name {
+      margin: 0;
+      font-size: clamp(22px, 5vw, 30px);
+      line-height: 1.1;
+      font-weight: 850;
+      letter-spacing: -.5px;
+      text-shadow: 0 2px 10px rgba(0,0,0,.2);
+    }
+
+    .restaurant-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      margin-top: 8px;
+      font-size: 12.5px;
+      color: rgba(255,255,255,.9);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.16);
+      backdrop-filter: blur(8px);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; }
+    .status-badge.closed .status-dot { background: #f87171; }
+
+    .hero-action {
+      flex: 0 0 auto;
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(255,255,255,.32);
+      border-radius: 14px;
+      background: rgba(255,255,255,.16);
+      color: #fff;
+      display: none;
+      place-items: center;
+      text-decoration: none;
+      backdrop-filter: blur(10px);
+    }
+
+    /* STICKY CONTROL AREA */
+    .sticky-panel {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: color-mix(in srgb, var(--bg) 90%, transparent);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+      padding: 10px 12px 8px;
+    }
+
+    .search-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(15,23,42,.04);
+      overflow: hidden;
+    }
+
+    .search-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      flex: 0 0 auto;
+    }
+
+    #menu-search {
+      width: 100%;
+      height: 44px;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text);
+      padding: 0 12px 0 0;
+      font-size: 14px;
+    }
+    #menu-search::placeholder { color: #9ca3af; }
+
+    .category-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-top: 9px;
+      scrollbar-width: none;
+      overscroll-behavior-inline: contain;
+    }
+    .category-scroll::-webkit-scrollbar { display: none; }
+
+    .cat-chip {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      min-height: 34px;
+      padding: 7px 13px;
+      border-radius: 999px;
+      white-space: nowrap;
+      font-size: 12.5px;
+      font-weight: 750;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+    .cat-chip.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+      box-shadow: 0 5px 14px color-mix(in srgb, var(--primary) 22%, transparent);
+    }
+
+    /* CONTENT */
+    .menu-wrap { padding: 14px 12px 30px; }
+
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 2px 2px 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .category-section {
+      scroll-margin-top: 110px;
+      margin-bottom: 20px;
+    }
+
+    .category-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 0 2px 9px;
+    }
+
+    .category-title {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+      font-weight: 850;
+      letter-spacing: -.2px;
+    }
+    .item-count {
+      color: var(--muted);
+      font-size: 11.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .items-list {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .menu-item {
+      position: relative;
+      display: flex;
+      gap: 13px;
+      padding: 14px;
+      border-bottom: 1px solid var(--border);
+      transition: background .2s ease;
+    }
+    .menu-item:last-child { border-bottom: 0; }
+    .menu-item:active { background: var(--surface-2); }
+    .menu-item.unavailable { opacity: .58; }
+
+    .item-content { flex: 1; min-width: 0; }
+    .item-main-row { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
+    .item-info { flex: 1; min-width: 0; }
+    .item-topline { display: flex; align-items: flex-start; gap: 7px; }
+
+    /* Menu-style right-aligned portion columns */
+    .item-price-area {
+      flex: 0 0 158px;
+      width: 158px;
+      align-self: flex-start;
+      margin-left: auto;
+    }
+    .price-header {
+      display: grid;
+      grid-template-columns: repeat(3, 45px);
+      gap: 5px;
+      justify-content: end;
+      margin-bottom: 5px;
+      color: var(--text);
+      font-size: 10px;
+      line-height: 1;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: .45px;
+      text-align: center;
+    }
+    .price-header.single { grid-template-columns: 58px; }
+    .portion-prices {
+      display: grid;
+      grid-template-columns: repeat(3, 45px);
+      gap: 5px;
+      justify-content: end;
+      align-items: center;
+    }
+    .portion-price {
+      width: 45px;
+      min-width: 45px;
+      padding: 2px 0;
+      text-align: center;
+      border: 0;
+      background: transparent;
+      border-radius: 0;
+      color: var(--primary);
+      font-weight: 850;
+    }
+    .portion-price.empty {
+      background: transparent;
+      border: 0;
+      color: #cbbdaf;
+    }
+    .portion-price .label { display: none; }
+    .portion-price .amount {
+      margin-top: 0;
+      font-size: 13px;
+      line-height: 1.25;
+      white-space: nowrap;
+    }
+    .single-price-area { display: flex; justify-content: flex-end; }
+    .single-price {
+      margin-top: 0;
+      width: 58px;
+      padding: 2px 0;
+      border: 0;
+      background: transparent;
+      border-radius: 0;
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 850;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .food-symbol {
+      width: 15px;
+      height: 15px;
+      margin-top: 2px;
+      border-radius: 3px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+    }
+    .food-symbol::after { content: ""; width: 7px; height: 7px; border-radius: 50%; }
+    .food-symbol.veg { border: 1.6px solid var(--veg); }
+    .food-symbol.veg::after { background: var(--veg); }
+    .food-symbol.nonveg { border: 1.6px solid var(--nonveg); }
+    .food-symbol.nonveg::after { background: var(--nonveg); border-radius: 1px; transform: rotate(45deg); width: 6px; height: 6px; }
+    .food-symbol.egg { border: 1.6px solid var(--egg); }
+    .food-symbol.egg::after { background: var(--egg); }
+
+    .item-name {
+      margin: 0;
+      font-size: 15.5px;
+      line-height: 1.25;
+      font-weight: 790;
+      color: var(--text);
+    }
+
+    .item-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 7px;
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 20px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      font-size: 10px;
+      line-height: 1;
+      font-weight: 800;
+      background: var(--primary-soft);
+      color: var(--primary-dark);
+    }
+    .tag.out { background: #fef2f2; color: #b91c1c; }
+    .tag.hot { background: #fff7ed; color: #c2410c; }
+
+    .item-desc {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .item-image-wrap {
+      position: relative;
+      width: 92px;
+      height: 92px;
+      flex: 0 0 92px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+    }
+    .item-image { width: 100%; height: 100%; object-fit: cover; }
+    .img-placeholder {
+      width: 100%; height: 100%;
+      display: grid; place-items: center;
+      color: #9ca3af;
+      background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    }
+    .img-placeholder svg { width: 26px; height: 26px; }
+
+    /* Warm printed-menu card styling */
+    .category-section { margin-bottom: 18px; }
+    .category-heading {
+      margin: 0;
+      padding: 11px 14px;
+      background: var(--primary);
+      border-radius: 15px 15px 0 0;
+      color: #fffaf2;
+    }
+    .category-title {
+      color: #fffaf2;
+      font-size: 17px;
+      text-transform: uppercase;
+      letter-spacing: .35px;
+    }
+    .item-count { color: rgba(255,250,242,.78); }
+    .items-list {
+      border: 1px solid var(--border);
+      border-top: 0;
+      border-radius: 0 0 15px 15px;
+      background: var(--surface);
+      box-shadow: 0 4px 12px rgba(90,20,15,.07);
+    }
+    .menu-item {
+      padding: 11px 13px;
+      border-bottom: 1px dashed #e2cda9;
+      background: var(--surface);
+    }
+    .menu-item:last-child { border-bottom: 0; }
+    .item-name { color: #6b174b; font-size: 14.5px; }
+    .item-desc { color: #8a7668; }
+    .price-header { color: #5a321e; }
+    .summary-line { color: var(--muted); }
+
+    @media (max-width: 560px) {
+      .menu-item { padding: 10px 10px; gap: 8px; }
+      .item-main-row { gap: 6px; }
+      .item-price-area { flex-basis: 151px; width: 151px; }
+      .price-header, .portion-prices { grid-template-columns: repeat(3, 43px); gap: 4px; }
+      .portion-price { width: 43px; min-width: 43px; }
+      .price-header.single { grid-template-columns: 55px; }
+      .single-price { width: 55px; }
+      .item-name { font-size: 14px; }
+      .portion-price .amount, .single-price { font-size: 12px; }
+    }
+
+    /* STATES */
+    .state-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 34px 20px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      color: var(--muted);
+    }
+    .state-card strong { display: block; color: var(--text); font-size: 17px; margin-bottom: 5px; }
+
+    .skeleton {
+      overflow: hidden;
+      position: relative;
+      background: #e9edf2;
+      border-radius: 10px;
+    }
+    .skeleton::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.65), transparent);
+      animation: shimmer 1.25s infinite;
+    }
+    @keyframes shimmer { 100% { transform: translateX(100%); } }
+
+    .loading-list {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .loading-row { display: flex; gap: 12px; padding: 14px; border-bottom: 1px solid var(--border); }
+    .loading-row:last-child { border-bottom: 0; }
+    .sk-line { height: 12px; margin-bottom: 8px; }
+    .sk-title { width: 58%; height: 15px; }
+    .sk-text { width: 85%; }
+    .sk-price { width: 35%; }
+    .sk-img { width: 90px; height: 90px; flex: 0 0 90px; }
+
+    .footer-note {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 11px;
+      padding: 8px 16px 0;
+    }
+
+    @media (min-width: 640px) {
+      body { padding-top: 18px; }
+      .app-shell {
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(15,23,42,.08);
+      }
+      .hero, .hero-content { min-height: 220px; }
+      .hero-content { padding: 28px 24px 22px; }
+      .sticky-panel { padding-inline: 18px; }
+      .menu-wrap { padding-inline: 18px; }
+      .menu-item { padding: 16px; }
+      .item-image-wrap { width: 110px; height: 100px; flex-basis: 110px; }
+    }
+  
+    .hero-welcome{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-size:18px;color:var(--accent,#d8ad62);margin-bottom:2px}
+    .hero-tagline{font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(28px,6vw,48px);line-height:.98;text-transform:uppercase;letter-spacing:1px;margin:0;color:#fff}
+    .hero-subtitle{font-size:12px;font-weight:800;letter-spacing:2px;margin-top:7px;color:rgba(255,255,255,.94)}
+    .hero-features{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:13px;font-size:12px;color:#fff}
+    .hero-feature{display:inline-flex;align-items:center;gap:5px}
+    .hero-slogans{font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;font-size:19px;line-height:.98;margin-top:18px;color:#fff}
+    .hero-slogans div:last-child{padding-left:45px;margin-top:3px}
+    .service-strip{background:#fff;color:#111827;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;font-size:12px}
+    .service-left{display:flex;align-items:center;gap:13px;flex-wrap:wrap}
+    .open-pill{background:#12964e;color:#fff;border-radius:999px;padding:8px 13px;font-weight:800}
+    .service-time{font-weight:700}
+    .services{display:flex;align-items:center;gap:15px;flex-wrap:wrap;font-weight:700}
+    .service{display:inline-flex;align-items:center;gap:5px}
+    @media(max-width:640px){
+      .hero-features{gap:7px 10px}.hero-slogans{font-size:17px}
+      .service-strip{align-items:flex-start;flex-direction:column}.services{gap:10px}
+    }
+
+
+    /* ===== Modern restaurant menu refresh ===== */
+    .app-shell{background:var(--bg);}
+    .hero{
+      min-height:330px;
+      border-radius:0 0 28px 28px;
+      isolation:isolate;
+      box-shadow:0 14px 40px rgba(30,20,10,.16);
+    }
+    .hero-cover{opacity:.48;filter:saturate(1.05) contrast(1.04);transform:scale(1.02);}
+    .hero-overlay{
+      background:
+        linear-gradient(180deg,rgba(8,8,8,.05) 0%,rgba(8,8,8,.18) 40%,rgba(8,8,8,.82) 100%),
+        linear-gradient(135deg,rgba(0,0,0,.18),transparent 60%);
+    }
+    .hero::before{width:260px;height:260px;right:-120px;top:-110px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.12)}
+    .hero::after{width:180px;height:180px;left:-90px;bottom:-110px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.10)}
+    .hero-content{min-height:330px;align-items:flex-end;padding:24px 18px 20px;gap:14px;}
+    .logo-wrap{
+      width:78px;height:78px;border-radius:22px;border:4px solid rgba(255,255,255,.9);
+      box-shadow:0 12px 28px rgba(0,0,0,.28);background:#fff;
+    }
+    .hero-info{padding-bottom:2px;}
+    .hero-welcome{font-size:17px;opacity:.94}
+    .hero-tagline{font-size:clamp(30px,8vw,52px);text-shadow:0 3px 18px rgba(0,0,0,.25)}
+    .hero-subtitle{font-size:11px;letter-spacing:2.4px;opacity:.94}
+    .hero-features{gap:7px;margin-top:12px}
+    .hero-feature{padding:5px 9px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.10);border-radius:999px;backdrop-filter:blur(10px)}
+    .hero-slogans{margin-top:14px;font-size:18px}
+    .hero-action{display:grid;align-self:flex-end;width:44px;height:44px;border-radius:15px;box-shadow:0 10px 24px rgba(0,0,0,.2)}
+
+    .service-strip{
+      margin:-14px 12px 0;position:relative;z-index:4;border:1px solid rgba(255,255,255,.8);
+      border-radius:18px;box-shadow:0 10px 26px rgba(20,20,20,.10);padding:12px 14px;
+    }
+    .open-pill{padding:7px 11px;font-size:11px}
+    .services{font-size:11px;gap:9px;color:#4b5563}
+    .service{padding:4px 7px;background:#f8fafc;border-radius:999px}
+
+    .sticky-panel{
+      top:0;margin-top:10px;padding:10px 12px 7px;background:linear-gradient(180deg,rgba(245,238,229,.97),rgba(245,238,229,.82));
+      border-bottom:0;
+    }
+    .search-wrap{border-radius:17px;box-shadow:0 10px 24px rgba(0,0,0,.07);background:rgba(255,255,255,.9)}
+    .search-icon{width:46px;height:46px;color:var(--primary)}
+    #menu-search{height:46px;font-size:14px}
+    .category-scroll{gap:9px;padding:10px 1px 5px;margin-bottom:12px}
+    .cat-chip{border-radius:999px!important;padding:9px 14px!important;font-weight:800!important;box-shadow:0 3px 10px rgba(0,0,0,.05)}
+
+    .menu-wrap{padding:8px 12px 18px}
+    .summary-line{font-size:11px;font-weight:700;padding:3px 3px 10px}
+    .category-section{margin-bottom:20px}
+    .category-heading{
+      padding:13px 15px;border-radius:18px 18px 0 0;box-shadow:0 5px 16px rgba(60,20,10,.12);position:relative;overflow:hidden;
+    }
+    .category-heading::after{content:"";position:absolute;right:-15px;top:-24px;width:78px;height:78px;border-radius:50%;background:rgba(255,255,255,.09)}
+    .category-title{font-size:15px;letter-spacing:.8px}
+    .items-list{border-radius:0 0 18px 18px;box-shadow:0 8px 22px rgba(30,20,10,.08);}
+    .menu-item{padding:14px 13px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(255,250,242,.94));}
+    .menu-item + .menu-item{background:rgba(255,250,242,.92)}
+    .menu-item:active{transform:scale(.997);background:var(--surface-2)}
+    .item-main-row{align-items:center}
+    .item-topline{align-items:center}
+    .item-name{font-size:15.5px;letter-spacing:-.1px}
+    .item-desc{font-size:12px;line-height:1.5;margin-top:6px}
+    .item-tags{margin-top:7px}
+    .tag{padding:4px 8px;font-size:9.5px}
+    .item-price-area{flex-basis:156px;width:156px}
+    .price-header{font-size:9px;opacity:.7}
+    .portion-price .amount,.single-price{font-size:13.5px}
+    .food-symbol{width:16px;height:16px}
+
+    .footer-note{padding:12px 16px 22px;font-size:10px}
+    @media(max-width:560px){
+      .hero{min-height:300px}
+      .hero-content{min-height:300px;padding:20px 14px 18px}
+      .logo-wrap{width:70px;height:70px;border-radius:19px}
+      .service-strip{margin-top:-12px}
+      .menu-wrap{padding-inline:10px}
+      .item-price-area{flex-basis:144px;width:144px}
+      .price-header,.portion-prices{grid-template-columns:repeat(3,41px);gap:3px}
+      .portion-price{width:41px;min-width:41px}
+      .price-header.single{grid-template-columns:52px}.single-price{width:52px}
+      .item-name{font-size:14.2px}
+    }
+    @media(min-width:640px){
+      .app-shell{border-radius:28px;overflow:visible}
+      .hero{border-radius:28px}
+      .service-strip{margin-inline:18px}
+      .sticky-panel{padding-inline:18px}
+      .menu-wrap{padding-inline:18px}
+    }
+
+
+    /* ===== Official restaurant website look ===== */
+    body{
+      background:
+        radial-gradient(circle at 10% 0%, rgba(180,130,60,.08), transparent 28%),
+        linear-gradient(180deg,#f7f7f5 0%,#f4f4f2 100%);
+      color:var(--text);
+    }
+    .app-shell{max-width:1180px;width:calc(100% - 28px);}
+    .site-nav{
+      height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px;
+      padding:0 8px;margin:0 0 14px;border-bottom:1px solid rgba(0,0,0,.07);
+    }
+    .site-brand{display:flex;align-items:center;gap:10px;min-width:0;}
+    .site-brand-mark{width:40px;height:40px;border-radius:12px;background:var(--primary);display:grid;place-items:center;color:#fff;box-shadow:0 8px 18px rgba(0,0,0,.10);overflow:hidden}
+    .site-brand-mark img{width:100%;height:100%;object-fit:cover}
+    .site-brand-name{font-weight:850;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .site-nav-links{display:flex;gap:8px;align-items:center}
+    .site-nav-link{border:0;background:transparent;color:var(--muted);font-weight:750;font-size:12px;padding:10px 12px;border-radius:10px;cursor:pointer}
+    .site-nav-link:hover{background:#fff;color:var(--text)}
+    .hero{border-radius:28px;box-shadow:0 18px 50px rgba(28,25,23,.13);min-height:460px}
+    .hero-cover{opacity:.72;filter:saturate(1.04) contrast(1.03);}
+    .hero-overlay{background:linear-gradient(180deg,rgba(12,10,8,.10) 10%,rgba(12,10,8,.18) 35%,rgba(12,10,8,.72) 100%)}
+    .hero-content{min-height:460px;padding:34px 38px 34px;align-items:flex-end}
+    .logo-wrap{width:110px;height:110px;border-radius:28px;border:5px solid rgba(255,255,255,.9);box-shadow:0 14px 34px rgba(0,0,0,.24)}
+    .hero-info{padding-bottom:4px}
+    .hero-welcome{font-size:18px;letter-spacing:.2px}
+    .hero-tagline{font-size:clamp(34px,6vw,64px);letter-spacing:-1.5px;line-height:.95}
+    .hero-subtitle{font-size:12px;letter-spacing:3px;margin-top:10px}
+    .hero-features{margin-top:16px}
+    .hero-feature{padding:7px 11px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.20);border-radius:999px}
+    .hero-slogans{font-size:21px;margin-top:18px}
+    .hero-action{width:48px;height:48px;border-radius:16px}
+    .service-strip{
+      margin:14px 0 0;padding:14px 18px;background:#fff;border:1px solid rgba(0,0,0,.07);
+      border-radius:18px;box-shadow:0 10px 28px rgba(0,0,0,.05);
+    }
+    .sticky-panel{margin-top:14px;border:1px solid rgba(0,0,0,.06);border-radius:18px;padding:12px 14px 10px;background:rgba(255,255,255,.91);box-shadow:0 10px 28px rgba(0,0,0,.05)}
+    .search-wrap{height:52px;border-radius:15px;box-shadow:none;background:#f7f7f5}
+    #menu-search{height:50px;font-size:14px}
+    .menu-wrap{padding:24px 4px 40px}
+    .category-section{margin-bottom:28px}
+    .category-heading{background:transparent;border-radius:0;padding:0 2px 10px;margin:0}
+    .category-title{color:var(--text);font-size:22px;text-transform:none;letter-spacing:-.3px}
+    .item-count{color:#8c8c86}
+    .items-list{border:1px solid rgba(0,0,0,.075);border-radius:18px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.045)}
+    .menu-item{padding:17px 18px;background:#fff;border-bottom:1px solid #efefec}
+    .menu-item + .menu-item{background:#fff}
+    .menu-item:hover{background:#fcfcfb}
+    .item-name{color:var(--text);font-size:15px}
+    .item-desc{color:#7c7d77}
+    .portion-price,.single-price{color:var(--primary)}
+    .footer-note{text-align:center;color:#a0a09b;padding:18px 16px 32px}
+    @media (max-width:900px){
+      .app-shell{width:calc(100% - 20px)}
+      .hero{min-height:410px}.hero-content{min-height:410px;padding:28px 24px}
+    }
+    @media (max-width:640px){
+      .app-shell{width:100%}.site-nav{padding:0 14px;height:62px;margin-bottom:10px}.site-nav-links{display:none}
+      .hero{border-radius:0;min-height:380px;box-shadow:none}.hero-content{min-height:380px;padding:22px 18px}
+      .logo-wrap{width:82px;height:82px;border-radius:22px}
+      .service-strip,.sticky-panel{border-radius:0;margin-top:10px}.menu-wrap{padding:20px 12px 32px}.category-title{font-size:20px}
+    }
+
+  </style>
+
+<style id="freemenu-no-banner-header">
+.hero{background:var(--surface)!important;color:var(--text)!important;min-height:0!important;border-radius:0 0 18px 18px!important;box-shadow:0 6px 24px rgba(0,0,0,.06)!important}
+.hero-cover,.hero-overlay{display:none!important}
+.hero-content{padding:22px 28px!important;min-height:0!important}
+.hero-info{color:var(--text)!important}
+.hero-welcome{color:var(--primary)!important}
+.hero-tagline,.hero-subtitle,.hero-slogans,.hero-feature{color:var(--text)!important}
+.hero-feature{background:rgba(0,0,0,.045)!important;border-color:rgba(0,0,0,.08)!important}
+.hero-action{position:static!important;margin-left:auto!important}
+.logo-wrap{background:#fff!important}
+@media(max-width:650px){.hero-content{padding:16px!important;gap:12px!important}.hero-slogans,.hero-features{display:none!important}}
+</style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style id="freemenu-price-ruler-fix">
 :root{
-  --gold:#dcae4f;
-  --gold2:#f0cb79;
-  --cream:#f7efe2;
-  --muted:#b9b0a4;
-  --black:#030303;
-  --panel:#080808;
-  --line:rgba(220,174,79,.55);
-  --green:#16c46a;
-  --red:#f02c35;
+  --fm-price-col:72px;
+  --fm-price-gap:8px;
+  --fm-price-width:232px;
 }
 
-.page{
-  width:min(1500px,100%);
-  margin:auto;
-  background:#030303;
-  overflow:hidden;
+/* Both heading and every menu row use EXACTLY the same ruler */
+.categoryPriceSwitch,
+.three-price-area{
+  width:var(--fm-price-width)!important;
+  min-width:var(--fm-price-width)!important;
+  max-width:var(--fm-price-width)!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,var(--fm-price-col))!important;
+  column-gap:var(--fm-price-gap)!important;
+  align-items:center!important;
+  justify-content:end!important;
+  margin-left:auto!important;
+  flex:0 0 var(--fm-price-width)!important;
+  box-sizing:border-box!important;
 }
 
-/* HERO */
+.categoryPriceSwitch span,
+.three-price-cell{
+  width:var(--fm-price-col)!important;
+  min-width:var(--fm-price-col)!important;
+  max-width:var(--fm-price-col)!important;
+  text-align:center!important;
+  box-sizing:border-box!important;
+}
+
+.categoryPriceSwitch span{
+  font-family:Arial,sans-serif!important;
+  font-size:11px!important;
+  line-height:1.2!important;
+  font-weight:800!important;
+  color:#5f554f!important;
+  letter-spacing:.15px!important;
+}
+
+.three-price-cell{
+  font-family:Arial,sans-serif!important;
+  font-size:13px!important;
+  line-height:1.2!important;
+  font-weight:900!important;
+  color:#171412!important;
+  font-variant-numeric:tabular-nums!important;
+}
+
+/* Ensure item text does not push price ruler out of alignment */
+.menu-item,
+.food-item{
+  display:flex!important;
+  align-items:center!important;
+}
+
+.menu-item > :not(.three-price-area),
+.food-item > :not(.three-price-area){
+  min-width:0!important;
+}
+
+@media(max-width:700px){
+  :root{
+    --fm-price-col:52px;
+    --fm-price-gap:4px;
+    --fm-price-width:164px;
+  }
+  .categoryPriceSwitch span{font-size:9px!important;font-weight:800!important}
+  .three-price-cell{font-size:11px!important;font-weight:900!important}
+}
+
+@media(max-width:430px){
+  :root{
+    --fm-price-col:45px;
+    --fm-price-gap:3px;
+    --fm-price-width:141px;
+  }
+  .categoryPriceSwitch span{font-size:8.5px!important}
+  .three-price-cell{font-size:10.5px!important}
+}
+</style>
+
+
+
+
+
+<style id="freemenu-image-style-v2">
+/* ===== Dark premium digital-menu design ===== */
+:root{
+  --fm-dark:#0b0e0f;
+  --fm-panel:#111516;
+  --fm-panel-2:#151a1b;
+  --fm-gold:#d9aa62;
+  --fm-gold-soft:#b98b4d;
+  --fm-cream:#f6f0e7;
+}
+body{
+  background:#e9e4dc!important;
+  color:#f5f1ea!important;
+  padding-bottom:30px!important;
+}
+.app-shell{
+  width:min(100%,1180px)!important;
+  margin:22px auto 0!important;
+  background:var(--fm-dark)!important;
+  border:1px solid rgba(217,170,98,.18)!important;
+  border-radius:24px!important;
+  overflow:hidden!important;
+  box-shadow:0 22px 70px rgba(0,0,0,.24)!important;
+}
+
+/* Header: logo + restaurant name centered, like the reference image */
 .hero{
-  position:relative;
-  min-height:610px;
-  padding:30px 34px 22px;
-  border-bottom:1px solid var(--line);
-  overflow:hidden;
+  min-height:178px!important;
+  border-radius:0!important;
   background:
-    radial-gradient(circle at 72% 42%,rgba(184,91,22,.24),transparent 23%),
-    radial-gradient(circle at 10% 70%,rgba(185,111,37,.13),transparent 25%),
-    linear-gradient(120deg,#070503 0%,#020202 48%,#0b0703 100%);
+    radial-gradient(circle at 18% 0%,rgba(217,170,98,.13),transparent 28%),
+    radial-gradient(circle at 84% 20%,rgba(217,170,98,.08),transparent 24%),
+    linear-gradient(180deg,#0d1112,#080b0c)!important;
+  border-bottom:1px solid rgba(217,170,98,.20)!important;
+  box-shadow:none!important;
 }
-.hero:before{
-  content:"";
-  position:absolute;inset:0;
-  background:
-    linear-gradient(90deg,rgba(0,0,0,.72),rgba(0,0,0,.12) 58%,rgba(0,0,0,.5)),
-    radial-gradient(circle at 85% 35%,rgba(255,188,73,.08),transparent 18%);
-  pointer-events:none;
+.hero::before{width:250px!important;height:250px!important;right:-100px!important;top:-150px!important;background:rgba(217,170,98,.06)!important}
+.hero::after{width:180px!important;height:180px!important;left:-90px!important;bottom:-130px!important;background:rgba(217,170,98,.045)!important}
+.hero-cover,.hero-overlay{display:none!important}
+.hero-content{
+  min-height:178px!important;
+  padding:24px 32px 20px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  gap:7px!important;
 }
-.decor{
-  position:absolute;
-  border:1px solid rgba(220,174,79,.22);
-  border-radius:50%;
-  pointer-events:none;
+.logo-wrap{
+  width:58px!important;
+  height:58px!important;
+  border-radius:50%!important;
+  border:1px solid var(--fm-gold)!important;
+  background:#101314!important;
+  box-shadow:0 7px 22px rgba(0,0,0,.35)!important;
 }
-.decor.one{width:300px;height:300px;left:-170px;top:-180px}
-.decor.two{width:240px;height:240px;right:-120px;bottom:-170px}
-
-.hero-grid{
-  position:relative;z-index:2;
-  display:grid;
-  grid-template-columns:1fr 1.12fr;
-  gap:28px;
-  min-height:550px;
-  align-items:center;
+.logo-wrap img{object-fit:cover!important}
+.hero-info{
+  width:100%!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  min-width:0!important;
 }
-.brand{text-align:center;padding:10px}
-.logo{
-  width:185px;height:185px;
-  margin:0 auto 14px;
-  border:3px solid var(--gold);
-  border-radius:50%;
-  display:grid;place-items:center;
-  color:var(--gold2);
-  background:radial-gradient(circle,#1b1205,#020202 72%);
-  box-shadow:0 0 0 7px rgba(220,174,79,.06),0 18px 45px rgba(0,0,0,.45);
-  font-family:Georgia,serif;
-  font-weight:700;
-  font-size:25px;
-  letter-spacing:2px;
+.hero-welcome{
+  order:0!important;
+  margin:0!important;
+  color:var(--fm-gold)!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-style:italic!important;
+  font-size:13px!important;
 }
-.logo small{display:block;font-size:8px;letter-spacing:2px;margin-top:8px}
-.script{
-  color:var(--gold2);
-  font-family:"Brush Script MT","Segoe Script",cursive;
-  font-size:38px;
-  line-height:1.05;
+.restaurant-name,.hero .restaurant-name{
+  order:1!important;
+  margin:0!important;
+  color:#f5efe6!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-size:clamp(30px,5vw,46px)!important;
+  line-height:1.03!important;
+  letter-spacing:2px!important;
+  font-weight:700!important;
+  text-transform:uppercase!important;
+  text-shadow:none!important;
 }
-.brand h1{
-  margin:14px 0 8px;
-  color:var(--gold2);
-  font-family:Georgia,"Times New Roman",serif;
-  font-size:48px;
-  line-height:.98;
-  letter-spacing:2px;
+.hero-subtitle{
+  order:2!important;
+  color:#d4c8b8!important;
+  font-size:10px!important;
+  font-weight:800!important;
+  letter-spacing:3px!important;
+  text-transform:uppercase!important;
 }
-.brand .sub{
-  color:#ddd3c6;
-  letter-spacing:4px;
-  font-size:13px;
-  line-height:1.7;
+.hero-features,.hero-slogans{display:flex!important}
+.hero-features{
+  order:3!important;
+  justify-content:center!important;
+  gap:7px!important;
+  margin-top:3px!important;
 }
-.features{
-  display:flex;justify-content:center;gap:34px;
-  margin-top:32px;
+.hero-feature{
+  background:transparent!important;
+  border:1px solid rgba(217,170,98,.38)!important;
+  color:#d9c8b0!important;
+  box-shadow:none!important;
+  border-radius:999px!important;
+  padding:4px 9px!important;
+  font-size:9px!important;
 }
-.feature{color:#eee4d6;font-size:10px;text-transform:uppercase;text-align:center;letter-spacing:.6px}
-.feature .ico{display:block;color:var(--gold2);font-size:28px;margin-bottom:8px}
-
-.hero-food{
-  position:relative;
-  min-height:470px;
-  display:flex;align-items:center;justify-content:center;
+.hero-slogans{
+  order:4!important;
+  justify-content:center!important;
+  gap:10px!important;
+  margin-top:2px!important;
+  color:#b8aa9b!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-style:italic!important;
+  font-size:12px!important;
 }
-.food-glow{
-  position:absolute;width:90%;height:80%;
-  border-radius:50%;
-  background:radial-gradient(circle,rgba(207,104,24,.25),transparent 68%);
-  filter:blur(18px);
-}
-.dish{
-  position:relative;
-  width:min(570px,100%);
-  aspect-ratio:1.15;
-  border-radius:48% 48% 42% 42%;
-  background:
-    radial-gradient(ellipse at 50% 48%,#c96521 0 15%,#8f3c12 37%,#34180a 65%,#080503 70%);
-  box-shadow:
-    inset 0 -35px 60px rgba(0,0,0,.65),
-    0 30px 70px rgba(0,0,0,.75);
-  transform:rotate(-3deg);
-}
-.dish:before{
-  content:"";
-  position:absolute;inset:11%;
-  border-radius:50%;
-  background:
-    radial-gradient(circle at 40% 35%,#e37a2b 0 5%,transparent 6%),
-    radial-gradient(circle at 58% 50%,#d96b20 0 8%,transparent 9%),
-    radial-gradient(circle at 34% 62%,#c95c19 0 7%,transparent 8%),
-    radial-gradient(circle at 67% 32%,#f09a45 0 5%,transparent 6%),
-    radial-gradient(ellipse,#c55a18,#73300f 68%,#3b1709);
-  box-shadow:inset 0 0 40px rgba(0,0,0,.35);
-}
-.dish:after{
-  content:"";
-  position:absolute;
-  width:120px;height:45px;
-  right:17%;top:27%;
-  border-radius:50%;
-  background:rgba(255,239,205,.78);
-  filter:blur(7px);
-  transform:rotate(-20deg);
-}
-.special{
-  position:absolute;right:2%;bottom:8%;
-  width:260px;
-  border:1px solid var(--gold);
-  border-radius:14px;
-  background:rgba(5,5,5,.82);
-  padding:13px 15px;
-  backdrop-filter:blur(8px);
-}
-.special .crown{color:var(--gold2);font-size:24px}
-.special b{font-size:14px}
-.special .price{color:var(--gold2);font-size:22px;font-weight:900;margin-top:4px}
-.gold-btn{
-  border:1px solid var(--gold);
-  color:var(--gold2);
-  background:rgba(0,0,0,.45);
-  border-radius:10px;
-  padding:10px 14px;
-  font-weight:800;
-  font-size:11px;
-  text-transform:uppercase;
-  letter-spacing:.5px;
+.hero-action{display:none!important}
+.restaurant-meta{order:5!important;margin-top:2px!important}
+.status-badge{
+  background:rgba(255,255,255,.07)!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  color:#ddd5cc!important;
 }
 
-/* AR QR */
-.qr{
-  position:absolute;right:28px;top:24px;z-index:5;
-  width:115px;padding:8px;
-  border:1px solid var(--gold);
-  border-radius:10px;background:#090909;
-  text-align:center;font-size:10px;
+/* Service strip becomes a clean dark information bar */
+.service-strip{
+  margin:0!important;
+  padding:11px 24px!important;
+  border:0!important;
+  border-bottom:1px solid rgba(217,170,98,.16)!important;
+  border-radius:0!important;
+  background:#0d1112!important;
+  box-shadow:none!important;
 }
-.qrbox{
-  height:78px;background:
-    repeating-linear-gradient(90deg,#fff 0 4px,#111 4px 7px),
-    repeating-linear-gradient(0deg,transparent 0 5px,#fff 5px 8px);
-  border:4px solid white;
-  margin-bottom:7px;
+.service-left,.services{
+  color:#d8d0c7!important;
 }
-.qr strong{color:#fff;display:block;line-height:1.35}
-
-/* STRIP */
-.strip{
-  padding:13px 34px;
-  border-bottom:1px solid rgba(220,174,79,.35);
-  display:flex;justify-content:flex-end;gap:22px;
-  color:#e7ddcf;font-size:12px;letter-spacing:2px;
+.open-pill{
+  background:#118447!important;
+  color:#fff!important;
+  box-shadow:none!important;
 }
-
-/* MENU */
-.menu{
-  padding:18px 28px 36px;
-}
-.menu-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:18px 42px;
-}
-.category{
-  min-width:0;
-  border-top:1px solid var(--gold);
-  padding-top:10px;
-}
-.category h2{
-  margin:0 0 10px;
-  color:var(--gold2);
-  font-family:Georgia,serif;
-  font-size:29px;
-  letter-spacing:1px;
-  display:flex;align-items:center;gap:12px;
-}
-.category h2:after{
-  content:"";height:1px;flex:1;background:linear-gradient(90deg,var(--gold),transparent);
-}
-.item{
-  display:grid;
-  grid-template-columns:120px 1fr auto;
-  gap:15px;
-  align-items:center;
-  padding:9px 0;
-  border-bottom:1px solid rgba(220,174,79,.18);
-}
-.thumb{
-  width:120px;height:88px;border:1px solid var(--gold);
-  border-radius:12px;
-  background:
-    radial-gradient(circle at 50% 50%,#c66b23,#63300f 47%,#080604 75%);
-  box-shadow:inset 0 0 22px rgba(0,0,0,.45);
-}
-.item h3{margin:0;color:#f5eee5;font-size:15px}
-.item p{margin:5px 0 8px;color:#aaa096;font-size:11px;line-height:1.35}
-.price{color:var(--gold2);font-weight:900;font-size:17px;white-space:nowrap}
-.badge{display:inline-block;margin-left:5px;font-size:12px}
-.veg{color:var(--green)}.nonveg{color:var(--red)}
-.actions{display:flex;gap:7px;flex-wrap:wrap}
-.actions button{padding:6px 9px;font-size:9px;border-radius:7px}
-
-/* compact categories */
-.compact-grid{
-  grid-column:1/-1;
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:24px;
-}
-.compact .item{
-  grid-template-columns:52px 1fr auto;
-  gap:8px;
-}
-.compact .thumb{width:52px;height:52px;border-radius:8px}
-.compact .item h3{font-size:11px}
-.compact .price{font-size:11px}
-.compact .item p,.compact .actions{display:none}
-
-/* FOOTER */
-.footer{
-  margin-top:16px;padding:24px 0 5px;
-  border-top:1px solid var(--gold);
-  display:flex;justify-content:space-between;gap:20px;align-items:center;
-}
-.footer-info{display:flex;gap:30px;flex-wrap:wrap;color:#e5ddd1;font-size:12px}
-.visit{
-  color:var(--gold2);
-  font-family:"Brush Script MT","Segoe Script",cursive;
-  font-size:34px;
+.service{
+  background:rgba(255,255,255,.045)!important;
+  border:1px solid rgba(255,255,255,.07)!important;
+  color:#d9d1c7!important;
 }
 
-/* 3D modal */
-.modal{
-  position:fixed;inset:0;z-index:100;
-  display:none;align-items:center;justify-content:center;
-  padding:18px;background:rgba(0,0,0,.82);
-  backdrop-filter:blur(8px);
+/* Search + category navigation */
+.sticky-panel{
+  position:sticky!important;
+  top:0!important;
+  margin:0!important;
+  padding:16px 24px 12px!important;
+  background:rgba(11,14,15,.96)!important;
+  border:0!important;
+  border-bottom:1px solid rgba(217,170,98,.15)!important;
+  backdrop-filter:blur(14px)!important;
 }
-.modal.show{display:flex}
-.modal-box{
-  width:min(820px,100%);
-  background:#0b0d0d;border:1px solid var(--gold);
-  border-radius:18px;overflow:hidden;
+.search-wrap{
+  max-width:720px!important;
+  margin:0 auto 12px!important;
+  height:46px!important;
+  background:#14191a!important;
+  border:1px solid rgba(217,170,98,.30)!important;
+  border-radius:12px!important;
+  box-shadow:none!important;
 }
-.modal-head{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:13px 15px;border-bottom:1px solid rgba(220,174,79,.25)
+.search-icon{color:#d9aa62!important}
+#menu-search{
+  height:44px!important;
+  background:transparent!important;
+  color:#f2ece3!important;
 }
-.modal-head strong{color:var(--gold2)}
-.close{
-  width:34px;height:34px;border:0;border-radius:9px;
-  background:#171717;color:#fff;font-size:22px;
+#menu-search::placeholder{color:#81786f!important}
+.category-scroll{
+  display:flex!important;
+  justify-content:center!important;
+  gap:8px!important;
+  overflow-x:auto!important;
+  scrollbar-width:none!important;
 }
-model-viewer{width:100%;height:min(68vh,570px);background:#111}
-.ar-button{
-  border:1px solid var(--gold)!important;
-  border-radius:9px!important;
-  background:#0b0906!important;
-  color:var(--gold2)!important;
-  padding:10px 14px!important;
+.category-scroll::-webkit-scrollbar{display:none!important}
+.cat-chip{
+  flex:0 0 auto!important;
+  border:1px solid rgba(217,170,98,.34)!important;
+  background:#101415!important;
+  color:#d8d0c8!important;
+  border-radius:999px!important;
+  padding:8px 15px!important;
+  font-size:11px!important;
+  font-weight:800!important;
+}
+.cat-chip.active{
+  background:var(--fm-gold)!important;
+  border-color:var(--fm-gold)!important;
+  color:#111!important;
+}
+
+/* Menu: two-column desktop layout like the reference */
+.menu-wrap{
+  padding:22px 24px 34px!important;
+  background:#0b0e0f!important;
+}
+.summary-line{
+  color:#968b81!important;
+  padding:0 2px 14px!important;
+}
+#menu-sections{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:14px!important;
+  align-items:start!important;
+}
+.category-section{
+  margin:0!important;
+  background:linear-gradient(180deg,#121718,#0f1314)!important;
+  border:1px solid rgba(217,170,98,.22)!important;
+  border-radius:15px!important;
+  overflow:hidden!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.16)!important;
+}
+.category-heading,.categoryHeadWithPrices{
+  background:transparent!important;
+  color:#f4eee5!important;
+  border-bottom:1px solid rgba(217,170,98,.18)!important;
+  padding:13px 15px!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.category-title{
+  color:#f4eee5!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-size:21px!important;
+  font-weight:700!important;
+  letter-spacing:.1px!important;
+}
+.item-count{color:#8f857c!important}
+.categoryPriceSwitch{
+  width:232px!important;
+  grid-template-columns:repeat(3,72px)!important;
+  gap:8px!important;
+}
+.categoryPriceSwitch span{
+  color:#c9bcae!important;
+  font-size:9px!important;
+  text-transform:uppercase!important;
+  letter-spacing:.5px!important;
+}
+.items-list{border:0!important;background:transparent!important}
+.menu-item{
+  background:transparent!important;
+  border-bottom:1px solid rgba(255,255,255,.07)!important;
+  padding:12px 14px!important;
+}
+.menu-item:last-child{border-bottom:0!important}
+.item-name{
+  color:#f5f0e9!important;
+  font-size:13px!important;
+  font-weight:800!important;
+}
+.item-desc{
+  color:#8f8983!important;
+  font-size:10px!important;
+  line-height:1.45!important;
+}
+.food-symbol{flex:0 0 auto!important}
+.three-price-cell{
+  color:#f2c77e!important;
+  font-size:12px!important;
   font-weight:900!important;
 }
-.modal-note{text-align:center;color:#8f887f;font-size:11px;padding:10px}
-
-/* mobile */
-@media(max-width:900px){
-  .hero{padding:22px 16px}
-  .hero-grid{grid-template-columns:1fr;min-height:auto}
-  .hero-food{min-height:350px}
-  .qr{right:15px;top:15px}
-  .brand{padding-top:65px}
-  .brand h1{font-size:37px}
-  .features{gap:16px}
-  .menu-grid{grid-template-columns:1fr}
-  .compact-grid{grid-template-columns:repeat(2,1fr);grid-column:auto}
-}
-@media(max-width:600px){
-  .hero{min-height:720px}
-  .hero-grid{gap:5px}
-  .logo{width:140px;height:140px;font-size:19px}
-  .script{font-size:29px}
-  .brand h1{font-size:31px}
-  .brand .sub{font-size:10px;letter-spacing:2.5px}
-  .features{display:grid;grid-template-columns:repeat(2,1fr);margin-top:20px}
-  .hero-food{min-height:330px}
-  .dish{width:95%}
-  .special{right:0;bottom:0;width:230px}
-  .strip{padding:11px 12px;justify-content:center;font-size:9px;letter-spacing:1px}
-  .menu{padding:14px 12px 28px}
-  .item{grid-template-columns:82px 1fr;gap:10px}
-  .thumb{width:82px;height:72px}
-  .price{grid-column:2}
-  .actions{grid-column:2}
-  .compact-grid{grid-template-columns:1fr}
-  .footer{display:block}
-  .visit{margin-top:18px}
+.item-price-area{
+  flex:0 0 232px!important;
+  width:232px!important;
+  min-width:232px!important;
 }
 
-/* print */
-@media print{
-  body{background:#fff}
-  .page{width:100%}
-  .modal,.qr{display:none!important}
-  .hero{break-inside:avoid}
+/* No dish photos in this design */
+.item-image-wrap,.item-image,.menu-item img:not(.logo-wrap img){display:none!important}
+
+/* Premium, restrained footer */
+.footer-note{
+  color:#746b63!important;
+  padding:22px 12px 8px!important;
+}
+
+/* Mobile */
+@media(max-width:800px){
+  .app-shell{
+    width:100%!important;
+    margin:0 auto!important;
+    border-radius:0!important;
+    border-left:0!important;
+    border-right:0!important;
+  }
+  #menu-sections{grid-template-columns:1fr!important}
+  .hero-content{padding:22px 16px 18px!important}
+  .menu-wrap{padding:18px 12px 28px!important}
+  .sticky-panel{padding:12px 12px 10px!important}
+}
+@media(max-width:560px){
+  .restaurant-name{font-size:30px!important;letter-spacing:1.2px!important}
+  .hero-features{display:none!important}
+  .service-strip{padding:9px 12px!important}
+  .service-left{font-size:10px!important}
+  .services{gap:4px!important}
+  .service{font-size:9px!important;padding:4px 6px!important}
+  .category-heading,.categoryHeadWithPrices{padding:11px 12px!important}
+  .category-title{font-size:19px!important}
+  .menu-item{padding:11px 12px!important}
+  .item-price-area{
+    flex-basis:164px!important;width:164px!important;min-width:164px!important;
+  }
+  .three-price-area,.categoryPriceSwitch{
+    width:164px!important;min-width:164px!important;
+    grid-template-columns:repeat(3,52px)!important;gap:4px!important;
+  }
+  .three-price-cell,.categoryPriceSwitch span{width:52px!important}
 }
 </style>
 
-<style id="real-db-owner-css">
-.owner-panel{margin:0 0 18px;padding:12px 14px;border:1px solid rgba(220,174,79,.45);border-radius:13px;background:linear-gradient(135deg,#0d0d0c,#16110a);display:flex;justify-content:space-between;align-items:center;gap:12px;color:#eee}
-.owner-panel b{display:block;color:#f0cb79;font-family:Georgia,serif;font-size:15px}.owner-panel span{display:block;color:#8f887f;font-size:10px;margin-top:3px}.owner-actions{display:flex;gap:7px;flex-wrap:wrap}.owner-panel .gold-btn{padding:8px 10px;font-size:9px}
-.menu-status{padding:8px 2px 14px;color:#8f887f;font-size:11px}.menu-status.error{color:#ff8c8c}
-.owner-modal{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;padding:14px;background:rgba(0,0,0,.82);backdrop-filter:blur(8px)}.owner-modal.show{display:flex}.owner-modal-box{width:min(720px,100%);max-height:92vh;overflow:auto;background:#090b0b;border:1px solid rgba(220,174,79,.55);border-radius:16px;box-shadow:0 30px 100px rgba(0,0,0,.6);color:#f7efe2}.owner-modal-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(220,174,79,.2)}.owner-modal-head strong{display:block;color:#f0cb79;font-family:Georgia,serif}.owner-modal-head small{display:block;color:#8f887f;font-size:10px;margin-top:3px}.owner-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;padding:16px}.owner-grid label{display:block;color:#bdb4a8;font-size:10px;font-weight:800}.owner-grid label.wide{grid-column:1/-1}.owner-grid input,.owner-grid textarea,.owner-grid select{display:block;width:100%;margin-top:6px;border:1px solid rgba(220,174,79,.25);border-radius:9px;background:#111516;color:#f7efe2;padding:10px;outline:none}.ar-upload-box{margin:0 16px 14px;padding:13px;border:1px solid rgba(220,174,79,.25);border-radius:12px;background:#0d1011}.ar-upload-title{display:flex;justify-content:space-between;gap:10px;align-items:center}.ar-upload-title b{color:#f0cb79}.ar-upload-title small{display:block;color:#8f887f;font-size:9px;margin-top:3px}.ar-upload-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:9px;margin-top:10px}.file-pick{display:inline-flex;align-items:center;justify-content:center;padding:8px 10px;border:1px solid rgba(220,174,79,.5);border-radius:8px;color:#f0cb79;font-size:10px;font-weight:900;cursor:pointer}.ar-upload-row>span{font-size:10px;color:#9e968d;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ar-upload-status{margin-top:10px;color:#817a73;font-size:9px;line-height:1.45}.ar-current{margin-top:9px;padding:8px;border-radius:8px;background:#15191a;color:#8f887f;font-size:9px}.owner-check{display:flex;gap:8px;align-items:center;padding:0 16px 14px;color:#bdb4a8;font-size:10px}.owner-modal-foot{display:flex;justify-content:flex-end;gap:8px;padding:13px 16px;border-top:1px solid rgba(220,174,79,.16)}.primary-gold{background:var(--gold)!important;color:#090909!important}
-@media(max-width:600px){.owner-panel{display:block}.owner-actions{margin-top:9px}.owner-grid{grid-template-columns:1fr}.owner-grid label.wide{grid-column:auto}.ar-upload-row{grid-template-columns:1fr}.ar-upload-row .gold-btn{width:100%}}
-.thumb img{width:100%;height:100%;display:block;border-radius:inherit;object-fit:cover}.primary-gold{background:var(--gold)!important;color:#090909!important}
+
+<style id="freemenu-final-grid-fix">
+/* Equal-height category rows: the blank area between two category cards is filled. */
+#menu-sections{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:14px!important;
+  align-items:stretch!important;
+}
+.category-section{
+  height:100%!important;
+  min-width:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  margin:0!important;
+}
+.category-section .items-list{
+  flex:1 1 auto!important;
+}
+
+/* Exact price ruler shared by category headings and every item. */
+.categoryHeadWithPrices{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 232px!important;
+  align-items:center!important;
+  column-gap:10px!important;
+}
+.categoryPriceSwitch,
+.menu-item .three-price-area{
+  width:232px!important;
+  min-width:232px!important;
+  max-width:232px!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,72px)!important;
+  column-gap:8px!important;
+  justify-self:end!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+}
+.categoryPriceSwitch span,
+.menu-item .three-price-cell{
+  width:72px!important;
+  min-width:72px!important;
+  max-width:72px!important;
+  box-sizing:border-box!important;
+  text-align:center!important;
+}
+.categoryPriceSwitch span{
+  color:#c9bcae!important;
+  font:800 9px/1.2 Arial,sans-serif!important;
+  text-transform:uppercase!important;
+  letter-spacing:.5px!important;
+}
+.menu-item{
+  display:block!important;
+}
+.menu-item .item-content{
+  width:100%!important;
+}
+.menu-item .item-main-row{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 232px!important;
+  align-items:center!important;
+  column-gap:10px!important;
+  width:100%!important;
+}
+.menu-item .item-info{
+  min-width:0!important;
+}
+.menu-item .item-price-area{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  width:232px!important;
+  min-width:232px!important;
+  max-width:232px!important;
+  justify-self:end!important;
+  align-self:center!important;
+}
+.menu-item .three-price-cell{
+  display:block!important;
+  color:#f2c77e!important;
+  font:900 13px/18px Arial,sans-serif!important;
+  font-variant-numeric:tabular-nums!important;
+  visibility:visible!important;
+  opacity:1!important;
+}
+@media(max-width:800px){
+  #menu-sections{grid-template-columns:1fr!important}
+}
+@media(max-width:560px){
+  .categoryHeadWithPrices{
+    grid-template-columns:minmax(0,1fr) 164px!important;
+  }
+  .categoryPriceSwitch,
+  .menu-item .three-price-area{
+    width:164px!important;min-width:164px!important;max-width:164px!important;
+    grid-template-columns:repeat(3,52px)!important;column-gap:4px!important;
+  }
+  .categoryPriceSwitch span,
+  .menu-item .three-price-cell{
+    width:52px!important;min-width:52px!important;max-width:52px!important;
+  }
+  .menu-item .item-main-row{
+    grid-template-columns:minmax(0,1fr) 164px!important;
+  }
+  .menu-item .item-price-area{
+    width:164px!important;min-width:164px!important;max-width:164px!important;
+  }
+}
+@media(max-width:430px){
+  .categoryHeadWithPrices{
+    grid-template-columns:minmax(0,1fr) 141px!important;
+  }
+  .categoryPriceSwitch,
+  .menu-item .three-price-area{
+    width:141px!important;min-width:141px!important;max-width:141px!important;
+    grid-template-columns:repeat(3,45px)!important;column-gap:3px!important;
+  }
+  .categoryPriceSwitch span,
+  .menu-item .three-price-cell{
+    width:45px!important;min-width:45px!important;max-width:45px!important;
+  }
+  .menu-item .item-main-row{
+    grid-template-columns:minmax(0,1fr) 141px!important;
+  }
+  .menu-item .item-price-area{
+    width:141px!important;min-width:141px!important;max-width:141px!important;
+  }
+}
+</style>
+
+
+<style>
+.ar3d-btn{margin-top:10px;border:1px solid rgba(212,175,55,.55);background:linear-gradient(135deg,#fff8df,#f4df9a);color:#5c4100;border-radius:10px;padding:8px 12px;font-size:11px;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(83,54,18,.08)}
+.ar3d-btn:active{transform:scale(.98)}
+.ar3d-modal{position:fixed;inset:0;background:rgba(10,10,10,.72);display:none;align-items:center;justify-content:center;z-index:9999;padding:16px}.ar3d-modal.show{display:flex}.ar3d-box{width:min(720px,100%);background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 25px 80px rgba(0,0,0,.35)}.ar3d-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #eee}.ar3d-head strong{font-size:15px}.ar3d-close{border:0;background:#f2f4f7;border-radius:10px;width:36px;height:36px;font-size:22px;cursor:pointer}.ar3d-viewer{width:100%;height:min(68vh,560px);background:#f7f7f5}.ar3d-tip{padding:11px 15px;font-size:11px;color:#667085;text-align:center}.ar3d-fail{display:none;padding:20px;text-align:center;color:#b42318;font-size:12px}
 </style>
 </head>
-
 <body>
-<div class="page">
+  <div class="app-shell">
 
-<header class="hero">
-  <div class="decor one"></div><div class="decor two"></div>
 
-  <div class="qr">
-    <div class="qrbox"></div>
-    <strong>SCAN QR</strong>
-    <span>VIEW OUR MENU<br>IN AR / 3D</span>
-  </div>
 
-  <div class="hero-grid">
-    <section class="brand">
-      <div class="logo">
-        URBAN<br>PUNJAB
-        <small>TRADITION • MODERN TASTE</small>
+
+    <header class="hero" id="hero">
+      <img id="rest-cover" class="hero-cover" alt="" style="display:none;" />
+      <div class="hero-overlay"></div>
+
+      <div class="hero-content">
+        <div class="logo-wrap" id="logo-container">
+          <div class="logo-fallback" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="hero-info">
+          <div id="rest-welcome" class="hero-welcome" style="display:none"></div>
+          <h1 id="rest-name" class="hero-tagline restaurant-name">Loading Menu...</h1>
+          <div id="rest-subtitle" class="hero-subtitle" style="display:none"></div>
+          <div id="rest-features" class="hero-features" style="display:none">
+            <span id="rest-feature1" class="hero-feature"></span>
+            <span id="rest-feature2" class="hero-feature"></span>
+            <span id="rest-feature3" class="hero-feature"></span>
+          </div>
+          <div id="rest-slogans" class="hero-slogans" style="display:none">
+            <div id="rest-slogan1"></div>
+            <div id="rest-slogan2"></div>
+          </div>
+          <div class="restaurant-meta" style="margin-top:11px">
+            <span id="rest-address" style="display:none;"></span>
+            <a id="rest-phone" href="#" style="display:none;color:inherit;text-decoration:none"></a>
+          </div>
+        </div>
+
+        <a id="rest-call-btn" class="hero-action" href="#" aria-label="Call restaurant">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24c1.12.37 2.33.57 3.57.57A1 1 0 0121 16.5V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1.02l-2.2 2.2z"/>
+          </svg>
+        </a>
       </div>
-      <div class="script">Taste · Explore · Experience ♡</div>
-      <h1>URBAN PUNJAB<br>JHILMIL</h1>
-      <div class="sub">AUTHENTIC PUNJABI FLAVORS<br>MODERN DINING EXPERIENCE</div>
+    </header>
 
-      <div class="features">
-        <div class="feature"><span class="ico">♧</span>Pure Veg</div>
-        <div class="feature"><span class="ico">♨</span>Fresh Ingredients</div>
-        <div class="feature"><span class="ico">♡</span>Made With Love</div>
-        <div class="feature"><span class="ico">♧</span>For Food Lovers</div>
+
+    <section class="service-strip" id="service-strip">
+      <div class="service-left">
+        <span id="rest-open-pill" class="open-pill">● Open Now</span>
+        <span id="rest-hours" class="service-time" style="display:none"></span>
+      </div>
+      <div class="services">
+        <span id="svc-dine" class="service">🍴 Dine In</span>
+        <span id="svc-take" class="service">🛍 Takeaway</span>
+        <span id="svc-delivery" class="service">🛵 Home Delivery</span>
       </div>
     </section>
 
-    <section class="hero-food">
-      <div class="food-glow"></div>
-      <div class="dish" aria-label="Butter Chicken hero dish"></div>
-      <div class="special">
-        <div class="crown">♛ <b>CHEF'S SPECIAL</b></div>
-        <div style="margin-top:8px">Butter Chicken</div>
-        <div class="price">₹ 320</div>
-        <button class="gold-btn" style="margin-top:10px" onclick="open3D('Butter Chicken','')">◇ VIEW IN 3D / AR</button>
+    <section class="sticky-panel">
+      <div class="search-wrap">
+        <div class="search-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-3.5-3.5"></path>
+          </svg>
+        </div>
+        <input id="menu-search" type="search" placeholder="Search food or category..." autocomplete="off" />
       </div>
+      <div class="category-scroll" id="category-chips"></div>
     </section>
-  </div>
-</header>
 
-<div class="strip">DINE IN · TAKEAWAY · DELIVERY</div>
-
-<main class="menu">
-  <div id="ownerPanel" class="owner-panel" style="display:none">
-    <div>
-      <b id="ownerPanelTitle">Signature 3D Manager</b>
-      <span id="ownerPlanText">Loading plan…</span>
-    </div>
-    <div class="owner-actions">
-      <button class="gold-btn" id="ownerAddBtn">＋ Add Menu Item</button>
-      <button class="gold-btn" id="ownerRefreshBtn">↻ Refresh</button>
-      <button class="gold-btn" id="ownerDashboardBtn">Dashboard</button>
-    </div>
+    <main class="menu-wrap">
+      <div id="summary-line" class="summary-line" style="display:none;"></div>
+      <div id="menu-sections"></div>
+      <div class="footer-note">Digital menu • Prices may be subject to change</div>
+    </main>
   </div>
 
-  <div id="menuStatus" class="menu-status">Loading menu…</div>
-  <div id="menuGrid" class="menu-grid"></div>
+  <script>
+    /* =========================================================
+       SUPABASE CONFIG
+       Keep RLS enabled in Supabase. An anon/public key is safe to
+       expose only when your database policies are configured correctly.
+    ========================================================== */
+    const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  <div class="footer">
-    <div class="footer-info">
-      <span id="footerAddress">📍 C-207/208 JHILMIL COLONY<br>Delhi - 110095</span>
-      <span id="footerPhone">☎ +91 8447000854</span>
-      <span>◎ Instagram &nbsp; ● Facebook &nbsp; G Google</span>
-    </div>
-    <div class="visit">Visit Us Today ♡</div>
-  </div>
-</main>
+    let restaurant = null;
+    let allItems = [];
+    let currentCategory = "all";
+    let searchText = "";
 
-<!-- Owner menu item modal -->
-<div class="owner-modal" id="ownerModal" aria-hidden="true">
-  <div class="owner-modal-box">
-    <div class="owner-modal-head">
-      <div>
-        <strong id="ownerModalTitle">Add Menu Item</strong>
-        <small id="ownerModalSub">Database + Cloudflare R2</small>
-      </div>
-      <button class="close" id="ownerModalClose">×</button>
-    </div>
-    <form id="ownerItemForm">
-      <input type="hidden" id="editItemId">
-      <div class="owner-grid">
-        <label>Item Name<input id="ownerItemName" required></label>
-        <label>Category<input id="ownerItemCategory" list="ownerCategories" required><datalist id="ownerCategories"></datalist></label>
-        <label class="wide">Description<textarea id="ownerItemDescription" rows="3"></textarea></label>
-        <label>Type
-          <select id="ownerItemType">
-            <option value="veg">Veg</option><option value="nonveg">Non-Veg</option><option value="egg">Egg</option>
-          </select>
-        </label>
-        <label>Price<input id="ownerItemPrice" type="number" min="0" step="0.01"></label>
-        <label>Quarter<input id="ownerPriceQuarter" type="number" min="0" step="0.01"></label>
-        <label>Half<input id="ownerPriceHalf" type="number" min="0" step="0.01"></label>
-        <label>Full<input id="ownerPriceFull" type="number" min="0" step="0.01"></label>
-      </div>
+    const $ = (id) => document.getElementById(id);
 
-      <div class="ar-upload-box">
-        <div class="ar-upload-title">
-          <div><b>Signature 3D / AR</b><small id="arPlanLimitText">Checking plan…</small></div>
-          <span id="arExistingBadge"></span>
+    function escapeHTML(value = "") {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function safeUrl(value) {
+      if (!value) return "";
+      try {
+        const url = new URL(value, window.location.origin);
+        if (["http:", "https:"].includes(url.protocol)) return url.href;
+      } catch (_) {}
+      return "";
+    }
+
+    function cssColor(value, fallback) {
+      if (!value) return fallback;
+      const test = document.createElement("span");
+      test.style.color = "";
+      test.style.color = value;
+      return test.style.color ? value : fallback;
+    }
+
+    function applyRestaurantTheme(rest) {
+      const root = document.documentElement.style;
+
+      // These fields are OPTIONAL. If your table does not have them,
+      // the fallback colors below will be used automatically.
+      const primary = cssColor(rest.primary_color || rest.theme_primary, "#0f766e");
+      const primaryDark = cssColor(rest.primary_dark || rest.theme_primary_dark, "#115e59");
+      const bg = cssColor(rest.background_color || rest.theme_background, "#f6f7f9");
+      const surface = cssColor(rest.card_color || rest.theme_card, "#ffffff");
+      const text = cssColor(rest.text_color || rest.theme_text, "#111827");
+
+      root.setProperty("--primary", primary);
+      root.setProperty("--primary-dark", primaryDark);
+      root.setProperty("--bg", bg);
+      root.setProperty("--surface", surface);
+      root.setProperty("--text", text);
+
+      const radius = Number(rest.card_radius || rest.theme_radius);
+      if (Number.isFinite(radius) && radius >= 0 && radius <= 40) {
+        root.setProperty("--radius", `${radius}px`);
+      }
+
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) metaTheme.setAttribute("content", primary);
+    }
+
+    function showLoading() {
+      $("menu-sections").innerHTML = `
+        <div class="loading-list" aria-label="Loading menu">
+          ${[1,2,3,4].map(() => `
+            <div class="loading-row">
+              <div style="flex:1; padding-top:4px;">
+                <div class="skeleton sk-title sk-line"></div>
+                <div class="skeleton sk-text sk-line"></div>
+                <div class="skeleton sk-price sk-line"></div>
+              </div>
+            </div>
+          `).join("")}
         </div>
-        <div class="ar-upload-row">
-          <label class="file-pick">Choose GLB
-            <input id="ownerGlbFile" type="file" accept=".glb,model/gltf-binary" hidden>
-          </label>
-          <span id="ownerGlbName">No GLB selected</span>
-          <button type="button" class="gold-btn" id="ownerGlbUploadBtn">Upload GLB to Cloudflare</button>
-        </div>
-        <div class="ar-upload-row">
-          <label class="file-pick">Choose USDZ
-            <input id="ownerUsdzFile" type="file" accept=".usdz,model/vnd.usdz+zip" hidden>
-          </label>
-          <span id="ownerUsdzName">Optional iPhone AR file</span>
-          <button type="button" class="gold-btn" id="ownerUsdzUploadBtn">Upload USDZ</button>
-        </div>
-        <div id="arUploadStatus" class="ar-upload-status">GLB max 20 MB. Upload uses the authenticated Cloudflare R2 Edge Function.</div>
-        <div class="ar-current" id="arCurrentModel" style="display:none"></div>
-      </div>
+      `;
+    }
 
-      <label class="owner-check"><input id="ownerItemAvailable" type="checkbox" checked> Available on menu</label>
+    function showState(title, message) {
+      $("menu-sections").innerHTML = `
+        <div class="state-card">
+          <strong>${escapeHTML(title)}</strong>
+          <span>${escapeHTML(message)}</span>
+        </div>
+      `;
+    }
 
-      <div class="owner-modal-foot">
-        <button type="button" class="gold-btn" id="ownerCancelBtn">Cancel</button>
-        <button type="submit" class="gold-btn primary-gold" id="ownerSaveBtn">Save to Database</button>
-      </div>
-    </form>
-  </div>
+    function logoFallback() {
+      return `
+        <div class="logo-fallback" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/>
+          </svg>
+        </div>
+      `;
+    }
+
+
+    function getItemType(item) {
+      if (String(item.item_type || "").toLowerCase() === "egg") return "egg";
+      if (String(item.item_type || "").toLowerCase() === "nonveg" || item.is_veg === false) return "nonveg";
+      return "veg";
+    }
+
+    function isUnavailable(item) {
+      return item.is_available === false || item.available === false || item.status === "unavailable" || item.status === "out_of_stock";
+    }
+
+    function renderPrice(item, category) {
+      const clean = v => (v !== null && v !== undefined && String(v).trim() !== "") ? String(v).trim() : "";
+      const q = clean(item.price_quarter);
+      const h = clean(item.price_half);
+      const f = clean(item.price_full) || clean(item.price);
+
+      return `<div class="three-price-area">
+        <span class="three-price-cell">${q ? "₹" + escapeHTML(q) : ""}</span>
+        <span class="three-price-cell">${h ? "₹" + escapeHTML(h) : ""}</span>
+        <span class="three-price-cell">${f ? "₹" + escapeHTML(f) : ""}</span>
+      </div>`;
+    }
+
+    function renderTags(item) {
+      const tags = [];
+      if (item.is_bestseller === true || item.bestseller === true) tags.push(`<span class="tag hot">★ Bestseller</span>`);
+      if (item.is_recommended === true || item.recommended === true) tags.push(`<span class="tag">Recommended</span>`);
+      if (item.is_spicy === true || item.spicy === true) tags.push(`<span class="tag hot">🌶 Spicy</span>`);
+      if (isUnavailable(item)) tags.push(`<span class="tag out">Unavailable</span>`);
+      return tags.length ? `<div class="item-tags">${tags.join("")}</div>` : "";
+    }
+
+    function renderItem(item) {
+      const type = getItemType(item);
+      const unavailable = isUnavailable(item);
+
+      return `
+        <article class="menu-item ${unavailable ? "unavailable" : ""}" data-name="${escapeHTML((item.name || "").toLowerCase())}">
+          <div class="item-content">
+            <div class="item-main-row">
+              <div class="item-info">
+                <div class="item-topline">
+                  <span class="food-symbol ${type}" aria-label="${type}"></span>
+                  <h3 class="item-name">${escapeHTML(item.name || "Unnamed item")}</h3>
+                </div>
+                ${renderTags(item)}
+                ${item.description ? `<p class="item-desc">${escapeHTML(item.description)}</p>` : ""}
+                ${item.ar_model_url && item.ar_enabled !== false ? `<button type="button" class="ar3d-btn" onclick="open3D(${JSON.stringify(item.name || "Dish")},${JSON.stringify(item.ar_model_url || "")},${JSON.stringify(item.ar_usdz_url || "")})">◈ 3D / AR View</button>` : ""}
+              </div>
+              <div class="item-price-area">
+                ${renderPrice(item, categoryKey(item.category))}
+              </div>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function directR2Url(raw){
+      return safeUrl(raw);
+    }
+    function open3D(name, modelURL, usdzURL=""){
+      const viewer=$("foodModel"), modal=$("ar3dModal"), fail=$("ar3dFail");
+      const glb=directR2Url(modelURL), usdz=directR2Url(usdzURL);
+      if(!viewer||!modal||!glb)return;
+      $("ar3dTitle").textContent=(name||"Dish")+" — 3D / AR";
+      if(fail)fail.style.display="none";
+      viewer.removeAttribute("src");
+      viewer.removeAttribute("ios-src");
+      viewer.setAttribute("src",glb);
+      if(usdz)viewer.setAttribute("ios-src",usdz);
+      modal.classList.add("show");
+      modal.setAttribute("aria-hidden","false");
+      document.body.style.overflow="hidden";
+    }
+    function close3D(){
+      const modal=$("ar3dModal"),viewer=$("foodModel");
+      if(modal){modal.classList.remove("show");modal.setAttribute("aria-hidden","true");}
+      if(viewer){viewer.removeAttribute("src");viewer.removeAttribute("ios-src");}
+      document.body.style.overflow="";
+    }
+    $("ar3dModal")?.addEventListener("click",e=>{if(e.target===$("ar3dModal"))close3D();});
+    $("foodModel")?.addEventListener("error",()=>{if($("ar3dFail"))$("ar3dFail").style.display="block";});
+
+    function categoryKey(category) {
+      return String(category || "General").trim() || "General";
+    }
+
+    function sectionId(name) {
+      return `cat-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "general"}`;
+    }
+
+
+/* FreeMenu owner-controlled menu ordering */
+function getSavedCategoryOrder(rest, items) {
+  const names = [...new Set(items.map(item => categoryKey(item.category)))];
+  const saved = Array.isArray(rest?.category_order) ? rest.category_order.map(String) : [];
+  const rank = new Map(saved.map((x,i)=>[x,i]));
+  return names.sort((a,b)=>{
+    const ar=rank.has(a)?rank.get(a):999999, br=rank.has(b)?rank.get(b):999999;
+    return ar-br || a.localeCompare(b);
+  });
+}
+
+    function getCategories(items) {
+      const categories = [];
+      const seen = new Set();
+      items.forEach(item => {
+        const category = categoryKey(item.category);
+        if (!seen.has(category)) {
+          seen.add(category);
+          categories.push(category);
+        }
+      });
+      return categories;
+    }
+
+    function renderCategoryChips() {
+      const categories = getSavedCategoryOrder(restaurant, allItems);
+      $("category-chips").innerHTML = [
+        `<button class="cat-chip ${currentCategory === "all" ? "active" : ""}" data-category="all">All Menu</button>`,
+        ...categories.map(category => `
+          <button class="cat-chip ${currentCategory === category ? "active" : ""}" data-category="${escapeHTML(category)}">
+            ${escapeHTML(category)}
+          </button>
+        `)
+      ].join("");
+    }
+
+    function getFilteredItems() {
+      const q = searchText.trim().toLowerCase();
+      return allItems.filter(item => {
+        const category = categoryKey(item.category);
+        const categoryMatch = currentCategory === "all" || category === currentCategory;
+        const haystack = `${item.name || ""} ${item.description || ""} ${category}`.toLowerCase();
+        const searchMatch = !q || haystack.includes(q);
+        return categoryMatch && searchMatch;
+      });
+    }
+
+    function renderMenu() {
+      const filtered = getFilteredItems();
+      const grouped = {};
+      filtered.forEach(item => {
+        const category = categoryKey(item.category);
+        if (!grouped[category]) grouped[category] = [];
+        grouped[category].push(item);
+      });
+      const orderedCategories = getSavedCategoryOrder(restaurant, Object.values(grouped).flat());
+      orderedCategories.forEach(category => {
+        if (grouped[category]) {
+          grouped[category].sort((a,b) => {
+            const ao = Number(a.sort_order ?? a.position ?? 999999);
+            const bo = Number(b.sort_order ?? b.position ?? 999999);
+            return ao - bo || String(a.name||"").localeCompare(String(b.name||""));
+          });
+        }
+      });
+
+      $("summary-line").style.display = "flex";
+      $("summary-line").innerHTML = `
+        <span>${filtered.length} item${filtered.length === 1 ? "" : "s"}</span>
+        ${searchText ? `<span>Search: “${escapeHTML(searchText)}”</span>` : ""}
+      `;
+
+      if (!filtered.length) {
+        showState("Nothing found", "Try another search or category.");
+        return;
+      }
+
+      $("menu-sections").innerHTML = orderedCategories.filter(category => grouped[category]).map(category => {
+        const items = grouped[category];
+        return `
+        <section class="category-section" id="${sectionId(category)}" data-category="${escapeHTML(category)}">
+          <div class="category-heading categoryHeadWithPrices">
+            <div style="display:flex;align-items:center;gap:9px;min-width:0">
+              <h2 class="category-title">${escapeHTML(category)}</h2>
+              <span class="item-count">${items.length} item${items.length === 1 ? "" : "s"}</span>
+            </div>
+            <div class="categoryPriceSwitch" aria-label="Prices">
+  ${(() => {
+    const hasQ = items.some(x => String(x.price_quarter ?? "").trim() !== "");
+    const hasH = items.some(x => String(x.price_half ?? "").trim() !== "");
+    const hasF = items.some(x => String(x.price_full ?? x.price ?? "").trim() !== "");
+    return `<span>${hasQ ? "Quarter" : ""}</span><span>${hasH ? "Half" : ""}</span><span>${hasF ? "Full" : ""}</span>`;
+  })()}
 </div>
-</div>
+          </div>
+          <div class="items-list">
+            ${items.map(renderItem).join("")}
+          </div>
+        </section>
+      `}).join("");
+    }
 
-<!-- 3D / AR modal -->
-<div class="modal" id="viewerModal">
-  <div class="modal-box">
-    <div class="modal-head">
-      <strong id="viewerTitle">3D Food Preview</strong>
-      <button class="close" onclick="close3D()">×</button>
-    </div>
-    <model-viewer id="foodModel"
-      src=""
-      ios-src=""
-      camera-controls
-      auto-rotate
-      rotation-per-second="30deg"
-      ar
-      ar-modes="webxr scene-viewer quick-look"
-      shadow-intensity="1.5"
-      environment-image="neutral"
-      crossorigin="anonymous"
-      alt="3D dish">
-      <button class="ar-button" slot="ar-button">♧ Place on Table (AR)</button>
+    function renderRestaurant(rest) {
+      restaurant = rest;
+      applyRestaurantTheme(rest);
+
+      const restaurantName = rest.name || "Restaurant";
+      // Optional restaurant information is shown ONLY when the owner has entered it.
+      // No hard-coded fallback text is used here.
+      const setOptionalText = (id, value, displayMode = "block") => {
+        const el = $(id);
+        if (!el) return false;
+        const text = value == null ? "" : String(value).trim();
+        el.textContent = text;
+        el.style.display = text ? displayMode : "none";
+        return !!text;
+      };
+
+      setOptionalText("rest-welcome", rest.welcome_text);
+      $("rest-name").textContent = restaurantName;
+      setOptionalText("rest-subtitle", rest.tagline || rest.subtitle_text);
+
+      let hasFeature = false;
+      ["rest-feature1","rest-feature2","rest-feature3"].forEach((id, i) => {
+        hasFeature = setOptionalText(id, rest[`feature_${i+1}`], "inline-flex") || hasFeature;
+      });
+      const features = $("rest-features");
+      if (features) features.style.display = hasFeature ? "flex" : "none";
+
+      const hasSlogan1 = setOptionalText("rest-slogan1", rest.slogan_1);
+      const hasSlogan2 = setOptionalText("rest-slogan2", rest.slogan_2);
+      const slogans = $("rest-slogans");
+      if (slogans) slogans.style.display = (hasSlogan1 || hasSlogan2) ? "flex" : "none";
+
+      document.title = `${restaurantName} • Menu`;
+
+      const logoUrl = safeUrl(rest.logo_url);
+      const brandMark = null;
+      $("logo-container").innerHTML = logoUrl
+        ? `<img src="${escapeHTML(logoUrl)}" alt="${escapeHTML(rest.name || "Restaurant")} logo" onerror="this.parentElement.innerHTML=logoFallback()" />`
+        : logoFallback();
+      if (brandMark) {
+        brandMark.innerHTML = logoUrl
+          ? `<img src="${escapeHTML(logoUrl)}" alt="" onerror="this.parentElement.innerHTML='<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/></svg>'" />`
+          : `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11h18M5 11v7h14v-7M8 7h8M9 4h6"/></svg>`;
+      }
+
+      const coverUrl = safeUrl(rest.banner_url || rest.cover_url || rest.cover_image);
+      const dummyBanner = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520">
+          <defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#6b1f1a"/><stop offset="0.55" stop-color="#9f5a32"/><stop offset="1" stop-color="#d8a84e"/></linearGradient></defs>
+          <rect width="1200" height="520" fill="url(#g)"/>
+          <circle cx="960" cy="110" r="160" fill="rgba(255,255,255,.10)"/>
+          <circle cx="180" cy="470" r="220" fill="rgba(255,255,255,.08)"/>
+          <path d="M0 390 C260 280 420 480 650 350 S1020 260 1200 360 L1200 520 L0 520Z" fill="rgba(0,0,0,.16)"/>
+          <text x="600" y="270" text-anchor="middle" font-family="Georgia,serif" font-size="54" font-weight="700" fill="white" opacity=".95">YOUR RESTAURANT</text>
+          <text x="600" y="315" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" letter-spacing="6" fill="white" opacity=".78">FOOD • FLAVOUR • EXPERIENCE</text>
+        </svg>`)} `;
+      $("rest-cover").src = coverUrl || dummyBanner;
+      $("rest-cover").style.display = "block";
+
+      // Contact details: show only values actually available in Supabase.
+      const phoneEl = $("rest-phone");
+      const phoneRaw = rest.phone == null ? "" : String(rest.phone).trim();
+      if (phoneEl && phoneRaw) {
+        const phone = phoneRaw.replace(/[^+\d]/g, "");
+        phoneEl.href = `tel:${phone}`;
+        phoneEl.textContent = `• ${phoneRaw}`;
+        phoneEl.style.display = "inline";
+      } else if (phoneEl) {
+        phoneEl.style.display = "none";
+        phoneEl.textContent = "";
+      }
+
+      const callBtn = $("rest-call-btn");
+      if (callBtn && phoneRaw) {
+        const phone = phoneRaw.replace(/[^+\d]/g, "");
+        callBtn.href = `tel:${phone}`;
+        callBtn.style.display = "grid";
+        const callText = rest.call_button_text ? String(rest.call_button_text).trim() : "";
+        callBtn.setAttribute("aria-label", callText || "Call restaurant");
+        callBtn.title = callText || phoneRaw;
+      } else if (callBtn) {
+        callBtn.style.display = "none";
+      }
+
+      const address = rest.address == null ? "" : String(rest.address).trim();
+      const addressEl = $("rest-address");
+      if (addressEl && address) {
+        addressEl.textContent = `• ${address}`;
+        addressEl.style.display = "inline";
+      } else if (addressEl) {
+        addressEl.style.display = "none";
+        addressEl.textContent = "";
+      }
+
+      const isOpen = rest.is_open !== false && rest.status !== "closed" && rest.is_active !== false;
+      const statusEl = $("rest-status");
+      statusEl.classList.toggle("closed", !isOpen);
+      statusEl.querySelector("span:last-child").textContent = isOpen ? "Open" : "Closed";
+      const openPill = $("rest-open-pill");
+      if(openPill){
+        openPill.textContent = isOpen ? "● Open Now" : "● Closed";
+        openPill.style.background = isOpen ? "#12964e" : "#b4232e";
+      }
+      const fmtTime = (v)=>{
+        if(!v) return "";
+        const parts=String(v).split(":");
+        let h=Number(parts[0]),m=Number(parts[1]||0),suffix=h>=12?"PM":"AM";
+        h=h%12||12;
+        return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")} ${suffix}`;
+      };
+      const opening = fmtTime(rest.opening_time);
+      const closing = fmtTime(rest.closing_time);
+      const hoursEl = $("rest-hours");
+      if (hoursEl) {
+        hoursEl.textContent = opening && closing ? `${opening} – ${closing}` : "";
+        hoursEl.style.display = opening && closing ? "inline-flex" : "none";
+      }
+      if($("svc-dine")) $("svc-dine").style.display=rest.dine_in===false?"none":"inline-flex";
+      if($("svc-take")) $("svc-take").style.display=rest.takeaway===false?"none":"inline-flex";
+      if($("svc-delivery")) $("svc-delivery").style.display=rest.home_delivery===false?"none":"inline-flex";
+    }
+
+    async function loadPublicMenu() {
+      showLoading();
+
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const slug = (params.get("r") || "").trim().toLowerCase();
+
+        let query = supabaseClient.from("restaurants").select("*");
+        if (slug) query = query.eq("slug", slug);
+
+        const { data: restaurants, error: restError } = await query.limit(1);
+        if (restError) throw restError;
+
+        if (!restaurants || !restaurants.length) {
+          $("rest-name").textContent = "Restaurant Not Found";
+          $("category-chips").innerHTML = "";
+          $("summary-line").style.display = "none";
+          showState("Restaurant not found", "Please check the menu link and try again.");
+          return;
+        }
+
+        const rest = restaurants[0];
+        renderRestaurant(rest);
+
+        const { data: items, error: itemsError } = await supabaseClient
+          .from("menu_items")
+          .select("*")
+          .eq("restaurant_id", rest.id);
+
+        if (itemsError) throw itemsError;
+
+        allItems = Array.isArray(items) ? items : [];
+
+        // Optional sorting if you later add sort_order fields.
+        allItems.sort((a, b) => {
+          const aOrder = Number(a.sort_order ?? a.position ?? 999999);
+          const bOrder = Number(b.sort_order ?? b.position ?? 999999);
+          return aOrder - bOrder;
+        });
+
+        if (!allItems.length) {
+          $("category-chips").innerHTML = "";
+          $("summary-line").style.display = "none";
+          showState("Menu is being prepared", "No menu items have been added yet.");
+          return;
+        }
+
+        renderCategoryChips();
+        renderMenu();
+      } catch (error) {
+        console.error("Menu load error:", error);
+        $("rest-name").textContent = "Menu Unavailable";
+        $("category-chips").innerHTML = "";
+        $("summary-line").style.display = "none";
+        showState("Unable to load menu", "Please refresh the page or try again shortly.");
+      }
+    }
+
+    $("menu-search").addEventListener("input", (event) => {
+      searchText = event.target.value || "";
+      renderMenu();
+    });
+
+    $("category-chips").addEventListener("click", (event) => {
+      const btn = event.target.closest(".cat-chip");
+      if (!btn) return;
+
+      currentCategory = btn.dataset.category || "all";
+      renderCategoryChips();
+      renderMenu();
+
+      window.scrollTo({
+        top: document.querySelector(".sticky-panel").offsetTop,
+        behavior: "smooth"
+      });
+    });
+
+    window.addEventListener("load", loadPublicMenu);
+  </script>
+
+<div class="ar3d-modal" id="ar3dModal" aria-hidden="true">
+  <div class="ar3d-box" role="dialog" aria-modal="true" aria-labelledby="ar3dTitle">
+    <div class="ar3d-head"><strong id="ar3dTitle">3D Food Preview</strong><button class="ar3d-close" type="button" onclick="close3D()">×</button></div>
+    <model-viewer id="foodModel" class="ar3d-viewer" src="" ios-src="" camera-controls auto-rotate rotation-per-second="30deg" ar ar-modes="webxr scene-viewer quick-look" shadow-intensity="1.5" environment-image="neutral" crossorigin="anonymous" alt="3D Dish Preview">
+      <button slot="ar-button" class="ar3d-btn">📱 Place on Table (AR)</button>
     </model-viewer>
-    <div class="modal-note">Rotate & zoom the dish. On supported phones use “Place on Table (AR)”.</div>
+    <div class="ar3d-tip">Rotate & zoom the dish. On supported phones, tap <b>Place on Table (AR)</b>.</div>
+    <div class="ar3d-fail" id="ar3dFail">3D model load failed. Check the Cloudflare R2 public URL and CORS settings.</div>
   </div>
 </div>
 
-
-<script>
-const SUPABASE_URL="https://pfsrpowopbrevocwsuii.supabase.co";
-const SUPABASE_ANON_KEY="sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-
-const SIGNATURE_FN=`${SUPABASE_URL}/functions/v1/signature-3d-model-upload`;
-let restaurant=null, items=[], ownerSession=null, ownerPlan=null, editingItem=null;
-let pending3D={glbUrl:"",usdzUrl:"",glbKey:"",usdzKey:""};
-
-const $=id=>document.getElementById(id);
-const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-const safeUrl=v=>{try{const u=new URL(v,location.origin);return ["http:","https:"].includes(u.protocol)?u.href:""}catch{return""}};
-
-function categoryKey(v){return String(v||"General").trim()||"General"}
-function typeClass(v){return String(v||"veg").toLowerCase()==="nonveg"?"nonveg":"veg"}
-function price(v){return v!==null&&v!==undefined&&String(v).trim()!==""?`₹ ${esc(v)}`:""}
-
-function resolveGlb(raw){
-  const direct=safeUrl(raw); if(!direct)return "";
-  if(direct.startsWith(SIGNATURE_FN))return direct;
-  try{
-    const u=new URL(direct);
-    const path=u.pathname.replace(/^\/+/,"");
-    if(path.startsWith("restaurants/")&&path.includes("/signature-3d/")&&/\.glb$/i.test(path))
-      return `${SIGNATURE_FN}?key=${encodeURIComponent(path)}`;
-  }catch{}
-  return direct;
-}
-
-function renderMenu(){
-  const grid=$("menuGrid");
-  if(!items.length){grid.innerHTML='<div class="menu-status">No menu items found.</div>';return}
-  const groups={};
-  items.forEach(x=>(groups[categoryKey(x.category)]??=[]).push(x));
-  const cats=Object.keys(groups).sort((a,b)=>a.localeCompare(b));
-  grid.innerHTML=cats.map(cat=>`
-    <section class="category">
-      <h2>${esc(cat)}</h2>
-      ${groups[cat].sort((a,b)=>(Number(a.sort_order??999999)-Number(b.sort_order??999999))).map(renderItem).join("")}
-    </section>
-  `).join("");
-  $("menuStatus").textContent=`${items.length} menu item${items.length===1?"":"s"}`;
-  renderCategoryDatalist();
-}
-
-function renderItem(item){
-  const has3d=!!item.ar_model_url;
-  const photo=safeUrl(item.image_url||item.photo_url||item.image||item.photo);
-  const thumb=photo?`<img class="thumb" src="${esc(photo)}" alt="" loading="lazy" style="object-fit:cover">`:`<div class="thumb"></div>`;
-  const btn=has3d?`<button class="gold-btn" onclick="open3D(${JSON.stringify(item.name||"Dish")},${JSON.stringify(item.ar_model_url||"")},${JSON.stringify(item.ar_usdz_url||"")})">◇ 3D / AR</button>`:"";
-  const owner=ownerSession?`
-    <button class="gold-btn owner-edit" data-id="${esc(item.id)}">Edit</button>
-    <button class="gold-btn owner-delete" data-id="${esc(item.id)}">Delete</button>`:"";
-  return `<div class="item">
-    ${thumb}
-    <div>
-      <h3>${esc(item.name||"Unnamed item")} <span class="badge ${typeClass(item.item_type)}">■</span></h3>
-      ${item.description?`<p>${esc(item.description)}</p>`:""}
-      <div class="actions">${btn}${owner}</div>
-    </div>
-    <div class="price">${price(item.price_full??item.price)}</div>
-  </div>`;
-}
-
-async function loadRestaurant(){
-  const slug=(new URLSearchParams(location.search).get("r")||"").trim().toLowerCase();
-  let q=db.from("restaurants").select("*").limit(1);
-  if(slug)q=q.eq("slug",slug);
-  const {data,error}=await q;
-  if(error)throw error;
-  if(!data?.length)throw new Error("Restaurant not found.");
-  restaurant=data[0];
-  document.title=`${restaurant.name||"Restaurant"} • Signature Menu`;
-  $("footerAddress").innerHTML=restaurant.address?`📍 ${esc(restaurant.address)}`:"";
-  if(restaurant.phone)$("footerPhone").textContent=`☎ ${restaurant.phone}`;
-}
-
-async function loadItems(){
-  const {data,error}=await db.from("menu_items").select("*").eq("restaurant_id",restaurant.id);
-  if(error)throw error;
-  items=Array.isArray(data)?data:[];
-  renderMenu();
-}
-
-async function detectOwner(){
-  const {data}=await db.auth.getSession();
-  ownerSession=data?.session||null;
-  if(!ownerSession)return;
-  const {data:r,error}=await db.from("restaurants").select("*").eq("owner_id",ownerSession.user.id).limit(1);
-  if(error||!r?.length)return;
-  if(r[0].id!==restaurant.id)return;
-  restaurant=r[0];
-  await loadPlan();
-  $("ownerPanel").style.display="flex";
-  $("ownerPanelTitle").textContent=`${restaurant.name||"Restaurant"} • Signature 3D`;
-  $("ownerPlanText").textContent=ownerPlan?`${ownerPlan.name} • ${ownerPlan.signature_3d_dishes_max||0} Signature 3D dishes`:"No assigned 3D plan";
-}
-
-async function loadPlan(){
-  if(restaurant.plan_id){
-    const {data}=await db.from("plans").select("*").eq("id",restaurant.plan_id).maybeSingle();
-    ownerPlan=data||null;
-  }else{
-    const {data}=await db.from("plans").select("*").eq("slug","free-starter").maybeSingle();
-    ownerPlan=data||null;
-  }
-}
-
-function planLimit(){return Math.max(0,Number(ownerPlan?.signature_3d_dishes_max||0))}
-function current3DCount(excludeId=""){return items.filter(x=>x.signature_3d===true&&x.ar_enabled!==false&&x.ar_model_url&&x.id!==excludeId).length}
-function canUse3D(existing=false){return existing||current3DCount(editingItem?.id||"")<planLimit()}
-
-function renderCategoryDatalist(){
-  const cats=[...new Set(items.map(x=>categoryKey(x.category)))];
-  $("ownerCategories").innerHTML=cats.map(x=>`<option value="${esc(x)}">`).join("");
-}
-
-function openOwnerModal(item=null){
-  if(!ownerSession){location.href="/owner.html?auth=login";return}
-  editingItem=item||null;
-  pending3D={glbUrl:item?.ar_model_url||"",usdzUrl:item?.ar_usdz_url||"",glbKey:"",usdzKey:""};
-  $("ownerModalTitle").textContent=item?"Edit Menu Item":"Add Menu Item";
-  $("editItemId").value=item?.id||"";
-  $("ownerItemName").value=item?.name||"";
-  $("ownerItemCategory").value=item?.category||"";
-  $("ownerItemDescription").value=item?.description||"";
-  $("ownerItemType").value=item?.item_type||"veg";
-  $("ownerItemPrice").value=item?.price??"";
-  $("ownerPriceQuarter").value=item?.price_quarter??"";
-  $("ownerPriceHalf").value=item?.price_half??"";
-  $("ownerPriceFull").value=item?.price_full??"";
-  $("ownerItemAvailable").checked=item?.is_available!==false;
-  $("ownerGlbName").textContent="No new GLB selected";
-  $("ownerUsdzName").textContent="Optional iPhone AR file";
-  $("arPlanLimitText").textContent=`Plan limit: ${planLimit()} • Used: ${current3DCount(item?.id||"")}`;
-  $("arExistingBadge").textContent=item?.ar_model_url?"✓ 3D already active":"";
-  $("arCurrentModel").style.display=item?.ar_model_url?"block":"none";
-  $("arCurrentModel").textContent=item?.ar_model_url?"Existing GLB is connected. Upload a new one only if replacing it.":"";
-  $("arUploadStatus").textContent=planLimit()>0?"GLB max 20 MB. Upload is authenticated and stored in Cloudflare R2.":"3D/AR is not included in this restaurant plan.";
-  $("ownerGlbUploadBtn").disabled=planLimit()<=0;
-  $("ownerUsdzUploadBtn").disabled=planLimit()<=0;
-  $("ownerModal").classList.add("show");
-  $("ownerModal").setAttribute("aria-hidden","false");
-}
-function closeOwnerModal(){$("ownerModal").classList.remove("show");$("ownerModal").setAttribute("aria-hidden","true")}
-function fileName(input,label){$(label).textContent=input.files?.[0]?.name||"No file selected"}
-$("ownerGlbFile").addEventListener("change",()=>fileName($("ownerGlbFile"),"ownerGlbName"));
-$("ownerUsdzFile").addEventListener("change",()=>fileName($("ownerUsdzFile"),"ownerUsdzName"));
-
-async function upload3DAsset(file,type){
-  if(!ownerSession)throw new Error("Please login again.");
-  if(!file)throw new Error("Choose a file first.");
-  if(file.size>20*1024*1024)throw new Error("Maximum file size is 20 MB.");
-  const ext=type==="glb"?".glb":".usdz";
-  if(!file.name.toLowerCase().endsWith(ext))throw new Error(`Please select a ${ext} file.`);
-  const {data,error}=await db.auth.getSession();
-  if(error||!data?.session?.access_token)throw new Error("Login session expired.");
-  if(!editingItem?.id)throw new Error("Save the menu item first, then upload the 3D model.");
-  const fd=new FormData();
-  fd.append("file",file);
-  fd.append("restaurant_id",restaurant.id);
-  fd.append("menu_item_id",editingItem.id);
-  fd.append("asset_type",type);
-  const res=await fetch(SIGNATURE_FN,{method:"POST",headers:{Authorization:`Bearer ${data.session.access_token}`,apikey:SUPABASE_ANON_KEY},body:fd});
-  const raw=await res.text();let result={};try{result=raw?JSON.parse(raw):{}}catch{}
-  if(!res.ok)throw new Error(result?.error||result?.details||`Upload failed (${res.status})`);
-  const url=result.url||result.public_url||"";
-  const key=result.object_key||result.key||"";
-  const proxy=key&&/\.glb$/i.test(key)?`${SIGNATURE_FN}?key=${encodeURIComponent(key)}`:"";
-  return {url:url||proxy,key};
-}
-
-async function uploadExistingAsset(type){
-  try{
-    if(!planLimit())throw new Error("Signature 3D / Full 3D plan required.");
-    const file=type==="glb"?$("ownerGlbFile").files[0]:$("ownerUsdzFile").files[0];
-    $("arUploadStatus").textContent=`Uploading ${type.toUpperCase()} to Cloudflare R2…`;
-    const result=await upload3DAsset(file,type);
-    if(type==="glb")pending3D.glbUrl=result.url,pending3D.glbKey=result.key;
-    else pending3D.usdzUrl=result.url,pending3D.usdzKey=result.key;
-    $("arUploadStatus").textContent=`✓ ${type.toUpperCase()} uploaded successfully. Save the item to finalize database links.`;
-  }catch(e){$("arUploadStatus").textContent=e.message;alert(e.message)}
-}
-$("ownerGlbUploadBtn").onclick=()=>uploadExistingAsset("glb");
-$("ownerUsdzUploadBtn").onclick=()=>uploadExistingAsset("usdz");
-
-async function saveItem(e){
-  e.preventDefault();
-  if(!ownerSession)return;
-  const id=$("editItemId").value||null;
-  const has3d=!!pending3D.glbUrl;
-  const oldHas3d=!!editingItem?.ar_model_url;
-  if(has3d&&!oldHas3d&&current3DCount(id)>=planLimit())return alert(`Your ${ownerPlan?.name||"current"} plan allows only ${planLimit()} Signature 3D dishes.`);
-  const payload={
-    restaurant_id:restaurant.id,
-    name:$("ownerItemName").value.trim(),
-    category:$("ownerItemCategory").value.trim()||"General",
-    description:$("ownerItemDescription").value.trim(),
-    item_type:$("ownerItemType").value,
-    is_available:$("ownerItemAvailable").checked,
-    price:$("ownerItemPrice").value===""?null:Number($("ownerItemPrice").value),
-    price_quarter:$("ownerPriceQuarter").value===""?null:Number($("ownerPriceQuarter").value),
-    price_half:$("ownerPriceHalf").value===""?null:Number($("ownerPriceHalf").value),
-    price_full:$("ownerPriceFull").value===""?null:Number($("ownerPriceFull").value)
-  };
-  if(has3d){
-    payload.ar_enabled=true;payload.signature_3d=true;payload.ar_model_url=pending3D.glbUrl;
-    payload.ar_usdz_url=pending3D.usdzUrl||null;payload.ar_storage_provider="cloudflare-r2";
-  }else if(oldHas3d&&editingItem?.ar_model_url){
-    payload.ar_enabled=editingItem.ar_enabled;payload.signature_3d=editingItem.signature_3d;
-    payload.ar_model_url=editingItem.ar_model_url;payload.ar_usdz_url=editingItem.ar_usdz_url||null;
-    payload.ar_storage_provider=editingItem.ar_storage_provider||"cloudflare-r2";
-  }else{
-    payload.ar_enabled=false;payload.signature_3d=false;payload.ar_model_url=null;payload.ar_usdz_url=null;
-  }
-  $("ownerSaveBtn").disabled=true;$("ownerSaveBtn").textContent="Saving…";
-  try{
-    let result;
-    if(id)result=await db.from("menu_items").update(payload).eq("id",id).eq("restaurant_id",restaurant.id).select().single();
-    else result=await db.from("menu_items").insert(payload).select().single();
-    if(result.error)throw result.error;
-    editingItem=result.data;
-    closeOwnerModal();await loadItems();
-    if(ownerSession)await detectOwner();
-  }catch(e){alert("Database save failed: "+e.message)}
-  finally{$("ownerSaveBtn").disabled=false;$("ownerSaveBtn").textContent="Save to Database"}
-}
-
-async function deleteItem(id){
-  if(!confirm("Delete this menu item permanently?"))return;
-  const {error}=await db.from("menu_items").delete().eq("id",id).eq("restaurant_id",restaurant.id);
-  if(error)return alert(error.message);
-  await loadItems();
-}
-
-async function open3D(name,modelURL,usdzURL=""){
-  const glb=resolveGlb(modelURL);
-  if(!glb){alert("Is dish ka 3D GLB model upload nahi hai.");return}
-  $("viewerTitle").textContent=(name||"Dish")+" — 3D / AR";
-  const viewer=$("foodModel");
-  viewer.removeAttribute("src");viewer.removeAttribute("ios-src");
-  viewer.setAttribute("src",glb);
-  if(usdzURL)viewer.setAttribute("ios-src",safeUrl(usdzURL));
-  $("viewerModal").classList.add("show");document.body.style.overflow="hidden";
-}
-function close3D(){$("viewerModal").classList.remove("show");$("foodModel").removeAttribute("src");$("foodModel").removeAttribute("ios-src");document.body.style.overflow=""}
-$("viewerModal").addEventListener("click",e=>{if(e.target.id==="viewerModal")close3D()});
-
-$("ownerAddBtn").onclick=()=>openOwnerModal();
-$("ownerRefreshBtn").onclick=async()=>{await loadRestaurant();await loadItems();await detectOwner()};
-$("ownerDashboardBtn").onclick=()=>location.href="/owner.html";
-$("ownerModalClose").onclick=closeOwnerModal;
-$("ownerCancelBtn").onclick=closeOwnerModal;
-$("ownerItemForm").addEventListener("submit",saveItem);
-$("menuGrid").addEventListener("click",e=>{
-  const edit=e.target.closest(".owner-edit"),del=e.target.closest(".owner-delete");
-  if(edit){const item=items.find(x=>String(x.id)===String(edit.dataset.id));if(item)openOwnerModal(item)}
-  if(del)deleteItem(del.dataset.id);
-});
-
-async function init(){
-  try{
-    $("menuStatus").textContent="Loading restaurant…";
-    await loadRestaurant();
-    await loadItems();
-    await detectOwner();
-  }catch(e){
-    console.error(e);
-    $("menuStatus").classList.add("error");
-    $("menuStatus").textContent=`Unable to load menu: ${e.message}`;
-  }
-}
-window.addEventListener("load",init);
-</script>
 </body>
 </html>
