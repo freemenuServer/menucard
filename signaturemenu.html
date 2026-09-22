@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#7b1e16" />
-  <title>Digital Menu</title>
+  <meta name="theme-color" content="#0b0b0a" />
+  <title>Signature Menu • FreeMenu</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
@@ -726,7 +726,15 @@
       .service-strip,.sticky-panel{border-radius:0;margin-top:10px}.menu-wrap{padding:20px 12px 32px}.category-title{font-size:20px}
     }
 
-  </style>
+  
+/* Owner menu manager */
+.owner-bar{display:none;margin:12px 0;padding:12px;border:1px solid var(--primary,#0f766e);background:color-mix(in srgb,var(--primary,#0f766e) 7%,#fff);border-radius:14px;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.owner-bar.show{display:flex}.owner-bar strong{font-size:12px}.owner-actions{display:flex;gap:7px;flex-wrap:wrap}.owner-btn{border:0;border-radius:9px;padding:8px 11px;font-size:11px;font-weight:800;background:var(--primary,#0f766e);color:#fff}.owner-btn.secondary{background:#111827}.owner-btn.light{background:#fff;color:#111827;border:1px solid #ddd}
+.owner-edit-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.owner-mini{font-size:10px;padding:7px 9px;border-radius:8px;border:1px solid #ddd;background:#fff;font-weight:800;cursor:pointer}.owner-mini.danger{color:#b4232e}.owner-badge{display:inline-flex;padding:4px 7px;border-radius:999px;background:#111827;color:#fff;font-size:9px;font-weight:900;margin-left:5px}
+.owner-modal{display:none;position:fixed;inset:0;background:#0009;z-index:9999;padding:14px;align-items:center;justify-content:center}.owner-modal.show{display:flex}.owner-modal-box{width:min(720px,100%);max-height:94vh;overflow:auto;background:#fff;border-radius:20px;padding:18px;box-shadow:0 25px 80px #0008}.owner-modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}.owner-modal-head strong{font-size:17px}.owner-close{border:0;background:#f1f3f5;border-radius:9px;width:34px;height:34px;font-size:20px}.owner-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.owner-field{display:flex;flex-direction:column;gap:5px}.owner-field.full{grid-column:1/-1}.owner-field label{font-size:10px;font-weight:800;color:#555}.owner-field input,.owner-field textarea,.owner-field select{width:100%;padding:10px;border:1px solid #ddd;border-radius:9px;outline:0;background:#fff}.owner-field textarea{min-height:75px;resize:vertical}.owner-file{border:1px dashed #bbb;padding:10px;border-radius:9px;background:#fafafa;font-size:11px}.owner-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:15px;flex-wrap:wrap}
+@media(max-width:600px){.owner-grid{grid-template-columns:1fr}.owner-field.full{grid-column:auto}}
+
+</style>
 
 <style id="freemenu-no-banner-header">
 .hero{background:var(--surface)!important;color:var(--text)!important;min-height:0!important;border-radius:0 0 18px 18px!important;box-shadow:0 6px 24px rgba(0,0,0,.06)!important}
@@ -1303,6 +1311,27 @@ body{
 .ar3d-btn:active{transform:scale(.98)}
 .ar3d-modal{position:fixed;inset:0;background:rgba(10,10,10,.72);display:none;align-items:center;justify-content:center;z-index:9999;padding:16px}.ar3d-modal.show{display:flex}.ar3d-box{width:min(720px,100%);background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 25px 80px rgba(0,0,0,.35)}.ar3d-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #eee}.ar3d-head strong{font-size:15px}.ar3d-close{border:0;background:#f2f4f7;border-radius:10px;width:36px;height:36px;font-size:22px;cursor:pointer}.ar3d-viewer{width:100%;height:min(68vh,560px);background:#f7f7f5}.ar3d-tip{padding:11px 15px;font-size:11px;color:#667085;text-align:center}.ar3d-fail{display:none;padding:20px;text-align:center;color:#b42318;font-size:12px}
 </style>
+
+<style id="signature-menu-theme">
+:root{--primary:#0b0b0a!important;--primary-dark:#000!important;--primary-soft:#171512!important;--accent:#d8ad5a!important;--bg:#090909!important;--surface:#11110f!important;--surface-2:#15130f!important;--text:#f4ead5!important;--muted:#b7ad9c!important;--border:rgba(216,173,90,.28)!important;--shadow:0 18px 55px rgba(0,0,0,.38)!important}
+body{background:radial-gradient(circle at 8% 2%,rgba(216,173,90,.08),transparent 24%),radial-gradient(circle at 92% 18%,rgba(216,173,90,.06),transparent 22%),#090909!important;color:var(--text)!important}
+.hero{min-height:540px!important;background:linear-gradient(90deg,rgba(5,5,4,.98) 0%,rgba(5,5,4,.88) 42%,rgba(5,5,4,.32) 100%),radial-gradient(circle at 72% 52%,rgba(216,173,90,.16),transparent 28%),#090909!important;border-bottom:1px solid rgba(216,173,90,.25)!important}
+.hero-cover{opacity:.62!important;filter:saturate(.85) contrast(1.05)!important}.hero-overlay{background:linear-gradient(180deg,rgba(0,0,0,.25),transparent 32%,rgba(0,0,0,.65)),linear-gradient(90deg,rgba(0,0,0,.3),transparent)!important}.hero-content{max-width:1180px!important}
+.logo-wrap{width:82px!important;height:82px!important;border:1px solid rgba(216,173,90,.55)!important;background:rgba(9,9,8,.72)!important}.logo-fallback{color:#e0b968!important}
+.restaurant-name,.hero-tagline{font-family:"Cormorant Garamond",Georgia,serif!important;font-size:clamp(46px,7vw,88px)!important;letter-spacing:.035em!important;line-height:.92!important;text-transform:uppercase!important;color:#f2d49a!important;text-shadow:0 4px 25px rgba(0,0,0,.45)!important}
+.hero-welcome{color:#e0b968!important;text-transform:uppercase!important;letter-spacing:.34em!important;font-size:10px!important;font-weight:900!important}.hero-subtitle{color:#f4ead5!important;letter-spacing:.2em!important;text-transform:uppercase!important;font-size:12px!important}.hero-features .hero-feature{border-color:rgba(216,173,90,.35)!important;background:rgba(216,173,90,.08)!important;color:#e9d3a0!important}.hero-slogans{color:#e8c781!important}
+.hero-action{border-color:#d8ad5a!important;background:linear-gradient(135deg,#d8ad5a,#a97c2e)!important;color:#16110a!important;box-shadow:0 14px 35px rgba(216,173,90,.18)!important}
+.service-strip{background:#0d0d0c!important;border-color:rgba(216,173,90,.18)!important;color:#d8cfbf!important}.open-pill{background:#153a28!important;color:#9ce0b8!important}.service{background:#15130f!important;border-color:rgba(216,173,90,.18)!important;color:#d8cfbf!important}
+.sticky-panel{background:rgba(9,9,9,.92)!important;border-color:rgba(216,173,90,.18)!important;backdrop-filter:blur(18px)!important}.search-wrap{background:#11110f!important;border-color:rgba(216,173,90,.25)!important}.search-wrap input,.search-wrap input::placeholder{color:#eee1c8!important}.category-chip{background:#11110f!important;border-color:rgba(216,173,90,.24)!important;color:#cfc3af!important}.category-chip.active{background:linear-gradient(135deg,#d8ad5a,#a97c2e)!important;border-color:#d8ad5a!important;color:#17110a!important}
+.menu-wrap{max-width:1180px!important}.summary-line{color:#a99e8b!important}.category-section{background:rgba(17,17,15,.82)!important;border:1px solid rgba(216,173,90,.15)!important;box-shadow:0 16px 45px rgba(0,0,0,.2)!important}.category-title{color:#e2bd73!important;font-family:"Cormorant Garamond",Georgia,serif!important;letter-spacing:.08em!important;text-transform:uppercase!important}.category-line{background:linear-gradient(90deg,#d8ad5a,transparent)!important}.menu-item{background:rgba(14,14,13,.72)!important;border-color:rgba(216,173,90,.12)!important}.menu-item:hover{border-color:rgba(216,173,90,.35)!important;transform:translateY(-1px)}.item-name{color:#f5ead6!important;font-family:"Cormorant Garamond",Georgia,serif!important;font-size:24px!important}.item-desc{color:#aaa092!important}.three-price-cell{color:#e4bd70!important}.food-symbol{background:#10100e!important}.tag{background:#17130d!important;color:#e2c27d!important;border-color:rgba(216,173,90,.22)!important}.owner-badge{background:linear-gradient(135deg,#d8ad5a,#a97c2e)!important;color:#17110a!important}.footer-note{color:#8e8578!important;border-color:rgba(216,173,90,.15)!important}
+.owner-bar{background:linear-gradient(135deg,#11110f,#1a160e)!important;border-color:rgba(216,173,90,.3)!important;color:#f3e4c5!important}.owner-bar #ownerPlanText{color:#bcae96!important}.owner-btn{background:linear-gradient(135deg,#d8ad5a,#a97c2e)!important;color:#17110a!important;border-color:#d8ad5a!important}.owner-btn.secondary,.owner-btn.light{background:#14130f!important;color:#e8d8b8!important;border-color:rgba(216,173,90,.25)!important}.owner-mini{background:#17130d!important;color:#e5c786!important;border-color:rgba(216,173,90,.2)!important}
+.ar3d-modal{background:rgba(0,0,0,.86)!important}.ar3d-box{background:#0f0f0e!important;border:1px solid rgba(216,173,90,.35)!important}.ar3d-head{border-color:rgba(216,173,90,.18)!important}.ar3d-head strong{color:#f3e4c5!important;font-family:"Cormorant Garamond",Georgia,serif!important;font-size:22px!important}.ar3d-close{background:#17130d!important;color:#e4c27c!important}.ar3d-viewer{background:radial-gradient(circle,#262116,#0e0e0d)!important}.ar3d-tip{color:#b9ad9a!important;background:#0f0f0e!important}.ar3d-fail{color:#ffb4ab!important;background:#0f0f0e!important}.ar3d-btn{background:linear-gradient(135deg,#e0bb6c,#a77a2b)!important;color:#17110a!important;border-color:#e0bb6c!important}
+.signature-ribbon{display:flex;align-items:center;justify-content:center;gap:10px;max-width:1180px;margin:18px auto 0;padding:10px 14px;color:#d8c6a6;font-size:10px;letter-spacing:.2em;text-transform:uppercase}.signature-ribbon:before,.signature-ribbon:after{content:"";height:1px;flex:1;background:linear-gradient(90deg,transparent,rgba(216,173,90,.4))}.signature-ribbon:after{transform:scaleX(-1)}
+.signature-hero-special{max-width:1180px;margin:26px auto 0;padding:0 16px}.signature-special-card{display:none;position:relative;overflow:hidden;border-radius:20px;min-height:220px;border:1px solid rgba(216,173,90,.25);background:linear-gradient(120deg,#15120d,#0d0d0c);box-shadow:0 20px 55px rgba(0,0,0,.3)}.signature-special-card.show{display:grid;grid-template-columns:1fr 300px}.signature-special-copy{padding:28px 30px;align-self:center}.signature-special-kicker{font-size:10px;letter-spacing:.28em;color:#d8ad5a;font-weight:900;text-transform:uppercase}.signature-special-copy h2{margin:7px 0 5px;color:#f4dfb1;font:700 34px/1.0 "Cormorant Garamond",Georgia,serif}.signature-special-copy p{margin:0;color:#b7ad9c;font-size:12px;line-height:1.6;max-width:560px}.signature-special-image{width:100%;height:100%;min-height:220px;object-fit:cover;filter:saturate(.9)}
+.signature-item-photo{margin:0 0 14px;height:190px;border-radius:14px;overflow:hidden;border:1px solid rgba(216,173,90,.16);background:#111}.signature-item-photo img{width:100%;height:100%;object-fit:cover;display:block}.menu-item{overflow:hidden!important}
+@media(max-width:720px){.hero{min-height:480px!important}.signature-special-card.show{grid-template-columns:1fr}.signature-special-image{height:180px;min-height:180px}.signature-special-copy{padding:22px}.restaurant-name,.hero-tagline{font-size:52px!important}}
+@media(max-width:600px){.signature-item-photo{height:170px}}
+</style>
 </head>
 <body>
   <div class="app-shell">
@@ -1337,10 +1366,6 @@ body{
             <div id="rest-slogan2"></div>
           </div>
           <div class="restaurant-meta" style="margin-top:11px">
-            <span id="rest-status" class="status-badge">
-              <span class="status-dot"></span>
-              <span>Open</span>
-            </span>
             <span id="rest-address" style="display:none;"></span>
             <a id="rest-phone" href="#" style="display:none;color:inherit;text-decoration:none"></a>
           </div>
@@ -1354,6 +1379,19 @@ body{
       </div>
     </header>
 
+    <div class="signature-ribbon"><span>Good Food • Authentic Taste • Made With Love</span></div>
+
+    <section class="signature-hero-special">
+      <div class="signature-special-card" id="signatureSpecialCard">
+        <div class="signature-special-copy">
+          <div class="signature-special-kicker">Chef's Special • Signature 3D</div>
+          <h2 id="signatureSpecialName">Signature Dish</h2>
+          <p id="signatureSpecialDesc">Explore this dish in interactive 3D and place it on your table with AR.</p>
+          <button type="button" class="ar3d-btn" id="signatureSpecialBtn">◈ View in 3D / AR</button>
+        </div>
+        <img id="signatureSpecialImage" class="signature-special-image" alt="Chef's Special">
+      </div>
+    </section>
 
     <section class="service-strip" id="service-strip">
       <div class="service-left">
@@ -1380,7 +1418,12 @@ body{
       <div class="category-scroll" id="category-chips"></div>
     </section>
 
-    <main class="menu-wrap">
+    <div class="owner-bar" id="ownerBar">
+  <div><strong id="ownerModeTitle">Signature Menu Manager</strong><div style="font-size:10px;color:#667085;margin-top:2px" id="ownerPlanText">Premium black & gold Signature Menu</div></div>
+  <div class="owner-actions"><button class="owner-btn" type="button" id="ownerAddBtn">＋ Add Item</button><button class="owner-btn secondary" type="button" id="ownerRefreshBtn">↻ Refresh</button><button class="owner-btn light" type="button" id="ownerDashboardBtn">Dashboard</button></div>
+</div>
+
+<main class="menu-wrap">
       <div id="summary-line" class="summary-line" style="display:none;"></div>
       <div id="menu-sections"></div>
       <div class="footer-note">Digital menu • Prices may be subject to change</div>
@@ -1399,6 +1442,10 @@ body{
 
     let restaurant = null;
     let allItems = [];
+    let ownerSession = null;
+    let ownerRestaurant = null;
+    let ownerPlan = null;
+    let ownerMode = false;
     let currentCategory = "all";
     let searchText = "";
 
@@ -1527,60 +1574,25 @@ body{
     function renderItem(item) {
       const type = getItemType(item);
       const unavailable = isUnavailable(item);
-
-      return `
-        <article class="menu-item ${unavailable ? "unavailable" : ""}" data-name="${escapeHTML((item.name || "").toLowerCase())}">
-          <div class="item-content">
-            <div class="item-main-row">
-              <div class="item-info">
-                <div class="item-topline">
-                  <span class="food-symbol ${type}" aria-label="${type}"></span>
-                  <h3 class="item-name">${escapeHTML(item.name || "Unnamed item")}</h3>
-                </div>
-                ${renderTags(item)}
-                ${item.description ? `<p class="item-desc">${escapeHTML(item.description)}</p>` : ""}
-                ${item.ar_model_url && item.ar_enabled !== false ? `<button type="button" class="ar3d-btn" onclick="open3D(${JSON.stringify(item.name || "Dish")},${JSON.stringify(item.ar_model_url || "")},${JSON.stringify(item.ar_usdz_url || "")})">◈ 3D / AR View</button>` : ""}
-              </div>
-              <div class="item-price-area">
-                ${renderPrice(item, categoryKey(item.category))}
-              </div>
-            </div>
-          </div>
-        </article>
-      `;
-    }
-
-    // Public GLB proxy. This keeps browser/model-viewer loading away from
-    // Cloudflare R2 CORS issues while the Owner still stores the real R2 URL.
-    const SIGNATURE_3D_FUNCTION_URL =
-      `${SUPABASE_URL}/functions/v1/signature-3d-model-upload`;
-
-    function resolveSignature3DGlb(raw){
-      const direct = safeUrl(raw);
-      if(!direct) return "";
-
-      // Already proxied: use it as-is.
-      if(direct.startsWith(SIGNATURE_3D_FUNCTION_URL)) return direct;
-
-      // Convert the public R2 URL into ?key=... for the public proxy.
-      try{
-        const u = new URL(direct);
-        const path = u.pathname.replace(/^\/+/, "");
-        if(path.startsWith("restaurants/") && path.includes("/signature-3d/") && /\.glb$/i.test(path)){
-          return `${SIGNATURE_3D_FUNCTION_URL}?key=${encodeURIComponent(path)}`;
-        }
-      }catch(_){}
-
-      return direct;
+      const modelButton = item.ar_model_url && item.ar_enabled !== false
+        ? `<button type="button" class="ar3d-btn" onclick="open3D(${JSON.stringify(item.name || "Dish")},${JSON.stringify(item.ar_model_url || "")},${JSON.stringify(item.ar_usdz_url || "")})">◈ 3D / AR View</button>` : "";
+      const ownerButtons = ownerMode ? `<div class="owner-edit-row">
+        <button class="owner-mini" onclick="editOwnerItem(${JSON.stringify(item.id)})">✎ Edit</button>
+        <button class="owner-mini" onclick="toggleOwnerAvailability(${JSON.stringify(item.id)})">${item.is_available===false?"Show":"Hide"}</button>
+        <button class="owner-mini danger" onclick="deleteOwnerItem(${JSON.stringify(item.id)})">Delete</button>
+        ${item.ar_model_url ? `<button class="owner-mini" onclick="open3D(${JSON.stringify(item.name||"Dish")},${JSON.stringify(item.ar_model_url||"")},${JSON.stringify(item.ar_usdz_url||"")})">◈ 3D</button>` : ""}
+      </div>` : "";
+      const imageUrl=safeUrl(item.image_url||item.photo_url||item.image||item.photo);
+      const photo=imageUrl ? `<div class="signature-item-photo"><img src="${escapeHTML(imageUrl)}" alt="${escapeHTML(item.name||"Dish")}" loading="lazy" onerror="this.parentElement.style.display='none'"></div>` : "";
+      return `<article class="menu-item ${unavailable ? "unavailable" : ""}" data-name="${escapeHTML((item.name || "").toLowerCase())}"><div class="item-content"><div class="item-main-row"><div class="item-info"><div class="item-topline"><span class="food-symbol ${type}" aria-label="${type}"></span><h3 class="item-name">${escapeHTML(item.name || "Unnamed item")}${item.ar_model_url ? `<span class="owner-badge">3D</span>` : ""}</h3></div>${renderTags(item)}${item.description ? `<p class="item-desc">${escapeHTML(item.description)}</p>` : ""}${modelButton}${ownerButtons}</div><div class="item-price-area">${renderPrice(item, categoryKey(item.category))}</div></div></div>${photo}</article>`;
     }
 
     function directR2Url(raw){
       return safeUrl(raw);
     }
-
     function open3D(name, modelURL, usdzURL=""){
       const viewer=$("foodModel"), modal=$("ar3dModal"), fail=$("ar3dFail");
-      const glb=resolveSignature3DGlb(modelURL), usdz=directR2Url(usdzURL);
+      const glb=directR2Url(modelURL), usdz=directR2Url(usdzURL);
       if(!viewer||!modal||!glb)return;
       $("ar3dTitle").textContent=(name||"Dish")+" — 3D / AR";
       if(fail)fail.style.display="none";
@@ -1599,10 +1611,8 @@ body{
       document.body.style.overflow="";
     }
     $("ar3dModal")?.addEventListener("click",e=>{if(e.target===$("ar3dModal"))close3D();});
-    $("foodModel")?.addEventListener("error",(event)=>{
-      console.error("Signature 3D model load error:", event);
-      if($("ar3dFail"))$("ar3dFail").style.display="block";
-    });
+    $("foodModel")?.addEventListener("error",()=>{if($("ar3dFail"))$("ar3dFail").style.display="block";});
+    $("foodModel")?.addEventListener("load",()=>{if($("ar3dFail"))$("ar3dFail").style.display="none";});
 
     function categoryKey(category) {
       return String(category || "General").trim() || "General";
@@ -1811,11 +1821,8 @@ function getSavedCategoryOrder(rest, items) {
 
       const isOpen = rest.is_open !== false && rest.status !== "closed" && rest.is_active !== false;
       const statusEl = $("rest-status");
-      if(statusEl){
-        statusEl.classList.toggle("closed", !isOpen);
-        const statusText = statusEl.querySelector("span:last-child");
-        if(statusText) statusText.textContent = isOpen ? "Open" : "Closed";
-      }
+      statusEl.classList.toggle("closed", !isOpen);
+      statusEl.querySelector("span:last-child").textContent = isOpen ? "Open" : "Closed";
       const openPill = $("rest-open-pill");
       if(openPill){
         openPill.textContent = isOpen ? "● Open Now" : "● Closed";
@@ -1840,7 +1847,91 @@ function getSavedCategoryOrder(rest, items) {
       if($("svc-delivery")) $("svc-delivery").style.display=rest.home_delivery===false?"none":"inline-flex";
     }
 
+    async function detectOwnerMode(){
+      ownerMode=false; ownerSession=null; ownerRestaurant=null; ownerPlan=null;
+      try{
+        const {data,error}=await supabaseClient.auth.getSession();
+        if(error||!data?.session?.user)return;
+        ownerSession=data.session;
+        const {data:r,error:re}=await supabaseClient.from("restaurants").select("*").eq("owner_id",ownerSession.user.id).limit(1).maybeSingle();
+        if(re||!r)return;
+        const slug=String(new URLSearchParams(location.search).get("r")||"").trim().toLowerCase();
+        if(!slug){
+          if(r.slug){ history.replaceState(null,"",`/menu.html?r=${encodeURIComponent(r.slug)}`); }
+        }else if(String(r.slug||"").toLowerCase()!==slug){
+          return;
+        }
+        ownerRestaurant=r; ownerMode=true;
+        const {data:p}=await supabaseClient.from("plans").select("id,name,slug,signature_3d_dishes_max,qr_stickers_max").eq("id",r.plan_id||"").maybeSingle();
+        ownerPlan=p||null;
+        $("ownerBar")?.classList.add("show");
+        $("ownerPlanText").textContent=`${p?.name||"Owner Mode"}${p?.signature_3d_dishes_max!=null?` • ${p.signature_3d_dishes_max} 3D dishes max`:""}${p?.signature_3d_dishes_max!=null?` • Used ${owner3DCount()}/${p.signature_3d_dishes_max}`:""}`;
+      }catch(e){console.warn("Owner mode check skipped",e)}
+    }
+    function ownerPlanAllows3D(){return Number(ownerPlan?.signature_3d_dishes_max||0)>0 || /signature|full.*3d/i.test(`${ownerPlan?.slug||""} ${ownerPlan?.name||""}`)}
+    function owner3DLimit(){return Math.max(0,Number(ownerPlan?.signature_3d_dishes_max||0))}
+    function owner3DCount(){return allItems.filter(i=>i.signature_3d===true && i.ar_model_url).length}
+    function ownerCanAdd3D(itemId=null){const limit=owner3DLimit();if(!ownerPlanAllows3D()||limit<=0)return false;const existing=allItems.find(i=>String(i.id)===String(itemId));if(existing?.signature_3d===true&&existing?.ar_model_url)return true;return owner3DCount()<limit}
+    async function uploadOwnerR2(file,folder){
+      if(!file)throw new Error("File select karein.");
+      const {data:{session},error}=await supabaseClient.auth.getSession();
+      if(error||!session?.access_token)throw new Error("Please login again.");
+      const fd=new FormData();fd.append("file",file);fd.append("restaurant_id",ownerRestaurant.id);fd.append("folder",folder);
+      const res=await fetch(`${SUPABASE_URL}/functions/v1/r2-upload`,{method:"POST",headers:{Authorization:`Bearer ${session.access_token}`,apikey:SUPABASE_ANON_KEY},body:fd});
+      let j={};try{j=await res.json()}catch(_){ } if(!res.ok)throw new Error(j?.error||`R2 upload failed (${res.status})`); if(!j?.url)throw new Error("R2 URL missing.");return j.url;
+    }
+    async function uploadOwner3D(file,itemId,type){
+      if(!ownerPlanAllows3D())throw new Error("Signature 3D / Full 3D plan required.");
+      if(!file)throw new Error(`${type.toUpperCase()} file select karein.`);
+      if(file.size>20*1024*1024)throw new Error("3D file 20 MB se chhoti honi chahiye.");
+      const ext=(file.name.split(".").pop()||"").toLowerCase();if(ext!==type)throw new Error(`Please select .${type} file.`);
+      const {data:{session},error}=await supabaseClient.auth.getSession();if(error||!session?.access_token)throw new Error("Please login again.");
+      const fd=new FormData();fd.append("file",file);fd.append("restaurant_id",ownerRestaurant.id);fd.append("menu_item_id",itemId);fd.append("asset_type",type);
+      const res=await fetch(`${SUPABASE_URL}/functions/v1/signature-3d-model-upload`,{method:"POST",headers:{Authorization:`Bearer ${session.access_token}`,apikey:SUPABASE_ANON_KEY},body:fd});
+      let j={};try{j=await res.json()}catch(_){ }if(!res.ok)throw new Error(j?.error||`3D upload failed (${res.status})`);
+      if(j?.url)return j.url;if(j?.public_url)return j.public_url;if(j?.object_key)return `https://images.freemenu.in/${String(j.object_key).replace(/^\/+/,"")}`;throw new Error("3D upload URL missing.");
+    }
+    function ownerOpenModal(item=null){
+      $("ownerEditId").value=item?.id||"";$("ownerItemTitle").textContent=item?`Edit: ${item.name}`:"Add Menu Item";
+      $("ownerName").value=item?.name||"";$("ownerCategory").value=item?.category||"";$("ownerDescription").value=item?.description||"";$("ownerType").value=item?.item_type||((item?.is_veg===false)?"nonveg":"veg");
+      $("ownerPrice").value=item?.price??"";$("ownerQtr").value=item?.price_quarter??"";$("ownerHalf").value=item?.price_half??"";$("ownerFull").value=item?.price_full??"";$("ownerAvailable").value=String(item?.is_available!==false);$("ownerPhotoFile").value="";$("ownerGlbFile").value="";$("ownerUsdzFile").value="";
+      $("ownerItemModal").classList.add("show");$("ownerItemModal").setAttribute("aria-hidden","false");
+    }
+    window.editOwnerItem=id=>{const i=allItems.find(x=>String(x.id)===String(id));if(i)ownerOpenModal(i)};
+    window.deleteOwnerItem=async id=>{if(!ownerMode||!confirm("Delete this menu item?"))return;const {error}=await supabaseClient.from("menu_items").delete().eq("id",id).eq("restaurant_id",ownerRestaurant.id);if(error)alert(error.message);else await loadPublicMenu();};
+    window.toggleOwnerAvailability=async id=>{if(!ownerMode)return;const i=allItems.find(x=>String(x.id)===String(id));if(!i)return;const {error}=await supabaseClient.from("menu_items").update({is_available:i.is_available===false}).eq("id",id).eq("restaurant_id",ownerRestaurant.id);if(error)alert(error.message);else await loadPublicMenu();};
+    async function saveOwnerItem(){
+      if(!ownerMode)return;const id=$("ownerEditId").value||null,name=$("ownerName").value.trim();if(!name)return alert("Item name required.");
+      const payload={name,category:$("ownerCategory").value.trim()||"General",description:$("ownerDescription").value.trim(),item_type:$("ownerType").value,is_veg:$("ownerType").value==="veg",price:$("ownerPrice").value===""?null:Number($("ownerPrice").value),price_quarter:$("ownerQtr").value===""?null:Number($("ownerQtr").value),price_half:$("ownerHalf").value===""?null:Number($("ownerHalf").value),price_full:$("ownerFull").value===""?null:Number($("ownerFull").value),is_available:$("ownerAvailable").value!=="false"};
+      const btn=$("ownerSaveBtn");btn.disabled=true;btn.textContent="Saving...";
+      try{
+        let savedId=id;
+        const photo=$("ownerPhotoFile").files?.[0],glb=$("ownerGlbFile").files?.[0],usdz=$("ownerUsdzFile").files?.[0];
+        if(glb&&!ownerPlanAllows3D())throw new Error("Signature 3D / Full 3D plan required for GLB.");
+        if(glb&&!ownerCanAdd3D(id))throw new Error(`3D dish limit reached (${owner3DLimit()}). Upgrade your plan to add more Signature 3D dishes.`);
+        if(id){const {error}=await supabaseClient.from("menu_items").update(payload).eq("id",id).eq("restaurant_id",ownerRestaurant.id);if(error)throw error;}
+        else {const {data,error}=await supabaseClient.from("menu_items").insert([{restaurant_id:ownerRestaurant.id,...payload}]).select("id").single();if(error)throw error;savedId=data.id;}
+        if(photo){const url=await uploadOwnerR2(photo,"menu-items");const {error}=await supabaseClient.from("menu_items").update({image_url:url}).eq("id",savedId).eq("restaurant_id",ownerRestaurant.id);if(error)throw error;}
+        let arModelUrl=id?(allItems.find(x=>String(x.id)===String(id))?.ar_model_url||null):null,arUsdzUrl=id?(allItems.find(x=>String(x.id)===String(id))?.ar_usdz_url||null):null;
+        if(glb)arModelUrl=await uploadOwner3D(glb,savedId,"glb");if(usdz)arUsdzUrl=await uploadOwner3D(usdz,savedId,"usdz");
+        if(glb||usdz){const {error}=await supabaseClient.from("menu_items").update({ar_enabled:true,signature_3d:true,ar_model_url:arModelUrl,ar_usdz_url:arUsdzUrl,ar_storage_provider:"cloudflare-r2"}).eq("id",savedId).eq("restaurant_id",ownerRestaurant.id);if(error)throw error;}
+        $("ownerItemModal").classList.remove("show");await loadPublicMenu();
+      }catch(e){console.error(e);alert(e?.message||String(e));}finally{btn.disabled=false;btn.textContent="Save Item"}
+    }
+
+    function renderSignatureSpecial(){
+      const card=$("signatureSpecialCard"),name=$("signatureSpecialName"),desc=$("signatureSpecialDesc"),img=$("signatureSpecialImage"),btn=$("signatureSpecialBtn");
+      if(!card||!name||!desc||!img||!btn)return;
+      const special=allItems.find(i=>i.ar_model_url&&i.ar_enabled!==false&&!isUnavailable(i));
+      if(!special){card.classList.remove("show");return;}
+      name.textContent=special.name||"Signature Dish";desc.textContent=special.description||"Explore this dish in interactive 3D and place it on your table with AR.";
+      const image=safeUrl(special.image_url||special.photo_url||special.image||special.photo);
+      img.src=image||"data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="900" height="500"><rect width="100%" height="100%" fill="#15130f"/><text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" fill="#d8ad5a" font-family="Georgia" font-size="38">SIGNATURE 3D</text></svg>`);
+      btn.onclick=()=>open3D(special.name||"Dish",special.ar_model_url||"",special.ar_usdz_url||"");card.classList.add("show");
+    }
+
     async function loadPublicMenu() {
+      await detectOwnerMode();
       showLoading();
 
       try {
@@ -1889,18 +1980,13 @@ function getSavedCategoryOrder(rest, items) {
 
         renderCategoryChips();
         renderMenu();
+        renderSignatureSpecial();
       } catch (error) {
         console.error("Menu load error:", error);
-        restaurant = null;
-        allItems = [];
-        currentCategory = "all";
         $("rest-name").textContent = "Menu Unavailable";
         $("category-chips").innerHTML = "";
         $("summary-line").style.display = "none";
-        showState(
-          "Unable to load menu",
-          error?.message ? `Please refresh the page or try again shortly. (${error.message})` : "Please refresh the page or try again shortly."
-        );
+        showState("Unable to load menu", "Please refresh the page or try again shortly.");
       }
     }
 
@@ -1923,8 +2009,38 @@ function getSavedCategoryOrder(rest, items) {
       });
     });
 
+    $("ownerAddBtn")?.addEventListener("click",()=>ownerOpenModal());
+    $("ownerRefreshBtn")?.addEventListener("click",()=>loadPublicMenu());
+    $("ownerDashboardBtn")?.addEventListener("click",()=>location.href="/owner.html");
+    $("ownerCloseBtn")?.addEventListener("click",()=>$("ownerItemModal").classList.remove("show"));
+    $("ownerCancelBtn")?.addEventListener("click",()=>$("ownerItemModal").classList.remove("show"));
+    $("ownerSaveBtn")?.addEventListener("click",saveOwnerItem);
+
     window.addEventListener("load", loadPublicMenu);
   </script>
+
+<div class="owner-modal" id="ownerItemModal" aria-hidden="true">
+  <div class="owner-modal-box">
+    <div class="owner-modal-head"><strong id="ownerItemTitle">Add Menu Item</strong><button class="owner-close" type="button" id="ownerCloseBtn">×</button></div>
+    <input type="hidden" id="ownerEditId">
+    <div class="owner-grid">
+      <div class="owner-field"><label>Item Name</label><input id="ownerName" placeholder="Butter Chicken"></div>
+      <div class="owner-field"><label>Category</label><input id="ownerCategory" placeholder="Main Course"></div>
+      <div class="owner-field full"><label>Description</label><textarea id="ownerDescription" placeholder="Dish description"></textarea></div>
+      <div class="owner-field"><label>Type</label><select id="ownerType"><option value="veg">Veg</option><option value="nonveg">Non-Veg</option><option value="egg">Egg</option></select></div>
+      <div class="owner-field"><label>Single / Full Price</label><input id="ownerPrice" type="number" min="0" step="0.01"></div>
+      <div class="owner-field"><label>Quarter Price</label><input id="ownerQtr" type="number" min="0" step="0.01"></div>
+      <div class="owner-field"><label>Half Price</label><input id="ownerHalf" type="number" min="0" step="0.01"></div>
+      <div class="owner-field"><label>Full Price</label><input id="ownerFull" type="number" min="0" step="0.01"></div>
+      <div class="owner-field"><label>Food Photo</label><input class="owner-file" id="ownerPhotoFile" type="file" accept="image/*"></div>
+      <div class="owner-field"><label>3D GLB Model</label><input class="owner-file" id="ownerGlbFile" type="file" accept=".glb,model/gltf-binary"></div>
+      <div class="owner-field"><label>iPhone USDZ (optional)</label><input class="owner-file" id="ownerUsdzFile" type="file" accept=".usdz,model/vnd.usdz+zip"></div>
+      <div class="owner-field"><label>Availability</label><select id="ownerAvailable"><option value="true">ON — Visible</option><option value="false">OFF — Hidden</option></select></div>
+    </div>
+    <div style="margin-top:10px;font-size:10px;color:#667085">3D/AR upload is available only for Signature 3D / Full 3D plans. GLB max 20 MB.</div>
+    <div class="owner-modal-actions"><button class="owner-btn light" type="button" id="ownerCancelBtn">Cancel</button><button class="owner-btn" type="button" id="ownerSaveBtn">Save Item</button></div>
+  </div>
+</div>
 
 <div class="ar3d-modal" id="ar3dModal" aria-hidden="true">
   <div class="ar3d-box" role="dialog" aria-modal="true" aria-labelledby="ar3dTitle">
