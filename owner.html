@@ -286,6 +286,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     <a class="navItem" href="#orders" data-section="orders"><i class="fa-solid fa-cart-shopping"></i> Orders <small>(Preview)</small></a>
     <a class="navItem" href="#qr" data-section="qr"><i class="fa-solid fa-qrcode"></i> QR Code</a>
     <a class="navItem" href="#preview" data-section="preview"><i class="fa-solid fa-mobile-screen-button"></i> Menu Preview</a>
+    <a class="navItem" href="#signature-menu" id="signatureMenuNav"><i class="fa-solid fa-crown"></i> Signature Menu <small>3D / AR</small></a>
     <a class="navItem" href="#analytics" data-section="analytics"><i class="fa-solid fa-chart-column"></i> Analytics</a>
     <a class="navItem" href="#settings" data-section="settings"><i class="fa-solid fa-gear"></i> Settings</a>
     <a class="navItem" href="#support" data-section="support"><i class="fa-regular fa-circle-question"></i> Help & Support</a>
@@ -405,6 +406,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     <div class="card">
       <div class="cardTitle">Quick Actions</div>
       <div class="quickGrid">
+        <button class="quick" type="button" id="quickSignatureMenu"><i class="fa-solid fa-crown"></i><div><strong>Signature 3D / AR Menu</strong><small>Open the black & gold customer menu</small></div></button>
         <button class="quick" id="quickQR"><i class="fa-solid fa-qrcode"></i><div><strong>Generate QR Code</strong><small>Open & download your menu QR</small></div></button>
         <button class="quick" id="quickPreview"><i class="fa-solid fa-mobile-screen"></i><div><strong>View Public Menu</strong><small>See what customers see</small></div></button>
         <button class="quick" id="quickCategory"><i class="fa-solid fa-circle-plus"></i><div><strong>Add New Category</strong><small>Organize your menu</small></div></button>
@@ -774,6 +776,10 @@ async function ownerLogin(){
     hideOwnerLogin();
     $("loader").classList.remove("hidden");
     await init(true);
+    if(currentRestaurant?.slug){
+      window.location.href = "/menu.html?r=" + encodeURIComponent(currentRestaurant.slug);
+      return;
+    }
   }catch(e){
     console.error("Owner login failed:",e);
     showLoginForm();
@@ -1407,6 +1413,8 @@ $("downloadQR").onclick=()=>{const a=document.createElement("a");a.href=$("qrBox
 function openPublic(){window.open(publicUrl(),"_blank","noopener")}
 ["publicTop","sidePublicBtn","quickPreview","openPublic2"].forEach(id=>$(id).onclick=openPublic);
 $("sidePlansBtn").onclick=()=>{window.location.href="/plans.html"};
+$("signatureMenuNav").onclick=(e)=>{e.preventDefault();if(!currentRestaurant?.slug)return toast("Restaurant slug not available yet.");window.open("/signaturemenu.html?r="+encodeURIComponent(currentRestaurant.slug),"_blank","noopener")};
+$("quickSignatureMenu")?.addEventListener("click",()=>$("signatureMenuNav")?.click());
 
 /* ---------- Theme preview ---------- */
 function updateTheme(){
