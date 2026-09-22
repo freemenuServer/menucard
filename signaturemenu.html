@@ -1,4 +1,26 @@
-<!DOCTYPE html>
+<
+
+function toggle3DRotation(){
+  const v=$('dishModel');
+  const b=$('modelRotateBtn');
+  if(!v)return;
+  if(v.hasAttribute('auto-rotate')){v.removeAttribute('auto-rotate');b?.classList.remove('active');b&&(b.textContent='↻ Auto Rotate');}
+  else{v.setAttribute('auto-rotate','');b?.classList.add('active');b&&(b.textContent='Ⅱ Stop Rotation');}
+}
+function reset3DView(){
+  const v=$('dishModel');
+  if(!v)return;
+  v.cameraOrbit='auto auto auto';
+  v.fieldOfView='auto';
+  v.jumpCameraToGoal?.();
+}
+async function enter3DFullscreen(){
+  const box=document.querySelector('.model3d-box');
+  if(!box)return;
+  if(document.fullscreenElement){await document.exitFullscreen?.();return;}
+  await box.requestFullscreen?.();
+}
+!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -65,7 +87,24 @@
     .bottom-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(1180px,100%);z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:12px 22px;display:grid;grid-template-columns:230px 1fr 270px;align-items:center;gap:14px;box-shadow:0 -10px 28px rgba(0,0,0,.06)}
     .whatsapp{border:none;border-radius:13px;color:#fff;font-weight:800;padding:15px 18px;background:#10ad55.nav-actions{display:flex;justify-content:center;gap:34px}.nav-action{border:none;background:none;display:flex;flex-direction:column;gap:4px;align-items:center;font-size:12px;color:#313844}.nav-action b{font-size:18px}
 
-    .model3d-modal{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;display:none;align-items:center;justify-content:center;padding:18px}.model3d-modal.show{display:flex}.model3d-box{width:min(760px,100%);background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.3)}.model3d-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line)}.model3d-title{font-weight:800;font-size:17px}.model3d-close{border:0;background:#f1f2f4;border-radius:999px;width:34px;height:34px;font-size:20px}.model3d-stage{height:min(65vh,520px);background:linear-gradient(180deg,#f7f8fa,#eef0f3)}model-viewer{width:100%;height:100%;--poster-color:transparent}.ar3d-btn{border:0;border-radius:999px;background:linear-gradient(135deg,#641219,#a91d28);color:#fff;font-weight:800;padding:9px 13px;font-size:12px;white-space:nowrap}.model3d-help{padding:11px 16px;color:#667085;font-size:12px;text-align:center}.dish-actions{display:flex;align-items:center;gap:8px;margin-top:8px}.dish-actions .dish-price{margin:0}.food-actions{display:flex;align-items:center;gap:8px}.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%) translateY(20px);background:#111;color:#fff;padding:11px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s;z-index:99}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    
+/* Professional Signature 3D / AR controls */
+.dish-actions,.food-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.dish-3d-btn,.ar-3d-btn{border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:9px 13px;font-weight:700;font-size:13px;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:7px}
+.dish-3d-btn{background:#111827;color:#fff}.ar-3d-btn{background:#fff;color:#111827;border-color:#d1d5db}
+.dish-3d-btn:hover,.ar-3d-btn:hover{transform:translateY(-1px);box-shadow:0 7px 18px rgba(0,0,0,.12)}
+.model3d-modal{backdrop-filter:blur(8px)}
+.model3d-box{width:min(960px,calc(100vw - 24px));border-radius:22px;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.28)}
+.model3d-head{padding:16px 18px;display:flex;align-items:center;justify-content:space-between}
+.model3d-subtitle{font-size:12px;opacity:.68;margin-top:3px}
+.model3d-stage{min-height:460px;background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.10),transparent 48%),#f4f4f5}
+#dishModel{width:100%;height:460px}
+.model3d-toolbar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:14px 16px;border-top:1px solid rgba(0,0,0,.08)}
+.model3d-tool{border:1px solid #d8dbe2;background:#fff;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer}
+.model3d-tool.active{background:#111827;color:#fff;border-color:#111827}
+.model3d-status{padding:0 16px 14px;text-align:center;font-size:12px;opacity:.65}
+@media(max-width:640px){#dishModel,.model3d-stage{height:380px;min-height:380px}.model3d-box{width:calc(100vw - 16px);border-radius:18px}}
+.model3d-modal{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:100;display:none;align-items:center;justify-content:center;padding:18px}.model3d-modal.show{display:flex}.model3d-box{width:min(760px,100%);background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.3)}.model3d-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line)}.model3d-title{font-weight:800;font-size:17px}.model3d-close{border:0;background:#f1f2f4;border-radius:999px;width:34px;height:34px;font-size:20px}.model3d-stage{height:min(65vh,520px);background:linear-gradient(180deg,#f7f8fa,#eef0f3)}model-viewer{width:100%;height:100%;--poster-color:transparent}.ar3d-btn{border:0;border-radius:999px;background:linear-gradient(135deg,#641219,#a91d28);color:#fff;font-weight:800;padding:9px 13px;font-size:12px;white-space:nowrap}.model3d-help{padding:11px 16px;color:#667085;font-size:12px;text-align:center}.dish-actions{display:flex;align-items:center;gap:8px;margin-top:8px}.dish-actions .dish-price{margin:0}.food-actions{display:flex;align-items:center;gap:8px}.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%) translateY(20px);background:#111;color:#fff;padding:11px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s;z-index:99}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
     @media(max-width:900px){
       .hero-inner{grid-template-columns:1fr;padding:32px 24px}.hero-right{display:none}.brand h1{font-size:45px}.content{padding:18px 18px 118px}.toolbar{grid-template-columns:1fr}.popular-grid{grid-template-columns:repeat(2,1fr)}.list-grid{grid-template-columns:1fr}.bottom-bar{grid-template-columns:1fr}.nav-actions{display:none}.whatsapp{display:block}.section h2{font-size:30px}
@@ -121,7 +160,7 @@
 <div class="toast" id="toast"></div>
 <div class="model3d-modal" id="model3dModal" onclick="if(event.target===this)close3D()">
   <div class="model3d-box">
-    <div class="model3d-head"><div class="model3d-title" id="model3dTitle">3D Dish View</div><button class="model3d-close" onclick="close3D()">×</button></div>
+    <div class="model3d-head"><div><div class="model3d-title" id="model3dTitle">3D Dish View</div><div class="model3d-subtitle" id="model3dSubtitle">Interactive 3D preview</div></div><button class="model3d-close" onclick="close3D()">×</button></div>
     <div class="model3d-stage"><model-viewer id="dishModel" src="" camera-controls auto-rotate rotation-per-second="30deg" ar ar-modes="webxr scene-viewer quick-look" shadow-intensity="1.5" environment-image="neutral" alt="3D Dish Preview"><button slot="ar-button" class="ar3d-btn">📱 Place on Table (AR)</button></model-viewer></div>
     <div class="model3d-help">Drag to rotate • Pinch to zoom • On supported phones use <b>Place on Table (AR)</b></div>
   </div>
@@ -158,8 +197,12 @@
   function open3D(item){
     const src=model3DValue(item); if(!src){toast('3D model is not available for this dish.');return;}
     $('model3dTitle').textContent=`${item?.name||'Dish'} • 3D View`;
+  $('model3dSubtitle').textContent='Interactive Signature 3D experience';
+  $('model3dStatus').textContent='Loading 3D model…';
     const viewer=$('dishModel'); viewer.src=src; viewer.alt=`${item?.name||'Dish'} 3D Preview`;
     $('model3dModal').classList.add('show'); document.body.style.overflow='hidden';
+  viewer.addEventListener('load',()=>{$('model3dStatus').textContent='Ready • Drag to rotate • Pinch to zoom • Tap AR to place';},{once:true});
+  viewer.addEventListener('error',()=>{$('model3dStatus').textContent='3D model could not be loaded. Please try again.';},{once:true});
   }
   function close3D(){const v=$('dishModel');v.removeAttribute('src');$('model3dModal').classList.remove('show');document.body.style.overflow='';}
 
