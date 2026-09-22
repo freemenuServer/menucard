@@ -79,26 +79,254 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 /* Toast */
 #toast{position:fixed;bottom:22px;right:22px;background:#172033;color:#fff;padding:11px 15px;border-radius:9px;font-size:12px;font-weight:700;opacity:0;transform:translateY(15px);transition:.25s;z-index:500}#toast.show{opacity:1;transform:none}
 
-/* Drag & Reorder Custom Styles */
-.reorderBanner{background:#fef3c7;border:1px solid #f59e0b;padding:10px 14px;border-radius:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:15px;font-size:12px;font-weight:700;color:#92400e}
-.reorderCategoryBlock{background:#fff;border:1.5px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden;transition:box-shadow .2s,border-color .2s}
-.reorderCategoryBlock.drag-over{border-color:var(--primary);box-shadow:0 0 0 2px rgba(181,29,59,.2)}
-.reorderCategoryHeader{padding:11px 14px;background:#f9fafb;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.catDragHandle{cursor:grab;color:#9ca3af;padding:4px 8px;font-size:14px}
-.catDragHandle:active{cursor:grabbing}
-.reorderItemList{min-height:48px;padding:8px}
-.reorderItemRow{display:flex;align-items:center;gap:12px;padding:9px 12px;border:1px solid #e5e7eb;border-radius:8px;background:#fff;margin-bottom:6px;font-size:12px;transition:transform .15s,background .15s}
-.reorderItemRow.drag-over{border-color:#3b82f6;background:#eff6ff}
-.reorderItemRow.dragging,.reorderCategoryBlock.dragging{opacity:0.45}
-.itemDragHandle{cursor:grab;color:#9ca3af;padding:2px 6px;font-size:13px}
-.itemDragHandle:active{cursor:grabbing}
-
 /* Responsive */
 @media(max-width:1050px){.grid4{grid-template-columns:repeat(2,1fr)}.twoCol,.twoCol.equal{grid-template-columns:1fr}.sidebar{width:205px}.content{margin-left:205px}.profileBox{grid-template-columns:110px 1fr}.bigLogo{width:105px;height:105px}}
 @media(max-width:760px){
  .sidebar{transform:translateX(-100%);transition:.25s;width:250px}.sidebar.open{transform:none}.content{margin-left:0}.topbar{height:66px;padding:0 12px}.mobileMenu{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--border);background:#fff;border-radius:8px}.topActions .openToggle{display:none}.profile .profileName{display:none}.container{padding:15px 11px 35px}.grid4{grid-template-columns:1fr 1fr;gap:9px}.stat{padding:13px;min-height:94px}.statValue{font-size:20px}.threeCol,.categoryCards{grid-template-columns:1fr}.profileBox{grid-template-columns:1fr;text-align:center}.bigLogo{margin:auto}.mediaCover{height:150px}.menuTable{min-width:700px}.menuTableWrap{overflow:auto}.quickGrid{grid-template-columns:1fr}.heroHideMobile{display:none}}
 @media(max-width:430px){.grid4{grid-template-columns:1fr 1fr}.statLabel{font-size:9px}.statValue{font-size:18px}.restTitle{font-size:14px}.restAddress{font-size:9px}}
+/* ---------- Menu Reorder ---------- */
+.reorderModalBox{width:min(980px,100%);max-height:92vh;padding:20px}
+.reorderHelp{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border:1px solid #dbeafe;background:#f5f9ff;border-radius:10px;margin-bottom:14px;font-size:11px;color:#475569}
+.reorderHelp i{color:#3283e8;margin-top:1px}
+.reorderCategories{display:flex;flex-direction:column;gap:10px;max-height:62vh;overflow:auto;padding:2px}
+.reorderCategory{border:1px solid var(--border);border-radius:12px;background:#fff;box-shadow:0 4px 14px rgba(15,23,42,.04)}
+.reorderCategory.dragging{opacity:.55;border-style:dashed}
+.reorderCategoryHeader{display:flex;align-items:center;gap:10px;padding:11px 12px;background:#fafbfc;border-bottom:1px solid var(--border);border-radius:12px 12px 0 0}
+.reorderCatHandle,.reorderItemHandle{color:#94a3b8;cursor:grab;flex:0 0 auto}
+.reorderCatHandle:active,.reorderItemHandle:active{cursor:grabbing}
+.reorderCategoryTitle{font-size:13px;font-weight:900;flex:1}
+.reorderCategoryCount{font-size:10px;color:var(--muted);font-weight:700}
+.reorderItems{padding:8px;min-height:12px}
+.reorderItem{display:flex;align-items:center;gap:9px;padding:9px 10px;border:1px solid #edf0f4;border-radius:9px;background:#fff;margin-bottom:6px}
+.reorderItem:last-child{margin-bottom:0}
+.reorderItem.dragging{opacity:.5}
+.reorderItemName{font-size:12px;font-weight:800;flex:1;min-width:0}
+.reorderItemMeta{font-size:9px;color:var(--muted);white-space:nowrap}
+.reorderDropHint{font-size:10px;color:#94a3b8;text-align:center;padding:7px;border:1px dashed #d8dee8;border-radius:8px}
+.reorderBlocked{border-color:#f5b8b8!important;background:#fff7f7!important}
+.reorderFooter{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;padding-top:13px;border-top:1px solid var(--border)}
+#reorderSaveBtn{min-width:125px}
+
+
+/* ---------- Menu Reorder ---------- */
+let reorderDrag=null;
+let reorderBlockedNoticeAt=0;
+
+function getReorderCategories(){
+  const names=categories();
+  return names.map(name=>({
+    name,
+    items:items
+      .filter(i=>(i.category||"General").trim()===name)
+      .sort((a,b)=>{
+        const ao=Number(a.sort_order),bo=Number(b.sort_order);
+        const ah=Number.isFinite(ao),bh=Number.isFinite(bo);
+        if(ah&&bh&&ao!==bo)return ao-bo;
+        if(ah&&!bh)return -1;
+        if(!ah&&bh)return 1;
+        return String(a.id).localeCompare(String(b.id));
+      })
+  }));
+}
+
+function buildReorderUI(){
+  const wrap=$("reorderCategories");
+  if(!wrap)return;
+  const groups=getReorderCategories();
+  wrap.innerHTML=groups.length?groups.map((g,gi)=>`
+    <div class="reorderCategory" draggable="true" data-category="${esc(g.name)}" data-cat-index="${gi}">
+      <div class="reorderCategoryHeader" data-category-handle>
+        <span class="reorderCatHandle" title="Drag category"><i class="fa-solid fa-grip-vertical"></i></span>
+        <span class="reorderCategoryTitle">${esc(g.name)}</span>
+        <span class="reorderCategoryCount">${g.items.length} item${g.items.length===1?"":"s"}</span>
+      </div>
+      <div class="reorderItems" data-item-list="${esc(g.name)}">
+        ${g.items.length?g.items.map(i=>`
+          <div class="reorderItem" draggable="true" data-item-id="${esc(i.id)}" data-item-category="${esc(g.name)}">
+            <span class="reorderItemHandle" title="Drag item"><i class="fa-solid fa-grip-lines"></i></span>
+            <span class="reorderItemName">${esc(i.name||"Unnamed item")}</span>
+            <span class="reorderItemMeta">${esc(priceText(i))}</span>
+          </div>`).join(""):'<div class="reorderDropHint">No items in this category</div>'}
+      </div>
+    </div>`).join(""):'<div class="muted" style="padding:25px;text-align:center">No menu categories/items found.</div>';
+
+  bindReorderDnD();
+}
+
+function bindReorderDnD(){
+  const wrap=$("reorderCategories");
+  if(!wrap)return;
+
+  wrap.querySelectorAll(".reorderCategory").forEach(cat=>{
+    cat.addEventListener("dragstart",e=>{
+      if(!e.target.closest("[data-category-handle]")){e.preventDefault();return}
+      reorderDrag={type:"category",category:cat.dataset.category};
+      cat.classList.add("dragging");
+      e.dataTransfer.effectAllowed="move";
+      e.dataTransfer.setData("text/plain",cat.dataset.category);
+    });
+    cat.addEventListener("dragend",()=>{
+      cat.classList.remove("dragging");
+      reorderDrag=null;
+      wrap.querySelectorAll(".reorderCategory").forEach(x=>x.classList.remove("reorderBlocked"));
+    });
+    cat.addEventListener("dragover",e=>{
+      if(reorderDrag?.type!=="category")return;
+      e.preventDefault();
+      const dragging=wrap.querySelector(".reorderCategory.dragging");
+      if(!dragging||dragging===cat)return;
+      const r=cat.getBoundingClientRect();
+      cat.parentNode.insertBefore(dragging,e.clientY<r.top+r.height/2?cat:cat.nextSibling);
+    });
+  });
+
+  wrap.querySelectorAll(".reorderItem").forEach(row=>{
+    row.addEventListener("dragstart",e=>{
+      e.stopPropagation();
+      reorderDrag={type:"item",id:String(row.dataset.itemId),category:row.dataset.itemCategory};
+      row.classList.add("dragging");
+      e.dataTransfer.effectAllowed="move";
+      e.dataTransfer.setData("text/plain",String(row.dataset.itemId));
+    });
+    row.addEventListener("dragend",()=>{
+      row.classList.remove("dragging");
+      reorderDrag=null;
+      wrap.querySelectorAll(".reorderBlocked").forEach(x=>x.classList.remove("reorderBlocked"));
+    });
+    row.addEventListener("dragover",e=>{
+      if(reorderDrag?.type!=="item")return;
+      const targetCategory=row.dataset.itemCategory;
+      if(targetCategory!==reorderDrag.category){
+        e.preventDefault();
+        row.classList.add("reorderBlocked");
+        if(Date.now()-reorderBlockedNoticeAt>900){
+          toast("Item category change is blocked. Drag within the same category only.");
+          reorderBlockedNoticeAt=Date.now();
+        }
+        return;
+      }
+      e.preventDefault();
+      row.classList.remove("reorderBlocked");
+      const dragging=wrap.querySelector(".reorderItem.dragging");
+      if(!dragging||dragging===row)return;
+      const r=row.getBoundingClientRect();
+      row.parentNode.insertBefore(dragging,e.clientY<r.top+r.height/2?row:row.nextSibling);
+    });
+    row.addEventListener("drop",e=>{
+      e.preventDefault();e.stopPropagation();
+      if(reorderDrag?.type==="item"&&row.dataset.itemCategory!==reorderDrag.category){
+        toast("Item category change is blocked.");
+      }
+    });
+  });
+
+  wrap.querySelectorAll(".reorderItems").forEach(list=>{
+    list.addEventListener("dragover",e=>{
+      if(reorderDrag?.type!=="item")return;
+      const targetCategory=list.dataset.itemList;
+      if(targetCategory!==reorderDrag.category){
+        e.preventDefault();
+        list.classList.add("reorderBlocked");
+        if(Date.now()-reorderBlockedNoticeAt>900){
+          toast("Item category change is blocked. Drag within the same category only.");
+          reorderBlockedNoticeAt=Date.now();
+        }
+        return;
+      }
+      e.preventDefault();
+      list.classList.remove("reorderBlocked");
+      const dragging=wrap.querySelector(".reorderItem.dragging");
+      if(!dragging)return;
+      if(e.target.closest(".reorderItem"))return;
+      list.appendChild(dragging);
+    });
+    list.addEventListener("dragleave",()=>list.classList.remove("reorderBlocked"));
+    list.addEventListener("drop",e=>{
+      e.preventDefault();e.stopPropagation();
+      const targetCategory=list.dataset.itemList;
+      if(reorderDrag?.type==="item"&&targetCategory!==reorderDrag.category){
+        toast("Item category change is blocked.");
+      }
+    });
+  });
+}
+
+async function openReorderMenu(){
+  if(!currentRestaurantId)return toast("Restaurant is not loaded yet.");
+  $("reorderModal").classList.add("show");
+  $("reorderCategories").innerHTML='<div class="muted" style="padding:25px;text-align:center">Loading current menu order...</div>';
+  await loadItems();
+  buildReorderUI();
+}
+
+function closeReorderMenu(){
+  $("reorderModal").classList.remove("show");
+  reorderDrag=null;
+}
+
+async function saveReorderMenu(){
+  const wrap=$("reorderCategories");
+  if(!wrap)return;
+  const categoryEls=[...wrap.querySelectorAll(":scope > .reorderCategory")];
+  if(!categoryEls.length)return toast("Nothing to save.");
+
+  const categoryOrder=categoryEls.map(el=>el.dataset.category);
+  const updates=[];
+  categoryEls.forEach((catEl,catIndex)=>{
+    const itemRows=[...catEl.querySelectorAll(":scope > .reorderItems > .reorderItem")];
+    itemRows.forEach((row,itemIndex)=>{
+      updates.push({
+        id:String(row.dataset.itemId),
+        category:row.dataset.itemCategory,
+        sort_order:(catIndex+1)*1000+(itemIndex+1)
+      });
+    });
+  });
+
+  const btn=$("reorderSaveBtn");
+  btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+  try{
+    const {data:restData,error:restError}=await supabaseClient
+      .from("restaurants")
+      .update({category_order:categoryOrder})
+      .eq("id",currentRestaurantId)
+      .select("*")
+      .single();
+    if(restError)throw restError;
+
+    if(updates.length){
+      const results=await Promise.all(updates.map(u=>
+        supabaseClient.from("menu_items")
+          .update({sort_order:u.sort_order})
+          .eq("id",u.id)
+          .eq("restaurant_id",currentRestaurantId)
+      ));
+      const itemError=results.find(r=>r.error)?.error;
+      if(itemError)throw itemError;
+    }
+
+    currentRestaurant=restData||{...currentRestaurant,category_order:categoryOrder};
+    const orderMap=new Map(updates.map(u=>[u.id,u.sort_order]));
+    items=items.map(i=>orderMap.has(String(i.id))?{...i,sort_order:orderMap.get(String(i.id))}:i);
+    categories();
+    closeReorderMenu();
+    renderAll();
+    toast("Menu order saved successfully.");
+  }catch(error){
+    console.error("Menu reorder save error:",error);
+    toast("Save Order failed: "+(error?.message||"Please check your Supabase columns."));
+  }finally{
+    btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Order';
+  }
+}
+
+$("reorderMenuBtn")?.addEventListener("click",openReorderMenu);
+$("reorderMenuBtnDash")?.addEventListener("click",openReorderMenu);
+$("reorderCancelBtn")?.addEventListener("click",closeReorderMenu);
+$("reorderSaveBtn")?.addEventListener("click",saveReorderMenu);
+
 </style>
+
 
 <style id="ownerLoginStyles">
 #ownerAuth{position:fixed;inset:0;z-index:10000;display:none;align-items:center;justify-content:center;padding:18px}
@@ -145,6 +373,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 @media(max-width:760px){.freemenu-login-brand{display:none!important}}
 </style>
 
+
 <style id="freemenu-login-layout">
 .ownerAuthSplit{width:min(920px,96vw)!important;max-height:92vh!important;padding:0!important;overflow:hidden!important;display:grid!important;grid-template-columns:1fr 1fr;gap:0;background:#fff!important}
 .ownerAuthSplit .freemenu-login-brand{display:block!important;min-height:520px}
@@ -161,6 +390,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 }
 @media(max-width:560px){.ownerAuthSplit .authChoiceGrid{grid-template-columns:1fr}}
 </style>
+
 
 <style id="freemenu-two-screen-auth-fix">
 .authRightPanel{background:#fff;min-height:520px}
@@ -181,9 +411,11 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
 <body>
 
+
 <div id="ownerAuth">
   <div class="ownerAuthBackdrop"></div>
 
+  <!-- AUTH SCREEN: exactly 2 sides — FreeMenu branding + Login/Sign Up -->
   <div class="ownerAuthCard ownerAuthSplit" id="authChoiceCard">
     <div class="freemenu-login-brand">
       <div class="freemenu-login-brand-inner">
@@ -205,76 +437,77 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
         <button type="button" id="authSignupTab" class="authTab">Sign Up</button>
       </div>
       <div class="authCombinedForm">
-        <!-- LOGIN FORM -->
-        <div class="ownerAuthCard authFormCard" id="loginCard" style="display:none">
-          <button type="button" class="authBack" id="backLoginBtn">← Back</button>
-          <div class="authBrand">🔐</div><div class="authKicker">FreeMenu Owner Portal</div>
-          <h1>Owner Login</h1>
-          <p class="authSub">Login with your existing account</p>
-          <div id="loginErrorNew" class="authError" style="display:none"></div>
+<!-- LOGIN FORM -->
+  <div class="ownerAuthCard authFormCard" id="loginCard" style="display:none">
+    <button type="button" class="authBack" id="backLoginBtn">← Back</button>
+    <div class="authBrand">🔐</div><div class="authKicker">FreeMenu Owner Portal</div>
+    <h1>Owner Login</h1>
+    <p class="authSub">Login with your existing account</p>
+    <div id="loginErrorNew" class="authError" style="display:none"></div>
 
-          <div class="formGroup">
-            <label>Email Address</label>
-            <input class="input" id="loginEmailNew" type="email" autocomplete="email" placeholder="owner@example.com">
-          </div>
-          <div class="formGroup">
-            <label>Password</label>
-            <input class="input" id="loginPasswordNew" type="password" autocomplete="current-password" placeholder="Enter your password">
-          </div>
-          <button type="button" class="loginSubmit" id="loginSubmitNew">🔐 Login to Owner Panel</button>
-          <button type="button" class="authSwitch" id="goSignupFromLogin">New here? Create an account</button>
-        </div>
-        <!-- SIGN UP FORM -->
-        <div class="ownerAuthCard authFormCard signupCard" id="signupCard" style="display:none">
-          <button type="button" class="authBack" id="backSignupBtn">← Back</button>
-          <div class="authBrand">📝</div><div class="authKicker">FreeMenu Partner</div>
-          <h1>Create Owner Account</h1>
-          <p class="authSub">Register your restaurant on FreeMenu</p>
-          <div id="signupErrorNew" class="authError" style="display:none"></div>
-          <div id="signupSuccessNew" class="authSuccess" style="display:none"></div>
+    <div class="formGroup">
+      <label>Email Address</label>
+      <input class="input" id="loginEmailNew" type="email" autocomplete="email" placeholder="owner@example.com">
+    </div>
+    <div class="formGroup">
+      <label>Password</label>
+      <input class="input" id="loginPasswordNew" type="password" autocomplete="current-password" placeholder="Enter your password">
+    </div>
+    <button type="button" class="loginSubmit" id="loginSubmitNew">🔐 Login to Owner Panel</button>
+    <button type="button" class="authSwitch" id="goSignupFromLogin">New here? Create an account</button>
+  </div>
+<!-- SIGN UP FORM -->
+  <div class="ownerAuthCard authFormCard signupCard" id="signupCard" style="display:none">
+    <button type="button" class="authBack" id="backSignupBtn">← Back</button>
+    <div class="authBrand">📝</div><div class="authKicker">FreeMenu Partner</div>
+    <h1>Create Owner Account</h1>
+    <p class="authSub">Register your restaurant on FreeMenu</p>
+    <div id="signupErrorNew" class="authError" style="display:none"></div>
+    <div id="signupSuccessNew" class="authSuccess" style="display:none"></div>
 
-          <div class="formGroup">
-            <label>Full Name</label>
-            <input class="input" id="signupName" type="text" placeholder="Your full name">
-          </div>
-          <div class="formGroup">
-            <label>Mobile Number</label>
-            <input class="input" id="signupPhone" type="tel" placeholder="10 digit mobile number">
-          </div>
-          <div class="formGroup">
-            <label>Email Address</label>
-            <input class="input" id="signupEmail" type="email" autocomplete="email" placeholder="owner@example.com">
-          </div>
-          <div class="twoCol">
-            <div class="formGroup">
-              <label>Password</label>
-              <input class="input" id="signupPassword" type="password" autocomplete="new-password" placeholder="Minimum 6 characters">
-            </div>
-            <div class="formGroup">
-              <label>Confirm Password</label>
-              <input class="input" id="signupConfirm" type="password" autocomplete="new-password" placeholder="Repeat password">
-            </div>
-          </div>
-          <div class="formGroup">
-            <label>Restaurant Name</label>
-            <input class="input" id="signupRestaurant" type="text" placeholder="Your restaurant name">
-          </div>
-          <div class="formGroup">
-            <label>Restaurant Address</label>
-            <input class="input" id="signupAddress" type="text" placeholder="Full restaurant address">
-          </div>
-          <div class="formGroup">
-            <label>Menu Slug</label>
-            <input class="input" id="signupSlug" type="text" placeholder="my-restaurant-menu">
-            <div class="slugHint">Your public menu: menu.html?r=your-slug</div>
-          </div>
+    <div class="formGroup">
+      <label>Full Name</label>
+      <input class="input" id="signupName" type="text" placeholder="Your full name">
+    </div>
+    <div class="formGroup">
+      <label>Mobile Number</label>
+      <input class="input" id="signupPhone" type="tel" placeholder="10 digit mobile number">
+    </div>
+    <div class="formGroup">
+      <label>Email Address</label>
+      <input class="input" id="signupEmail" type="email" autocomplete="email" placeholder="owner@example.com">
+    </div>
+    <div class="twoCol">
+      <div class="formGroup">
+        <label>Password</label>
+        <input class="input" id="signupPassword" type="password" autocomplete="new-password" placeholder="Minimum 6 characters">
+      </div>
+      <div class="formGroup">
+        <label>Confirm Password</label>
+        <input class="input" id="signupConfirm" type="password" autocomplete="new-password" placeholder="Repeat password">
+      </div>
+    </div>
+    <div class="formGroup">
+      <label>Restaurant Name</label>
+      <input class="input" id="signupRestaurant" type="text" placeholder="Your restaurant name">
+    </div>
+    <div class="formGroup">
+      <label>Restaurant Address</label>
+      <input class="input" id="signupAddress" type="text" placeholder="Full restaurant address">
+    </div>
+    <div class="formGroup">
+      <label>Menu Slug</label>
+      <input class="input" id="signupSlug" type="text" placeholder="my-restaurant-menu">
+      <div class="slugHint">Your public menu: menu.html?r=your-slug</div>
+    </div>
 
-          <button type="button" class="loginSubmit" id="signupSubmitNew">📝 Create Restaurant Account</button>
-          <button type="button" class="authSwitch" id="goLoginFromSignup">Already have an account? Login</button>
-        </div>
+    <button type="button" class="loginSubmit" id="signupSubmitNew">📝 Create Restaurant Account</button>
+    <button type="button" class="authSwitch" id="goLoginFromSignup">Already have an account? Login</button>
+  </div>
       </div>
     </div>
   </div>
+</div>
 </div>
 
 <div id="loader"><div class="loader-card"><div class="spinner"></div><p style="font-weight:800">Loading Owner Panel...</p></div></div>
@@ -393,13 +626,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
   <div class="twoCol">
     <div class="card">
-      <div class="cardTitle">
-        <span>Menu Management</span>
-        <div class="actions">
-          <button class="btn sm" id="dashReorderBtn"><i class="fa-solid fa-arrow-down-up-across-line"></i> Reorder Menu</button>
-          <button class="btn primary sm" id="openAdd"><i class="fa-solid fa-plus"></i> Add New Item</button>
-        </div>
-      </div>
+      <div class="cardTitle">Menu Management <div class="actions"><button class="btn blue sm" id="reorderMenuBtnDash"><i class="fa-solid fa-grip-vertical"></i> Reorder Menu</button><button class="btn primary sm" id="openAdd"><i class="fa-solid fa-plus"></i> Add New Item</button></div></div>
       <div class="menuToolbar">
         <input class="input" id="menuSearch" placeholder="Search food items...">
         <select class="select" id="menuCategoryFilter" style="max-width:160px"><option value="">All Categories</option></select>
@@ -438,35 +665,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 <!-- FULL MENU MANAGEMENT -->
 <section id="section-menu" class="hidden">
   <div class="card">
-    <div class="cardTitle">
-      <span>Menu Management</span>
-      <div class="actions">
-        <button class="btn sm" id="toggleReorderBtn"><i class="fa-solid fa-arrow-down-up-across-line"></i> Reorder Menu</button>
-        <button class="btn primary" id="openAdd2"><i class="fa-solid fa-plus"></i> Add New Item</button>
-      </div>
+    <div class="cardTitle">Menu Management <div class="actions"><button class="btn blue" id="reorderMenuBtn"><i class="fa-solid fa-grip-vertical"></i> Reorder Menu</button><button class="btn primary" id="openAdd2"><i class="fa-solid fa-plus"></i> Add New Item</button></div></div>
+    <div class="menuToolbar">
+      <input class="input" id="fullSearch" placeholder="Search item, description or category...">
+      <select class="select" id="fullCatFilter" style="max-width:190px"><option value="">All Categories</option></select>
+      <select class="select" id="fullTypeFilter" style="max-width:150px"><option value="">All Types</option><option value="veg">Veg</option><option value="nonveg">Non-Veg</option><option value="egg">Egg</option></select>
     </div>
-
-    <!-- REORDER CONTROLS BANNER -->
-    <div id="reorderControls" class="reorderBanner hidden">
-      <div><i class="fa-solid fa-circle-info"></i> Drag categories to change sequence, or drag items within their category. (Items cannot be dropped into other categories).</div>
-      <div class="actions">
-        <button class="btn sm" id="cancelReorderBtn">Cancel</button>
-        <button class="btn primary sm" id="saveReorderBtn"><i class="fa-solid fa-floppy-disk"></i> Save Order</button>
-      </div>
-    </div>
-
-    <!-- NORMAL TABLE VIEW -->
-    <div id="menuNormalView">
-      <div class="menuToolbar">
-        <input class="input" id="fullSearch" placeholder="Search item, description or category...">
-        <select class="select" id="fullCatFilter" style="max-width:190px"><option value="">All Categories</option></select>
-        <select class="select" id="fullTypeFilter" style="max-width:150px"><option value="">All Types</option><option value="veg">Veg</option><option value="nonveg">Non-Veg</option><option value="egg">Egg</option></select>
-      </div>
-      <div class="menuTableWrap"><table class="menuTable"><thead><tr><th>Item</th><th>Category</th><th>Type</th><th>Single</th><th>Qtr</th><th>Half</th><th>Full</th><th>Status</th><th>Actions</th></tr></thead><tbody id="fullItems"></tbody></table></div>
-    </div>
-
-    <!-- REORDER DRAG & DROP VIEW CONTAINER -->
-    <div id="menuReorderView" class="hidden"></div>
+    <div class="menuTableWrap"><table class="menuTable"><thead><tr><th>Item</th><th>Category</th><th>Type</th><th>Single</th><th>Qtr</th><th>Half</th><th>Full</th><th>Status</th><th>Actions</th></tr></thead><tbody id="fullItems"></tbody></table></div>
   </div>
 </section>
 
@@ -507,7 +712,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
         <label class="serviceBtn"><input type="checkbox" id="fDelivery" checked> 🛵 Home Delivery</label>
       </div>
       <button class="btn primary" id="saveHeroInfo" style="margin-top:15px"><i class="fa-solid fa-floppy-disk"></i> Save Public Information</button>
-      <p class="muted" style="font-size:10px;margin-top:10px">These fields require the accompanying FreeMenu SQL migration before Supabase can store them.</p>
+      <p class="muted" style="font-size:10px;margin:10px 0 0">These fields require the accompanying FreeMenu SQL migration before Supabase can store them.</p>
     </div>
 
   </div>
@@ -517,7 +722,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 <section id="section-categories" class="hidden">
   <div class="card">
     <div class="cardTitle">Categories <button class="btn primary" id="addCategory2"><i class="fa-solid fa-plus"></i> Add Category</button></div>
-    <p class="muted" style="font-size:12px;margin-top:-5px">Categories follow the saved order from Menu Reorder or are derived automatically from menu items.</p>
+    <p class="muted" style="font-size:12px;margin-top:-5px">Your current Supabase design stores category as text on each menu item, so categories are derived automatically from menu items.</p>
     <div class="categoryCards" id="categoryCardsFull"></div>
   </div>
 </section>
@@ -687,6 +892,30 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
  </div>
 </div>
 
+
+<!-- MENU REORDER MODAL -->
+<div class="modal" id="reorderModal">
+ <div class="modalBox reorderModalBox">
+  <div class="modalHead">
+   <h3><i class="fa-solid fa-grip-vertical" style="color:var(--blue);margin-right:6px"></i> Reorder Menu</h3>
+   <button class="close" data-close="reorderModal"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="reorderHelp">
+   <i class="fa-solid fa-circle-info"></i>
+   <div>
+    <b>Category order:</b> drag categories up/down.
+    <br><b>Item order:</b> drag items only inside their own category.
+    <br><b>Important:</b> moving an item to a different category is blocked. Click <b>Save Order</b> to publish the new order.
+   </div>
+  </div>
+  <div id="reorderCategories" class="reorderCategories"></div>
+  <div class="reorderFooter">
+   <button class="btn" id="reorderCancelBtn">Cancel</button>
+   <button class="btn primary" id="reorderSaveBtn"><i class="fa-solid fa-floppy-disk"></i> Save Order</button>
+  </div>
+ </div>
+</div>
+
 <!-- CATEGORY MODAL -->
 <div class="modal" id="catModal">
  <div class="modalBox" style="max-width:420px">
@@ -700,6 +929,12 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 <div id="toast"></div>
 
 <script>
+/* ============================================================
+   OWNER PAGE AUTH — NO SEPARATE login.html REQUIRED
+   If the user is logged out, this same page shows Owner Login.
+   ============================================================
+   SUPABASE CONFIG — TAKEN FROM YOUR SUPPLIED OWNER CODE
+   ============================================================ */
 const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -710,13 +945,6 @@ let currentPlan=null;
 let signature3dLimit=0;
 let signature3dCount=0;
 let isPremiumRestaurant=false;
-
-// Reorder State
-let isReordering=false;
-let reorderCategoryList=[];
-let reorderItemsByCategory={};
-let draggedCategory=null;
-let draggedItem=null;
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
@@ -745,36 +973,38 @@ document.querySelectorAll(".navItem").forEach(a=>a.addEventListener("click",e=>{
 window.addEventListener("hashchange",()=>showSection(location.hash.slice(1)||"dashboard"));
 $("mobileMenu").onclick=()=>$("sidebar").classList.toggle("open");
 
+
+
 function showOwnerLogin(){
-  $("loader")?.classList.add("hidden");
-  $("ownerAuth")?.classList.add("show");
-  if($("authChoiceCard")) $("authChoiceCard").style.display="grid";
+  $("loader").classList.add("hidden");
+  $("ownerAuth").classList.add("show");
+  $("authChoiceCard").style.display="grid";
   showLoginForm();
 }
 function hideOwnerLogin(){
-  $("ownerAuth")?.classList.remove("show");
+  $("ownerAuth").classList.remove("show");
 }
 function showLoginForm(){
-  $("ownerAuth")?.classList.add("show");
-  if($("authChoiceCard")) $("authChoiceCard").style.display="grid";
-  $("loginCard")?.classList.add("active");
-  $("signupCard")?.classList.remove("active");
-  if($("loginCard")) $("loginCard").style.display="block";
-  if($("signupCard")) $("signupCard").style.display="none";
+  $("ownerAuth").classList.add("show");
+  $("authChoiceCard").style.display="grid";
+  $("loginCard").classList.add("active");
+  $("signupCard").classList.remove("active");
+  $("loginCard").style.display="block";
+  $("signupCard").style.display="none";
   $("authLoginTab")?.classList.add("active");
   $("authSignupTab")?.classList.remove("active");
 }
 function showSignupForm(){
-  $("ownerAuth")?.classList.add("show");
-  if($("authChoiceCard")) $("authChoiceCard").style.display="grid";
-  $("loginCard")?.classList.remove("active");
-  $("signupCard")?.classList.add("active");
-  if($("loginCard")) $("loginCard").style.display="none";
-  if($("signupCard")) $("signupCard").style.display="block";
+  $("ownerAuth").classList.add("show");
+  $("authChoiceCard").style.display="grid";
+  $("loginCard").classList.remove("active");
+  $("signupCard").classList.add("active");
+  $("loginCard").style.display="none";
+  $("signupCard").style.display="block";
   $("authLoginTab")?.classList.remove("active");
   $("authSignupTab")?.classList.add("active");
 }
-function showAuthChoice(){ showOwnerLogin(); }
+function showAuthChoice(){ showLoginForm(); }
 $("authLoginTab")?.addEventListener("click",showLoginForm);
 $("authSignupTab")?.addEventListener("click",showSignupForm);
 function setAuthMsg(id,msg,ok=false){
@@ -807,8 +1037,10 @@ async function ownerLogin(){
       return;
     }
     hideOwnerLogin();
-    $("loader")?.classList.remove("hidden");
+    $("loader").classList.remove("hidden");
     await init(true);
+    // Owner login must stay on the Owner Dashboard.
+    // Public/customer menus are opened separately from the dashboard.
     return;
   }catch(e){
     console.error("Owner login failed:",e);
@@ -864,6 +1096,8 @@ async function ownerSignup(){
     return;
   }
 
+  // Supabase may require email confirmation. If a session exists, create the
+  // restaurant immediately; otherwise instruct the owner to confirm and login.
   if(data.user && data.session){
     const {data:existing,error:checkError}=await supabaseClient
       .from("restaurants").select("id").eq("slug",slug).maybeSingle();
@@ -907,8 +1141,8 @@ async function ownerSignup(){
     setAuthMsg("signupSuccessNew","Account and restaurant created. Opening Owner Dashboard...",true);
     setTimeout(async()=>{
       hideOwnerLogin();
-      $("loader")?.classList.remove("hidden");
-      await init(true);
+      $("loader").classList.remove("hidden");
+      await init();
     },500);
   }else{
     setAuthMsg("signupSuccessNew","Account created. Please verify your email, then login to open your Owner Dashboard.",true);
@@ -935,14 +1169,17 @@ async function init(afterLogin=false){
     ]);
     session=result?.data?.session||null;
     if(!session?.user){
-      showOwnerLogin();
+      showAuthChoice();
       return;
     }
 
     const adminRestaurantId=new URLSearchParams(location.search).get("admin_restaurant");
 
+    // Normal owner page: fresh loads still require an explicit owner login.
+    // Super Admin direct-access links are the exception: the existing authenticated
+    // Super Admin session is verified below and may open the selected restaurant.
     if(!afterLogin && !adminRestaurantId){
-      showOwnerLogin();
+      showAuthChoice();
       return;
     }
     let superAdminMode=false;
@@ -957,6 +1194,8 @@ async function init(afterLogin=false){
     if($("ownerName")) $("ownerName").textContent=session.user.user_metadata?.full_name||session.user.email?.split("@")[0]||"Owner";
     if($("avatar")) $("avatar").textContent=initials($("ownerName")?.textContent);
 
+    // Super Admin can open any restaurant by ID. Normal owners remain
+    // restricted to their own owner_id relationship.
     let data,error;
     if(superAdminMode){
       const res=await supabaseClient.from("restaurants").select("*").eq("id",adminRestaurantId).limit(1);
@@ -968,6 +1207,7 @@ async function init(afterLogin=false){
 
     if(error) return fail("Could not load restaurant profile: "+error.message);
 
+    // Backward compatibility for older owner accounts.
     if(!data?.length && !superAdminMode){
       const meta=session.user.user_metadata||{};
       const rs=String(meta.restaurant_slug||"").trim().toLowerCase();
@@ -1081,6 +1321,7 @@ function startRestaurantPlanRealtime(){
   restaurantPlanRealtime=supabaseClient
     .channel("owner-restaurant-plan-"+currentRestaurantId)
     .on("postgres_changes",{event:"UPDATE",schema:"public",table:"restaurants",filter:"id=eq."+currentRestaurantId},async payload=>{
+      console.log("Restaurant updated from Admin:",payload.new?.plan_id);
       currentRestaurant=payload.new||currentRestaurant;
       await loadCurrentPlan();
     })
@@ -1119,11 +1360,14 @@ async function loadCurrentPlan(){
   descEl.textContent="";featuresEl.innerHTML="";
   let plan=null, error=null;
 
+  /* Primary source: Super Admin assignment via restaurants.plan_id. */
   if(currentRestaurant?.plan_id){
     const res=await supabaseClient.from("plans").select("*").eq("id",currentRestaurant.plan_id).maybeSingle();
     plan=res.data||null;error=res.error||null;
   }
 
+  /* Backward compatibility: older admin records may only have restaurants.plan.
+     Resolve every known plan value to the real plans row before ever falling back to Free. */
   if(!plan){
     const legacy=String(currentRestaurant?.plan||"").trim().toLowerCase();
     const legacySlugMap={
@@ -1154,6 +1398,7 @@ async function loadCurrentPlan(){
   }
 
   if(error||!plan){
+    console.warn("Assigned plan could not be loaded:",error?.message||"Plan not found");
     nameEl.textContent="Assigned plan";
     descEl.textContent="Plan is assigned, but its details could not be read.";
     priceEl.innerHTML='—';
@@ -1166,6 +1411,14 @@ async function loadCurrentPlan(){
   }
 
   currentPlan=plan;
+  console.log("FreeMenu current restaurant plan:",{
+    restaurantId:currentRestaurant?.id,
+    plan_id:currentRestaurant?.plan_id,
+    legacy_plan:currentRestaurant?.plan,
+    resolved_plan_id:plan?.id,
+    resolved_plan_slug:plan?.slug,
+    signature_3d_dishes_max:plan?.signature_3d_dishes_max
+  });
   signature3dLimit=Math.max(0,Number(plan.signature_3d_dishes_max||0));
   await refreshSignature3DCount();
   updateSignature3DUI();
@@ -1260,32 +1513,31 @@ async function uploadMenuPhoto(){
 }
 
 async function loadItems(){
-  const {data,error}=await supabaseClient
-    .from("menu_items")
-    .select("*")
-    .eq("restaurant_id",currentRestaurantId)
-    .order("sort_order",{ascending:true})
-    .order("id",{ascending:true});
-
+  const {data,error}=await supabaseClient.from("menu_items").select("*").eq("restaurant_id",currentRestaurantId);
   if(error){toast(error.message);return}
-  items=data||[];renderAll();
+  items=data||[];
+  items.sort((a,b)=>{
+    const ao=Number(a.sort_order);
+    const bo=Number(b.sort_order);
+    const ah=Number.isFinite(ao), bh=Number.isFinite(bo);
+    if(ah&&bh&&ao!==bo)return ao-bo;
+    if(ah&&!bh)return -1;
+    if(!ah&&bh)return 1;
+    return String(a.id).localeCompare(String(b.id));
+  });
+  renderAll();
 }
 
-/* ---------- Rendering & Ordering Logic ---------- */
+/* ---------- Rendering ---------- */
 function categories(){
-  const allInItems=[...new Set(items.map(i=>(i.category||"General").trim()).filter(Boolean))];
-  const saved=Array.isArray(currentRestaurant?.category_order)?currentRestaurant.category_order:[];
-  if(saved.length){
-    const orderMap=new Map(saved.map((c,i)=>[c,i]));
-    return allInItems.sort((a,b)=>{
-      const rankA=orderMap.has(a)?orderMap.get(a):999999;
-      const rankB=orderMap.has(b)?orderMap.get(b):999999;
-      return rankA-rankB || a.localeCompare(b);
-    });
-  }
-  return allInItems.sort((a,b)=>a.localeCompare(b));
+  const names=[...new Set(items.map(i=>(i.category||"General").trim()).filter(Boolean))];
+  const saved=Array.isArray(currentRestaurant?.category_order)?currentRestaurant.category_order.map(String):[];
+  const rank=new Map(saved.map((x,i)=>[x,i]));
+  return names.sort((a,b)=>{
+    const ar=rank.has(a)?rank.get(a):999999, br=rank.has(b)?rank.get(b):999999;
+    return ar-br || a.localeCompare(b);
+  });
 }
-
 function fillCategorySelects(){
   const opts=categories().map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
   ["menuCategoryFilter","fullCatFilter"].forEach(id=>$(id).innerHTML='<option value="">All Categories</option>'+opts);
@@ -1322,215 +1574,6 @@ function renderCategories(){
  $("categoryCardsFull").innerHTML=html||'<div class="muted" style="font-size:12px">No categories yet.</div>';
 }
 
-/* ============================================================
-   MENU REORDER (CATEGORIES + STRICT IN-CATEGORY ITEMS)
-   ============================================================ */
-function startReordering(){
-  isReordering=true;
-  $("menuNormalView").classList.add("hidden");
-  $("menuReorderView").classList.remove("hidden");
-  $("reorderControls").classList.remove("hidden");
-  $("toggleReorderBtn").classList.add("hidden");
-
-  reorderCategoryList=[...categories()];
-  reorderItemsByCategory={};
-  reorderCategoryList.forEach(c=>{
-    reorderItemsByCategory[c]=items
-      .filter(i=>(i.category||"General").trim()===c)
-      .map(i=>({...i}));
-  });
-
-  renderReorderView();
-}
-
-function cancelReordering(){
-  isReordering=false;
-  $("menuNormalView").classList.remove("hidden");
-  $("menuReorderView").classList.add("hidden");
-  $("reorderControls").classList.add("hidden");
-  $("toggleReorderBtn").classList.remove("hidden");
-}
-
-function renderReorderView(){
-  const container=$("menuReorderView");
-  if(!reorderCategoryList.length){
-    container.innerHTML='<div style="padding:30px;text-align:center;color:#777">No items or categories available to reorder.</div>';
-    return;
-  }
-
-  container.innerHTML=reorderCategoryList.map((cat,cIdx)=>{
-    const catItems=reorderItemsByCategory[cat]||[];
-    return `
-      <div class="reorderCategoryBlock" data-cat="${esc(cat)}" data-cat-idx="${cIdx}">
-        <div class="reorderCategoryHeader">
-          <div style="display:flex;align-items:center;gap:10px">
-            <span class="catDragHandle" title="Drag to reorder category"><i class="fa-solid fa-grip-vertical"></i></span>
-            <strong style="font-size:14px">${esc(cat)}</strong>
-            <span class="muted" style="font-size:11px">(${catItems.length} items)</span>
-          </div>
-        </div>
-        <div class="reorderItemList" data-cat="${esc(cat)}">
-          ${catItems.map((item,iIdx)=>`
-            <div class="reorderItemRow" draggable="true" data-id="${item.id}" data-cat="${esc(cat)}" data-idx="${iIdx}">
-              <span class="itemDragHandle" title="Drag to reorder dish"><i class="fa-solid fa-grip-vertical"></i></span>
-              ${typeCell(item)}
-              <div style="flex:1">
-                <strong>${esc(item.name)}</strong>
-                <span class="muted" style="margin-left:8px">${esc(priceText(item))}</span>
-              </div>
-            </div>
-          `).join("")}
-        </div>
-      </div>
-    `;
-  }).join("");
-
-  attachReorderDragEvents();
-}
-
-function attachReorderDragEvents(){
-  const catBlocks=document.querySelectorAll(".reorderCategoryBlock");
-  catBlocks.forEach(block=>{
-    const handle=block.querySelector(".catDragHandle");
-    handle.setAttribute("draggable","true");
-
-    handle.addEventListener("dragstart",e=>{
-      draggedCategory=block.dataset.cat;
-      block.classList.add("dragging");
-      e.dataTransfer.setData("text/plain","cat:"+draggedCategory);
-    });
-
-    handle.addEventListener("dragend",()=>{
-      block.classList.remove("dragging");
-      draggedCategory=null;
-      catBlocks.forEach(b=>b.classList.remove("drag-over"));
-    });
-
-    block.addEventListener("dragover",e=>{
-      if(!draggedCategory) return;
-      e.preventDefault();
-      block.classList.add("drag-over");
-    });
-
-    block.addEventListener("dragleave",()=>{
-      block.classList.remove("drag-over");
-    });
-
-    block.addEventListener("drop",e=>{
-      if(!draggedCategory) return;
-      e.preventDefault();
-      block.classList.remove("drag-over");
-      const targetCat=block.dataset.cat;
-      if(draggedCategory && targetCat && draggedCategory!==targetCat){
-        const fromIdx=reorderCategoryList.indexOf(draggedCategory);
-        const toIdx=reorderCategoryList.indexOf(targetCat);
-        if(fromIdx>-1 && toIdx>-1){
-          const [moved]=reorderCategoryList.splice(fromIdx,1);
-          reorderCategoryList.splice(toIdx,0,moved);
-          renderReorderView();
-        }
-      }
-    });
-  });
-
-  const itemRows=document.querySelectorAll(".reorderItemRow");
-  itemRows.forEach(row=>{
-    row.addEventListener("dragstart",e=>{
-      draggedItem={
-        id:row.dataset.id,
-        cat:row.dataset.cat,
-        idx:parseInt(row.dataset.idx,10)
-      };
-      row.classList.add("dragging");
-      e.dataTransfer.setData("text/plain","item:"+row.dataset.id);
-    });
-
-    row.addEventListener("dragend",()=>{
-      row.classList.remove("dragging");
-      draggedItem=null;
-      itemRows.forEach(r=>r.classList.remove("drag-over"));
-    });
-
-    row.addEventListener("dragover",e=>{
-      if(!draggedItem) return;
-      if(draggedItem.cat !== row.dataset.cat) return;
-      e.preventDefault();
-      row.classList.add("drag-over");
-    });
-
-    row.addEventListener("dragleave",()=>{
-      row.classList.remove("drag-over");
-    });
-
-    row.addEventListener("drop",e=>{
-      if(!draggedItem) return;
-      if(draggedItem.cat !== row.dataset.cat) return;
-      e.preventDefault();
-      row.classList.remove("drag-over");
-
-      const targetIdx=parseInt(row.dataset.idx,10);
-      const cat=draggedItem.cat;
-      const list=reorderItemsByCategory[cat];
-
-      if(list && draggedItem.idx!==targetIdx){
-        const [moved]=list.splice(draggedItem.idx,1);
-        list.splice(targetIdx,0,moved);
-        renderReorderView();
-      }
-    });
-  });
-}
-
-async function saveMenuOrder(){
-  const saveBtn=$("saveReorderBtn");
-  saveBtn.disabled=true;
-  saveBtn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
-
-  try{
-    const {error:catError}=await supabaseClient
-      .from("restaurants")
-      .update({category_order:reorderCategoryList})
-      .eq("id",currentRestaurantId);
-
-    if(catError) throw catError;
-
-    const updates=[];
-    reorderCategoryList.forEach(cat=>{
-      const catItems=reorderItemsByCategory[cat]||[];
-      catItems.forEach((item,idx)=>{
-        updates.push(
-          supabaseClient
-            .from("menu_items")
-            .update({sort_order:idx})
-            .eq("id",item.id)
-            .eq("restaurant_id",currentRestaurantId)
-        );
-      });
-    });
-
-    await Promise.all(updates);
-
-    toast("Menu order saved successfully!");
-    if(currentRestaurant) currentRestaurant.category_order=reorderCategoryList;
-    cancelReordering();
-    await loadItems();
-  }catch(e){
-    console.error("Save order error:",e);
-    toast("Failed to save order: "+(e?.message||e));
-  }finally{
-    saveBtn.disabled=false;
-    saveBtn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Order';
-  }
-}
-
-$("toggleReorderBtn").onclick=startReordering;
-$("dashReorderBtn").onclick=()=>{
-  showSection("menu");
-  history.replaceState(null,"","#menu");
-  startReordering();
-};
-$("cancelReorderBtn").onclick=cancelReordering;
-$("saveReorderBtn").onclick=saveMenuOrder;
 
 /* ---------- Item CRUD ---------- */
 function openItem(id=null){
@@ -1569,8 +1612,9 @@ async function saveItem(){
     const res=await supabaseClient.from("menu_items").update(payload).eq("id",id).eq("restaurant_id",currentRestaurantId).select("id").single();
     if(res.error)throw res.error;savedId=res.data.id;
   }else{
-    const maxSort=items.filter(it=>(it.category||"General").trim()===category).reduce((mx,it)=>Math.max(mx,it.sort_order||0),-1);
-    const res=await supabaseClient.from("menu_items").insert([{restaurant_id:currentRestaurantId,sort_order:maxSort+1,...payload}]).select("id").single();
+    const sameCategory=items.filter(i=>(i.category||"General").trim()===category);
+    const nextSort=sameCategory.reduce((m,i)=>Math.max(m,Number(i.sort_order)||0),0)+1;
+    const res=await supabaseClient.from("menu_items").insert([{restaurant_id:currentRestaurantId,...payload,sort_order:nextSort}]).select("id").single();
     if(res.error)throw res.error;savedId=res.data.id;
   }
   let arModelUrl=existing?.ar_model_url||null,arUsdzUrl=existing?.ar_usdz_url||null;
@@ -1635,7 +1679,7 @@ $("uploadLogo").onclick=()=>uploadMediaFile("logo");
 $("saveHeroInfo").onclick=async()=>{
   const payload={
     welcome_text:$("fWelcome").value.trim(),
-    tagline:$("fTagline").value.trim() \vert{}\vert{} $("fName").value.trim(),
+    tagline:$("fTagline").value.trim() || $("fName").value.trim(),
     subtitle_text:$("fSubtitle").value.trim(),
     feature_1:$("fFeature1").value.trim(),
     feature_2:$("fFeature2").value.trim(),
@@ -1664,6 +1708,7 @@ $("addCategoryBtn").onclick=openCat;$("addCategory2").onclick=openCat;$("quickCa
 $("saveCategory").onclick=async()=>{
  const cat=$("newCat").value.trim();if(!cat)return toast("Enter a category name");
  if(categories().includes(cat))return toast("Category already exists");
+ /* Existing schema has no category table. Create a zero-priced placeholder. */
  const {error}=await supabaseClient.from("menu_items").insert([{restaurant_id:currentRestaurantId,name:"New Item",category:cat,description:"",item_type:"veg",is_veg:true,price:null,price_quarter:null,price_half:null,price_full:null,is_available:true}]);
  if(error){toast("Could not create category: "+error.message);return}
  $("catModal").classList.remove("show");toast("Category created with a placeholder item");await loadItems();openItem(items.find(i=>i.category===cat)?.id);
@@ -1681,7 +1726,8 @@ $("downloadQR").onclick=()=>{const a=document.createElement("a");a.href=$("qrBox
 
 /* ---------- Public menu ---------- */
 function openPublic(){window.open(publicUrl(),"_blank","noopener")}
-["publicTop","sidePublicBtn","quickPreview","openPublic2"].forEach(id=>$(id).onclick=openPublic);$("sidePlansBtn").onclick=()=>{window.location.href="/plans.html"};
+["publicTop","sidePublicBtn","quickPreview","openPublic2"].forEach(id=>$(id).onclick=openPublic);
+$("sidePlansBtn").onclick=()=>{window.location.href="/plans.html"};
 
 /* ---------- Theme preview ---------- */
 function updateTheme(){
@@ -1711,6 +1757,8 @@ $("quickTheme").onclick=()=>{showSection("settings");history.replaceState(null,"
 
 /* ---------- Media & Upload Policy ---------- */
 async function loadMediaRules(){
+  // Defaults are intentionally safe and let the dashboard load even when
+  // the optional RPC has not been added yet.
   try{
     const controller = new AbortController();
     const timer = setTimeout(()=>controller.abort(),4500);
@@ -1873,7 +1921,7 @@ setInterval(()=>{
 },30000);
 
 /* ---------- Logout ---------- */
-async function logout(){await supabaseClient.auth.signOut();showOwnerLogin()}
+async function logout(){await supabaseClient.auth.signOut();showAuthChoice()}
 $("logoutBtn").onclick=logout;$("logout2").onclick=logout;
 
 /* ---------- Modal close ---------- */
@@ -1888,31 +1936,37 @@ supabaseClient.auth.onAuthStateChange((event, newSession)=>{
     showOwnerLogin();
   }
 });
-
-/* ---------- Application Startup (Fixed Loader Issue) ---------- */
 window.addEventListener("load",async()=>{
   try{
     if(!window.supabase){
-      throw new Error("Supabase library load nahi ho payi. Internet connection check karein.");
+      throw new Error("Supabase library could not be loaded. Check your internet connection.");
     }
-    const adminRestaurantId=new URLSearchParams(location.search).get("admin_restaurant");
-    const {data:{session:existingSession}}=await supabaseClient.auth.getSession();
 
-    if(existingSession?.user || adminRestaurantId){
-      await init(true);
-    } else {
-      $("loader")?.classList.add("hidden");
-      showOwnerLogin();
+    // Super Admin direct access: reuse the already authenticated Super Admin
+    // session and open the selected restaurant without asking for the owner's password.
+    const adminRestaurantId=new URLSearchParams(location.search).get("admin_restaurant");
+    if(adminRestaurantId){
+      await init(false);
+      return;
     }
+
+    showAuthChoice();
   }catch(e){
     console.error("Owner page startup failed:",e);
-    $("loader")?.classList.add("hidden");
-    showOwnerLogin();
+    const loader=$("loader");
+    if(loader){
+      loader.classList.remove("hidden");
+      loader.innerHTML=`<div style="text-align:center;padding:25px"><h3>Unable to load Owner Login</h3><p>${esc(e?.message||"Unexpected startup error")}</p><button class="btn" onclick="location.reload()">Retry</button></div>`;
+    }
   }
 });
 </script>
 
 <script>
+/* Direct links from Index:
+   owner.html?auth=login  -> Login form
+   owner.html?auth=signup -> Sign Up form
+*/
 window.addEventListener("load",function(){
   const mode=new URLSearchParams(location.search).get("auth");
   if(!mode) return;
