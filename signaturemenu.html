@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0b0b0a" />
   <title>Signature Menu • FreeMenu</title>
+  <meta name="freemenu-signature-version" content="2026-09-22-r1">
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
@@ -1958,9 +1959,20 @@ function getSavedCategoryOrder(rest, items) {
         const { data: items, error: itemsError } = await supabaseClient
           .from("menu_items")
           .select("*")
-          .eq("restaurant_id", rest.id);
+          .eq("restaurant_id", rest.id)
+          .order("sort_order", { ascending: true, nullsFirst: false });
 
-        if (itemsError) throw itemsError;
+        if (itemsError) {
+          console.error("Signature Menu menu_items query failed:", {
+            message: itemsError.message,
+            code: itemsError.code,
+            details: itemsError.details,
+            hint: itemsError.hint,
+            restaurantId: rest.id,
+            slug
+          });
+          throw itemsError;
+        }
 
         allItems = Array.isArray(items) ? items : [];
 
@@ -1983,10 +1995,14 @@ function getSavedCategoryOrder(rest, items) {
         renderSignatureSpecial();
       } catch (error) {
         console.error("Menu load error:", error);
-        $("rest-name").textContent = "Menu Unavailable";
+        $("rest-name").textContent = restaurant?.name || "Menu Unavailable";
         $("category-chips").innerHTML = "";
         $("summary-line").style.display = "none";
-        showState("Unable to load menu", "Please refresh the page or try again shortly.");
+        const raw = String(error?.message || "");
+        const friendly = /row-level security|permission denied|not allowed|42501/i.test(raw)
+          ? "Public menu access is blocked by Supabase RLS. Run the included SQL policy once."
+          : (raw || "Please refresh the page or try again shortly.");
+        showState("Unable to load menu", friendly);
       }
     }
 
