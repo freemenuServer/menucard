@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Smart Digital Menu & AR Platform</title>
-  <meta name="description" content="Interactive 3D/AR Restaurant Menu with Signature Mode and SaaS Plans" />
+  <title>Urban Cafe - Photo Menu</title>
+  <meta name="description" content="Responsive public restaurant photo menu template with 3D/AR" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   
   <!-- 3D Model Viewer Library -->
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
@@ -17,7 +17,6 @@
       --brand:#9f1620;
       --brand-dark:#7d0e16;
       --gold:#f1b640;
-      --gold-dark:#b38118;
       --green:#10a957;
       --text:#141414;
       --muted:#6f7580;
@@ -37,144 +36,62 @@
 
     .app{max-width:1180px;margin:0 auto;background:#fff;min-height:100vh;box-shadow:0 0 50px rgba(0,0,0,.06)}
 
-    /* Top Path View Switcher */
-    .view-switcher-bar{
-      background:#111315;
-      padding:10px 16px;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:10px;
-      border-bottom:1px solid #2d3139;
-      position:sticky;
-      top:0;
-      z-index:30;
-    }
-    .view-btn{
-      padding:7px 16px;
-      border-radius:20px;
-      font-size:12.5px;
-      font-weight:700;
-      border:1px solid #444;
-      background:transparent;
-      color:#bbb;
-      transition:.2s;
-      display:flex;
-      align-items:center;
-      gap:6px;
-    }
-    .view-btn.active{
-      background:var(--gold);
-      color:#111;
-      border-color:var(--gold);
-      box-shadow:0 0 12px rgba(241,182,64,.35);
-    }
-
-    /* Hero Section */
-    .hero{position:relative;min-height:300px;color:#fff;overflow:hidden;background:
-      linear-gradient(90deg,rgba(5,5,5,.92) 0%,rgba(5,5,5,.75) 45%,rgba(5,5,5,.25) 75%,rgba(5,5,5,.4) 100%),
-      url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1800&q=85') center/cover no-repeat;}
-    .hero-inner{padding:36px 40px;display:grid;grid-template-columns:1.1fr .9fr;gap:20px;align-items:center;min-height:300px}
+    .hero{position:relative;min-height:320px;color:#fff;overflow:hidden;background:
+      linear-gradient(90deg,rgba(5,5,5,.92) 0%,rgba(5,5,5,.74) 42%,rgba(5,5,5,.18) 72%,rgba(5,5,5,.36) 100%),
+      url('https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1800&q=88') center/cover no-repeat;}
+    .hero-inner{padding:42px 44px;display:grid;grid-template-columns:1.1fr .9fr;gap:20px;align-items:center;min-height:320px}
     .brand-row{display:flex;align-items:center;gap:18px}
-    .logo{width:76px;height:76px;border:2px solid var(--gold);border-radius:50%;display:grid;place-items:center;font-size:34px;background:rgba(159,22,32,.55);backdrop-filter:blur(5px);overflow:hidden;}
-    .brand h1{font-family:"Playfair Display",serif;font-size:48px;line-height:1;margin:0;letter-spacing:-1px}
-    .brand h1 span{color:var(--gold)}
-    .tagline{margin-top:8px;letter-spacing:4px;font-size:11px;font-weight:700;color:#ddd;text-transform:uppercase}
-    .info{display:flex;flex-wrap:wrap;gap:14px 24px;margin-top:22px;font-size:13.5px;color:#f0f0f0}
-    .quote{margin-top:22px;font-family:"Playfair Display",serif;font-size:22px;font-style:italic;color:#ffd86c}
-    .hero-right{display:flex;justify-content:flex-end;align-items:center}
-    .hero-badge-tag{
-      border:1px solid rgba(241,182,64,.4);
-      background:rgba(0,0,0,.5);
-      backdrop-filter:blur(6px);
-      padding:12px 20px;
-      border-radius:14px;
-      text-align:right;
-    }
-    .hero-badge-tag b{color:var(--gold);font-size:18px;display:block;}
+    .logo{width:78px;height:78px;border:2px solid #fff;border-radius:50%;display:grid;place-items:center;font-size:37px;background:rgba(159,22,32,.55);backdrop-filter:blur(5px);overflow:hidden;}
+    .brand h1{font-family:"Playfair Display",serif;font-size:54px;line-height:1;margin:0;letter-spacing:-1px}.brand h1 span{color:var(--gold)}
+    .tagline{margin-top:10px;letter-spacing:6px;font-size:12px;font-weight:700}
+    .info{display:flex;flex-wrap:wrap;gap:18px 28px;margin-top:28px;font-size:14px;color:#f5f5f5}
+    .info span{display:flex;align-items:center;gap:8px}
+    .quote{margin-top:28px;font-family:"Playfair Display",serif;font-size:24px;font-style:italic;color:#ffd86c}
+    .hero-right{display:flex;justify-content:flex-end;align-items:center}.hero-word{font-family:"Playfair Display",serif;font-size:33px;line-height:1.08;text-align:right}.hero-word span{color:var(--gold)}
 
-    /* Content Area */
-    .content{border-radius:26px 26px 0 0;margin-top:-22px;position:relative;background:#fff;padding:22px 26px 120px}
-    .toolbar{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;position:sticky;top:45px;z-index:10;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);padding:6px 0 14px}
-    .cats{display:flex;gap:8px;overflow:auto;scrollbar-width:none}.cats::-webkit-scrollbar{display:none}
-    .cat{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 15px;white-space:nowrap;font-size:13px;font-weight:600}
+    .content{border-radius:30px 30px 0 0;margin-top:-24px;position:relative;background:#fff;padding:22px 30px 120px}
+    .toolbar{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;position:sticky;top:0;z-index:10;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);padding:6px 0 16px}
+    .cats{display:flex;gap:10px;overflow:auto;scrollbar-width:none}.cats::-webkit-scrollbar{display:none}
+    .cat{border:1px solid var(--line);background:#fff;border-radius:14px;padding:12px 16px;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.04);font-weight:600}
     .cat.active{background:var(--brand);border-color:var(--brand);color:#fff}
-    .search{position:relative}
-    .search input{width:100%;padding:12px 16px 12px 42px;border:1px solid var(--line);border-radius:12px;background:#fafbfc;outline:none}
-    .search:before{content:'⌕';position:absolute;left:15px;top:8px;font-size:22px;color:#667085}
+    .search{position:relative}.search input{width:100%;padding:14px 16px 14px 44px;border:1px solid var(--line);border-radius:14px;background:#fafbfc;outline:none}.search input:focus{border-color:#d7a7aa;box-shadow:0 0 0 4px rgba(159,22,32,.08)}
+    .search:before{content:'⌕';position:absolute;left:16px;top:8px;font-size:25px;color:#667085}
 
-    .section{margin-top:26px}
-    .section-head{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:12px}
-    .section h2{font-family:"Playfair Display",serif;font-size:30px;margin:0}
-    .section-sub{color:var(--muted);font-size:13px}
-    
-    /* Food Card Grids */
+    .section{margin-top:28px}.section-head{display:flex;justify-content:space-between;gap:18px;align-items:end;margin-bottom:14px}.section h2{font-family:"Playfair Display",serif;font-size:34px;margin:0}.section-sub{color:var(--muted);font-size:14px}.see-all{font-weight:700;color:var(--brand);border:none;background:none}
+
     .popular-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-    .food-card{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 6px 20px rgba(0,0,0,.04);display:flex;flex-direction:column;min-width:0}
-    .food-image{position:relative;height:165px;background:#eee}
-    .food-image img{height:100%}
-    .food-card.no-photo .food-image{display:none}
-    .badge{position:absolute;left:8px;top:8px;padding:4px 8px;border-radius:999px;color:#fff;font-size:11px;font-weight:800}
-    .badge.gold{background:var(--gold);color:#111}
-    .badge.red{background:#e82d2d}
-    .type-icon{position:absolute;right:8px;top:8px;width:22px;height:22px;border:2px solid currentColor;border-radius:3px;background:#fff;display:grid;place-items:center}
-    .type-icon:after{content:'';width:8px;height:8px;border-radius:50%;background:currentColor}
-    .veg{color:#10a957}.nonveg{color:#e22a2a}.egg{color:#f3b51b}
-    .food-body{padding:12px;display:flex;flex-direction:column;gap:6px;flex:1}
-    .food-title{font-family:"Playfair Display",serif;font-size:18px;font-weight:700}
-    .food-desc{font-size:12px;line-height:1.4;color:#626a76;min-height:34px}
-    .food-bottom{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
-    .price{font-size:19px;font-weight:800;color:#9b141d}
+    .food-card{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.045);display:flex;flex-direction:column;min-width:0}
+    .food-image{position:relative;height:175px;background:#eee}.food-image img{height:100%}.food-card.no-photo .food-image{display:none}.food-card.no-photo{display:block}.dish-row.no-photo{grid-template-columns:1fr}.dish-row.no-photo .dish-main{grid-column:1}.badge{position:absolute;left:10px;top:10px;padding:6px 10px;border-radius:999px;color:#fff;font-size:12px;font-weight:800}.badge.red{background:#e82d2d}.badge.gold{background:#ffca38;color:#3b2d00}.type-icon{position:absolute;right:10px;top:10px;width:25px;height:25px;border:2px solid currentColor;border-radius:3px;background:#fff;display:grid;place-items:center}.type-icon:after{content:'';width:10px;height:10px;border-radius:50%;background:currentColor}.veg{color:#10a957}.nonveg{color:#e22a2a}.egg{color:#f3b51b}
+    .food-body{padding:13px;display:flex;flex-direction:column;gap:8px;flex:1}.food-title{font-family:"Playfair Display",serif;font-size:19px;font-weight:700}.food-desc{font-size:13px;line-height:1.45;color:#626a76;min-height:38px}.food-bottom{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}.price{font-size:22px;font-weight:800;color:#9b141d}
 
-    /* List Grid Rows */
-    .list-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-    .dish-row{border:1px solid var(--line);border-radius:14px;padding:9px;display:grid;grid-template-columns:110px 1fr auto;gap:12px;align-items:center;box-shadow:0 4px 14px rgba(0,0,0,.03)}
-    .dish-row img{height:95px;border-radius:10px}
-    .dish-name-line{display:flex;align-items:center;gap:8px}
-    .mini-type{width:20px;height:20px;border:2px solid currentColor;border-radius:3px;display:grid;place-items:center;flex:0 0 auto}
-    .mini-type:after{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
-    .dish-title{font-family:"Playfair Display",serif;font-size:17px;font-weight:700}
-    .dish-desc{font-size:12px;line-height:1.4;color:#667085;margin:4px 0 6px}
-    .dish-price{font-size:18px;font-weight:800;color:#9b141d}
+    .list-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.dish-row{border:1px solid var(--line);border-radius:16px;padding:9px;display:grid;grid-template-columns:118px 1fr auto;gap:14px;align-items:center;box-shadow:0 6px 18px rgba(0,0,0,.035)}.dish-row img{height:105px;border-radius:11px}.dish-main{min-width:0}.dish-name-line{display:flex;align-items:center;gap:9px}.mini-type{width:22px;height:22px;border:2px solid currentColor;border-radius:3px;display:grid;place-items:center;flex:0 0 auto}.mini-type:after{content:'';width:8px;height:8px;border-radius:50%;background:currentColor}.dish-title{font-family:"Playfair Display",serif;font-size:18px;font-weight:700}.dish-desc{font-size:13px;line-height:1.45;color:#667085;margin:6px 0 8px}.dish-price{font-size:20px;font-weight:800;color:#9b141d}
 
-    /* 3D AR Trigger Button */
+    /* 3D / AR Button */
     .btn-ar{
-      border:1px solid #111;
-      background:linear-gradient(135deg, #2a2c30, #111);
-      color:var(--gold);
-      padding:7px 12px;
+      border:1px solid var(--brand);
+      background:#fff;
+      color:var(--brand);
+      padding:6px 12px;
       border-radius:8px;
       font-weight:700;
-      font-size:11.5px;
+      font-size:12px;
       display:inline-flex;
       align-items:center;
       gap:4px;
       transition:.2s;
     }
     .btn-ar:hover{
-      background:linear-gradient(135deg, #ffd875, #e5a735);
-      color:#111;
-      border-color:#e5a735;
+      background:var(--brand);
+      color:#fff;
     }
 
-    /* Plans Page Styling */
-    .plans-wrapper{padding:20px 0}
-    .plans-head{text-align:center;max-width:600px;margin:0 auto 35px}
-    .plans-head h2{font-family:"Playfair Display",serif;font-size:36px;margin:0 0 10px}
-    .plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-    .plan-card{border:1px solid var(--line);border-radius:20px;padding:26px;background:#fff;display:flex;flex-direction:column;position:relative}
-    .plan-card.highlight{border-color:var(--gold);box-shadow:0 12px 35px rgba(241,182,64,.2);background:#0b0c0e;color:#fff}
-    .plan-card.highlight .plan-feature{color:#ccc}
-    .plan-badge{position:absolute;top:-12px;right:20px;background:var(--gold);color:#111;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:800}
-    .plan-name{font-size:20px;font-weight:800;margin-bottom:8px}
-    .plan-price{font-size:36px;font-weight:800;margin-bottom:16px}
-    .plan-price span{font-size:14px;font-weight:400;color:var(--muted)}
-    .plan-features{list-style:none;padding:0;margin:0 0 26px;display:flex;flex-direction:column;gap:10px}
-    .plan-feature{font-size:13px;display:flex;align-items:center;gap:8px}
-    .plan-cta{margin-top:auto;padding:12px;border-radius:12px;border:none;font-weight:800;background:var(--brand);color:#fff;text-align:center}
-    .plan-card.highlight .plan-cta{background:linear-gradient(135deg,#ffe08c,#e5a735);color:#111}
+    .bottom-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(1180px,100%);z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:12px 22px;display:grid;grid-template-columns:230px 1fr 270px;align-items:center;gap:14px;box-shadow:0 -10px 28px rgba(0,0,0,.06)}
+    .whatsapp{border:none;border-radius:13px;color:#fff;font-weight:800;padding:15px 18px;background:#10ad55;}
+    .nav-actions{display:flex;justify-content:center;gap:34px}.nav-action{border:none;background:none;display:flex;flex-direction:column;gap:4px;align-items:center;font-size:12px;color:#313844}.nav-action b{font-size:18px}
 
-    /* 3D AR Modal */
+    .toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%) translateY(20px);background:#111;color:#fff;padding:11px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s;z-index:99}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* 3D Modal Styling */
     .ar-modal{
       position:fixed;
       inset:0;
@@ -186,177 +103,100 @@
       justify-content:center;
       padding:16px;
     }
-    .ar-modal.show{display:flex}
+    .ar-modal.show{display:flex;}
     .ar-box{
-      background:#111214;
-      border:1px solid #444;
-      color:#fff;
+      background:#fff;
       width:min(520px,100%);
       height:min(640px,85vh);
       border-radius:20px;
       overflow:hidden;
       display:flex;
       flex-direction:column;
+      box-shadow:0 20px 40px rgba(0,0,0,0.3);
       position:relative;
     }
-    .ar-header{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #222}
-    .ar-header h3{margin:0;font-size:16px;font-weight:700;color:var(--gold)}
-    .ar-close{border:none;background:#252528;color:#fff;border-radius:50%;width:32px;height:32px;font-size:18px}
-    model-viewer{width:100%;flex:1;background:radial-gradient(circle,#252528,#0c0c0e 75%)}
+    .ar-header{
+      padding:14px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      border-bottom:1px solid var(--line);
+    }
+    .ar-header h3{margin:0;font-size:16px;font-weight:700;color:var(--brand-dark);}
+    .ar-close{border:none;background:#eee;border-radius:50%;width:32px;height:32px;font-size:18px;}
+    model-viewer{width:100%;flex:1;background:radial-gradient(circle,#ffffff,#eceef2 80%);}
     .ar-launch-btn{
       position:absolute;
       bottom:40px;
       left:50%;
       transform:translateX(-50%);
-      background:linear-gradient(135deg, #ffe08c, #e5a735);
-      color:#111;
+      background:var(--brand);
+      color:#fff;
       border:none;
-      padding:11px 22px;
-      border-radius:25px;
-      font-weight:800;
+      padding:10px 20px;
+      border-radius:24px;
+      font-weight:700;
       font-size:13px;
+      box-shadow:0 4px 14px rgba(159,22,32,0.4);
     }
-    .ar-tip{padding:10px;text-align:center;font-size:11.5px;color:#888;background:#08090a;border-top:1px solid #1c1d1e}
-
-    /* Bottom Bar */
-    .bottom-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(1180px,100%);z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:10px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 -10px 28px rgba(0,0,0,.06)}
-    .whatsapp{border:none;border-radius:12px;color:#fff;font-weight:800;padding:12px 18px;background:#10ad55}
+    .ar-tip{
+      padding:10px;
+      text-align:center;
+      font-size:12px;
+      color:var(--muted);
+      background:var(--soft);
+      border-top:1px solid var(--line);
+    }
 
     @media(max-width:900px){
-      .hero-inner{grid-template-columns:1fr;padding:26px 20px}
-      .hero-right{display:none}
-      .popular-grid{grid-template-columns:repeat(2,1fr)}
-      .list-grid{grid-template-columns:1fr}
-      .plans-grid{grid-template-columns:1fr}
+      .hero-inner{grid-template-columns:1fr;padding:32px 24px}.hero-right{display:none}.brand h1{font-size:45px}.content{padding:18px 18px 118px}.toolbar{grid-template-columns:1fr}.popular-grid{grid-template-columns:repeat(2,1fr)}.list-grid{grid-template-columns:1fr}.bottom-bar{grid-template-columns:1fr}.nav-actions{display:none}.whatsapp{display:block}.section h2{font-size:30px}
     }
     @media(max-width:560px){
-      .brand h1{font-size:34px}
-      .popular-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-      .food-image{height:130px}
-      .dish-row{grid-template-columns:85px 1fr;gap:8px}
-      .dish-row img{height:80px}
+      .hero{min-height:285px}.hero-inner{min-height:285px;padding:28px 18px}.logo{width:62px;height:62px;font-size:30px}.brand h1{font-size:36px}.tagline{letter-spacing:3px}.info{gap:9px 14px;font-size:12px}.quote{font-size:19px}.content{border-radius:22px 22px 0 0;margin-top:-18px;padding:14px 12px 110px}.popular-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.food-image{height:135px}.food-body{padding:10px}.food-title{font-size:16px}.food-desc{font-size:12px;min-height:auto}.food-bottom{align-items:flex-end}.price{font-size:18px}.section h2{font-size:27px}.section-head{align-items:center}.section-sub{display:none}.dish-row{grid-template-columns:92px 1fr;gap:10px}.dish-row img{height:90px}.dish-title{font-size:16px}.dish-desc{font-size:12px;padding-right:6px}.bottom-bar{grid-template-columns:1fr 1fr;padding:10px}.whatsapp{padding:13px 12px;font-size:13px}
     }
   </style>
-
-  <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
-
 <div class="app">
-  <!-- TOP VIEW SWITCHER PATHS -->
-  <div class="view-switcher-bar">
-    <button class="view-btn" id="btnViewStandard" onclick="switchRoute('standard')">
-      📋 Full Menu
-    </button>
-    <button class="view-btn" id="btnViewSignature" onclick="switchRoute('signature')">
-      ✨ 3D Signature
-    </button>
-    <button class="view-btn" id="btnViewPlans" onclick="switchRoute('plans')">
-      🚀 Plans & Pricing
-    </button>
-  </div>
-
-  <!-- RESTAURANT HERO SECTION (Hidden on plans page) -->
-  <header class="hero" id="heroSection">
+  <header class="hero">
     <div class="hero-inner">
       <div>
         <div class="brand-row">
           <div class="logo" id="restaurantLogo">♨</div>
-          <div class="brand">
-            <h1 id="restaurantName">Loading...</h1>
-            <div class="tagline" id="restaurantTagline">GOOD FOOD • GOOD MOOD</div>
-          </div>
+          <div class="brand"><h1 id="restaurantName">Loading...</h1><div class="tagline" id="restaurantTagline">GOOD FOOD • GOOD MOOD</div></div>
         </div>
         <div class="info">
-          <span id="restaurantAddress"></span>
-          <span id="restaurantHours"></span>
-          <a id="restaurantPhone" href="#" style="color:inherit;text-decoration:none"></a>
+          <span id="restaurantAddress"></span><span id="restaurantHours"></span><a id="restaurantPhone" href="#" style="color:inherit;text-decoration:none"></a>
         </div>
         <div class="quote" id="restaurantQuote">Food Brings People Together</div>
       </div>
-      <div class="hero-right">
-        <div class="hero-badge-tag">
-          <span style="font-size:11px;letter-spacing:1px;color:#bbb;">MENU MODE</span>
-          <b id="heroModeTitle">STANDARD SELECTION</b>
-        </div>
-      </div>
+      <div class="hero-right"><div class="hero-word">Good<br><span>Food</span><br>Good<br><span>Mood</span></div></div>
     </div>
   </header>
 
-  <!-- MAIN MENU CONTENT -->
   <main class="content">
-    
-    <!-- MENU VIEW -->
-    <div id="menuViewContainer">
-      <div class="toolbar">
-        <div class="cats" id="categoryTabs"></div>
-        <div class="search"><input id="searchInput" placeholder="Search dishes..." /></div>
-      </div>
-
-      <section class="section" id="popularSection">
-        <div class="section-head">
-          <div><h2 id="featuredTitle">Popular Dishes</h2><div class="section-sub">Our most loved items</div></div>
-        </div>
-        <div class="popular-grid" id="popularGrid"></div>
-      </section>
-
-      <div id="categorySections"></div>
+    <div class="toolbar">
+      <div class="cats" id="categoryTabs"></div>
+      <div class="search"><input id="searchInput" placeholder="Search dishes..." /></div>
     </div>
 
-    <!-- PLANS & PRICING VIEW -->
-    <div id="plansViewContainer" class="plans-wrapper" style="display:none;">
-      <div class="plans-head">
-        <h2>Choose Your Digital Menu Plan</h2>
-        <p style="color:var(--muted);font-size:14px;">Boost customer engagement and sales with interactive QR and 3D Augmented Reality food menus.</p>
-      </div>
+    <section class="section" id="popularSection">
+      <div class="section-head"><div><h2>Popular Dishes</h2><div class="section-sub">Our most loved items</div></div><button class="see-all">See All →</button></div>
+      <div class="popular-grid" id="popularGrid"></div>
+    </section>
 
-      <div class="plans-grid">
-        <!-- Plan 1 -->
-        <div class="plan-card">
-          <div class="plan-name">Starter Menu</div>
-          <div class="plan-price">₹0 <span>/ forever</span></div>
-          <ul class="plan-features">
-            <li class="plan-feature">✓ Contactless QR Code</li>
-            <li class="plan-feature">✓ Text-based Menu Items</li>
-            <li class="plan-feature">✓ Real-time Price Update</li>
-            <li class="plan-feature">✓ Unlimited Customer Scans</li>
-          </ul>
-          <button class="plan-cta" onclick="alert('Starter Plan selected!')">Get Started</button>
-        </div>
-
-        <!-- Plan 2 -->
-        <div class="plan-card">
-          <div class="plan-name">Growth Pro</div>
-          <div class="plan-price">₹499 <span>/ month</span></div>
-          <ul class="plan-features">
-            <li class="plan-feature">✓ Everything in Starter</li>
-            <li class="plan-feature">✓ Full HD Food Photo Menu</li>
-            <li class="plan-feature">✓ WhatsApp Direct Order Button</li>
-            <li class="plan-feature">✓ Category & Bestseller Badges</li>
-            <li class="plan-feature">✓ Custom Restaurant Branding</li>
-          </ul>
-          <button class="plan-cta" onclick="alert('Growth Pro selected!')">Upgrade to Pro</button>
-        </div>
-
-        <!-- Plan 3 (AR Ultra) -->
-        <div class="plan-card highlight">
-          <div class="plan-badge">MOST POPULAR</div>
-          <div class="plan-name">AR Ultra Signature</div>
-          <div class="plan-price">₹1,499 <span>/ month</span></div>
-          <ul class="plan-features">
-            <li class="plan-feature">✓ Everything in Growth Pro</li>
-            <li class="plan-feature">✓ <b>3D & AR Table Placement (.glb)</b></li>
-            <li class="plan-feature">✓ Dedicated Signature Menu URL</li>
-            <li class="plan-feature">✓ High-speed Cloudflare R2 Hosting</li>
-            <li class="plan-feature">✓ VIP Table QR Standee Designs</li>
-          </ul>
-          <button class="plan-cta" onclick="alert('Contacting sales for AR Ultra setup!')">Activate AR Ultra</button>
-        </div>
-      </div>
-    </div>
-
+    <div id="categorySections"></div>
   </main>
+</div>
+
+<div class="bottom-bar">
+  <div class="nav-actions">
+    <button class="nav-action" onclick="window.scrollTo({top:0,behavior:'smooth'})"><b>⌂</b><span>Home</span></button>
+    <button class="nav-action" onclick="shareMenu()"><b>↗</b><span>Share Menu</span></button>
+    <button class="nav-action" id="callUsBtn" onclick="location.href='tel:+919876543210'"><b>☎</b><span>Call Us</span></button>
+  </div>
+  <button class="whatsapp" onclick="shareWhatsApp()">☘ Share on WhatsApp</button>
 </div>
 
 <!-- 3D AR MODAL -->
@@ -377,140 +217,132 @@
       shadow-intensity="1.5">
       <button slot="ar-button" class="ar-launch-btn">📱 Place on Table (AR)</button>
     </model-viewer>
-    <div class="ar-tip">Rotate & zoom with fingers • Tap Place on Table to view in physical space</div>
+    <div class="ar-tip">Rotate & zoom with fingers • Tap Place on Table to view in AR</div>
   </div>
 </div>
 
-<div class="bottom-bar">
-  <div style="font-size:13px;font-weight:700;" id="bottomBarText">FreeMenu.in • Smart QR Platform</div>
-  <button class="whatsapp" onclick="shareWhatsApp()">☘ Share on WhatsApp</button>
-</div>
+<div class="toast" id="toast"></div>
 
 <script>
   const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   
-  const urlParams = new URLSearchParams(window.location.search);
-  const slug = (urlParams.get('r') || 'urbanpunjab').trim().toLowerCase();
-  const currentView = (urlParams.get('view') || 'standard').toLowerCase();
-
-  let restaurant = null, menuData = [], categories = ['All Items'], selectedCategory = 'All Items';
-  const $ = id => document.getElementById(id);
-  const esc = (v='') => String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
-  const safeUrl = v => { if(!v) return ''; try{ const u=new URL(v,location.origin); return ['http:','https:'].includes(u.protocol)?u.href:''; }catch(_){ return ''; } };
-  const money = v => { const n = Number(v); return Number.isFinite(n) ? '₹' + n.toLocaleString('en-IN') : ''; };
-  const typeValue = i => { const t = String(i.item_type || i.type || '').toLowerCase(); if(t==='egg') return 'egg'; if(t==='nonveg' || i.is_veg===false) return 'nonveg'; return 'veg'; };
-  const badgeValue = i => (i.is_bestseller || i.bestseller) ? 'Bestseller' : (i.is_signature) ? 'Signature' : (i.is_recommended || i.recommended) ? 'Recommended' : '';
-  const imageValue = i => safeUrl(i.image_url || i.photo_url || i.image || i.photo);
-  const categoryKey = i => String(i.category || 'General').trim() || 'General';
+  let restaurant=null, menuData=[], categories=['All Items'], selectedCategory='All Items';
+  const $=id=>document.getElementById(id);
+  const esc=(v='')=>String(v).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
+  const safeUrl=v=>{if(!v)return '';try{const u=new URL(v,location.origin);return ['http:','https:'].includes(u.protocol)?u.href:'';}catch(_){return '';}};
+  const money=v=>{const n=Number(v);return Number.isFinite(n)?'₹'+n.toLocaleString('en-IN'):'';};
+  const typeValue=i=>{const t=String(i.item_type||i.type||'').toLowerCase();if(t==='egg')return 'egg';if(t==='nonveg'||i.is_veg===false)return 'nonveg';return 'veg';};
+  const badgeValue=i=>i.is_bestseller===true||i.bestseller===true?'Bestseller':i.is_recommended===true||i.recommended===true?'Recommended':i.is_spicy===true||i.spicy===true?'Spicy':'';
+  const imageValue=i=>safeUrl(i.image_url||i.photo_url||i.image||i.photo);
+  const categoryKey=i=>String(i.category||'General').trim()||'General';
 
   function hasAR(i){
     return (i.ar_enabled === true || String(i.ar_enabled).toLowerCase() === 'true' || i.signature_3d === true) && !!(i.ar_model_url || i.ar_usdz_url);
   }
 
-  /* Path Route Switcher */
-  function switchRoute(viewType) {
-    const url = new URL(window.location.href);
-    if (viewType === 'standard') {
-      url.searchParams.delete('view');
-    } else {
-      url.searchParams.set('view', viewType);
-    }
-    window.location.href = url.toString();
-  }
-
-  function highlightCurrentNav() {
-    $('btnViewStandard').classList.toggle('active', currentView === 'standard');
-    $('btnViewSignature').classList.toggle('active', currentView === 'signature');$('btnViewPlans').classList.toggle('active', currentView === 'plans');
+  function categoryOrder(){
+    const names=[...new Set(menuData.map(categoryKey))],saved=Array.isArray(restaurant?.category_order)?restaurant.category_order.map(String):[],rank=new Map(saved.map((x,i)=>[x,i]));
+    return names.sort((a,b)=>(rank.has(a)?rank.get(a):999999)-(rank.has(b)?rank.get(b):999999)||a.localeCompare(b));
   }
 
   function renderRestaurant(){
-    const name = restaurant?.name || 'Urban Punjab';
-    document.title = `${name} • ${currentView === 'signature' ? 'Signature 3D Menu' : 'Menu'}`;
-    $('restaurantName').textContent = name;
-    const logo = safeUrl(restaurant?.logo_url);
-    $('restaurantLogo').innerHTML = logo ? `<img src="${esc(logo)}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">` : '♨';
-    
-    if (currentView === 'signature') {
-      $('restaurantTagline').textContent = '★ EXCLUSIVE SIGNATURE SELECTION ★';
-      $('heroModeTitle').textContent = '3D / AR SIGNATURE MODE';$('featuredTitle').textContent = 'Signature 3D Specialities';
-    } else {
-      $('restaurantTagline').textContent = restaurant?.tagline || 'GOOD FOOD • GOOD MOOD';
-      $('heroModeTitle').textContent = 'STANDARD MENU';$('featuredTitle').textContent = 'Popular Dishes';
-    }
-
-    $('restaurantAddress').textContent = restaurant?.address ? `📍 ${restaurant.address}` : '';
-    $('restaurantQuote').textContent = restaurant?.slogan_1 || 'Authentic Flavours, Timeless Taste';
-    const ph = String(restaurant?.phone || '').trim();
+    const name=restaurant?.name||'Restaurant';document.title=`${name} • Menu`;$('restaurantName').textContent=name;
+    const logo=safeUrl(restaurant?.logo_url);$('restaurantLogo').innerHTML=logo?`<img src="${esc(logo)}" alt="${esc(name)}" style="width:100%;height:100%;object-fit:cover;border-radius:inherit" onerror="this.parentElement.textContent='♨'">`:'♨';
+    $('restaurantTagline').textContent=restaurant?.tagline||restaurant?.subtitle_text||'GOOD FOOD • GOOD MOOD';
+    $('restaurantAddress').textContent=restaurant?.address?`📍 ${restaurant.address}`:'';
+    const fmt=v=>{if(!v)return '';const [hh,mm='0']=String(v).split(':'),n=Number(hh);if(!Number.isFinite(n))return '';return `${String(n%12||12).padStart(2,'0')}:${String(mm).padStart(2,'0')} ${n>=12?'PM':'AM'}`;};
+    const op=fmt(restaurant?.opening_time),cl=fmt(restaurant?.closing_time);$('restaurantHours').textContent=op&&cl?`◷ ${op} - ${cl}`:'';
+    const ph=String(restaurant?.phone||'').trim();
     if(ph){
-      $('restaurantPhone').href = `tel:${ph.replace(/[^\d+]/g,'')}`;
-      $('restaurantPhone').textContent = `☎ ${ph}`;
+      $('restaurantPhone').href=`tel:${ph.replace(/[^\d+]/g,'')}`;
+      $('restaurantPhone').textContent=`☎ ${ph}`;
+      $('callUsBtn').setAttribute('onclick', `location.href='tel:${ph.replace(/[^\d+]/g,'')}'`);
+    } else {
+      $('restaurantPhone').style.display='none';
     }
+    $('restaurantQuote').textContent=restaurant?.slogan_1||restaurant?.welcome_text||'Food Brings People Together';
   }
 
-  function categoryOrder(){
-    const names = [...new Set(menuData.map(categoryKey))];
-    return names.sort();
-  }
-
-  function renderTabs(){
-    $('categoryTabs').innerHTML = categories.map(c => `<button class="cat ${selectedCategory===c?'active':''}" onclick="selectCategory('${c.replace(/'/g,"\\'")}')">${esc(c)}</button>`).join('');
-  }
-
+  const typeIcon=(type,mini=false)=>`<span class="${mini?'mini-type':'type-icon'} ${type}"></span>`;
+  const badgeHTML=b=>b?`<span class="badge ${b==='Bestseller'||b==='Recommended'?'red':'gold'}">${esc(b)}</span>`:'';
+  
+  function renderTabs(){$('categoryTabs').innerHTML=categories.map(c=>`<button class="cat ${selectedCategory===c?'active':''}" onclick="selectCategory('${c.replace(/'/g,"\\'")}')">${esc(c)}</button>`).join('');}
+  
   function filteredItems(){
-    const q = $('searchInput').value.trim().toLowerCase();
-    return menuData.filter(i => {
-      const c = categoryKey(i), h = `${i.name||''} ${i.description||''} ${c}`.toLowerCase();
-      return (selectedCategory === 'All Items' || c === selectedCategory) && (!q || h.includes(q));
-    });
+    const q=$('searchInput').value.trim().toLowerCase();
+    return menuData.filter(i=>{const c=categoryKey(i),h=`${i.name||''} ${i.description||''} ${c}`.toLowerCase();return (selectedCategory==='All Items'||c===selectedCategory)&&(!q||h.includes(q));});
   }
 
   function renderMenu(){
     renderTabs();
-    const items = filteredItems();
-    const popular = items.filter(i => i.is_bestseller || i.is_signature || i.ar_enabled).slice(0, 4);
-    $('popularSection').style.display = popular.length ? 'block' : 'none';
+    const items=filteredItems(),popular=items.filter(i=>i.is_bestseller===true||i.bestseller===true||i.is_recommended===true||i.recommended===true).slice(0,4);
+    $('popularSection').style.display=popular.length?'block':'none';
+    
+    // Popular Section Cards
+    $('popularGrid').innerHTML=popular.map(i=>{
+      const img=imageValue(i);
+      const arBtn = hasAR(i) ? `<button class="btn-ar" onclick='openAR(${JSON.stringify(i.name||"Dish")}, ${JSON.stringify(i.ar_model_url||"")}, ${JSON.stringify(i.ar_usdz_url||"")})'>◈ 3D View</button>` : '';
 
-    $('popularGrid').innerHTML = popular.map(i => {
-      const img = imageValue(i);
-      const arBtn = hasAR(i) ? `<button class="btn-ar" onclick='openAR(${JSON.stringify(i.name||"Dish")}, ${JSON.stringify(i.ar_model_url||"")}, ${JSON.stringify(i.ar_usdz_url||"")})'>◈ 3D / AR</button>` : '';
-
-      return `<article class="food-card">
-        ${img ? `<div class="food-image">
-          <img src="${esc(img)}" alt="${esc(i.name||'Food')}">
-          ${badgeValue(i) ? `<span class="badge ${badgeValue(i)==='Signature'?'gold':'red'}">${esc(badgeValue(i))}</span>` : ''}
-          <span class="type-icon ${typeValue(i)}"></span>
-        </div>` : ''}
+      if(img) {
+        return `<article class="food-card">
+          <div class="food-image">
+            <img src="${esc(img)}" alt="${esc(i.name||'Food')}" onerror="this.closest('.food-card').classList.add('no-photo');this.parentElement.style.display='none'">
+            ${badgeHTML(badgeValue(i))}${typeIcon(typeValue(i))}
+          </div>
+          <div class="food-body">
+            <div class="food-title">${esc(i.name||'Unnamed item')}</div>
+            <div class="food-desc">${esc(i.description||'')}</div>
+            <div class="food-bottom">
+              <span class="price">${money(i.price_full??i.price)}</span>
+              ${arBtn}
+            </div>
+          </div>
+        </article>`;
+      }
+      return `<article class="food-card no-photo">
         <div class="food-body">
-          <div class="food-title">${esc(i.name||'Unnamed item')}</div>
+          <div class="food-title">${typeIcon(typeValue(i),true)} ${esc(i.name||'Unnamed item')}</div>
           <div class="food-desc">${esc(i.description||'')}</div>
           <div class="food-bottom">
-            <span class="price">${money(i.price_full ?? i.price)}</span>
+            <span class="price">${money(i.price_full??i.price)}</span>
             ${arBtn}
           </div>
         </div>
       </article>`;
     }).join('');
 
-    $('categorySections').innerHTML = categoryOrder().filter(c => selectedCategory === 'All Items' || c === selectedCategory).map(cat => {
-      const list = items.filter(i => categoryKey(i) === cat);
-      if(!list.length) return '';
+    // Categories Section Rows
+    $('categorySections').innerHTML=categoryOrder().filter(c=>selectedCategory==='All Items'||c===selectedCategory).map(cat=>{
+      const list=items.filter(i=>categoryKey(i)===cat);
+      if(!list.length)return '';
       return `<section class="section">
         <div class="section-head">
-          <div><h2>${esc(cat)}</h2></div>
+          <div><h2>${esc(cat)}</h2><div class="section-sub">${cat==='Starters'?'Start your food journey with amazing flavors':'Delicious choices for every appetite'}</div></div>
+          <button class="see-all" onclick="selectCategory('${cat.replace(/'/g,"\\'")}')">See All →</button>
         </div>
         <div class="list-grid">
-          ${list.map(i => {
-            const img = imageValue(i);
-            const arBtn = hasAR(i) ? `<button class="btn-ar" style="margin-top:6px;" onclick='openAR(${JSON.stringify(i.name||"Dish")}, ${JSON.stringify(i.ar_model_url\vert{}\vert{}"")}, ${JSON.stringify(i.ar_usdz_url||"")})'>◈ 3D / AR</button>` : '';
+          ${list.map(i=>{
+            const img=imageValue(i);
+            const arBtn = hasAR(i) ? `<button class="btn-ar" style="margin-top:6px;" onclick='openAR(${JSON.stringify(i.name||"Dish")}, ${JSON.stringify(i.ar_model_url\vert{}\vert{}"")}, ${JSON.stringify(i.ar_usdz_url||"")})'>◈ 3D View</button>` : '';
 
-            return `<article class="dish-row">
-              ${img ? `<img src="${esc(img)}" alt="${esc(i.name||'Food')}">` : '<div style="width:90px;height:90px;background:#eee;border-radius:10px;"></div>'}
+            if(img) {
+              return `<article class="dish-row">
+                <img src="${esc(img)}" alt="${esc(i.name||'Food')}" onerror="this.closest('.dish-row').classList.add('no-photo');this.remove()">
+                <div class="dish-main">
+                  <div class="dish-name-line">${typeIcon(typeValue(i),true)}<div class="dish-title">${esc(i.name||'Unnamed item')}</div></div>
+                  <div class="dish-desc">${esc(i.description||'')}</div>
+                  <div class="dish-price">${money(i.price_full??i.price)}</div>
+                </div>
+                <div>${arBtn}</div>
+              </article>`;
+            }
+            return `<article class="dish-row no-photo">
               <div class="dish-main">
-                <div class="dish-name-line"><span class="mini-type ${typeValue(i)}"></span><div class="dish-title">${esc(i.name||'Unnamed item')}</div></div>
+                <div class="dish-name-line">${typeIcon(typeValue(i),true)}<div class="dish-title">${esc(i.name||'Unnamed item')}</div></div>
                 <div class="dish-desc">${esc(i.description||'')}</div>
-                <div class="dish-price">${money(i.price_full ?? i.price)}</div>
+                <div class="dish-price">${money(i.price_full??i.price)}</div>
               </div>
               <div>${arBtn}</div>
             </article>`;
@@ -518,16 +350,22 @@
         </div>
       </section>`;
     }).join('');
+
+    if(!items.length)$('categorySections').innerHTML='<div style="padding:30px;text-align:center;color:#667085">No menu items found.</div>';
   }
 
-  function selectCategory(c){
-    selectedCategory = c;
-    renderMenu();
+  function selectCategory(c){selectedCategory=c;renderMenu();if(c!=='All Items')$('categorySections').scrollIntoView({behavior:'smooth',block:'start'});}
+  function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove('show'),1800);}
+  
+  async function shareMenu(){
+    if(navigator.share){try{await navigator.share({title:`${restaurant?.name||'Restaurant'} Menu`,text:'Check our menu',url:location.href});}catch(e){}}
+    else{navigator.clipboard?.writeText(location.href);toast('Menu link copied');}
   }
+  function shareWhatsApp(){window.open('https://wa.me/?text='+encodeURIComponent(`${restaurant?.name||'Restaurant'} Menu: ${location.href}`),'_blank');}
 
-  /* 3D Model Modal Handler */
+  /* 3D / AR Controller */
   function openAR(name, glbUrl, usdzUrl = "") {
-    $('arTitle').textContent = `${name} — 3D AR Preview`;
+    $('arTitle').textContent = `${name} — 3D Preview`;
     const viewer = $('arViewer');
     viewer.removeAttribute("src");
     viewer.removeAttribute("ios-src");
@@ -540,7 +378,10 @@
   }
 
   function closeAR() {
-    $('arModal').classList.remove('show');$('arViewer').removeAttribute("src");
+    $('arModal').classList.remove('show');
+    const viewer = $('arViewer');
+    viewer.removeAttribute("src");
+    viewer.removeAttribute("ios-src");
     document.body.style.overflow = 'auto';
   }
 
@@ -548,62 +389,30 @@
     if(e.target === this) closeAR();
   });
 
-  function shareWhatsApp(){
-    window.open('https://wa.me/?text=' + encodeURIComponent(`Check out our menu: ${location.href}`), '_blank');
-  }
-
-  /* Main Loader Controller */
-  async function loadApplication(){
-    highlightCurrentNav();
-
-    // Agar View = Plans hai toh Menu hide karke direct Plans show karein
-    if (currentView === 'plans') {
-      $('heroSection').style.display = 'none';
-      $('menuViewContainer').style.display = 'none';$('plansViewContainer').style.display = 'block';
-      document.title = 'Plans & Pricing • FreeMenu';
-      return;
-    }
-
-    try {
-      // 1. Fetch Restaurant Info
-      const { data: rest, error: re } = await supabaseClient
-        .from('restaurants')
-        .select('*')
-        .eq('slug', slug)
-        .limit(1)
-        .maybeSingle();
-
-      if (re || !rest) throw new Error("Restaurant not found");
-      restaurant = rest;
+  async function loadGrowthMenu(){
+    try{
+      const slug=(new URLSearchParams(location.search).get('r')||'').trim().toLowerCase();
+      if(!slug){$('restaurantName').textContent='Restaurant Not Found';return;}
+      const {data:rest,error:re}=await supabaseClient.from('restaurants').select('*').eq('slug',slug).limit(1).maybeSingle();
+      if(re)throw re;
+      if(!rest){$('restaurantName').textContent='Restaurant Not Found';return;}
+      restaurant=rest;
+      
+      const {data:items,error:ie}=await supabaseClient.from('menu_items').select('*').eq('restaurant_id',rest.id);
+      if(ie)throw ie;
+      menuData=Array.isArray(items)?items:[];
+      menuData.sort((a,b)=>Number(a.sort_order??a.position??999999)-Number(b.sort_order??b.position??999999)||String(a.name||'').localeCompare(String(b.name||'')));
+      categories=['All Items',...categoryOrder()];
       renderRestaurant();
-
-      // 2. Fetch Menu Items (With Path View Logic)
-      let query = supabaseClient
-        .from('menu_items')
-        .select('*')
-        .eq('restaurant_id', rest.id)
-        .neq('is_available', false);
-
-      // Agar view=signature hai, toh sirf 3D / AR ya Signature dishes layein
-      if (currentView === 'signature') {
-        query = query.or('ar_enabled.eq.true,is_signature.eq.true');
-      }
-
-      const { data: items, error: ie } = await query;
-      if (ie) throw ie;
-
-      menuData = Array.isArray(items) ? items : [];
-      categories = ['All Items', ...categoryOrder()];
       renderMenu();
-
-    } catch (err) {
-      console.error(err);
-      $('restaurantName').textContent = 'Menu Unavailable';
+    }catch(e){
+      console.error('Growth menu load error:',e);
+      $('restaurantName').textContent='Menu Unavailable';$('categorySections').innerHTML='<div style="padding:30px;text-align:center;color:#667085">Unable to load this restaurant menu.</div>';
     }
   }
 
-  $('searchInput').addEventListener('input', renderMenu);
-  window.addEventListener('load', loadApplication);
+  $('searchInput').addEventListener('input',renderMenu);
+  window.addEventListener('load',loadGrowthMenu);
 </script>
 </body>
 </html>
