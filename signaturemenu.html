@@ -1,26 +1,4 @@
-<
-
-function toggle3DRotation(){
-  const v=$('dishModel');
-  const b=$('modelRotateBtn');
-  if(!v)return;
-  if(v.hasAttribute('auto-rotate')){v.removeAttribute('auto-rotate');b?.classList.remove('active');b&&(b.textContent='↻ Auto Rotate');}
-  else{v.setAttribute('auto-rotate','');b?.classList.add('active');b&&(b.textContent='Ⅱ Stop Rotation');}
-}
-function reset3DView(){
-  const v=$('dishModel');
-  if(!v)return;
-  v.cameraOrbit='auto auto auto';
-  v.fieldOfView='auto';
-  v.jumpCameraToGoal?.();
-}
-async function enter3DFullscreen(){
-  const box=document.querySelector('.model3d-box');
-  if(!box)return;
-  if(document.fullscreenElement){await document.exitFullscreen?.();return;}
-  await box.requestFullscreen?.();
-}
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -85,7 +63,7 @@ async function enter3DFullscreen(){
     .list-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.dish-row{border:1px solid var(--line);border-radius:16px;padding:9px;display:grid;grid-template-columns:118px 1fr auto;gap:14px;align-items:center;box-shadow:0 6px 18px rgba(0,0,0,.035)}.dish-row img{height:105px;border-radius:11px}.dish-main{min-width:0}.dish-name-line{display:flex;align-items:center;gap:9px}.mini-type{width:22px;height:22px;border:2px solid currentColor;border-radius:3px;display:grid;place-items:center;flex:0 0 auto}.mini-type:after{content:'';width:8px;height:8px;border-radius:50%;background:currentColor}.dish-title{font-family:"Playfair Display",serif;font-size:18px;font-weight:700}.dish-desc{font-size:13px;line-height:1.45;color:#667085;margin:6px 0 8px}.dish-price{font-size:20px;font-weight:800;color:#9b141d}.dish-row .add{align-self:end;margin-bottom:4px}
 
     .bottom-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(1180px,100%);z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:12px 22px;display:grid;grid-template-columns:230px 1fr 270px;align-items:center;gap:14px;box-shadow:0 -10px 28px rgba(0,0,0,.06)}
-    .whatsapp{border:none;border-radius:13px;color:#fff;font-weight:800;padding:15px 18px;background:#10ad55.nav-actions{display:flex;justify-content:center;gap:34px}.nav-action{border:none;background:none;display:flex;flex-direction:column;gap:4px;align-items:center;font-size:12px;color:#313844}.nav-action b{font-size:18px}
+    .whatsapp{border:none;border-radius:13px;color:#fff;font-weight:800;padding:15px 18px;background:#10ad55}.nav-actions{display:flex;justify-content:center;gap:34px}.nav-action{border:none;background:none;display:flex;flex-direction:column;gap:4px;align-items:center;font-size:12px;color:#313844}.nav-action b{font-size:18px}
 
     
 /* Professional Signature 3D / AR controls */
@@ -161,8 +139,15 @@ async function enter3DFullscreen(){
 <div class="model3d-modal" id="model3dModal" onclick="if(event.target===this)close3D()">
   <div class="model3d-box">
     <div class="model3d-head"><div><div class="model3d-title" id="model3dTitle">3D Dish View</div><div class="model3d-subtitle" id="model3dSubtitle">Interactive 3D preview</div></div><button class="model3d-close" onclick="close3D()">×</button></div>
-    <div class="model3d-stage"><model-viewer id="dishModel" src="" camera-controls auto-rotate rotation-per-second="30deg" ar ar-modes="webxr scene-viewer quick-look" shadow-intensity="1.5" environment-image="neutral" alt="3D Dish Preview"><button slot="ar-button" class="ar3d-btn">📱 Place on Table (AR)</button></model-viewer></div>
-    <div class="model3d-help">Drag to rotate • Pinch to zoom • On supported phones use <b>Place on Table (AR)</b></div>
+    <div class="model3d-stage"><model-viewer id="dishModel" src="" camera-controls auto-rotate rotation-per-second="30deg" ar ar-modes="webxr scene-viewer quick-look" shadow-intensity="1.5" environment-image="neutral" alt="3D Dish Preview"><button slot="ar-button" class="ar3d-btn">📱 Place on Table</button></model-viewer></div>
+    <div class="model3d-toolbar">
+      <button type="button" class="model3d-tool active" id="modelRotateBtn" onclick="toggle3DRotation()">↻ Auto Rotate</button>
+      <button type="button" class="model3d-tool" onclick="reset3DView()">↺ Reset View</button>
+      <button type="button" class="model3d-tool" onclick="enter3DFullscreen()">⛶ Fullscreen</button>
+      <button type="button" class="model3d-tool model3d-ar-tool" onclick="activate3DAR()">📱 View in AR</button>
+    </div>
+    <div class="model3d-status" id="model3dStatus">Loading interactive 3D experience…</div>
+    <div class="model3d-help">Drag to rotate • Pinch to zoom • Tap <b>View in AR</b> on a supported phone to place the dish on your table.</div>
   </div>
 </div>
 
@@ -205,6 +190,20 @@ async function enter3DFullscreen(){
   viewer.addEventListener('error',()=>{$('model3dStatus').textContent='3D model could not be loaded. Please try again.';},{once:true});
   }
   function close3D(){const v=$('dishModel');v.removeAttribute('src');$('model3dModal').classList.remove('show');document.body.style.overflow='';}
+  function open3DByIndex(index){const item=menuData[Number(index)];if(item)open3D(item);}
+  function toggle3DRotation(){
+    const v=$('dishModel'),b=$('modelRotateBtn'); if(!v)return;
+    if(v.hasAttribute('auto-rotate')){v.removeAttribute('auto-rotate');b?.classList.remove('active');if(b)b.textContent='↻ Auto Rotate';}
+    else{v.setAttribute('auto-rotate','');b?.classList.add('active');if(b)b.textContent='Ⅱ Stop Rotation';}
+  }
+  function reset3DView(){const v=$('dishModel');if(!v)return;v.cameraOrbit='auto auto auto';v.fieldOfView='auto';v.jumpCameraToGoal?.();}
+  async function enter3DFullscreen(){const box=document.querySelector('.model3d-box');if(!box)return;if(document.fullscreenElement){await document.exitFullscreen?.();return;}await box.requestFullscreen?.();}
+  async function activate3DAR(){
+    const v=$('dishModel');
+    if(!v?.src)return;
+    if(typeof v.activateAR==='function'){try{await v.activateAR();}catch(e){console.warn('AR unavailable:',e);toast('AR is not supported on this device/browser.');}}
+    else toast('AR is available on supported mobile devices only.');
+  }
 
   const categoryKey=i=>String(i.category||'General').trim()||'General';
   function categoryOrder(){const names=[...new Set(menuData.map(categoryKey))],saved=Array.isArray(restaurant?.category_order)?restaurant.category_order.map(String):[],rank=new Map(saved.map((x,i)=>[x,i]));return names.sort((a,b)=>(rank.has(a)?rank.get(a):999999)-(rank.has(b)?rank.get(b):999999)||a.localeCompare(b));}
@@ -225,8 +224,8 @@ async function enter3DFullscreen(){
   function filteredItems(){const q=$('searchInput').value.trim().toLowerCase();return menuData.filter(i=>{const c=categoryKey(i),h=`${i.name||''} ${i.description||''} ${c}`.toLowerCase();return (selectedCategory==='All Items'||c===selectedCategory)&&(!q||h.includes(q));});}
   function renderMenu(){
     renderTabs();const items=filteredItems(),popular=items.filter(i=>i.is_bestseller===true||i.bestseller===true||i.is_recommended===true||i.recommended===true).slice(0,4);$('popularSection').style.display=popular.length?'block':'none';
-    $('popularGrid').innerHTML=popular.map(i=>{const img=imageValue(i);if(img)return `<article class="food-card"><div class="food-image"><img src="${esc(img)}" alt="${esc(i.name||'Food')}" onerror="this.closest('.food-card').classList.add('no-photo');this.parentElement.style.display='none'">${badgeHTML(badgeValue(i))}${typeIcon(typeValue(i))}</div><div class="food-body"><div class="food-title">${esc(i.name||'Unnamed item')}</div><div class="food-desc">${esc(i.description||'')}</div><div class="food-bottom"><span class="price">${money(i.price_full??i.price)}</span><div class="food-actions">${has3D(i)?`<button class="ar3d-btn" onclick="open3D(${JSON.stringify(i).replace(/"/g,"&quot;")})">3D View</button>`:""}</div></div></div></article>`;return `<article class="food-card no-photo"><div class="food-body"><div class="food-title">${typeIcon(typeValue(i),true)} ${esc(i.name||'Unnamed item')}</div><div class="food-desc">${esc(i.description||'')}</div><div class="food-bottom"><span class="price">${money(i.price_full??i.price)}</span><div class="food-actions">${has3D(i)?`<button class="ar3d-btn" onclick="open3D(${JSON.stringify(i).replace(/"/g,"&quot;")})">3D View</button>`:""}</div></div></div></article>`;}).join('');
-    $('categorySections').innerHTML=categoryOrder().filter(c=>selectedCategory==='All Items'||c===selectedCategory).map(cat=>{const list=items.filter(i=>categoryKey(i)===cat);if(!list.length)return '';return `<section class="section"><div class="section-head"><div><h2>${esc(cat)}</h2><div class="section-sub">${cat==='Starters'?'Start your food journey with amazing flavors':'Delicious choices for every appetite'}</div></div><button class="see-all" onclick="selectCategory('${cat.replace(/'/g,"\\'")}')">See All →</button></div><div class="list-grid">${list.map(i=>{const img=imageValue(i);if(img)return `<article class="dish-row"><img src="${esc(img)}" alt="${esc(i.name||'Food')}" onerror="this.closest('.dish-row').classList.add('no-photo');this.remove()"><div class="dish-main"><div class="dish-name-line">${typeIcon(typeValue(i),true)}<div class="dish-title">${esc(i.name||'Unnamed item')}</div></div><div class="dish-desc">${esc(i.description||'')}</div><div class="dish-actions"><div class="dish-price">${money(i.price_full??i.price)}</div>${has3D(i)?`<button class="ar3d-btn" onclick="open3D(${JSON.stringify(i).replace(/"/g,"&quot;")})">3D View</button>`:""}</div></div></article>`;return `<article class="dish-row no-photo"><div class="dish-main"><div class="dish-name-line">${typeIcon(typeValue(i),true)}<div class="dish-title">${esc(i.name||'Unnamed item')}</div></div><div class="dish-desc">${esc(i.description||'')}</div><div class="dish-actions"><div class="dish-price">${money(i.price_full??i.price)}</div>${has3D(i)?`<button class="ar3d-btn" onclick="open3D(${JSON.stringify(i).replace(/"/g,"&quot;")})">3D View</button>`:""}</div></div></article>`;}).join('')}</div></section>`;}).join('');
+    $('popularGrid').innerHTML=popular.map(i=>{const img=imageValue(i);if(img)return `<article class="food-card"><div class="food-image"><img src="${esc(img)}" alt="${esc(i.name||'Food')}" onerror="this.closest('.food-card').classList.add('no-photo');this.parentElement.style.display='none'">${badgeHTML(badgeValue(i))}${typeIcon(typeValue(i))}</div><div class="food-body"><div class="food-title">${esc(i.name||'Unnamed item')}</div><div class="food-desc">${esc(i.description||'')}</div><div class="food-bottom"><span class="price">${money(i.price_full??i.price)}</span><div class="food-actions">${has3D(i)?`<button class="dish-3d-btn" onclick="open3DByIndex(${menuData.indexOf(i)})">◈ 3D View</button><button class="ar-3d-btn" onclick="open3DByIndex(${menuData.indexOf(i)});setTimeout(activate3DAR,450)">📱 AR</button>`:""}</div></div></div></article>`;return `<article class="food-card no-photo"><div class="food-body"><div class="food-title">${typeIcon(typeValue(i),true)} ${esc(i.name||'Unnamed item')}</div><div class="food-desc">${esc(i.description||'')}</div><div class="food-bottom"><span class="price">${money(i.price_full??i.price)}</span><div class="food-actions">${has3D(i)?`<button class="dish-3d-btn" onclick="open3DByIndex(${menuData.indexOf(i)})">◈ 3D View</button><button class="ar-3d-btn" onclick="open3DByIndex(${menuData.indexOf(i)});setTimeout(activate3DAR,450)">📱 AR</button>`:""}</div></div></div></article>`;}).join('');
+    $('categorySections').innerHTML=categoryOrder().filter(c=>selectedCategory==='All Items'||c===selectedCategory).map(cat=>{const list=items.filter(i=>categoryKey(i)===cat);if(!list.length)return '';return `<section class="section"><div class="section-head"><div><h2>${esc(cat)}</h2><div class="section-sub">${cat==='Starters'?'Start your food journey with amazing flavors':'Delicious choices for every appetite'}</div></div><button class="see-all" onclick="selectCategory('${cat.replace(/'/g,"\\'")}')">See All →</button></div><div class="list-grid">${list.map(i=>{const img=imageValue(i);if(img)return `<article class="dish-row"><img src="${esc(img)}" alt="${esc(i.name||'Food')}" onerror="this.closest('.dish-row').classList.add('no-photo');this.remove()"><div class="dish-main"><div class="dish-name-line">${typeIcon(typeValue(i),true)}<div class="dish-title">${esc(i.name||'Unnamed item')}</div></div><div class="dish-desc">${esc(i.description||'')}</div><div class="dish-actions"><div class="dish-price">${money(i.price_full??i.price)}</div>${has3D(i)?`<button class="dish-3d-btn" onclick="open3DByIndex(${menuData.indexOf(i)})">◈ 3D View</button><button class="ar-3d-btn" onclick="open3DByIndex(${menuData.indexOf(i)});setTimeout(activate3DAR,450)">📱 AR</button>`:""}</div></div></article>`;return `<article class="dish-row no-photo"><div class="dish-main"><div class="dish-name-line">${typeIcon(typeValue(i),true)}<div class="dish-title">${esc(i.name||'Unnamed item')}</div></div><div class="dish-desc">${esc(i.description||'')}</div><div class="dish-actions"><div class="dish-price">${money(i.price_full??i.price)}</div>${has3D(i)?`<button class="dish-3d-btn" onclick="open3DByIndex(${menuData.indexOf(i)})">◈ 3D View</button><button class="ar-3d-btn" onclick="open3DByIndex(${menuData.indexOf(i)});setTimeout(activate3DAR,450)">📱 AR</button>`:""}</div></div></article>`;}).join('')}</div></section>`;}).join('');
     if(!items.length)$('categorySections').innerHTML='<div style="padding:30px;text-align:center;color:#667085">No menu items found.</div>';
   }
   function selectCategory(c){selectedCategory=c;renderMenu();if(c!=='All Items')$('categorySections').scrollIntoView({behavior:'smooth',block:'start'});}
