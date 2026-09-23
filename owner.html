@@ -314,7 +314,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     <a class="navItem" href="#analytics" data-section="analytics"><i class="fa-solid fa-chart-column"></i> Analytics</a>
     <a class="navItem" href="#settings" data-section="settings"><i class="fa-solid fa-gear"></i> Settings</a>
     <a class="navItem" href="#support" data-section="support"><i class="fa-regular fa-circle-question"></i> Help & Support</a>
-    <a class="navItem" href="/plans.html" id="plansNavLink"><i class="fa-solid fa-crown"></i> Plans & Pricing</a>
+    <a class="navItem" href="javascript:void(0)" onclick="openOwnerPlans()" id="plansNavLink"><i class="fa-solid fa-crown"></i> Plans & Pricing</a>
   </nav>
   <div class="sidePromo">
     <i class="fa-solid fa-crown"></i><strong>Grow Your Business</strong>
@@ -373,7 +373,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     </div>
     <div class="planFeatureList" id="currentPlanFeatures"></div>
     <div class="planSummaryActions">
-      <a class="btn sm" href="/plans.html"><i class="fa-solid fa-list"></i> View Plans & Pricing</a>
+      <a class="btn sm" href="javascript:void(0)" onclick="openOwnerPlans()"><i class="fa-solid fa-list"></i> View Plans & Pricing</a>
       <span class="muted" id="currentPlanNote" style="font-size:10px">Plan details are controlled by FreeMenu Super Admin.</span>
     </div>
   </div>
@@ -1625,7 +1625,7 @@ $("downloadQR").onclick=()=>{const a=document.createElement("a");a.href=$("qrBox
 /* ---------- Public menu ---------- */
 function openPublic(){window.open(publicUrl(),"_blank","noopener")}
 ["publicTop","sidePublicBtn","quickPreview","openPublic2"].forEach(id=>$(id).onclick=openPublic);
-$("sidePlansBtn").onclick=()=>{window.location.href="/plans.html"};
+$("sidePlansBtn").onclick=()=>{window.location.href="javascript:void(0)" onclick="openOwnerPlans()"};
 
 /* ---------- Theme preview ---------- */
 function updateTheme(){
@@ -2099,6 +2099,21 @@ $("reorderMenuBtn")?.addEventListener("click",openReorderMenu);
 $("reorderMenuBtnDash")?.addEventListener("click",openReorderMenu);
 $("reorderCancelBtn")?.addEventListener("click",closeReorderMenu);
 $("reorderSaveBtn")?.addEventListener("click",saveReorderMenu);
+
+function openOwnerPlans(){
+  try{
+    const token=(crypto?.randomUUID?crypto.randomUUID():String(Date.now())+"-"+Math.random().toString(36).slice(2));
+    sessionStorage.setItem("fm_owner_plans_access",JSON.stringify({
+      token,
+      expiresAt:Date.now()+10*60*1000
+    }));
+    window.location.href="/plans.html?owner_plans="+encodeURIComponent(token);
+  }catch(e){
+    console.error("Plans access setup failed:",e);
+    toast("Plans page open nahi ho pa raha.");
+  }
+}
+
 </script>
 </body>
 </html>
