@@ -355,7 +355,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
       <div class="planSummaryTitle">
         <div class="planCrown"><i class="fa-solid fa-crown"></i></div>
         <div>
-          <div class="planEyebrow">Current Plan</div>
+          <div class="planEyebrow">Current Plan <span id="customPlanBadge" class="hidden" style="display:inline-block;margin-left:6px;padding:3px 6px;border-radius:999px;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;font-size:8px;letter-spacing:.3px">CUSTOM MENU</span></div>
           <div class="planName" id="currentPlanName">Loading plan...</div>
           <div class="muted" id="currentPlanDescription" style="font-size:10px;margin-top:3px"></div>
         </div>
@@ -729,6 +729,22 @@ let currentPlan=null;
 let signature3dLimit=0;
 let signature3dCount=0;
 let isPremiumRestaurant=false;
+
+/* ---------- Custom Menu assignment (Super Admin controlled) ----------
+   Custom Menu is stored directly on restaurants and takes precedence over
+   the normal plans.plan_id assignment. Nothing in the existing plan system
+   is removed; this only adds the custom-plan layer.
+*/
+let isCustomMenuPlan=false;
+let customMenuSettings={
+  photo_enabled:false,
+  gallery_enabled:false,
+  ar_enabled:false,
+  qr_stickers_max:null,
+  signature_3d_dishes_max:0,
+  features:[],
+  notes:""
+};
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
@@ -1123,13 +1139,29 @@ async function loadCurrentPlan(){
         statusEl=$("currentPlanStatus"), metricsEl=$("currentPlanMetrics"), featuresEl=$("currentPlanFeatures"), noteEl=$("currentPlanNote");
   if(!nameEl)return;
 
+  const customPlanBadge=$("customPlanBadge");
+  if(customPlanBadge) customPlanBadge.classList.toggle("hidden",!Boolean(currentRestaurant?.custom_plan_enabled));
+
   const money=n=>"₹"+Number(n||0).toLocaleString("en-IN");
   const period=v=>{
     const x=String(v||"/ month").trim();
     return x.startsWith("/")?x:"/ "+x.replace(/^\/\s*/,"");
   };
+
+  isCustomMenuPlan=Boolean(currentRestaurant?.custom_plan_enabled);
+  customMenuSettings={
+    photo_enabled:currentRestaurant?.custom_photo_enabled===true,
+    gallery_enabled:currentRestaurant?.custom_gallery_enabled===true,
+    ar_enabled:currentRestaurant?.custom_ar_enabled===true,
+    qr_stickers_max:currentRestaurant?.custom_qr_stickers_max??null,
+    signature_3d_dishes_max:Math.max(0,Number(currentRestaurant?.custom_signature_3d_dishes_max||0)),
+    features:Array.isArray(currentRestaurant?.custom_features)?currentRestaurant.custom_features:[],
+    notes:String(currentRestaurant?.custom_notes||"")
+  };
+
   const renderNoPlan=()=>{
-    currentPlan=null; signature3dLimit=0; signature3dCount=0; updateSignature3DUI();
+    currentPlan=null; isCustomMenuPlan=false; signature3dLimit=0; signature3dCount=0;
+    updateSignature3DUI(); updateMenuPhotoUI();
     nameEl.textContent="No plan assigned";
     descEl.textContent="Ask Super Admin to assign a plan to this restaurant.";
     priceEl.innerHTML='—';
@@ -1142,6 +1174,86 @@ async function loadCurrentPlan(){
 
   nameEl.textContent="Loading plan...";
   descEl.textContent="";featuresEl.innerHTML="";
+
+  /* ============================================================
+     NEW: Super Admin Custom Menu
+     Custom settings live on restaurants and are intentionally checked
+     before plan_id so the owner always receives the admin-assigned
+     custom configuration.
+     ============================================================ */
+  if(isCustomMenuPlan){
+    const customFeatures=customMenuSettings.features
+      .map(f=>typeof f==="string"?f:(f?.enabled===false?"":(f?.text||f?.name||"")))
+      .filter(Boolean);
+
+    currentPlan={
+      id:"custom-"+String(currentRestaurant?.id||""),
+      name:String(currentRestaurant?.custom_plan_name||"Custom Menu"),
+      slug:"custom-menu",
+      plan_type:"custom",
+      monthly_price:Number(currentRestaurant?.custom_monthly_price||0),
+      setup_fee:Number(currentRestaurant?.custom_setup_fee||0),
+      period_label:"/ month",
+      setup_fee_label:"One-Time",
+      description:"Custom Menu settings assigned by FreeMenu Super Admin.",
+      badge_text:"CUSTOM MENU • ADMIN ASSIGNED",
+      is_active:true,
+      qr_stickers_max:customMenuSettings.qr_stickers_max,
+      signature_3d_dishes_max:customMenuSettings.signature_3d_dishes_max,
+      features:customFeatures,
+      custom_photo_enabled:customMenuSettings.photo_enabled,
+      custom_gallery_enabled:customMenuSettings.gallery_enabled,
+      custom_ar_enabled:customMenuSettings.ar_enabled
+    };
+
+    signature3dLimit=customMenuSettings.ar_enabled ? customMenuSettings.signature_3d_dishes_max : 0;
+    await refreshSignature3DCount();
+    updateSignature3DUI();
+    updateMenuPhotoUI();
+
+    nameEl.textContent=currentPlan.name;
+    descEl.textContent=currentPlan.description;
+    priceEl.innerHTML=`${money(currentPlan.monthly_price)} <small>${esc(period(currentPlan.period_label))}</small>`;
+    statusEl.textContent="CUSTOM ACTIVE";
+    statusEl.style.background="#eef2ff";
+    statusEl.style.color="#4338ca";
+    statusEl.style.borderColor="#c7d2fe";
+
+    const setupText=Number(currentPlan.setup_fee||0)===0
+      ? "Free"
+      : `${money(currentPlan.setup_fee)} • ${currentPlan.setup_fee_label}`;
+
+    const qr=currentPlan.qr_stickers_max==null?"—":String(currentPlan.qr_stickers_max);
+    const dishes=currentPlan.signature_3d_dishes_max==null?"—":String(currentPlan.signature_3d_dishes_max);
+
+    metricsEl.innerHTML=`
+      <div class="planMetric"><div class="k">Setup Fee</div><div class="v">${esc(setupText)}</div></div>
+      <div class="planMetric"><div class="k">QR Stickers</div><div class="v">${esc(qr)}</div></div>
+      <div class="planMetric"><div class="k">3D Dishes</div><div class="v">${esc(dishes)}</div></div>
+      <div class="planMetric"><div class="k">Plan Type</div><div class="v">Custom</div></div>`;
+
+    featuresEl.innerHTML=customFeatures.slice(0,8)
+      .map(f=>`<span class="planFeatureChip"><i class="fa-solid fa-check"></i>${esc(f)}</span>`).join("");
+
+    noteEl.textContent=currentRestaurant?.custom_notes
+      ? String(currentRestaurant.custom_notes)
+      : "Custom Menu settings are controlled by FreeMenu Super Admin.";
+
+    console.log("FreeMenu Custom Menu settings:",{
+      restaurantId:currentRestaurant?.id,
+      custom_plan_name:currentRestaurant?.custom_plan_name,
+      monthly_price:currentRestaurant?.custom_monthly_price,
+      setup_fee:currentRestaurant?.custom_setup_fee,
+      qr_stickers_max:currentRestaurant?.custom_qr_stickers_max,
+      signature_3d_dishes_max:currentRestaurant?.custom_signature_3d_dishes_max,
+      photo_enabled:currentRestaurant?.custom_photo_enabled,
+      gallery_enabled:currentRestaurant?.custom_gallery_enabled,
+      ar_enabled:currentRestaurant?.custom_ar_enabled
+    });
+    return;
+  }
+
+  /* Existing standard plan resolution remains unchanged. */
   let plan=null, error=null;
 
   /* Primary source: Super Admin assignment via restaurants.plan_id. */
@@ -1206,6 +1318,7 @@ async function loadCurrentPlan(){
   signature3dLimit=Math.max(0,Number(plan.signature_3d_dishes_max||0));
   await refreshSignature3DCount();
   updateSignature3DUI();
+  updateMenuPhotoUI();
 
   nameEl.textContent=plan.name||"Current Plan";
   descEl.textContent=plan.description||"";
@@ -1230,8 +1343,8 @@ async function loadCurrentPlan(){
   featuresEl.innerHTML=features.slice(0,8).map(f=>`<span class="planFeatureChip"><i class="fa-solid fa-check"></i>${esc(f)}</span>`).join("");
   noteEl.textContent=plan.badge_text?plan.badge_text+" • Plan assigned by Super Admin.":"Plan assigned by Super Admin.";
 }
-
 function isSignature3DPlan(){
+  if(isCustomMenuPlan) return customMenuSettings.ar_enabled===true && signature3dLimit>0;
   return signature3dLimit>0 || /signature|full.*3d/i.test(`${currentPlan?.slug||""} ${currentPlan?.name||""}`);
 }
 async function refreshSignature3DCount(){
@@ -1250,6 +1363,7 @@ function updateSignature3DUI(){
   }
 }
 function isGrowthPhotoPlan(){
+  if(isCustomMenuPlan) return customMenuSettings.photo_enabled===true;
   const key=`${currentPlan?.slug||""} ${currentPlan?.name||""}`.toLowerCase();
   return key.includes("growth") || key.includes("signature") || key.includes("full 3d") || key.includes("3d-experience");
 }
@@ -1581,9 +1695,15 @@ async function refreshMediaPolicyUI(){
     String(r.subscription_status||"").toLowerCase()==="active" &&
     (!r.subscription_expires_at || new Date(r.subscription_expires_at)>new Date());
 
-  if($("galleryPaidBox"))$("galleryPaidBox").style.display=mediaRules.gallery_paid_enabled?"block":"none";
+  const customGalleryEnabled=isCustomMenuPlan && customMenuSettings.gallery_enabled===true;
+  const galleryEnabled=customGalleryEnabled || mediaRules.gallery_paid_enabled;
+
+  if($("galleryPaidBox"))$("galleryPaidBox").style.display=galleryEnabled?"block":"none";
   if($("galleryLocked")){
-    if(!mediaRules.gallery_paid_enabled){
+    if(customGalleryEnabled){
+      $("galleryLocked").innerHTML="✅ Custom Menu Gallery access is active. This setting is controlled by FreeMenu Super Admin.";
+      $("galleryUploadBox").style.display="block";
+    }else if(!mediaRules.gallery_paid_enabled){
       $("galleryLocked").textContent="Photo Gallery is disabled by Super Admin.";
       $("galleryUploadBox").style.display="none";
     }else if(!isPremiumRestaurant){
@@ -1656,8 +1776,8 @@ $("uploadBannerMedia").onclick=()=>uploadMediaFile("banner");
 $("chooseGalleryMedia").onclick=()=>$("galleryMediaFile").click();
 $("galleryMediaFile").onchange=()=>{$("chooseGalleryMedia").textContent=$("galleryMediaFile").files[0]?.name?.slice(0,18)||"Choose"};
 $("uploadGalleryMedia").onclick=async()=>{
-  if(!mediaRules.gallery_paid_enabled)return toast("Gallery is disabled by Super Admin.");
-  if(!isPremiumRestaurant)return toast("Upgrade to Premium to use the Gallery.");
+  if(!(isCustomMenuPlan && customMenuSettings.gallery_enabled===true) && !mediaRules.gallery_paid_enabled)return toast("Gallery is disabled by Super Admin.");
+  if(!(isCustomMenuPlan && customMenuSettings.gallery_enabled===true) && !isPremiumRestaurant)return toast("Upgrade to Premium to use the Gallery.");
   const file=$("galleryMediaFile").files[0],bad=validateMediaFile(file);if(bad)return toast(bad);
   $("uploadGalleryMedia").disabled=true;$("uploadGalleryMedia").textContent="Uploading...";
   try{
@@ -1678,7 +1798,7 @@ function renderGalleryList(){
   el.innerHTML=g.length?g.map((u,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)"><img src="${esc(u)}" style="width:48px;height:38px;object-fit:cover;border-radius:7px"><span style="flex:1;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(u)}</span><button class="btn sm" type="button" onclick="removeGalleryImage(${i})">Remove</button></div>`).join(""):'<div class="muted" style="font-size:10px">No gallery images yet.</div>';
 }
 async function removeGalleryImage(i){
-  if(!mediaRules.gallery_paid_enabled||!isPremiumRestaurant)return toast("Gallery access is not available.");
+  if(!(isCustomMenuPlan && customMenuSettings.gallery_enabled===true) && (!mediaRules.gallery_paid_enabled||!isPremiumRestaurant))return toast("Gallery access is not available.");
   const g=Array.isArray(currentRestaurant?.gallery)?[...currentRestaurant.gallery]:[];
   g.splice(i,1);
   const {data,error}=await supabaseClient.from("restaurants").update({gallery:g}).eq("id",currentRestaurantId).select("*").single();
