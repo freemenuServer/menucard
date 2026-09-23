@@ -314,7 +314,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     <a class="navItem" href="#analytics" data-section="analytics"><i class="fa-solid fa-chart-column"></i> Analytics</a>
     <a class="navItem" href="#settings" data-section="settings"><i class="fa-solid fa-gear"></i> Settings</a>
     <a class="navItem" href="#support" data-section="support"><i class="fa-regular fa-circle-question"></i> Help & Support</a>
-    <a class="navItem" href="javascript:void(0)" onclick="openOwnerPlans()" id="plansNavLink"><i class="fa-solid fa-crown"></i> Plans & Pricing</a>
+    <a class="navItem" href="javascript:void(0)" id="plansNavLink" onclick="openOwnerPlans()"><i class="fa-solid fa-crown"></i> Plans & Pricing</a>
   </nav>
   <div class="sidePromo">
     <i class="fa-solid fa-crown"></i><strong>Grow Your Business</strong>
@@ -1625,7 +1625,7 @@ $("downloadQR").onclick=()=>{const a=document.createElement("a");a.href=$("qrBox
 /* ---------- Public menu ---------- */
 function openPublic(){window.open(publicUrl(),"_blank","noopener")}
 ["publicTop","sidePublicBtn","quickPreview","openPublic2"].forEach(id=>$(id).onclick=openPublic);
-$("sidePlansBtn").onclick=()=>{window.location.href="javascript:void(0)" onclick="openOwnerPlans()"};
+$("sidePlansBtn").onclick=()=>openOwnerPlans();
 
 /* ---------- Theme preview ---------- */
 function updateTheme(){
@@ -2102,9 +2102,11 @@ $("reorderSaveBtn")?.addEventListener("click",saveReorderMenu);
 
 function openOwnerPlans(){
   try{
-    const token=(crypto?.randomUUID?crypto.randomUUID():String(Date.now())+"-"+Math.random().toString(36).slice(2));
+    const token=(window.crypto&&crypto.randomUUID)
+      ? crypto.randomUUID()
+      : String(Date.now())+"-"+Math.random().toString(36).slice(2);
     sessionStorage.setItem("fm_owner_plans_access",JSON.stringify({
-      token,
+      token:token,
       expiresAt:Date.now()+10*60*1000
     }));
     window.location.href="/plans.html?owner_plans="+encodeURIComponent(token);
