@@ -70,9 +70,6 @@
       padding:25px;min-width:0;box-shadow:var(--shadow);
       overflow:hidden
     }
-    .plan.active-plan{border-color:rgba(54,211,153,.75);box-shadow:0 22px 70px rgba(54,211,153,.10)}
-    .plan.active-plan .plan-btn{background:#159a70;cursor:default}
-    .plan.active-plan .plan-btn:hover{background:#159a70;transform:none}
     .plan.recommended{
       border-color:rgba(239,51,64,.72);
       box-shadow:0 22px 70px rgba(239,51,64,.12)
@@ -152,7 +149,7 @@
   <div class="wrap">
     <div class="topbar">
       <div class="brand">Free<span>Menu</span>.in</div>
-      <a class="back" href="/owner.html">← Owner Dashboard</a>
+      <a class="back" href="../owner.html">← Owner Dashboard</a>
     </div>
 
     <section class="hero">
@@ -174,7 +171,48 @@
 
   <div id="toast" class="toast"></div>
 
-  <script>
+  
+<script>
+/* FreeMenu Plans Access Gate
+   Plans are intentionally not a public/direct page.
+   Owner dashboard opens this page with a short-lived navigation token.
+*/
+(function(){
+  const params = new URLSearchParams(location.search);
+  const token = params.get("owner_plans");
+  const now = Date.now();
+
+  let allowed = false;
+  try{
+    const saved = sessionStorage.getItem("fm_owner_plans_access");
+    if(saved){
+      const data = JSON.parse(saved);
+      allowed = data && data.token && data.token === token && Number(data.expiresAt) > now;
+    }
+  }catch(e){}
+
+  if(!allowed){
+    document.documentElement.innerHTML = `
+      <head><title>FreeMenu.in</title></head>
+      <body style="margin:0;min-height:100vh;display:grid;place-items:center;background:#f8fafc;font-family:Arial,sans-serif">
+        <div style="max-width:420px;margin:20px;padding:28px;background:#fff;border:1px solid #e4e7ec;border-radius:18px;text-align:center;box-shadow:0 10px 30px rgba(16,24,40,.08)">
+          <div style="font-size:42px">🔒</div>
+          <h2 style="margin:12px 0 8px;color:#101828">Plans page restricted</h2>
+          <p style="margin:0 0 20px;color:#667085">Please open Plans from your Owner Dashboard.</p>
+          <button onclick="location.href='/owner.html'" style="border:0;border-radius:10px;padding:11px 18px;background:#111827;color:#fff;cursor:pointer">Go to Owner</button>
+        </div>
+      </body>`;
+    throw new Error("Plans page requires Owner Dashboard access.");
+  }
+
+  /* Remove the token from the visible URL after validating it. */
+  if(history.replaceState){
+    history.replaceState({}, document.title, location.pathname);
+  }
+})();
+</script>
+
+<script>
     const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
 
@@ -240,40 +278,60 @@
         const features = normalizeFeatures(plan.features);
         const recommended = plan.is_recommended === true;
         const isFree = plan.plan_type === "free" || Number(plan.monthly_price || 0) === 0;
-        const isCurrent = Boolean(window.__currentPlanId && plan.id === window.__currentPlanId);
+
         const featureHtml = features.map(feature => `
           <li class="${feature.enabled ? "" : "disabled"}">
             <span class="check">${feature.enabled ? "✓" : "×"}</span>
             <span>${escapeHtml(feature.text)}</span>
           </li>
         `).join("");
+
         const badge = plan.badge_text
           ? `<div class="ribbon">${escapeHtml(plan.badge_text)}</div>`
           : "";
+
         const setupLabel = plan.setup_fee_label || "One-Time";
         const setupFee = Number(plan.setup_fee || 0);
-        const buttonText = isCurrent
-          ? "Current Active Plan"
-          : (plan.button_text || (isFree ? "Select Free Starter" : `Upgrade to ${plan.name}`));
+
+        const buttonText =
+          plan.button_text ||
+          (isFree ? "Current Active Plan" : `Upgrade to ${plan.name}`);
 
         return `
-          <article class="plan ${recommended ? "recommended" : ""} ${isFree ? "free" : ""} ${isCurrent ? "active-plan" : ""}">
+          <article class="plan ${recommended ? "recommended" : ""} ${isFree ? "free" : ""}">
             ${badge}
+
             <div class="plan-name">${escapeHtml(plan.name)}</div>
-            <div class="desc">${escapeHtml(plan.description || "")}</div>
+
+            <div class="desc">
+              ${escapeHtml(plan.description || "")}
+            </div>
+
             <div class="price-row">
               <span class="currency">₹</span>
               <span class="price">${money(plan.monthly_price)}</span>
               <span class="period">${escapeHtml(plan.period_label || "/ month")}</span>
             </div>
+
             <div class="setup">
-              Setup Fee: <strong>₹${money(setupFee)}</strong>
+              Setup Fee:
+              <strong>₹${money(setupFee)}</strong>
               ${setupLabel ? ` <span>(${escapeHtml(setupLabel)})</span>` : ""}
             </div>
+
             <ul class="features">
-              ${featureHtml || `<li><span class="check">✓</span><span>Plan details available from FreeMenu</span></li>`}
+              ${featureHtml || `
+                <li>
+                  <span class="check">✓</span>
+                  <span>Plan details available from FreeMenu</span>
+                </li>
+              `}
             </ul>
-            <button class="plan-btn" type="button" ${isCurrent ? "disabled aria-current=\"true\"" : `onclick="selectPlan('${escapeHtml(plan.slug)}','${escapeHtml(plan.name)}',${isFree})"`}>
+
+            <button
+              class="plan-btn"
+              type="button"
+              onclick="selectPlan('${escapeHtml(plan.slug)}','${escapeHtml(plan.name)}',${isFree})">
               ${escapeHtml(buttonText)}
             </button>
           </article>
@@ -284,30 +342,26 @@
     async function loadPlans(){
       $("status").textContent = "Loading plans...";
 
-      const { data: sessionData } = await supabaseClient.auth.getSession();
-      const user = sessionData?.session?.user || null;
-      window.__currentPlanId = null;
-
-      if(user){
-        const { data: restaurant, error: restaurantError } = await supabaseClient
-          .from("restaurants")
-          .select("id, plan_id, owner_id")
-          .eq("owner_id", user.id)
-          .limit(1)
-          .maybeSingle();
-
-        if(!restaurantError && restaurant?.plan_id){
-          window.__currentPlanId = restaurant.plan_id;
-        }
-      }
-
       const { data, error } = await supabaseClient
         .from("plans")
         .select(`
-          id, name, slug, plan_type, monthly_price, setup_fee,
-          period_label, setup_fee_label, description, badge_text, button_text,
-          qr_stickers_max, signature_3d_dishes_max, features,
-          is_active, is_recommended, sort_order
+          id,
+          name,
+          slug,
+          plan_type,
+          monthly_price,
+          setup_fee,
+          period_label,
+          setup_fee_label,
+          description,
+          badge_text,
+          button_text,
+          qr_stickers_max,
+          signature_3d_dishes_max,
+          features,
+          is_active,
+          is_recommended,
+          sort_order
         `)
         .eq("is_active", true)
         .order("sort_order", { ascending:true })
@@ -316,7 +370,11 @@
       if(error){
         console.error("Plans load error:", error);
         $("status").textContent = "Unable to load plans.";
-        $("plans").innerHTML = `<div class="empty"><strong>Plans could not be loaded.</strong><br><br>Please make sure the <b>plans</b> table SQL has been run in Supabase.</div>`;
+        $("plans").innerHTML = `
+          <div class="empty">
+            <strong>Plans could not be loaded.</strong><br><br>
+            Please make sure the <b>plans</b> table SQL has been run in Supabase.
+          </div>`;
         return;
       }
 
