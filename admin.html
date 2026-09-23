@@ -157,7 +157,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
     <div><h2>Subscriptions & Plan Assignment</h2><p style="color:#667085;margin:4px 0 0">Manually assign a plan to any restaurant, just like QR assignment.</p></div>
     <div class="toolbar"><button class="iconbtn" onclick="loadAll()">↻ Refresh</button></div>
   </div>
-  <div class="notice"><b>Manual assignment:</b> Select a restaurant, choose an active plan from the dropdown, and save. The selected plan is stored directly on that restaurant.</div>
+  <div class="notice"><b>Manual assignment:</b> Select a restaurant and choose an active plan. <b>Custom Menu</b> is Super Admin-only and lets you manually define price, QR quantity, photo/gallery access, and 3D/AR quantity for that restaurant. Custom settings are stored directly on the restaurant and are not shown on the public Plans page.</div>
   <div class="card" style="margin-bottom:12px">
     <div class="card-head"><h3>Assign Restaurant Plan</h3></div>
     <div class="formgrid">
@@ -370,38 +370,89 @@ function renderSubscriptions(){
   }
   if($('assignPlanSelect')){
     const current=$('assignPlanSelect').value;
-    $('assignPlanSelect').innerHTML='<option value="">Select plan...</option>'+activePlans.map(p=>`<option value="${esc(p.id)}">${esc(p.name)} — ₹${Number(p.monthly_price||0).toLocaleString('en-IN')}/month</option>`).join('');
-    if(activePlans.some(p=>p.id===current))$('assignPlanSelect').value=current;
+    $('assignPlanSelect').innerHTML='<option value="">Select plan...</option>'+activePlans.map(p=>`<option value="${esc(p.id)}">${esc(p.name)} — ₹${Number(p.monthly_price||0).toLocaleString('en-IN')}/month</option>`).join('')+'<option value="__custom__">Custom Menu — Super Admin Only</option>';
+    if(activePlans.some(p=>p.id===current)||current==='__custom__')$('assignPlanSelect').value=current;
   }
   const list=restaurants.filter(r=>`${r.name} ${r.phone||''} ${r.slug||''}`.toLowerCase().includes(search));
-  $('subsTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Current Plan</th><th>Price</th><th>Plan Status</th><th>Assigned</th><th>Action</th></tr></thead><tbody>${list.map(r=>{const p=plans.find(x=>x.id===r.plan_id);return `<tr><td><b>${esc(r.name)}</b><br><small>${esc(r.phone||r.slug||'')}</small></td><td>${p?`<b>${esc(p.name)}</b><br><small>${esc(p.slug)}</small>`:'<span style="color:#98a2b3">Not Assigned</span>'}</td><td>${p?'₹'+Number(p.monthly_price||0).toLocaleString('en-IN'):'—'}</td><td>${p?pill(p.is_active?'active':'blocked'):'<span class="pill orange">● unassigned</span>'}</td><td>${r.plan_assigned_at?fmt(r.plan_assigned_at,true):'—'}</td><td><button class="iconbtn" onclick="openAssignRestaurantPlan('${r.id}')">Assign / Change</button>${p?` <button class="danger" onclick="removeRestaurantPlan('${r.id}')">Remove</button>`:''}</td></tr>`}).join('')||'<tr><td colspan="6"><div class="empty">No restaurants found.</div></td></tr>'}</tbody></table>`;
+  $('subsTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Current Plan</th><th>Price</th><th>Limits</th><th>Plan Status</th><th>Assigned</th><th>Action</th></tr></thead><tbody>${list.map(r=>{
+    const isCustom=r.plan_assignment_type==='custom';
+    const p=plans.find(x=>x.id===r.plan_id);
+    const name=isCustom?(r.custom_plan_name||'Custom Menu'):(p?.name||'Not Assigned');
+    const price=isCustom?Number(r.custom_monthly_price||0):Number(p?.monthly_price||0);
+    const qr=isCustom?r.custom_qr_stickers_max:p?.qr_stickers_max;
+    const d3=isCustom?r.custom_signature_3d_dishes_max:p?.signature_3d_dishes_max;
+    return `<tr><td><b>${esc(r.name)}</b><br><small>${esc(r.phone||r.slug||'')}</small></td><td><b>${esc(name)}</b>${isCustom?'<br><small>Super Admin Custom</small>':p?`<br><small>${esc(p.slug)}</small>`:''}</td><td>${(isCustom||p)?'₹'+price.toLocaleString('en-IN'):'—'}</td><td>${(qr==null?'QR —':`QR ${esc(qr)}`)} • ${(d3==null?'3D —':`3D ${esc(d3)}`)}</td><td>${isCustom?'<span class="pill" style="background:#f3e8ff;color:#7f56d9">● custom</span>':p?pill(p.is_active?'active':'blocked'):'<span class="pill orange">● unassigned</span>'}</td><td>${r.plan_assigned_at?fmt(r.plan_assigned_at,true):'—'}</td><td><button class="iconbtn" onclick="openAssignRestaurantPlan('${r.id}')">Assign / Change</button>${(p||isCustom)?` <button class="danger" onclick="removeRestaurantPlan('${r.id}')">Remove</button>`:''}</td></tr>`;
+  }).join('')||'<tr><td colspan="7"><div class="empty">No restaurants found.</div></td></tr>'}</tbody></table>`;
 }
 function openAssignRestaurantPlan(rid){
   const r=restaurants.find(x=>x.id===rid); if(!r)return;
   const current=plans.find(p=>p.id===r.plan_id);
-  modal('Assign Plan to Restaurant',`<div class="notice"><b>${esc(r.name)}</b><br>Current plan: <b>${esc(current?.name||'Not Assigned')}</b></div><div class="field"><label>Select Plan</label><select id="modalAssignPlan">${plans.filter(p=>p.is_active).map(p=>`<option value="${esc(p.id)}" ${p.id===r.plan_id?'selected':''}>${esc(p.name)} — ₹${Number(p.monthly_price||0).toLocaleString('en-IN')}/month</option>`).join('')}</select></div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveRestaurantPlan('${r.id}')">Save Plan</button></div>`);
+  const isCustom=r.plan_assignment_type==='custom';
+  const qr=isCustom?r.custom_qr_stickers_max:'';
+  const d3=isCustom?r.custom_signature_3d_dishes_max:'';
+  const html=`<div class="notice"><b>${esc(r.name)}</b><br>Current: <b>${esc(isCustom?(r.custom_plan_name||'Custom Menu'):(current?.name||'Not Assigned'))}</b></div>
+    <div class="field"><label>Assignment Type</label><select id="modalAssignType" onchange="toggleCustomPlanFields()"><option value="standard" ${!isCustom?'selected':''}>Standard Plan</option><option value="custom" ${isCustom?'selected':''}>Custom Menu — Super Admin Only</option></select></div>
+    <div id="standardPlanFields" class="field" style="margin-top:10px"><label>Select Plan</label><select id="modalAssignPlan">${plans.filter(p=>p.is_active).map(p=>`<option value="${esc(p.id)}" ${p.id===r.plan_id&&!isCustom?'selected':''}>${esc(p.name)} — ₹${Number(p.monthly_price||0).toLocaleString('en-IN')}/month</option>`).join('')}</select></div>
+    <div id="customPlanFields" style="display:${isCustom?'block':'none'};margin-top:10px">
+      <div class="notice" style="background:#f8f5ff;border-color:#d9c7ff;color:#6941c6"><b>Custom Menu settings</b><br>These values are saved only for this restaurant. They do not create or publish a public pricing plan.</div>
+      <div class="formgrid">
+        <div class="field"><label>Custom Plan Name</label><input id="customPlanName" value="${esc(r.custom_plan_name||'Custom Menu')}" placeholder="Custom Menu"></div>
+        <div class="field"><label>Monthly Price (₹)</label><input id="customMonthlyPrice" type="number" min="0" value="${Number(r.custom_monthly_price||0)}"></div>
+        <div class="field"><label>Setup Fee (₹)</label><input id="customSetupFee" type="number" min="0" value="${Number(r.custom_setup_fee||0)}"></div>
+        <div class="field"><label>QR Stickers Maximum</label><input id="customQrMax" type="number" min="0" value="${qr??''}" placeholder="10"></div>
+        <div class="field"><label>3D / AR Image Quantity</label><input id="custom3dMax" type="number" min="0" value="${d3??''}" placeholder="25"></div>
+        <div class="field"><label>Food Photos</label><select id="customPhoto"><option value="false" ${r.custom_photo_enabled!==true?'selected':''}>OFF</option><option value="true" ${r.custom_photo_enabled===true?'selected':''}>ON</option></select></div>
+        <div class="field"><label>Gallery</label><select id="customGallery"><option value="false" ${r.custom_gallery_enabled!==true?'selected':''}>OFF</option><option value="true" ${r.custom_gallery_enabled===true?'selected':''}>ON</option></select></div>
+        <div class="field"><label>3D / AR Feature</label><select id="customAr"><option value="false" ${r.custom_ar_enabled!==true?'selected':''}>OFF</option><option value="true" ${r.custom_ar_enabled===true?'selected':''}>ON</option></select></div>
+        <div class="field full"><label>Custom Plan Notes</label><textarea id="customPlanNotes" placeholder="Internal notes for Super Admin">${esc(r.custom_plan_notes||'')}</textarea></div>
+        <div class="field full"><label>Features — one per line</label><textarea id="customFeatures" placeholder="Food photos
+Custom QR quantity
+3D / AR dishes">${esc(Array.isArray(r.custom_features)?r.custom_features.map(x=>typeof x==='string'?x:(x?.text||'')).filter(Boolean).join('\n'):'')}</textarea></div>
+      </div>
+    </div>
+    <div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveRestaurantPlan('${r.id}')">Save Assignment</button></div>`;
+  modal('Assign Plan to Restaurant',html);
+}
+function toggleCustomPlanFields(){
+  const custom=$('modalAssignType')?.value==='custom';
+  if($('standardPlanFields'))$('standardPlanFields').style.display=custom?'none':'block';
+  if($('customPlanFields'))$('customPlanFields').style.display=custom?'block':'none';
 }
 async function assignRestaurantPlan(){
   const rid=$('assignPlanRestaurant')?.value,pid=$('assignPlanSelect')?.value;
   if(!rid||!pid)return toast('Restaurant aur plan select karein.');
+  if(pid==='__custom__'){openAssignRestaurantPlan(rid);$('modalAssignType').value='custom';toggleCustomPlanFields();return;}
   await saveRestaurantPlan(rid,pid);
 }
 async function saveRestaurantPlan(rid,pidOverride=null){
+  const restaurant=restaurants.find(r=>r.id===rid);
+  if(!restaurant)return toast('Restaurant not found.');
+  const assignmentType=$('modalAssignType')?.value || (pidOverride==='__custom__'?'custom':'standard');
+  const now=new Date().toISOString();
+  if(assignmentType==='custom'){
+    const d3=$('custom3dMax')?.value===''?null:Number($('custom3dMax')?.value);
+    const qr=$('customQrMax')?.value===''?null:Number($('customQrMax')?.value);
+    if((d3!=null&&(!Number.isInteger(d3)||d3<0))||(qr!=null&&(!Number.isInteger(qr)||qr<0)))return toast('QR aur 3D quantity valid whole number honi chahiye.');
+    const features=($('customFeatures')?.value||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean).map(text=>({text,enabled:true}));
+    const payload={plan_id:null,plan_assignment_type:'custom',custom_plan_name:$('customPlanName')?.value.trim()||'Custom Menu',custom_monthly_price:Number($('customMonthlyPrice')?.value||0),custom_setup_fee:Number($('customSetupFee')?.value||0),custom_qr_stickers_max:qr,custom_signature_3d_dishes_max:d3,custom_photo_enabled:$('customPhoto')?.value==='true',custom_gallery_enabled:$('customGallery')?.value==='true',custom_ar_enabled:$('customAr')?.value==='true',custom_features:features,custom_plan_notes:$('customPlanNotes')?.value.trim()||null,plan_assigned_at:now,plan_assigned_by:session.user.id};
+    const r=await db.from('restaurants').update(payload).eq('id',rid);
+    if(r.error)return toast('Custom Menu assignment failed: '+r.error.message);
+    await logAction(`Assigned Custom Menu to ${restaurant.name} — 3D ${d3==null?'unlimited':d3}, QR ${qr==null?'unlimited':qr}`,rid);
+    closeModal();await loadAll();toast(`Custom Menu assigned to ${restaurant.name}`);return;
+  }
   const pid=pidOverride||$('modalAssignPlan')?.value;
-  if(!rid||!pid)return toast('Plan select karein.');
-  const plan=plans.find(p=>p.id===pid),restaurant=restaurants.find(r=>r.id===rid);
+  if(!pid||pid==='__custom__')return toast('Plan select karein.');
+  const plan=plans.find(p=>p.id===pid);
   if(!plan)return toast('Selected plan not found.');
-  const r=await db.from('restaurants').update({plan_id:pid,plan_assigned_at:new Date().toISOString(),plan_assigned_by:session.user.id}).eq('id',rid);
+  const r=await db.from('restaurants').update({plan_id:pid,plan_assignment_type:'standard',custom_plan_name:null,custom_monthly_price:0,custom_setup_fee:0,custom_qr_stickers_max:null,custom_signature_3d_dishes_max:null,custom_photo_enabled:false,custom_gallery_enabled:false,custom_ar_enabled:false,custom_features:[],custom_plan_notes:null,plan_assigned_at:now,plan_assigned_by:session.user.id}).eq('id',rid);
   if(r.error)return toast('Plan assignment failed: '+r.error.message);
-  await logAction(`Assigned plan ${plan.name} to ${restaurant?.name||rid}`,rid);
-  closeModal();
-  await loadAll();
-  toast(`${plan.name} assigned to ${restaurant?.name||'restaurant'}`);
+  await logAction(`Assigned plan ${plan.name} to ${restaurant.name}`,rid);
+  closeModal();await loadAll();toast(`${plan.name} assigned to ${restaurant.name}`);
 }
 async function removeRestaurantPlan(rid){
   const restaurant=restaurants.find(r=>r.id===rid); if(!restaurant)return;
   if(!confirm(`Remove the current plan from ${restaurant.name}?`))return;
-  const r=await db.from('restaurants').update({plan_id:null,plan_assigned_at:null,plan_assigned_by:null}).eq('id',rid);
+  const r=await db.from('restaurants').update({plan_id:null,plan_assignment_type:'standard',custom_plan_name:null,custom_monthly_price:0,custom_setup_fee:0,custom_qr_stickers_max:null,custom_signature_3d_dishes_max:null,custom_photo_enabled:false,custom_gallery_enabled:false,custom_ar_enabled:false,custom_features:[],custom_plan_notes:null,plan_assigned_at:null,plan_assigned_by:null}).eq('id',rid);
   if(r.error)return toast('Could not remove plan: '+r.error.message);
   await logAction(`Removed restaurant plan from ${restaurant.name}`,rid);
   await loadAll();toast('Plan removed');
