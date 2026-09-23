@@ -165,7 +165,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
       <div class="field"><label>Plan</label><select id="assignPlanSelect"></select></div>
       <div class="field"><label>Plan Expiry Date</label><input id="assignPlanExpiry" type="date" min="${new Date().toISOString().slice(0,10)}"><small style="display:block;margin-top:5px;color:#667085">Expiry ke baad Free Starter.</small></div>
     </div>
-    <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="primary" onclick="assignRestaurantPlan()">Assign Plan</button></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px"><button class="iconbtn" onclick="openCustomMenuAssignment()">+ Custom Menu</button><button class="primary" onclick="assignRestaurantPlan()">Assign Plan</button></div>
   </div>
   <div class="card">
     <div class="card-head"><h3>Restaurant Plan Assignments</h3><input class="input" id="planAssignmentSearch" placeholder="Search restaurant..." oninput="renderSubscriptions()"></div>
@@ -378,7 +378,7 @@ function renderSubscriptions(){
     if(activePlans.some(p=>p.id===current))$('assignPlanSelect').value=current;
   }
   const list=restaurants.filter(r=>`${r.name} ${r.phone||''} ${r.slug||''}`.toLowerCase().includes(search));
-  $('subsTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Current Plan</th><th>Price</th><th>Plan Status</th><th>Assigned</th><th>Action</th></tr></thead><tbody>${list.map(r=>{const p=plans.find(x=>x.id===r.plan_id);return `<tr><td><b>${esc(r.name)}</b><br><small>${esc(r.phone||r.slug||'')}</small></td><td>${p?`<b>${esc(p.name)}</b><br><small>${esc(p.slug)}</small>`:'<span style="color:#98a2b3">Not Assigned</span>'}</td><td>${p?'₹'+Number(p.monthly_price||0).toLocaleString('en-IN'):'—'}</td><td>${p?pill(p.is_active?'active':'blocked'):'<span class="pill orange">● unassigned</span>'}</td><td>${r.plan_assigned_at?fmt(r.plan_assigned_at,true):'—'}${r.plan_expires_at?`<br><small style="color:${isPlanExpired(r)?'#b42318':'#667085'}">Expires: ${esc(toDateInputValue(r.plan_expires_at))}${isPlanExpired(r)?' • expired':''}</small>`:''}</td><td><button class="iconbtn" onclick="openAssignRestaurantPlan('${r.id}')">Assign / Change</button>${p?` <button class="danger" onclick="removeRestaurantPlan('${r.id}')">Remove</button>`:''}</td></tr>`}).join('')||'<tr><td colspan="6"><div class="empty">No restaurants found.</div></td></tr>'}</tbody></table>`;
+  $('subsTable').innerHTML=`<table class="table"><thead><tr><th>Restaurant</th><th>Current Plan</th><th>Price</th><th>Plan Status</th><th>Assigned</th><th>Action</th></tr></thead><tbody>${list.map(r=>{const p=plans.find(x=>x.id===r.plan_id);const custom=!!r.custom_plan_enabled;const displayName=custom?(r.custom_plan_name||'Custom Menu'):(p?.name||'Not Assigned');const displayPrice=custom?'₹'+Number(r.custom_monthly_price||0).toLocaleString('en-IN'):p?'₹'+Number(p.monthly_price||0).toLocaleString('en-IN'):'—';const status=custom?pill('active'):p?pill(p.is_active?'active':'blocked'):'<span class="pill orange">● unassigned</span>';return `<tr><td><b>${esc(r.name)}</b><br><small>${esc(r.phone||r.slug||'')}</small></td><td>${custom?`<b>${esc(displayName)}</b><br><small>custom-menu • admin assigned</small>`:p?`<b>${esc(p.name)}</b><br><small>${esc(p.slug)}</small>`:'<span style="color:#98a2b3">Not Assigned</span>'}</td><td>${displayPrice}</td><td>${status}</td><td>${(r.plan_assigned_at||r.custom_plan_assigned_at)?fmt(r.plan_assigned_at||r.custom_plan_assigned_at,true):'—'}${r.plan_expires_at?`<br><small style="color:${isPlanExpired(r)?'#b42318':'#667085'}">Expires: ${esc(toDateInputValue(r.plan_expires_at))}${isPlanExpired(r)?' • expired':''}</small>`:''}</td><td><button class="iconbtn" onclick="${custom?`openCustomMenuAssignment('${r.id}')`:`openAssignRestaurantPlan('${r.id}')`}">${custom?'Edit Custom':'Assign / Change'}</button>${p||custom?` <button class="danger" onclick="removeRestaurantPlan('${r.id}')">Remove</button>`:''}</td></tr>`}).join('')||'<tr><td colspan="6"><div class="empty">No restaurants found.</div></td></tr>'}</tbody></table>`;
 }
 
 function toDateInputValue(value){
@@ -467,6 +467,82 @@ function openAssignRestaurantPlan(rid){
       <button class="smallbtn" onclick="closeModal()">Cancel</button>
       <button class="primary" onclick="saveRestaurantPlan('${r.id}')">Save Plan</button>
     </div>`);
+}
+
+function openCustomMenuAssignment(rid=''){
+  const r=rid?restaurants.find(x=>x.id===rid):restaurants.find(x=>x.id===($('assignPlanRestaurant')?.value||''));
+  const today=new Date().toISOString().slice(0,10);
+  const currentExpiry=toDateInputValue(r?.plan_expires_at||r?.custom_plan_expires_at||'');
+  const features=Array.isArray(r?.custom_features)?r.custom_features:[];
+  const featureText=features.map(f=>typeof f==='string'?f:(f?.text||f?.name||'')).filter(Boolean).join('\n');
+  modal('Custom Menu Assignment',`
+    <div class="notice"><b>Custom Menu</b> — settings are saved directly on the restaurant and take priority over the standard plan.</div>
+    <div class="formgrid">
+      <div class="field full"><label>Restaurant</label><select id="customRestaurantSelect">${restaurants.map(x=>`<option value="${esc(x.id)}" ${x.id===(r?.id||'')?'selected':''}>${esc(x.name)}${x.phone?' — '+esc(x.phone):''}</option>`).join('')}</select></div>
+      <div class="field"><label>Custom Plan Name</label><input id="customPlanName" value="${esc(r?.custom_plan_name||'Custom Menu')}" placeholder="e.g. Royal 3D Package"></div>
+      <div class="field"><label>Monthly Price (₹)</label><input id="customMonthlyPrice" type="number" min="0" step="1" value="${Number(r?.custom_monthly_price||0)}"></div>
+      <div class="field"><label>Setup Fee (₹)</label><input id="customSetupFee" type="number" min="0" step="1" value="${Number(r?.custom_setup_fee||0)}"></div>
+      <div class="field"><label>QR Quantity</label><input id="customQrMax" type="number" min="0" step="1" value="${r?.custom_qr_stickers_max==null?'':Number(r.custom_qr_stickers_max)}"></div>
+      <div class="field"><label>3D / AR Dish Quantity</label><input id="custom3dMax" type="number" min="0" step="1" value="${Number(r?.custom_signature_3d_dishes_max||0)}"></div>
+      <div class="field"><label>Photos</label><select id="customPhotoEnabled"><option value="false" ${r?.custom_photo_enabled===true?'':'selected'}>OFF</option><option value="true" ${r?.custom_photo_enabled===true?'selected':''}>ON</option></select></div>
+      <div class="field"><label>Gallery</label><select id="customGalleryEnabled"><option value="false" ${r?.custom_gallery_enabled===true?'':'selected'}>OFF</option><option value="true" ${r?.custom_gallery_enabled===true?'selected':''}>ON</option></select></div>
+      <div class="field"><label>3D / AR</label><select id="customArEnabled"><option value="false" ${r?.custom_ar_enabled===true?'':'selected'}>OFF</option><option value="true" ${r?.custom_ar_enabled===true?'selected':''}>ON</option></select></div>
+      <div class="field"><label>Expiry Date</label><input id="customPlanExpiry" type="date" min="${today}" value="${currentExpiry}"><small style="display:block;margin-top:5px;color:#667085">Expiry ke baad restaurant automatically Free Starter par shift hoga.</small></div>
+      <div class="field full"><label>Custom Features — one per line</label><textarea id="customFeatures" style="min-height:110px" placeholder="Premium support\nCustom branding\n15 Signature 3D dishes">${esc(featureText)}</textarea></div>
+      <div class="field full"><label>Admin Notes</label><textarea id="customNotes" style="min-height:80px" placeholder="Internal notes">${esc(r?.custom_notes||'')}</textarea></div>
+    </div>
+    <div class="modalfoot">
+      <button class="smallbtn" onclick="closeModal()">Cancel</button>
+      <button class="primary" onclick="saveCustomMenuAssignment()">Save Custom Menu</button>
+    </div>`);
+}
+
+async function saveCustomMenuAssignment(){
+  const rid=$('customRestaurantSelect')?.value;
+  const name=($('customPlanName')?.value||'Custom Menu').trim()||'Custom Menu';
+  const expiry=$('customPlanExpiry')?.value||'';
+  const monthly=Math.max(0,Number($('customMonthlyPrice')?.value||0));
+  const setup=Math.max(0,Number($('customSetupFee')?.value||0));
+  const qrRaw=$('customQrMax')?.value;
+  const qr=qrRaw===''||qrRaw==null?null:Math.max(0,Math.floor(Number(qrRaw)));
+  const dishes=Math.max(0,Math.floor(Number($('custom3dMax')?.value||0)));
+  const photo=$('customPhotoEnabled')?.value==='true';
+  const gallery=$('customGalleryEnabled')?.value==='true';
+  const ar=$('customArEnabled')?.value==='true';
+  const features=($('customFeatures')?.value||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  const notes=($('customNotes')?.value||'').trim();
+  if(!rid)return toast('Restaurant select karein.');
+  if(!expiry)return toast('Custom Menu expiry date select karein.');
+  const selectedExpiry=new Date(`${expiry}T23:59:59.999`);
+  if(Number.isNaN(selectedExpiry.getTime())||selectedExpiry.getTime()<=Date.now())return toast('Valid future expiry date select karein.');
+  if(!Number.isFinite(monthly)||!Number.isFinite(setup)||!Number.isFinite(dishes)||!Number.isFinite(qr??0))return toast('Numeric values valid rakhein.');
+  const restaurant=restaurants.find(r=>r.id===rid);
+  const payload={
+    custom_plan_enabled:true,
+    custom_plan_name:name,
+    custom_monthly_price:monthly,
+    custom_setup_fee:setup,
+    custom_qr_stickers_max:qr,
+    custom_signature_3d_dishes_max:dishes,
+    custom_photo_enabled:photo,
+    custom_gallery_enabled:gallery,
+    custom_ar_enabled:ar,
+    custom_features:features,
+    custom_notes:notes||null,
+    custom_plan_assigned_at:new Date().toISOString(),
+    custom_plan_assigned_by:session?.user?.id||null,
+    custom_plan_expires_at:selectedExpiry.toISOString(),
+    plan_id:null,
+    plan_assigned_at:new Date().toISOString(),
+    plan_assigned_by:session?.user?.id||null,
+    plan_expires_at:selectedExpiry.toISOString()
+  };
+  const result=await db.from('restaurants').update(payload).eq('id',rid);
+  if(result.error)return toast('Custom Menu save failed: '+result.error.message);
+  await logAction(`Assigned Custom Menu ${name} to ${restaurant?.name||rid} until ${expiry}`,rid);
+  closeModal();
+  await loadAll();
+  toast(`Custom Menu assigned to ${restaurant?.name||'restaurant'} until ${expiry}`);
 }
 
 async function assignRestaurantPlan(){
