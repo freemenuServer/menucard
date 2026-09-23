@@ -1926,7 +1926,21 @@ function getSavedCategoryOrder(rest, items) {
               planKey.includes("signature_3d") ||
               (planKey.includes("signature") && planKey.includes("3d"));
 
-            if (isSignature3D) {
+            // NEW: Full 3D Experience also uses the Signature Menu template.
+            // The actual GLB / AR dish limit remains controlled by the assigned
+            // plan's signature_3d_dishes_max value in Owner Dashboard.
+            const isFull3D =
+              planKey.includes("full 3d") ||
+              planKey.includes("full-3d") ||
+              planKey.includes("full_3d") ||
+              (planKey.includes("full") && planKey.includes("3d"));
+
+            // NEW: Super Admin Custom Menu also uses the Signature Menu template.
+            // Custom Menu stays fully controlled by the restaurant's custom
+            // settings (including custom_signature_3d_dishes_max) in Owner Dashboard.
+            const isCustomMenu = rest.custom_plan_enabled === true;
+
+            if (isSignature3D || isFull3D || isCustomMenu) {
               const signatureUrl = new URL("/signaturemenu.html", window.location.origin);
               signatureUrl.searchParams.set("r", rest.slug);
               window.location.replace(signatureUrl.href);
