@@ -80,6 +80,13 @@
       padding:6px 10px;font-size:10px;font-weight:900;letter-spacing:.5px
     }
     .plan-name{font-size:22px;font-weight:850;margin-bottom:7px;padding-right:70px}
+    .plan.current-active{border-color:rgba(54,211,153,.78);box-shadow:0 22px 70px rgba(54,211,153,.10)}
+    .active-ribbon{position:absolute;top:14px;left:14px;background:var(--green);color:#06130e;border-radius:999px;padding:6px 10px;font-size:10px;font-weight:900;letter-spacing:.5px}
+    .plan.current-active .plan-btn{background:#1f8f68;cursor:default}
+    .plan.current-active .plan-btn:hover{background:#1f8f68;transform:none}
+    .current-summary{margin:0 auto 26px;max-width:900px;border:1px solid rgba(54,211,153,.25);background:rgba(54,211,153,.06);border-radius:16px;padding:14px 18px;text-align:center;color:#d7f8eb;font-size:14px}
+    .current-summary strong{color:#fff}
+    .custom-summary{border-color:rgba(99,102,241,.35);background:rgba(99,102,241,.08);color:#e7e9ff}
     .desc{font-size:13px;line-height:1.55;color:var(--muted);min-height:42px}
     .price-row{display:flex;align-items:flex-end;gap:6px;margin:22px 0 5px}
     .currency{font-size:21px;font-weight:800;margin-bottom:6px}
@@ -162,6 +169,7 @@
     </section>
 
     <div id="status">Loading plans...</div>
+    <div id="currentSummary" class="current-summary" style="display:none"></div>
     <section id="plans" class="plans"></section>
 
     <div class="footer">
@@ -263,7 +271,7 @@
       }).filter(item => item.text);
     }
 
-    function renderPlans(rows){
+    function renderPlans(rows, currentPlanId=null, customCurrent=null){
       const root = $("plans");
 
       if(!rows.length){
@@ -278,6 +286,7 @@
         const features = normalizeFeatures(plan.features);
         const recommended = plan.is_recommended === true;
         const isFree = plan.plan_type === "free" || Number(plan.monthly_price || 0) === 0;
+        const isCurrent = !customCurrent && currentPlanId && String(plan.id) === String(currentPlanId);
 
         const featureHtml = features.map(feature => `
           <li class="${feature.enabled ? "" : "disabled"}">
@@ -294,11 +303,13 @@
         const setupFee = Number(plan.setup_fee || 0);
 
         const buttonText =
-          plan.button_text ||
-          (isFree ? "Current Active Plan" : `Upgrade to ${plan.name}`);
+          isCurrent ? "Current Active Plan" :
+          (plan.button_text ||
+          (isFree ? "Current Active Plan" : `Upgrade to ${plan.name}`));
 
         return `
-          <article class="plan ${recommended ? "recommended" : ""} ${isFree ? "free" : ""}">
+          <article class="plan ${recommended ? "recommended" : ""} ${isFree ? "free" : ""} ${isCurrent ? "current-active" : ""}">
+            ${isCurrent ? `<div class="active-ribbon">CURRENT ACTIVE</div>` : ""}
             ${badge}
 
             <div class="plan-name">${escapeHtml(plan.name)}</div>
@@ -331,7 +342,7 @@
             <button
               class="plan-btn"
               type="button"
-              onclick="selectPlan('${escapeHtml(plan.slug)}','${escapeHtml(plan.name)}',${isFree})">
+              onclick="selectPlan('${escapeHtml(plan.slug)}','${escapeHtml(plan.name)}',${isFree},${isCurrent})" ${isCurrent ? "disabled" : ""}>
               ${escapeHtml(buttonText)}
             </button>
           </article>
@@ -342,63 +353,119 @@
     async function loadPlans(){
       $("status").textContent = "Loading plans...";
 
-      const { data, error } = await supabaseClient
-        .from("plans")
-        .select(`
-          id,
-          name,
-          slug,
-          plan_type,
-          monthly_price,
-          setup_fee,
-          period_label,
-          setup_fee_label,
-          description,
-          badge_text,
-          button_text,
-          qr_stickers_max,
-          signature_3d_dishes_max,
-          features,
-          is_active,
-          is_recommended,
-          sort_order
-        `)
-        .eq("is_active", true)
-        .order("sort_order", { ascending:true })
-        .order("monthly_price", { ascending:true });
+      const [{data:plansData,error:plansError},{data:{user}}] = await Promise.all([
+        supabaseClient
+          .from("plans")
+          .select(`
+            id,name,slug,plan_type,monthly_price,setup_fee,period_label,setup_fee_label,
+            description,badge_text,button_text,qr_stickers_max,signature_3d_dishes_max,
+            features,is_active,is_recommended,sort_order
+          `)
+          .eq("is_active", true)
+          .order("sort_order", { ascending:true })
+          .order("monthly_price", { ascending:true }),
+        supabaseClient.auth.getUser()
+      ]);
 
-      if(error){
-        console.error("Plans load error:", error);
+      if(plansError){
+        console.error("Plans load error:", plansError);
         $("status").textContent = "Unable to load plans.";
-        $("plans").innerHTML = `
-          <div class="empty">
-            <strong>Plans could not be loaded.</strong><br><br>
-            Please make sure the <b>plans</b> table SQL has been run in Supabase.
-          </div>`;
+        $("plans").innerHTML = `<div class="empty"><strong>Plans could not be loaded.</strong><br><br>Please make sure the <b>plans</b> table SQL has been run in Supabase.</div>`;
         return;
       }
 
+      let restaurant=null;
+      let restaurantError=null;
+      if(user?.id){
+        const res=await supabaseClient
+          .from("restaurants")
+          .select("id,name,owner_id,plan_id,plan,custom_plan_enabled,custom_plan_name,custom_monthly_price,custom_setup_fee,custom_qr_stickers_max,custom_signature_3d_dishes_max,custom_photo_enabled,custom_gallery_enabled,custom_ar_enabled,custom_features,custom_notes,plan_expires_at,custom_plan_expires_at")
+          .eq("owner_id",user.id)
+          .limit(1)
+          .maybeSingle();
+        restaurant=res.data||null;
+        restaurantError=res.error||null;
+      }
+
+      if(restaurantError) console.warn("Current restaurant load error:",restaurantError.message);
+
+      const rows=plansData||[];
+      const currentPlanId=restaurant?.custom_plan_enabled ? null : (restaurant?.plan_id||null);
+      const customCurrent=restaurant?.custom_plan_enabled===true;
+
+      window.__freeMenuPlans = rows;
+      window.__freeMenuRestaurant = restaurant;
+      window.__freeMenuCurrentPlan = customCurrent
+        ? { name: restaurant?.custom_plan_name || "Custom Menu" }
+        : (rows.find(p => String(p.id) === String(currentPlanId)) || null);
+
+      const summary=$("currentSummary");
+      if(summary){
+        if(customCurrent){
+          const expires=restaurant?.custom_plan_expires_at||restaurant?.plan_expires_at;
+          summary.className="current-summary custom-summary";
+          summary.style.display="block";
+          summary.innerHTML=`<strong>Current Active Plan:</strong> ${escapeHtml(restaurant?.custom_plan_name||"Custom Menu")} · Custom Menu assigned by Super Admin${expires?` · Expires ${escapeHtml(new Date(expires).toLocaleDateString("en-IN"))}`:""}`;
+        }else{
+          const current=rows.find(p=>String(p.id)===String(currentPlanId));
+          summary.className="current-summary";
+          summary.style.display="block";
+          summary.innerHTML=current
+            ? `<strong>Current Active Plan:</strong> ${escapeHtml(current.name)}${restaurant?.plan_expires_at?` · Expires ${escapeHtml(new Date(restaurant.plan_expires_at).toLocaleDateString("en-IN"))}`:""}`
+            : `<strong>Current Active Plan:</strong> ${currentPlanId?"Assigned plan details unavailable":"No plan assigned"}`;
+        }
+      }
+
       $("status").textContent = "";
-      renderPlans(data || []);
+      renderPlans(rows, currentPlanId, customCurrent);
     }
 
-    function selectPlan(slug, name, isFree){
+    function selectPlan(slug, name, isFree, isCurrent=false){
+      if(isCurrent){
+        showToast("Ye aapka current active plan hai.");
+        return;
+      }
+
       if(isFree){
         showToast("This is the Free Starter plan.");
         return;
       }
 
-      /*
-        Payment/subscription gateway is not connected here yet.
-        This keeps the pricing page independent from payment logic.
-        Later the button can call your subscription/payment function
-        using the plan slug.
-      */
-      const params = new URLSearchParams({
-        plan: slug
-      });
+      const plan = (window.__freeMenuPlans || []).find(p => String(p.slug) === String(slug));
+      const restaurant = window.__freeMenuRestaurant || null;
+      const currentPlan = window.__freeMenuCurrentPlan || null;
 
-      window.location.href = `../owner.html?upgrade=${encodeURIComponent(slug)}`;
+      const monthly = plan ? `₹${money(plan.monthly_price)}${plan.period_label || "/ month"}` : "Not available";
+      const setup = plan ? `₹${money(plan.setup_fee)}${plan.setup_fee_label ? ` (${plan.setup_fee_label})` : ""}` : "Not available";
+      const qr = plan?.qr_stickers_max == null ? "As per plan" : plan.qr_stickers_max;
+      const ar = plan?.signature_3d_dishes_max == null ? "Not specified" : plan.signature_3d_dishes_max;
+      const features = normalizeFeatures(plan?.features || []).map(f => `${f.enabled ? "✓" : "×"} ${f.text}`).join("\n") || "Plan details available from FreeMenu";
+      const current = currentPlan ? currentPlan.name : (restaurant?.custom_plan_enabled ? (restaurant.custom_plan_name || "Custom Menu") : "No plan assigned");
+
+      const message = [
+        "Hello FreeMenu 👋",
+        "I want to upgrade my restaurant menu plan.",
+        "",
+        `Selected Plan: ${name}`,
+        `Plan Slug: ${slug}`,
+        `Monthly Price: ${monthly}`,
+        `Setup Fee: ${setup}`,
+        `QR Stickers: ${qr}`,
+        `3D / AR Dishes: ${ar}`,
+        "",
+        "Plan Features:",
+        features,
+        "",
+        "Restaurant Details:",
+        `Restaurant Name: ${restaurant?.name || "Not available"}`,
+        `Current Active Plan: ${current}`,
+        `Owner ID: ${restaurant?.owner_id || "Not available"}`,
+        "",
+        "Please share the upgrade/payment process and next steps."
+      ].join("\n");
+
+      const whatsappUrl = `https://wa.me/917091924949?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, "_blank", "noopener,noreferrer");
     }
 
     loadPlans();
