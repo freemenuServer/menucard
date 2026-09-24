@@ -238,7 +238,28 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
       <input class="input" id="loginPasswordNew" type="password" autocomplete="current-password" placeholder="Enter your password">
     </div>
     <button type="button" class="loginSubmit" id="loginSubmitNew">🔐 Login to Owner Panel</button>
+    <button type="button" class="authSwitch" id="forgotPasswordBtn">Forgot Password?</button>
     <button type="button" class="authSwitch" id="goSignupFromLogin">New here? Create an account</button>
+  </div>
+
+<!-- RESET PASSWORD FORM -->
+  <div class="ownerAuthCard authFormCard" id="resetPasswordCard" style="display:none">
+    <button type="button" class="authBack" id="backResetPasswordBtn">← Back to Login</button>
+    <div class="authBrand">🔑</div><div class="authKicker">FreeMenu Owner Portal</div>
+    <h1>Reset Password</h1>
+    <p class="authSub">Set a new password for your Owner account</p>
+    <div id="resetPasswordError" class="authError" style="display:none"></div>
+    <div id="resetPasswordSuccess" class="authSuccess" style="display:none"></div>
+
+    <div class="formGroup">
+      <label>New Password</label>
+      <input class="input" id="resetPasswordNew" type="password" autocomplete="new-password" placeholder="Minimum 6 characters">
+    </div>
+    <div class="formGroup">
+      <label>Confirm New Password</label>
+      <input class="input" id="resetPasswordConfirm" type="password" autocomplete="new-password" placeholder="Repeat new password">
+    </div>
+    <button type="button" class="loginSubmit" id="resetPasswordSubmit">🔑 Update Password</button>
   </div>
 <!-- SIGN UP FORM -->
   <div class="ownerAuthCard authFormCard signupCard" id="signupCard" style="display:none">
@@ -789,8 +810,10 @@ function showLoginForm(){
   $("authChoiceCard").style.display="grid";
   $("loginCard").classList.add("active");
   $("signupCard").classList.remove("active");
+  $("resetPasswordCard")?.classList.remove("active");
   $("loginCard").style.display="block";
   $("signupCard").style.display="none";
+  if($("resetPasswordCard")) $("resetPasswordCard").style.display="none";
   $("authLoginTab")?.classList.add("active");
   $("authSignupTab")?.classList.remove("active");
 }
@@ -799,10 +822,24 @@ function showSignupForm(){
   $("authChoiceCard").style.display="grid";
   $("loginCard").classList.remove("active");
   $("signupCard").classList.add("active");
+  $("resetPasswordCard")?.classList.remove("active");
   $("loginCard").style.display="none";
   $("signupCard").style.display="block";
+  if($("resetPasswordCard")) $("resetPasswordCard").style.display="none";
   $("authLoginTab")?.classList.remove("active");
   $("authSignupTab")?.classList.add("active");
+}
+function showResetPasswordForm(){
+  $("ownerAuth").classList.add("show");
+  $("authChoiceCard").style.display="grid";
+  $("loginCard").classList.remove("active");
+  $("signupCard").classList.remove("active");
+  $("loginCard").style.display="none";
+  $("signupCard").style.display="none";
+  $("resetPasswordCard")?.classList.add("active");
+  if($("resetPasswordCard")) $("resetPasswordCard").style.display="block";
+  $("authLoginTab")?.classList.remove("active");
+  $("authSignupTab")?.classList.remove("active");
 }
 function showAuthChoice(){ showLoginForm(); }
 $("authLoginTab")?.addEventListener("click",showLoginForm);
@@ -813,6 +850,72 @@ function setAuthMsg(id,msg,ok=false){
   el.textContent=msg;
   el.style.display=msg?"block":"none";
   el.className=ok?"authSuccess":"authError";
+}
+
+async function requestPasswordReset(){
+  const email=$("loginEmailNew").value.trim();
+  setAuthMsg("loginErrorNew","");
+  if(!email){
+    setAuthMsg("loginErrorNew","Please enter your owner email address first.");
+    $("loginEmailNew")?.focus();
+    return;
+  }
+  const btn=$("forgotPasswordBtn");
+  if(btn){ btn.disabled=true; btn.textContent="Sending reset link..."; }
+  try{
+    const redirectTo=location.origin+location.pathname+"?auth=reset";
+    const {error}=await supabaseClient.auth.resetPasswordForEmail(email,{redirectTo});
+    if(error){
+      setAuthMsg("loginErrorNew",error.message);
+      return;
+    }
+    setAuthMsg("loginErrorNew","Password reset link sent. Please check your email.",true);
+  }catch(e){
+    console.error("Password reset request failed:",e);
+    setAuthMsg("loginErrorNew",e?.message||"Unable to send password reset email. Please try again.");
+  }finally{
+    if(btn){ btn.disabled=false; btn.textContent="Forgot Password?"; }
+  }
+}
+
+async function updateOwnerPassword(){
+  const password=$("resetPasswordNew").value;
+  const confirm=$("resetPasswordConfirm").value;
+  setAuthMsg("resetPasswordError","");
+  setAuthMsg("resetPasswordSuccess","");
+  if(password.length<6){
+    setAuthMsg("resetPasswordError","Password must be at least 6 characters.");
+    return;
+  }
+  if(password!==confirm){
+    setAuthMsg("resetPasswordError","Passwords do not match.");
+    return;
+  }
+  const btn=$("resetPasswordSubmit");
+  btn.disabled=true;
+  btn.textContent="Updating password...";
+  try{
+    const {error}=await supabaseClient.auth.updateUser({password});
+    if(error){
+      setAuthMsg("resetPasswordError",error.message);
+      return;
+    }
+    setAuthMsg("resetPasswordSuccess","Password updated successfully. You can now login with your new password.",true);
+    $("resetPasswordNew").value="";
+    $("resetPasswordConfirm").value="";
+    setTimeout(()=>{
+      supabaseClient.auth.signOut().finally(()=>{
+        history.replaceState({},document.title,location.pathname+"?auth=login");
+        showLoginForm();
+      });
+    },1200);
+  }catch(e){
+    console.error("Password update failed:",e);
+    setAuthMsg("resetPasswordError",e?.message||"Unable to update password. Please try again.");
+  }finally{
+    btn.disabled=false;
+    btn.textContent="🔑 Update Password";
+  }
 }
 
 async function ownerLogin(){
@@ -955,6 +1058,11 @@ async function ownerSignup(){
 
 $("goSignupFromLogin").onclick=showSignupForm;
 $("goLoginFromSignup").onclick=showLoginForm;
+$("forgotPasswordBtn").onclick=requestPasswordReset;
+$("backResetPasswordBtn").onclick=showLoginForm;
+$("resetPasswordSubmit").onclick=updateOwnerPassword;
+$("resetPasswordNew").addEventListener("keydown",e=>{if(e.key==="Enter")updateOwnerPassword()});
+$("resetPasswordConfirm").addEventListener("keydown",e=>{if(e.key==="Enter")updateOwnerPassword()});
 $("loginSubmitNew").onclick=ownerLogin;
 $("loginPasswordNew").addEventListener("keydown",e=>{if(e.key==="Enter")ownerLogin()});
 $("signupSubmitNew").onclick=ownerSignup;
@@ -1835,6 +1943,10 @@ document.querySelectorAll(".modal").forEach(m=>m.addEventListener("click",e=>{if
 /* ---------- Misc ---------- */
 document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{showSection(b.dataset.go==="restaurantEdit"?"restaurant":b.dataset.go==="galleryEdit"?"gallery":"dashboard")});
 supabaseClient.auth.onAuthStateChange((event, newSession)=>{
+  if(event==="PASSWORD_RECOVERY"){
+    showResetPasswordForm();
+    return;
+  }
   if(event==="SIGNED_OUT"){
     session=null; currentRestaurant=null; currentRestaurantId=null; items=[];
     showOwnerLogin();
@@ -1877,6 +1989,7 @@ window.addEventListener("load",function(){
   setTimeout(()=>{
     if(mode==="login") showLoginForm();
     if(mode==="signup") showSignupForm();
+    if(mode==="reset") showResetPasswordForm();
   },150);
 });
 </script>
