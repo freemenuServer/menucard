@@ -15,7 +15,7 @@ body{min-height:100vh;background:#f3f5f7;color:#151820;font-family:Inter,Arial,H
 .decor{position:absolute;opacity:.13;font-size:38px;z-index:1}.d1{left:24px;top:62px;transform:rotate(-15deg)}.d2{right:25px;top:55px;transform:rotate(12deg)}.d3{left:23px;bottom:180px;transform:rotate(-10deg)}.d4{right:25px;bottom:165px;transform:rotate(12deg)}
 .content{position:relative;z-index:2;text-align:center}.note{font-size:14px;font-style:italic;font-weight:700;color:#6f737b;margin-bottom:8px}.smallTitle{font-size:34px;line-height:1;font-weight:850;letter-spacing:-1.5px}.bigTitle{font-size:76px;line-height:.9;font-weight:950;letter-spacing:-4px;margin:0}
 .lines{display:flex;justify-content:center;gap:6px;margin:16px 0 13px}.lines i{display:block;width:88px;height:7px;border-radius:10px}.g{background:#45ad4d}.o{background:#ffb21d}.r{background:#f25459}
-.restaurant{font-size:21px;font-weight:900;margin:4px 0 8px}.code{display:inline-block;background:#f4f4f4;border-radius:999px;padding:7px 13px;color:#666;font-size:12px;font-weight:900;letter-spacing:.6px;margin-bottom:14px}
+.restaurant{font-size:21px;font-weight:900;margin:4px 0 8px}
 .qrBox{width:min(100%,450px);margin:auto;background:#fff;border:1px solid #ededed;border-radius:26px;padding:22px;box-shadow:0 12px 35px rgba(0,0,0,.09)}#qrcode{width:100%;display:flex;justify-content:center;align-items:center}#qrcode canvas,#qrcode svg{display:block;max-width:100%;height:auto!important}.scan{margin-top:14px;font-size:13px;font-weight:850;color:#555}
 .brandArea{margin-top:25px}.brand{display:flex;justify-content:center;align-items:center;gap:7px}.leaf{font-size:26px}.brandName{font-size:38px;font-weight:950;letter-spacing:-2px;line-height:1}.brandName span{font-weight:500}.tag{margin-top:7px;font-size:10px;font-weight:900;letter-spacing:4px;color:#666}.brandLines{display:flex;justify-content:center;gap:5px;margin-top:12px}.brandLines i{width:28px;height:4px;border-radius:8px}
 .features{display:grid;grid-template-columns:repeat(3,1fr);margin-top:23px;padding-top:18px;border-top:1px solid #eee}.feature{padding:0 10px;border-right:1px solid #e5e5e5}.feature:last-child{border-right:0}.fi{font-size:21px;margin-bottom:4px}.ft{font-size:13px;font-weight:900}.fs{font-size:10px;color:#777;margin-top:3px}.footer{margin-top:21px;font-size:11px;font-weight:900;letter-spacing:2px;color:#999}.footer2{font-size:12px;font-weight:750;color:#555;margin-top:5px}
@@ -50,7 +50,7 @@ body{min-height:100vh;background:#f3f5f7;color:#151820;font-family:Inter,Arial,H
 <div class="features"><div class="feature"><div class="fi">🌿</div><div class="ft">Digital Menu</div><div class="fs">Eco Friendly</div></div><div class="feature"><div class="fi">⚡</div><div class="ft">Quick Access</div><div class="fs">No App Needed</div></div><div class="feature"><div class="fi">♡</div><div class="ft">Easy Access</div><div class="fs">Simple & Fast</div></div></div>
 <div class="footer">FREEMENU.IN</div><div class="footer2">Eat • Explore • Enjoy</div>
 </div></div>
-<div id="unassigned" class="poster"><div class="state"><div class="stateIcon">✓</div><h2>QR Code Not Assigned</h2><div id="unassignedCode" class="badge">FM-0001</div><p>This QR code is available and has not been assigned to a restaurant yet.</p><p style="margin-top:10px">Assign this QR code from the Super Admin panel.</p></div></div>
+<div id="unassigned" class="poster"><div class="state"><div class="stateIcon">✓</div><h2>QR Code Not Assigned</h2><p>This QR code is available and has not been assigned to a restaurant yet.</p><p style="margin-top:10px">Assign this QR code from the Super Admin panel.</p></div></div>
 <div id="error" class="poster"><div class="state"><div class="stateIcon">!</div><h2>QR Code Error</h2><p id="errorText">We could not process this QR code.</p></div></div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.9.2/lib/qr-code-styling.js"></script>
@@ -59,10 +59,10 @@ body{min-height:100vh;background:#f3f5f7;color:#151820;font-family:Inter,Arial,H
 const SUPABASE_URL='https://pfsrpowopbrevocwsuii.supabase.co';
 const SUPABASE_ANON_KEY='sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
 const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-const loading=document.getElementById('loading'),poster=document.getElementById('poster'),unassigned=document.getElementById('unassigned'),errorBox=document.getElementById('error'),errorText=document.getElementById('errorText'),restaurantName=document.getElementById('restaurantName'),unassignedCode=document.getElementById('unassignedCode'),qrContainer=document.getElementById('qrcode');
+const loading=document.getElementById('loading'),poster=document.getElementById('poster'),unassigned=document.getElementById('unassigned'),errorBox=document.getElementById('error'),errorText=document.getElementById('errorText'),restaurantName=document.getElementById('restaurantName'),qrContainer=document.getElementById('qrcode');
 let currentCode='',qrInstance=null;
 function getMenuUrl(slug){return new URL('/menu.html?r='+encodeURIComponent(slug),window.location.origin).href}
-function showUnassigned(code){loading.style.display='none';poster.style.display='none';errorBox.style.display='none';unassigned.style.display='block';unassignedCode.textContent=code;unassigned.querySelector('.state').style.display='block'}
+function showUnassigned(code){loading.style.display='none';poster.style.display='none';errorBox.style.display='none';unassigned.style.display='block';unassigned.querySelector('.state').style.display='block'}
 function showError(message){loading.style.display='none';poster.style.display='none';unassigned.style.display='none';errorBox.style.display='block';errorText.textContent=message||'We could not process this QR code.';errorBox.querySelector('.state').style.display='block'}
 let currentDesign=1;
 const designConfig={
