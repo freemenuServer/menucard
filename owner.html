@@ -67,7 +67,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .serviceBtns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:15px}.serviceBtn{border:1px solid var(--border);background:#fff;border-radius:9px;padding:10px;font-size:11px;font-weight:700}.serviceBtn i{margin-right:5px}
 
 /* Menu */
-.menuToolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.menuToolbar .input{max-width:260px}.menuTable{width:100%;border-collapse:collapse;font-size:12px}.menuTable th{text-align:left;color:#6b7280;font-size:10px;text-transform:uppercase;padding:9px 6px;border-bottom:1px solid var(--border)}.menuTable td{padding:10px 6px;border-bottom:1px solid #eef0f3;vertical-align:middle}.menuTable tr:last-child td{border-bottom:0}.foodName{font-weight:800}.foodCat{font-size:10px;color:var(--muted);margin-top:2px}.foodType{display:inline-grid;place-items:center;width:16px;height:16px;border:1.5px solid #19a45a;border-radius:3px}.foodType.nv{border-color:#d93838}.foodType.nv:after{content:"";border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:7px solid #d93838}.foodType.veg:after{content:"";width:6px;height:6px;background:#19a45a;border-radius:50%}.foodType.egg{border-color:#d98b17}.foodType.egg:after{content:"";width:6px;height:6px;background:#d98b17;border-radius:50%}.pricesMini{white-space:nowrap;font-weight:700}.switch{width:38px;height:21px;background:#cbd5e1;border-radius:20px;padding:2px;border:0}.switch:after{content:"";display:block;width:17px;height:17px;border-radius:50%;background:#fff;transition:.2s}.switch.on{background:#17aa6b}.switch.on:after{transform:translateX(17px)}.statusToggle{display:inline-flex;align-items:center;gap:7px;border:0;background:transparent;padding:0;font-size:10px;font-weight:800}.statusToggle .statusText{min-width:30px;text-align:left}.statusToggle.off .statusText{color:#b45309}.statusToggle.on .statusText{color:#087443}.categoryCards{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.categoryCard{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff}.catImage{height:80px;background:#eee center/cover}.catBody{padding:9px}.catName{font-weight:800;font-size:12px}.catCount{font-size:10px;color:var(--muted);margin-top:3px}
+.menuToolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.menuToolbar .input{max-width:260px}.menuTable{width:100%;border-collapse:collapse;font-size:12px}.menuTable th{text-align:left;color:#6b7280;font-size:10px;text-transform:uppercase;padding:9px 6px;border-bottom:1px solid var(--border)}.menuTable td{padding:10px 6px;border-bottom:1px solid #eef0f3;vertical-align:middle}.menuTable tr:last-child td{border-bottom:0}.foodName{font-weight:800}.foodCat{font-size:10px;color:var(--muted);margin-top:2px}.foodType{display:inline-grid;place-items:center;width:16px;height:16px;border:1.5px solid #19a45a;border-radius:3px}.foodType.nv{border-color:#d93838}.foodType.nv:after{content:"";border-left:4px solid transparent;border-right:4px solid transparent;border-bottom:7px solid #d93838}.foodType.veg:after{content:"";width:6px;height:6px;background:#19a45a;border-radius:50%}.foodType.egg{border-color:#d98b17}.foodType.egg:after{content:"";width:6px;height:6px;background:#d98b17;border-radius:50%}.pricesMini{white-space:nowrap;font-weight:700}.switch{width:38px;height:21px;background:#cbd5e1;border-radius:20px;padding:2px;border:0}.switch:after{content:"";display:block;width:17px;height:17px;border-radius:50%;background:#fff;transition:.2s}.switch.on{background:#17aa6b}.switch.on:after{transform:translateX(17px)}.statusToggle{display:inline-flex;align-items:center;gap:7px;border:0;background:transparent;padding:0;font-size:10px;font-weight:800}.statusToggle .statusText{min-width:30px;text-align:left}.statusToggle.off .statusText{color:#b45309}.statusToggle.on .statusText{color:#087443}.categoryCards{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.categoryCards.categoryArrangeMode .categoryCard{cursor:grab}.categoryCards.categoryArrangeMode .categoryCard:active{cursor:grabbing}.categoryCard.categoryDragging{opacity:.5;border-style:dashed;transform:scale(.99)}.categoryCard.categoryDragOver{border-color:#3283e8;box-shadow:0 0 0 2px rgba(50,131,232,.12)}.categoryArrangeHint{font-size:10px;color:var(--muted);margin:6px 0 0}.categoryArrangeActions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.categoryCard{border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff}.catImage{height:80px;background:#eee center/cover}.catBody{padding:9px}.catName{font-weight:800;font-size:12px}.catCount{font-size:10px;color:var(--muted);margin-top:3px}
 
 /* Quick actions */
 .quickGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.quick{padding:14px;border-radius:10px;border:1px solid var(--border);display:flex;gap:12px;align-items:center}.quick i{font-size:20px;color:var(--green)}.quick strong{font-size:12px}.quick small{display:block;font-size:10px;color:var(--muted);margin-top:3px}
@@ -191,6 +191,31 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .authCombinedForm .loginCard.active{display:block!important}
 @media(max-width:760px){.ownerAuthSplit{grid-template-columns:1fr!important}.freemenu-login-brand{display:block!important;min-height:250px}.freemenu-login-brand-inner{padding:28px}.freemenu-login-brand h1{font-size:36px}.authRightPanel{min-height:auto!important;padding:28px 22px!important}}
 </style>
+
+<style id="freemenu-menu-maintenance-owner-style">
+  .menuLiveToggle{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    margin-top:14px;padding:13px 14px;border:1px solid var(--border);
+    border-radius:12px;background:#fff;
+  }
+  .menuLiveToggleInfo{min-width:0}
+  .menuLiveToggleTitle{font-size:12px;font-weight:850;color:var(--text)}
+  .menuLiveToggleSub{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.45}
+  .menuLiveSwitch{
+    flex:0 0 auto;border:0;cursor:pointer;width:54px;height:30px;padding:3px;
+    border-radius:999px;background:#cbd5e1;transition:.2s;position:relative;
+  }
+  .menuLiveSwitch:after{
+    content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;
+    border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.18);transition:.2s;
+  }
+  .menuLiveSwitch.on{background:#17aa6b}
+  .menuLiveSwitch.on:after{transform:translateX(24px)}
+  .menuLiveSwitch.off{background:#dc8b2c}
+  .menuLiveState{font-size:10px;font-weight:850;white-space:nowrap}
+  .menuLiveState.on{color:#087443}.menuLiveState.off{color:#b45309}
+</style>
+
 </head>
 
 <body>
@@ -442,8 +467,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
       </div>
     </div>
     <div class="card" id="categories">
-      <div class="cardTitle">Menu Categories <button class="btn sm" id="addCategoryBtn"><i class="fa-solid fa-plus"></i> Category</button></div>
-      <div class="categoryCards" id="categoryCards"></div>
+      <div class="cardTitle">Menu Categories <div class="categoryArrangeActions"><button class="btn blue sm" id="arrangeCategoriesBtn"><i class="fa-solid fa-up-down"></i> Arrange</button><button class="btn primary sm" id="saveCategoryOrderBtn" style="display:none"><i class="fa-solid fa-floppy-disk"></i> Save Order</button><button class="btn sm" id="cancelCategoryOrderBtn" style="display:none">Cancel</button><button class="btn sm" id="addCategoryBtn"><i class="fa-solid fa-plus"></i> Category</button></div></div>
+      <p class="categoryArrangeHint" id="categoryArrangeHint">Click Arrange, then drag categories up/down.</p><div class="categoryCards" id="categoryCards"></div>
     </div>
   </div>
 
@@ -455,13 +480,22 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
         <button class="quick" id="quickPreview"><i class="fa-solid fa-mobile-screen"></i><div><strong>View Public Menu</strong><small>See what customers see</small></div></button>
         <button class="quick" id="quickCategory"><i class="fa-solid fa-circle-plus"></i><div><strong>Add New Category</strong><small>Organize your menu</small></div></button>
         <button class="quick" id="quickTheme"><i class="fa-solid fa-palette"></i><div><strong>Theme & Branding</strong><small>Customize menu appearance</small></div></button>
-        <button class="quick" id="quickMenuMaintenance"><i class="fa-solid fa-power-off"></i><div><strong id="menuMaintenanceTitle">Menu is LIVE</strong><small id="menuMaintenanceHint">Turn OFF while updating prices</small></div></button>
       </div>
     </div>
     <div class="card" id="qr">
       <div class="cardTitle">Restaurant Status <span class="muted" style="font-size:10px">Based on available database fields</span></div>
       <div class="hoursRow"><span>Restaurant</span><strong id="statusName">—</strong></div>
-      <div class="hoursRow"><span>Public Menu</span><strong id="publicMenuStatus" style="color:var(--green)">LIVE</strong></div>
+      <div class="hoursRow"><span>Public Menu</span><strong id="publicMenuStatus" style="color:var(--green)">Live</strong></div>
+      <div class="menuLiveToggle">
+        <div class="menuLiveToggleInfo">
+          <div class="menuLiveToggleTitle">Menu Update Mode</div>
+          <div class="menuLiveToggleSub">Turn this OFF while updating prices. Customers will see “Price Now Updating — Menu will be available soon.”</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:9px">
+          <span id="menuLiveState" class="menuLiveState on">LIVE</span>
+          <button type="button" id="menuLiveSwitch" class="menuLiveSwitch on" aria-label="Turn public menu off" aria-pressed="true"></button>
+        </div>
+      </div>
       <div class="hoursRow"><span>Menu Items</span><strong id="statusItems">0</strong></div>
       <div class="hoursRow"><span>Menu URL</span><button class="btn sm" id="copyMenu">Copy Link</button></div>
     </div>
@@ -1176,6 +1210,7 @@ function fillProfile(){
   $("topName").textContent=name;$("profileName").textContent=name;$("statusName").textContent=name;$("themeName").textContent=name;
   $("topAddress").textContent=r.address||"Restaurant Owner";
   $("profilePhone").textContent=r.phone||"—";$("profileAddress").textContent=r.address||"—";$("profileSlug").textContent=r.slug||"—";
+  updateMenuMaintenanceUI();
   $("fName").value=r.name||"";$("fPhone").value=r.phone||"";$("fSlug").value=r.slug||"";$("fLogo").value=r.logo_url||"";$("fAddress").value=r.address||"";
   if($("fLogoMedia")) $("fLogoMedia").value=r.logo_url||"";
   if($("fBannerMedia")) $("fBannerMedia").value=r.banner_url||r.cover_url||"";
@@ -1519,6 +1554,66 @@ async function uploadMenuPhoto(){
   finally{ $("uploadMenuPhoto").disabled=!isGrowthPhotoPlan(); $("uploadMenuPhoto").textContent="Upload"; }
 }
 
+
+/* ---------- Public Menu ON/OFF maintenance ---------- */
+function updateMenuMaintenanceUI(){
+  const off=currentRestaurant?.menu_update_mode===true;
+  const status=$("publicMenuStatus");
+  const state=$("menuLiveState");
+  const sw=$("menuLiveSwitch");
+
+  if(status){
+    status.textContent=off?"Updating":"Live";
+    status.style.color=off?"#b45309":"var(--green)";
+  }
+  if(state){
+    state.textContent=off?"UPDATING":"LIVE";
+    state.className="menuLiveState "+(off?"off":"on");
+  }
+  if(sw){
+    sw.classList.toggle("off",off);
+    sw.classList.toggle("on",!off);
+    sw.setAttribute("aria-pressed",String(!off));
+    sw.setAttribute("aria-label",off?"Turn public menu on":"Turn public menu off");
+    sw.disabled=false;
+  }
+}
+
+async function toggleMenuMaintenance(){
+  if(!currentRestaurant?.id) return;
+
+  const currentlyOff=currentRestaurant.menu_update_mode===true;
+  const nextValue=!currentlyOff;
+  const btn=$("menuLiveSwitch");
+  if(btn) btn.disabled=true;
+
+  try{
+    const {data,error}=await supabaseClient
+      .from("restaurants")
+      .update({menu_update_mode:nextValue})
+      .eq("id",currentRestaurant.id)
+      .select("*")
+      .maybeSingle();
+
+    if(error){
+      console.error("Menu maintenance update failed:",error);
+      toast("Menu ON/OFF update failed. Run the menu maintenance SQL first.");
+      return;
+    }
+
+    currentRestaurant=data||{...currentRestaurant,menu_update_mode:nextValue};
+    updateMenuMaintenanceUI();
+    toast(nextValue
+      ? "Public menu OFF. Customers will see the price-update message."
+      : "Public menu is LIVE again.");
+  }catch(e){
+    console.error("Menu maintenance toggle error:",e);
+    toast(e?.message||"Unable to change public menu status.");
+  }finally{
+    if(btn) btn.disabled=false;
+  }
+}
+
 async function loadItems(){
   const {data,error}=await supabaseClient.from("menu_items").select("*").eq("restaurant_id",currentRestaurantId);
   if(error){toast(error.message);return}
@@ -1575,10 +1670,11 @@ function renderCategories(){
  const html=categories().map(c=>{
    const count=items.filter(i=>(i.category||"General").trim()===c).length;
    const image=items.find(i=>(i.category||"").trim()===c)?.image_url||"";
-   return `<div class="categoryCard"><div class="catImage" style="${image?`background-image:url('${esc(image)}')`:""}"></div><div class="catBody"><div class="catName">${esc(c)}</div><div class="catCount">${count} item${count===1?"":"s"}</div></div></div>`;
+   return `<div class="categoryCard" data-category-name="${esc(c)}"><div class="catImage" style="${image?`background-image:url('${esc(image)}')`:""}"></div><div class="catBody"><div class="catName">${esc(c)}</div><div class="catCount">${count} item${count===1?"":"s"}</div></div></div>`;
  }).join("");
  $("categoryCards").innerHTML=html||'<div class="muted" style="font-size:12px">No categories yet.</div>';
  $("categoryCardsFull").innerHTML=html||'<div class="muted" style="font-size:12px">No categories yet.</div>';
+ if(typeof bindCategoryArrangeDnD==="function") bindCategoryArrangeDnD();
 }
 
 
@@ -1709,6 +1805,98 @@ $("saveHeroInfo").onclick=async()=>{
   toast("Public menu information saved");
 };
 
+/* ---------- Category Drag Reorder ---------- */
+let categoryArrangeMode=false;
+let categoryDragName=null;
+let categoryOrderDraft=null;
+
+function getCategoryCardOrder(){
+  return [...$("categoryCards").querySelectorAll(".categoryCard[data-category-name]")].map(el=>el.dataset.categoryName);
+}
+
+function setCategoryArrangeMode(on){
+  categoryArrangeMode=!!on;
+  const wrap=$("categoryCards"), hint=$("categoryArrangeHint"), arrange=$("arrangeCategoriesBtn"), save=$("saveCategoryOrderBtn"), cancel=$("cancelCategoryOrderBtn");
+  if(wrap) wrap.classList.toggle("categoryArrangeMode",categoryArrangeMode);
+  if(arrange) arrange.style.display=categoryArrangeMode?"none":"";
+  if(save) save.style.display=categoryArrangeMode?"":"none";
+  if(cancel) cancel.style.display=categoryArrangeMode?"":"none";
+  if(hint) hint.textContent=categoryArrangeMode?"Drag a category card left/right or up/down, then click Save Order.":"Click Arrange, then drag categories up/down.";
+  if(!categoryArrangeMode){
+    categoryDragName=null;
+    wrap?.querySelectorAll(".categoryCard").forEach(el=>el.classList.remove("categoryDragging","categoryDragOver"));
+  }
+}
+
+function bindCategoryArrangeDnD(){
+  const wrap=$("categoryCards");
+  if(!wrap)return;
+  wrap.querySelectorAll(".categoryCard[data-category-name]").forEach(card=>{
+    card.draggable=categoryArrangeMode;
+    card.addEventListener("dragstart",e=>{
+      if(!categoryArrangeMode){e.preventDefault();return}
+      categoryDragName=card.dataset.categoryName;
+      card.classList.add("categoryDragging");
+      e.dataTransfer.effectAllowed="move";
+      e.dataTransfer.setData("text/plain",categoryDragName);
+    });
+    card.addEventListener("dragend",()=>{
+      categoryDragName=null;
+      card.classList.remove("categoryDragging");
+      wrap.querySelectorAll(".categoryDragOver").forEach(x=>x.classList.remove("categoryDragOver"));
+    });
+    card.addEventListener("dragover",e=>{
+      if(!categoryArrangeMode||!categoryDragName||categoryDragName===card.dataset.categoryName)return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect="move";
+      card.classList.add("categoryDragOver");
+      const dragging=wrap.querySelector(".categoryDragging");
+      if(!dragging||dragging===card)return;
+      const r=card.getBoundingClientRect();
+      const after=e.clientX>r.left+r.width/2;
+      wrap.insertBefore(dragging,after?card.nextSibling:card);
+    });
+    card.addEventListener("dragleave",()=>card.classList.remove("categoryDragOver"));
+    card.addEventListener("drop",e=>{e.preventDefault();card.classList.remove("categoryDragOver")});
+  });
+}
+
+async function saveCategoryOrder(){
+  const order=getCategoryCardOrder();
+  if(!order.length){setCategoryArrangeMode(false);return}
+  const btn=$("saveCategoryOrderBtn");
+  if(btn){btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Saving...'}
+  try{
+    const {data,error}=await supabaseClient.from("restaurants").update({category_order:order}).eq("id",currentRestaurantId).select("*").single();
+    if(error)throw error;
+    currentRestaurant=data||{...currentRestaurant,category_order:order};
+    categoryOrderDraft=order.slice();
+    setCategoryArrangeMode(false);
+    renderCategories();
+    renderDashboardTable();
+    renderFullTable();
+    toast("Category order saved successfully.");
+  }catch(e){
+    console.error("Category order save failed:",e);
+    toast("Category order save failed: "+(e?.message||"Please check category_order column."));
+  }finally{
+    if(btn){btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Order'}
+  }
+}
+
+function cancelCategoryOrder(){
+  setCategoryArrangeMode(false);
+  renderCategories();
+}
+
+$("arrangeCategoriesBtn")?.addEventListener("click",()=>{
+  categoryOrderDraft=getCategoryCardOrder();
+  setCategoryArrangeMode(true);
+  bindCategoryArrangeDnD();
+});
+$("saveCategoryOrderBtn")?.addEventListener("click",saveCategoryOrder);
+$("cancelCategoryOrderBtn")?.addEventListener("click",cancelCategoryOrder);
+
 /* ---------- Categories ---------- */
 function openCat(){$("newCat").value="";$("catModal").classList.add("show")}
 $("addCategoryBtn").onclick=openCat;$("addCategory2").onclick=openCat;$("quickCategory").onclick=openCat;
@@ -1727,53 +1915,14 @@ function renderQR(){
  $("qrBox").innerHTML=`<img alt="QR Code" style="width:220px;height:220px" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(url)}">`;
 }
 $("quickQR").onclick=()=>{showSection("qr");history.replaceState(null,"","#qr")};
+$("menuLiveSwitch").onclick=toggleMenuMaintenance;
 $("copyQR").onclick=async()=>{await navigator.clipboard.writeText(publicUrl());toast("Menu link copied")};
 $("copyMenu").onclick=async()=>{await navigator.clipboard.writeText(publicUrl());toast("Menu link copied")};
 $("downloadQR").onclick=()=>{const a=document.createElement("a");a.href=$("qrBox").querySelector("img").src;a.download=(currentRestaurant.slug||"restaurant")+"-menu-qr.png";a.target="_blank";a.click()};
 
-/* ---------- Owner-controlled menu maintenance ---------- */
-function isMenuOff(){
-  return currentRestaurant?.menu_update_mode===true;
-}
-function renderMenuMaintenanceState(){
-  const off=isMenuOff();
-  const title=$("menuMaintenanceTitle");
-  const hint=$("menuMaintenanceHint");
-  const status=$("publicMenuStatus");
-  if(title) title.textContent=off?"Menu is OFF":"Menu is LIVE";
-  if(hint) hint.textContent=off?"Customers see maintenance message":"Turn OFF while updating prices";
-  if(status){
-    status.textContent=off?"UPDATING":"LIVE";
-    status.style.color=off?"#d97706":"var(--green)";
-  }
-}
-async function toggleMenuMaintenance(){
-  if(!currentRestaurantId) return;
-  const next=!isMenuOff();
-  const btn=$("quickMenuMaintenance");
-  if(btn) btn.disabled=true;
-  try{
-    const {data,error}=await supabaseClient.from("restaurants")
-      .update({menu_update_mode:next})
-      .eq("id",currentRestaurantId)
-      .select("*").single();
-    if(error) throw error;
-    currentRestaurant=data||currentRestaurant;
-    renderMenuMaintenanceState();
-    toast(next?"Public menu OFF — customers will see the updating message":"Public menu LIVE again");
-  }catch(e){
-    console.error("Menu maintenance toggle failed:",e);
-    toast("Could not change menu status. Run the menu maintenance SQL first.");
-  }finally{
-    if(btn) btn.disabled=false;
-  }
-}
-renderMenuMaintenanceState();
-
 /* ---------- Public menu ---------- */
 function openPublic(){window.open(publicUrl(),"_blank","noopener")}
 ["publicTop","sidePublicBtn","quickPreview","openPublic2"].forEach(id=>$(id).onclick=openPublic);
-$("quickMenuMaintenance").onclick=toggleMenuMaintenance;
 $("sidePlansBtn").onclick=()=>openOwnerPlans();
 
 /* ---------- Theme preview ---------- */
