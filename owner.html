@@ -455,12 +455,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
         <button class="quick" id="quickPreview"><i class="fa-solid fa-mobile-screen"></i><div><strong>View Public Menu</strong><small>See what customers see</small></div></button>
         <button class="quick" id="quickCategory"><i class="fa-solid fa-circle-plus"></i><div><strong>Add New Category</strong><small>Organize your menu</small></div></button>
         <button class="quick" id="quickTheme"><i class="fa-solid fa-palette"></i><div><strong>Theme & Branding</strong><small>Customize menu appearance</small></div></button>
+        <button class="quick" id="quickMenuMaintenance"><i class="fa-solid fa-power-off"></i><div><strong id="menuMaintenanceTitle">Menu is LIVE</strong><small id="menuMaintenanceHint">Turn OFF while updating prices</small></div></button>
       </div>
     </div>
     <div class="card" id="qr">
       <div class="cardTitle">Restaurant Status <span class="muted" style="font-size:10px">Based on available database fields</span></div>
       <div class="hoursRow"><span>Restaurant</span><strong id="statusName">—</strong></div>
-      <div class="hoursRow"><span>Public Menu</span><strong style="color:var(--green)">Live</strong></div>
+      <div class="hoursRow"><span>Public Menu</span><strong id="publicMenuStatus" style="color:var(--green)">LIVE</strong></div>
       <div class="hoursRow"><span>Menu Items</span><strong id="statusItems">0</strong></div>
       <div class="hoursRow"><span>Menu URL</span><button class="btn sm" id="copyMenu">Copy Link</button></div>
     </div>
@@ -1730,9 +1731,49 @@ $("copyQR").onclick=async()=>{await navigator.clipboard.writeText(publicUrl());t
 $("copyMenu").onclick=async()=>{await navigator.clipboard.writeText(publicUrl());toast("Menu link copied")};
 $("downloadQR").onclick=()=>{const a=document.createElement("a");a.href=$("qrBox").querySelector("img").src;a.download=(currentRestaurant.slug||"restaurant")+"-menu-qr.png";a.target="_blank";a.click()};
 
+/* ---------- Owner-controlled menu maintenance ---------- */
+function isMenuOff(){
+  return currentRestaurant?.menu_update_mode===true;
+}
+function renderMenuMaintenanceState(){
+  const off=isMenuOff();
+  const title=$("menuMaintenanceTitle");
+  const hint=$("menuMaintenanceHint");
+  const status=$("publicMenuStatus");
+  if(title) title.textContent=off?"Menu is OFF":"Menu is LIVE";
+  if(hint) hint.textContent=off?"Customers see maintenance message":"Turn OFF while updating prices";
+  if(status){
+    status.textContent=off?"UPDATING":"LIVE";
+    status.style.color=off?"#d97706":"var(--green)";
+  }
+}
+async function toggleMenuMaintenance(){
+  if(!currentRestaurantId) return;
+  const next=!isMenuOff();
+  const btn=$("quickMenuMaintenance");
+  if(btn) btn.disabled=true;
+  try{
+    const {data,error}=await supabaseClient.from("restaurants")
+      .update({menu_update_mode:next})
+      .eq("id",currentRestaurantId)
+      .select("*").single();
+    if(error) throw error;
+    currentRestaurant=data||currentRestaurant;
+    renderMenuMaintenanceState();
+    toast(next?"Public menu OFF — customers will see the updating message":"Public menu LIVE again");
+  }catch(e){
+    console.error("Menu maintenance toggle failed:",e);
+    toast("Could not change menu status. Run the menu maintenance SQL first.");
+  }finally{
+    if(btn) btn.disabled=false;
+  }
+}
+renderMenuMaintenanceState();
+
 /* ---------- Public menu ---------- */
 function openPublic(){window.open(publicUrl(),"_blank","noopener")}
 ["publicTop","sidePublicBtn","quickPreview","openPublic2"].forEach(id=>$(id).onclick=openPublic);
+$("quickMenuMaintenance").onclick=toggleMenuMaintenance;
 $("sidePlansBtn").onclick=()=>openOwnerPlans();
 
 /* ---------- Theme preview ---------- */
