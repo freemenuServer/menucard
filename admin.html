@@ -747,7 +747,7 @@ async function renderPrintQR(items,title){
     return {
       id:x.id,
       code:x.code,
-      url:qrTargetURL(x.code),
+      url:r?.slug ? new URL('/menu.html?r='+encodeURIComponent(r.slug),location.origin).href : qrTargetURL(x.code),
       restaurant:r?.name||'Restaurant Menu',
       label:x.label||''
     };
