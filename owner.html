@@ -561,8 +561,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 <!-- CATEGORIES -->
 <section id="section-categories" class="hidden">
   <div class="card">
-    <div class="cardTitle">Categories <button class="btn primary" id="addCategory2"><i class="fa-solid fa-plus"></i> Add Category</button></div>
-    <p class="muted" style="font-size:12px;margin-top:-5px">Your current Supabase design stores category as text on each menu item, so categories are derived automatically from menu items.</p>
+    <div class="cardTitle">Categories <div class="categoryArrangeActions"><button class="btn blue sm" id="arrangeCategoriesFullBtn"><i class="fa-solid fa-up-down"></i> Arrange</button><button class="btn primary sm" id="saveCategoryOrderFullBtn" style="display:none"><i class="fa-solid fa-floppy-disk"></i> Save Order</button><button class="btn sm" id="cancelCategoryOrderFullBtn" style="display:none">Cancel</button><button class="btn primary" id="addCategory2"><i class="fa-solid fa-plus"></i> Add Category</button></div></div>
+    <p class="muted" style="font-size:12px;margin-top:-5px">Categories are derived from your menu items. Use Arrange to manually set the category order used by the public menu.</p><p class="categoryArrangeHint" id="categoryArrangeHintFull">Click Arrange, drag categories into your preferred order, then Save Order.</p>
     <div class="categoryCards" id="categoryCardsFull"></div>
   </div>
 </section>
@@ -1740,7 +1740,7 @@ function renderCategories(){
  }).join("");
  $("categoryCards").innerHTML=html||'<div class="muted" style="font-size:12px">No categories yet.</div>';
  $("categoryCardsFull").innerHTML=html||'<div class="muted" style="font-size:12px">No categories yet.</div>';
- if(typeof bindCategoryArrangeDnD==="function") bindCategoryArrangeDnD();
+ if(typeof bindCategoryArrangeDnD==="function"){ bindCategoryArrangeDnD("categoryCards"); bindCategoryArrangeDnD("categoryCardsFull"); }
 }
 
 
@@ -1884,66 +1884,80 @@ $("saveHeroInfo").onclick=async()=>{
   toast("Public menu information saved");
 };
 
-/* ---------- Category Drag Reorder ---------- */
+/* ---------- Manual Category Drag Reorder ---------- */
 let categoryArrangeMode=false;
 let categoryDragName=null;
 let categoryOrderDraft=null;
+let categoryArrangeContainer="categoryCards";
 
-function getCategoryCardOrder(){
-  return [...$("categoryCards").querySelectorAll(".categoryCard[data-category-name]")].map(el=>el.dataset.categoryName);
+function getCategoryCardOrder(containerId=categoryArrangeContainer){
+  const wrap=$(containerId);
+  return wrap?[...wrap.querySelectorAll(".categoryCard[data-category-name]")].map(el=>el.dataset.categoryName):[];
 }
 
-function setCategoryArrangeMode(on){
+function setCategoryArrangeMode(on,containerId=categoryArrangeContainer){
   categoryArrangeMode=!!on;
-  const wrap=$("categoryCards"), hint=$("categoryArrangeHint"), arrange=$("arrangeCategoriesBtn"), save=$("saveCategoryOrderBtn"), cancel=$("cancelCategoryOrderBtn");
-  if(wrap) wrap.classList.toggle("categoryArrangeMode",categoryArrangeMode);
-  if(arrange) arrange.style.display=categoryArrangeMode?"none":"";
-  if(save) save.style.display=categoryArrangeMode?"":"none";
-  if(cancel) cancel.style.display=categoryArrangeMode?"":"none";
-  if(hint) hint.textContent=categoryArrangeMode?"Drag a category card left/right or up/down, then click Save Order.":"Click Arrange, drag categories into your preferred order, then Save Order.";
+  categoryArrangeContainer=containerId||"categoryCards";
+  const containers=["categoryCards","categoryCardsFull"];
+  containers.forEach(id=>{
+    const wrap=$(id);
+    if(wrap)wrap.classList.toggle("categoryArrangeMode",categoryArrangeMode&&id===categoryArrangeContainer);
+    if(wrap)wrap.querySelectorAll(".categoryCard").forEach(el=>el.draggable=categoryArrangeMode&&id===categoryArrangeContainer);
+  });
+  const isFull=categoryArrangeContainer==="categoryCardsFull";
+  const pairs=[
+    ["arrangeCategoriesBtn","saveCategoryOrderBtn","cancelCategoryOrderBtn","categoryArrangeHint"],
+    ["arrangeCategoriesFullBtn","saveCategoryOrderFullBtn","cancelCategoryOrderFullBtn","categoryArrangeHintFull"]
+  ];
+  pairs.forEach((ids,idx)=>{
+    const [a,s,c,h]=ids,active=(idx===1)===isFull;
+    if($(a))$(a).style.display=categoryArrangeMode&&active?"none":"";
+    if($(s))$(s).style.display=categoryArrangeMode&&active?"":"none";
+    if($(c))$(c).style.display=categoryArrangeMode&&active?"":"none";
+    if($(h))$(h).textContent=categoryArrangeMode&&active?"Drag categories into your preferred order, then click Save Order.":"Click Arrange, drag categories into your preferred order, then Save Order.";
+  });
   if(!categoryArrangeMode){
     categoryDragName=null;
-    wrap?.querySelectorAll(".categoryCard").forEach(el=>el.classList.remove("categoryDragging","categoryDragOver"));
+    containers.forEach(id=>$(id)?.querySelectorAll(".categoryCard").forEach(el=>el.classList.remove("categoryDragging","categoryDragOver")));
   }
 }
 
-function bindCategoryArrangeDnD(){
-  const wrap=$("categoryCards");
+function bindCategoryArrangeDnD(containerId="categoryCards"){
+  const wrap=$(containerId);
   if(!wrap)return;
   wrap.querySelectorAll(".categoryCard[data-category-name]").forEach(card=>{
-    card.draggable=categoryArrangeMode;
-    card.addEventListener("dragstart",e=>{
-      if(!categoryArrangeMode){e.preventDefault();return}
+    card.draggable=categoryArrangeMode&&containerId===categoryArrangeContainer;
+    card.ondragstart=e=>{
+      if(!categoryArrangeMode||containerId!==categoryArrangeContainer){e.preventDefault();return}
       categoryDragName=card.dataset.categoryName;
       card.classList.add("categoryDragging");
       e.dataTransfer.effectAllowed="move";
       e.dataTransfer.setData("text/plain",categoryDragName);
-    });
-    card.addEventListener("dragend",()=>{
+    };
+    card.ondragend=()=>{
       categoryDragName=null;
       card.classList.remove("categoryDragging");
       wrap.querySelectorAll(".categoryDragOver").forEach(x=>x.classList.remove("categoryDragOver"));
-    });
-    card.addEventListener("dragover",e=>{
-      if(!categoryArrangeMode||!categoryDragName||categoryDragName===card.dataset.categoryName)return;
+    };
+    card.ondragover=e=>{
+      if(!categoryArrangeMode||containerId!==categoryArrangeContainer||!categoryDragName||categoryDragName===card.dataset.categoryName)return;
       e.preventDefault();
       e.dataTransfer.dropEffect="move";
       card.classList.add("categoryDragOver");
       const dragging=wrap.querySelector(".categoryDragging");
       if(!dragging||dragging===card)return;
       const r=card.getBoundingClientRect();
-      const after=e.clientX>r.left+r.width/2;
-      wrap.insertBefore(dragging,after?card.nextSibling:card);
-    });
-    card.addEventListener("dragleave",()=>card.classList.remove("categoryDragOver"));
-    card.addEventListener("drop",e=>{e.preventDefault();card.classList.remove("categoryDragOver")});
+      wrap.insertBefore(dragging,e.clientX>r.left+r.width/2?card.nextSibling:card);
+    };
+    card.ondragleave=()=>card.classList.remove("categoryDragOver");
+    card.ondrop=e=>{e.preventDefault();card.classList.remove("categoryDragOver")};
   });
 }
 
 async function saveCategoryOrder(){
-  const order=getCategoryCardOrder();
+  const order=getCategoryCardOrder(categoryArrangeContainer);
   if(!order.length){setCategoryArrangeMode(false);return}
-  const btn=$("saveCategoryOrderBtn");
+  const btn=$(categoryArrangeContainer==="categoryCardsFull"?"saveCategoryOrderFullBtn":"saveCategoryOrderBtn");
   if(btn){btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Saving...'}
   try{
     const {data,error}=await supabaseClient.from("restaurants").update({category_order:order}).eq("id",currentRestaurantId).select("*").single();
@@ -1969,12 +1983,21 @@ function cancelCategoryOrder(){
 }
 
 $("arrangeCategoriesBtn")?.addEventListener("click",()=>{
+  categoryArrangeContainer="categoryCards";
   categoryOrderDraft=getCategoryCardOrder();
-  setCategoryArrangeMode(true);
-  bindCategoryArrangeDnD();
+  setCategoryArrangeMode(true,"categoryCards");
+  bindCategoryArrangeDnD("categoryCards");
 });
 $("saveCategoryOrderBtn")?.addEventListener("click",saveCategoryOrder);
 $("cancelCategoryOrderBtn")?.addEventListener("click",cancelCategoryOrder);
+$("arrangeCategoriesFullBtn")?.addEventListener("click",()=>{
+  categoryArrangeContainer="categoryCardsFull";
+  categoryOrderDraft=getCategoryCardOrder("categoryCardsFull");
+  setCategoryArrangeMode(true,"categoryCardsFull");
+  bindCategoryArrangeDnD("categoryCardsFull");
+});
+$("saveCategoryOrderFullBtn")?.addEventListener("click",saveCategoryOrder);
+$("cancelCategoryOrderFullBtn")?.addEventListener("click",cancelCategoryOrder);
 
 /* ---------- Categories ---------- */
 function openCat(){$("newCat").value="";$("catModal").classList.add("show")}
