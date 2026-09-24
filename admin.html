@@ -116,7 +116,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
 
 <div id="restaurants" class="page"><div class="subpage-head"><div><h2>Restaurants</h2><p style="color:#667085">Manage all registered restaurants.</p></div><div style="display:flex;gap:8px"><button class="iconbtn" onclick="loadAll()" title="Refresh data">↻ Refresh</button><button class="primary" onclick="openRestaurantModal()">+ Add Restaurant</button></div></div><div class="card"><div class="toolbar"><input class="input" id="restaurantSearch" placeholder="Search restaurant, phone, city..."><select class="input" id="restaurantStatus"><option value="">All Status</option><option>active</option><option>pending</option><option>blocked</option></select></div><div id="restaurantPageTable" class="tablewrap" style="margin-top:12px"></div></div></div>
 
-<div id="qrManagement" class="page"><div class="subpage-head"><div><h2>QR Management</h2><p style="color:#667085">Generate QR codes in lots of 100, identify each QR by its printed number, assign up to 10 QR codes to each restaurant, and print any individual QR.</p></div><div class="toolbar"><button class="iconbtn" onclick="loadQRs()">↻ Refresh</button><button class="primary" onclick="generateQRBatch(100)">＋ Generate Next 100</button><button class="primary" onclick="printAvailableQRs()">🖨 Print Available</button></div></div><div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:12px"><div class="stat"><div class="stat-top"><div class="ico blue">📱</div><div><h2 id="qrTotal">0</h2><p>Total QR Codes</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico green">✓</div><div><h2 id="qrAvailable">0</h2><p>Available</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico orange">↗</div><div><h2 id="qrAssigned">0</h2><p>Assigned</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico purple">10</div><div><h2>10</h2><p>Max per Restaurant</p></div></div></div></div><div class="card"><div class="toolbar"><input class="input" id="qrSearch" placeholder="Search QR ID, restaurant, label..."><select class="input" id="qrStatus"><option value="">All Status</option><option value="available">Available</option><option value="assigned">Assigned</option></select><select class="input" id="qrRestaurantFilter"><option value="">All Restaurants</option></select></div><div id="qrTable" class="tablewrap" style="margin-top:12px"></div></div></div><div id="owners" class="page"><div class="subpage-head"><h2>Restaurant Owners</h2></div><div class="card"><div class="toolbar"><input class="input" id="ownerSearch" placeholder="Search owner email/name..."></div><div id="ownersTable" class="tablewrap" style="margin-top:12px"></div></div></div>
+<div id="qrManagement" class="page"><div class="subpage-head"><div><h2>QR Management</h2><p style="color:#667085">Generate QR codes in lots of 100, identify each QR by its printed number, assign up to 10 QR codes to each restaurant, and print any individual QR.</p></div><div class="toolbar"><button class="iconbtn" onclick="loadQRs()">↻ Refresh</button><label class="smallbtn" style="display:flex;align-items:center;gap:7px">QR Design <select id="qrPrintDesign" style="border:0;outline:0;background:transparent;font-size:11px;font-weight:700"><option value="1">① Premium Gold</option><option value="2">② Black Luxury</option><option value="3">③ Fresh Green</option><option value="4">④ Warm Classic</option></select></label><button class="primary" onclick="generateQRBatch(100)">＋ Generate Next 100</button><button class="primary" onclick="printAvailableQRs()">🖨 Print Available</button></div></div><div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:12px"><div class="stat"><div class="stat-top"><div class="ico blue">📱</div><div><h2 id="qrTotal">0</h2><p>Total QR Codes</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico green">✓</div><div><h2 id="qrAvailable">0</h2><p>Available</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico orange">↗</div><div><h2 id="qrAssigned">0</h2><p>Assigned</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico purple">10</div><div><h2>10</h2><p>Max per Restaurant</p></div></div></div></div><div class="card"><div class="toolbar"><input class="input" id="qrSearch" placeholder="Search QR ID, restaurant, label..."><select class="input" id="qrStatus"><option value="">All Status</option><option value="available">Available</option><option value="assigned">Assigned</option></select><select class="input" id="qrRestaurantFilter"><option value="">All Restaurants</option></select></div><div id="qrTable" class="tablewrap" style="margin-top:12px"></div></div></div><div id="owners" class="page"><div class="subpage-head"><h2>Restaurant Owners</h2></div><div class="card"><div class="toolbar"><input class="input" id="ownerSearch" placeholder="Search owner email/name..."></div><div id="ownersTable" class="tablewrap" style="margin-top:12px"></div></div></div>
 
 <div id="menu" class="page"><div class="subpage-head"><h2>Menu Management</h2></div><div class="card"><div class="toolbar"><select class="input" id="menuRestaurantFilter"><option value="">All Restaurants</option></select><input class="input" id="menuSearch" placeholder="Search item/category..."><button class="primary" onclick="openMenuModal()">+ Add Menu Item</button></div><div id="menuTable" class="tablewrap" style="margin-top:12px"></div></div></div>
 
@@ -680,6 +680,7 @@ $('mediaBannerEnabled')?.addEventListener('change',renderMediaRulesSummary);
 $('mediaGalleryPaid')?.addEventListener('change',renderMediaRulesSummary);
 
 let qrCodes=[];
+let qrPrintDesign=Number(localStorage.getItem("fm_qr_print_design")||1);
 async function loadQRs(){
   const r=await db.from('qr_codes').select('*').order('code',{ascending:true});
   if(r.error){console.error(r.error);toast('QR table not ready: '+r.error.message);return}
@@ -711,6 +712,19 @@ async function assignQR(id){
 async function unassignQR(id){if(!confirm('Unassign this QR? It will become available again.'))return;const x=qrCodes.find(q=>q.id===id);const r=await db.from('qr_codes').update({restaurant_id:null,label:null,status:'available',assigned_at:null,assigned_by:null}).eq('id',id);if(r.error)return toast(r.error.message);await logAction('Unassigned QR '+(x?.code||''));await loadQRs();toast('QR is available again')}
 function qrTargetURL(code){return new URL('/qr.html?code='+encodeURIComponent(code),location.origin).href}
 
+const qrPrintDesignConfig={
+  1:{name:'Premium Gold',dots:'#571b1d',corner:'#d8a73d',cornerDot:'#571b1d',dotType:'dots',cornerType:'extra-rounded',cornerDotType:'dot',bg:'#fff8e9',accent:'#7b1e22',accent2:'#d8a73d',border:'#e4b86b'},
+  2:{name:'Black Luxury',dots:'#111315',corner:'#d8ae55',cornerDot:'#111315',dotType:'classy',cornerType:'extra-rounded',cornerDotType:'dot',bg:'#111315',accent:'#d8ae55',accent2:'#f5e9c8',border:'#c79a42'},
+  3:{name:'Fresh Green',dots:'#183b27',corner:'#2f7d4a',cornerDot:'#183b27',dotType:'rounded',cornerType:'extra-rounded',cornerDotType:'dot',bg:'#f7fbf5',accent:'#2f7d4a',accent2:'#8fbd4e',border:'#9ac39a'},
+  4:{name:'Warm Classic',dots:'#5a2b18',corner:'#ef7c28',cornerDot:'#5a2b18',dotType:'dots',cornerType:'square',cornerDotType:'square',bg:'#fff4e8',accent:'#bd4e1f',accent2:'#ef7c28',border:'#e4a26b'}
+};
+
+function setQRPrintDesign(n){
+  qrPrintDesign=Math.min(4,Math.max(1,Number(n)||1));
+  localStorage.setItem('fm_qr_print_design',String(qrPrintDesign));
+  if($('qrPrintDesign'))$('qrPrintDesign').value=String(qrPrintDesign);
+}
+
 function printSingleQR(id){
   const x=qrCodes.find(q=>q.id===id);
   if(!x)return toast('QR code not found.');
@@ -724,57 +738,100 @@ async function printAvailableQRs(){
 }
 
 async function renderPrintQR(items,title){
+  setQRPrintDesign($('qrPrintDesign')?.value||qrPrintDesign);
   const w=window.open('','_blank');
   if(!w)return toast('Please allow pop-ups for printing QR codes.');
-  const payload=items.map(x=>({id:x.id,code:x.code,url:qrTargetURL(x.code)}));
-  const cards=payload.map(x=>`
+
+  const payload=items.map(x=>{
+    const r=restaurants.find(y=>y.id===x.restaurant_id);
+    return {
+      id:x.id,
+      code:x.code,
+      url:qrTargetURL(x.code),
+      restaurant:r?.name||'Restaurant Menu',
+      label:x.label||''
+    };
+  });
+
+  const cards=payload.map((x,i)=>`
     <div class="qr-card">
-      <div class="badge">
-        <div class="scan"><span>SCAN FOR</span><strong>MENU</strong></div>
-        <div class="food-icon left">♜</div>
-        <div class="food-icon right">◖</div>
-        <div class="qr-circle"><div class="qrbox" id="qr-${x.id}"></div></div>
-        <div class="brand"><span>Free</span><b>Menu</b><i>.in</i></div>
+      <div class="poster design-${qrPrintDesign}" data-card="${i}">
+        <div class="blob orange"></div><div class="blob green"></div><div class="blob red"></div>
+        <div class="decor d1">🥬</div><div class="decor d2">🍽️</div><div class="decor d3">🍕</div><div class="decor d4">🥤</div>
+        <div class="content">
+          <div class="note">Tasty Moments Here</div>
+          <div class="smallTitle">Scan for</div><div class="bigTitle">Menu</div>
+          <div class="lines"><i class="g"></i><i class="o"></i><i class="r"></i></div>
+          <div class="restaurant">${esc(x.restaurant)}</div>
+          <div class="code">${esc(x.code)}</div>
+          <div class="qrBox"><div class="qrbox" id="qr-${esc(x.id)}"></div><div class="scan">📱 Scan with your phone camera</div></div>
+          <div class="brandArea"><div class="brand"><div class="leaf">🌿</div><div class="brandName">FreeMenu<span>.in</span></div></div><div class="tag">GOOD FOOD CLOSER TO YOU</div><div class="brandLines"><i class="g"></i><i class="o"></i><i class="r"></i></div></div>
+          <div class="features"><div class="feature"><div class="fi">🌿</div><div class="ft">Digital Menu</div><div class="fs">Eco Friendly</div></div><div class="feature"><div class="fi">⚡</div><div class="ft">Quick Access</div><div class="fs">No App Needed</div></div><div class="feature"><div class="fi">♡</div><div class="ft">Easy Access</div><div class="fs">Simple & Fast</div></div></div>
+          <div class="footer">FREEMENU.IN</div><div class="footer2">Eat • Explore • Enjoy</div>
+        </div>
       </div>
     </div>`).join('');
 
-  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title>
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title>
 <style>
 *{box-sizing:border-box}
-body{font-family:Arial,Helvetica,sans-serif;margin:8mm;color:#111;background:#fff}
-.head{text-align:center;margin-bottom:7mm}.head h2{margin:0 0 2mm;font-size:21px}.head p{margin:0;color:#666;font-size:12px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7mm}
-.qr-card{display:flex;justify-content:center;break-inside:avoid}
-.badge{width:210px;height:210px;border-radius:50%;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 42%,#171717 0 62%,#080808 63% 100%);border:5px solid #d9a928;box-shadow:inset 0 0 0 3px #2a2a2a,0 2px 0 #8b6414;text-align:center;color:#fff}
-.badge:before{content:"";position:absolute;inset:5px;border:2px solid #f4c94f;border-radius:50%;pointer-events:none}
-.scan{position:absolute;top:13px;left:0;right:0;z-index:3;text-align:center;line-height:1}
-.scan span{display:block;font-size:13px;font-weight:800;letter-spacing:.8px;color:#fff}
-.scan strong{display:block;margin-top:3px;font-size:27px;letter-spacing:.8px;color:#f5c642;text-shadow:0 1px 0 #8b6414}
-.qr-circle{position:absolute;left:50%;top:70px;transform:translateX(-50%);width:112px;height:112px;border-radius:50%;background:#fff;border:4px solid #d9a928;display:grid;place-items:center;z-index:2}
-.qrbox{width:98px;height:98px;display:grid;place-items:center}.qrbox svg{display:block!important;width:98px!important;height:98px!important}
-.brand{position:absolute;left:50%;bottom:19px;transform:translateX(-50%);z-index:4;white-space:nowrap;font-size:18px;font-weight:900;letter-spacing:-.6px;text-shadow:0 1px 0 #111}
-.brand:before{content:"";position:absolute;left:50%;top:-5px;transform:translateX(-50%);width:132px;height:25px;border-radius:7px;background:#f2c33e;z-index:-1;box-shadow:0 1px 0 #8b6414}
-.brand span{color:#111}.brand b{color:#111}.brand i{font-style:normal;color:#fff}
-.food-icon{position:absolute;color:#f2c33e;font-size:31px;z-index:1;top:83px;font-weight:700}.food-icon.left{left:19px;transform:rotate(90deg)}.food-icon.right{right:20px;transform:rotate(-25deg)}
-@media print{body{margin:6mm}.grid{gap:5mm}.badge{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
+body{font-family:Inter,Arial,Helvetica,sans-serif;margin:0;background:#f3f5f7;color:#151820}
+.toolbar{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid #e5e7eb;padding:12px;display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap}
+.toolbar button{border:1px solid #d9dde2;background:#fff;color:#252a31;border-radius:999px;padding:8px 13px;font-size:12px;font-weight:850;cursor:pointer}
+.toolbar button.active{background:#151820;color:#fff;border-color:#151820}
+.toolbar .printBtn{background:#ef3340;border-color:#ef3340;color:#fff}
+.toolbar .count{font-size:11px;color:#667085;margin-left:4px}
+.page{padding:16px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:1100px;margin:0 auto}
+.qr-card{break-inside:avoid;display:flex;justify-content:center}
+.poster{position:relative;overflow:hidden;width:100%;max-width:330px;min-height:455px;border-radius:23px;padding:25px 15px 22px;box-shadow:0 10px 30px rgba(0,0,0,.10);border:1px solid #ddd}
+.blob{position:absolute;pointer-events:none}.orange{width:120px;height:120px;left:-60px;top:-70px;border-radius:50%}.green{width:125px;height:105px;left:-55px;bottom:-70px;border-radius:60% 40% 20% 80%}.red{width:120px;height:110px;right:-55px;bottom:-65px;border-radius:45% 55% 70% 30%}
+.decor{position:absolute;opacity:.13;font-size:25px;z-index:1}.d1{left:13px;top:46px;transform:rotate(-15deg)}.d2{right:14px;top:43px;transform:rotate(12deg)}.d3{left:13px;bottom:120px;transform:rotate(-10deg)}.d4{right:14px;bottom:108px;transform:rotate(12deg)}
+.content{position:relative;z-index:2;text-align:center}.note{font-size:9px;font-style:italic;font-weight:700;margin-bottom:4px}.smallTitle{font-size:20px;line-height:1;font-weight:850;letter-spacing:-.8px}.bigTitle{font-size:45px;line-height:.9;font-weight:950;letter-spacing:-2px;margin:0}
+.lines{display:flex;justify-content:center;gap:3px;margin:9px 0 7px}.lines i{display:block;width:42px;height:4px;border-radius:10px}
+.restaurant{font-size:14px;font-weight:900;margin:3px 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.code{display:inline-block;padding:4px 8px;background:#f4f4f4;border-radius:999px;color:#666;font-size:8px;font-weight:900;letter-spacing:.4px;margin-bottom:7px}
+.qrBox{width:180px;margin:auto;background:#fff;padding:9px;box-shadow:0 7px 18px rgba(0,0,0,.09)}.qrbox{width:160px;height:160px;display:flex;align-items:center;justify-content:center}.qrbox svg,.qrbox canvas{display:block!important;width:160px!important;height:160px!important}.scan{margin-top:7px;font-size:8px;font-weight:850}
+.brandArea{margin-top:12px}.brand{display:flex;justify-content:center;align-items:center;gap:4px}.leaf{font-size:15px}.brandName{font-size:20px;font-weight:950;letter-spacing:-1px;line-height:1}.brandName span{font-weight:500}.tag{margin-top:4px;font-size:6px;font-weight:900;letter-spacing:2px}.brandLines{display:flex;justify-content:center;gap:3px;margin-top:6px}.brandLines i{width:18px;height:2px;border-radius:8px}
+.features{display:grid;grid-template-columns:repeat(3,1fr);margin-top:11px;padding-top:9px;border-top:1px solid #eee}.feature{padding:0 3px;border-right:1px solid #e5e5e5}.feature:last-child{border-right:0}.fi{font-size:12px;margin-bottom:2px}.ft{font-size:7px;font-weight:900}.fs{font-size:6px;margin-top:2px}.footer{margin-top:10px;font-size:7px;font-weight:900;letter-spacing:1px}.footer2{font-size:7px;font-weight:750;margin-top:2px}
+.poster.design-1{background:#fff8e9;color:#571b1d;border-color:#e4b86b}.design-1 .orange{background:#d8a73d}.design-1 .green{background:#8b2024}.design-1 .red{background:#571b1d}.design-1 .note{color:#8b6a50}.design-1 .smallTitle{font-family:Georgia,serif}.design-1 .bigTitle{font-family:Georgia,serif;color:#7b1e22}.design-1 .lines .g{background:#7b1e22}.design-1 .lines .o{background:#d8a73d}.design-1 .lines .r{background:#b97831}.design-1 .qrBox{border:2px solid #7b1e22;border-radius:20px;box-shadow:0 10px 28px rgba(91,31,30,.13)}.design-1 .scan{color:#7b1e22}.design-1 .brandName{color:#7b1e22}.design-1 .brandName span{color:#b97831}.design-1 .tag,.design-1 .footer2{color:#8b6a50}.design-1 .brandLines .g{background:#7b1e22}.design-1 .brandLines .o{background:#d8a73d}.design-1 .brandLines .r{background:#b97831}
+.poster.design-2{background:#111315;color:#f8f1df;border-color:#c79a42}.design-2 .orange{background:#c79532}.design-2 .green{background:#2f5b43}.design-2 .red{background:#713a2e}.design-2 .note{color:#c7b78e}.design-2 .smallTitle{font-family:Georgia,serif;color:#f5e9c8}.design-2 .bigTitle{font-family:Georgia,serif;color:#d8ae55}.design-2 .lines .g{background:#6c9b63}.design-2 .lines .o{background:#d8ae55}.design-2 .lines .r{background:#a85d43}.design-2 .qrBox{border:2px solid #d8ae55;border-radius:14px;box-shadow:0 14px 35px rgba(0,0,0,.38)}.design-2 .scan{color:#5b5141}.design-2 .brandName{color:#f5e9c8}.design-2 .brandName span{color:#d8ae55}.design-2 .tag,.design-2 .footer2{color:#bfb49a}.design-2 .feature{border-color:#3a3d3f}.design-2 .fs{color:#aaa18f}.design-2 .brandLines .g{background:#6c9b63}.design-2 .brandLines .o{background:#d8ae55}.design-2 .brandLines .r{background:#a85d43}
+.poster.design-3{background:#f7fbf5;color:#183b27;border-color:#9ac39a}.design-3 .orange{background:#9fcf67}.design-3 .green{background:#2f7d4a}.design-3 .red{background:#b74b38}.design-3 .note{color:#52745e}.design-3 .smallTitle{font-family:Inter,Arial,sans-serif}.design-3 .bigTitle{font-family:Inter,Arial,sans-serif;color:#2f7d4a}.design-3 .lines .g{background:#2f7d4a}.design-3 .lines .o{background:#8fbd4e}.design-3 .lines .r{background:#b74b38}.design-3 .qrBox{border:2px solid #2f7d4a;border-radius:30px;box-shadow:0 12px 30px rgba(47,125,74,.13)}.design-3 .scan{color:#386148}.design-3 .brandName{color:#225d38}.design-3 .brandName span{color:#7aa63d}.design-3 .tag,.design-3 .footer2{color:#63806c}.design-3 .brandLines .g{background:#2f7d4a}.design-3 .brandLines .o{background:#8fbd4e}.design-3 .brandLines .r{background:#b74b38}
+.poster.design-4{background:#fff4e8;color:#5a2b18;border-color:#e4a26b}.design-4 .orange{background:#ef7c28}.design-4 .green{background:#6b8d3a}.design-4 .red{background:#9c3f26}.design-4 .note{color:#9a5d3d}.design-4 .smallTitle{font-family:Georgia,serif}.design-4 .bigTitle{font-family:Georgia,serif;color:#bd4e1f}.design-4 .lines .g{background:#6b8d3a}.design-4 .lines .o{background:#ef7c28}.design-4 .lines .r{background:#9c3f26}.design-4 .qrBox{border:2px solid #bd4e1f;border-radius:18px;box-shadow:0 12px 30px rgba(120,55,25,.14)}.design-4 .scan{color:#7a4a33}.design-4 .brandName{color:#7b321c}.design-4 .brandName span{color:#ef7c28}.design-4 .tag,.design-4 .footer2{color:#95664d}.design-4 .brandLines .g{background:#6b8d3a}.design-4 .brandLines .o{background:#ef7c28}.design-4 .brandLines .r{background:#9c3f26}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.grid{grid-template-columns:1fr}.poster{max-width:360px}}
+@media print{@page{size:A4;margin:8mm}body{background:#fff}.toolbar{display:none!important}.page{padding:0}.grid{grid-template-columns:repeat(3,1fr);gap:7mm}.poster{max-width:none;box-shadow:none;break-inside:avoid;min-height:92mm;padding:10mm 4mm 7mm;border-radius:6mm}.qrBox{width:44mm;padding:2.5mm}.qrbox{width:39mm;height:39mm}.qrbox svg,.qrbox canvas{width:39mm!important;height:39mm!important}.restaurant{font-size:10pt}.code{font-size:7pt}.smallTitle{font-size:16pt}.bigTitle{font-size:32pt}.brandName{font-size:19pt}}
 </style></head><body>
-<div class="head"><h2>${title}</h2><p>${payload.length} QR code${payload.length===1?'':'s'}</p></div>
-<div class="grid">${cards}</div>
+<div class="toolbar">
+  <span style="font-size:12px;font-weight:900;margin-right:4px">QR Design:</span>
+  <button data-design="1" onclick="applyDesign(1)">① Premium Gold</button>
+  <button data-design="2" onclick="applyDesign(2)">② Black Luxury</button>
+  <button data-design="3" onclick="applyDesign(3)">③ Fresh Green</button>
+  <button data-design="4" onclick="applyDesign(4)">④ Warm Classic</button>
+  <button class="printBtn" onclick="window.print()">🖨 Print</button>
+  <span class="count">${payload.length} QR${payload.length===1?'':'s'}</span>
+</div>
+<div class="page"><div class="grid">${cards}</div></div>
 <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.9.2/lib/qr-code-styling.js"><\/script>
 <script>
 const data=${JSON.stringify(payload)};
-window.onload=()=>{
- data.forEach(x=>{
-  const q=new QRCodeStyling({width:98,height:98,type:'svg',data:x.url,margin:0,qrOptions:{errorCorrectionLevel:'H'},dotsOptions:{type:'dots',color:'#000000'},cornersSquareOptions:{type:'dot',color:'#000000'},cornersDotOptions:{type:'dot',color:'#000000'},backgroundOptions:{color:'#ffffff'}});
-  q.append(document.getElementById('qr-'+x.id));
- });
- setTimeout(()=>window.print(),1200);
-};
+let selectedDesign=${qrPrintDesign};
+const configs=${JSON.stringify(qrPrintDesignConfig)};
+function applyDesign(n){
+  selectedDesign=Number(n)||1;
+  document.querySelectorAll('.toolbar button[data-design]').forEach(b=>b.classList.toggle('active',Number(b.dataset.design)===selectedDesign));
+  document.querySelectorAll('.poster').forEach(p=>{p.className='poster design-'+selectedDesign});
+  data.forEach(x=>{
+    const el=document.getElementById('qr-'+x.id); if(!el)return; el.innerHTML='';
+    const c=configs[selectedDesign];
+    const q=new QRCodeStyling({width:160,height:160,type:'svg',data:x.url,margin:4,qrOptions:{typeNumber:0,mode:'Byte',errorCorrectionLevel:'H'},dotsOptions:{type:c.dotType,color:c.dots},cornersSquareOptions:{type:c.cornerType,color:c.corner},cornersDotOptions:{type:c.cornerDotType,color:c.cornerDot},backgroundOptions:{color:'#ffffff'}});
+    q.append(el);
+  });
+}
+window.onload=()=>applyDesign(selectedDesign);
 <\/script></body></html>`);
   w.document.close();
 }
 
-$('qrSearch')?.addEventListener('input',renderQRs);$('qrStatus')?.addEventListener('change',renderQRs);$('qrRestaurantFilter')?.addEventListener('change',renderQRs);
+$('qrPrintDesign')?.addEventListener('change',e=>setQRPrintDesign(e.target.value));setQRPrintDesign(qrPrintDesign);$('qrSearch')?.addEventListener('input',renderQRs);$('qrStatus')?.addEventListener('change',renderQRs);$('qrRestaurantFilter')?.addEventListener('change',renderQRs);
 function exportRestaurantsCSV(){const rows=[['id','name','slug','phone','address','status'],...restaurants.map(r=>[r.id,r.name,r.slug,r.phone,r.address,statusOf(r)])];const csv=rows.map(row=>row.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='freemenu-restaurants.csv';a.click()}
 async function logout(){await db.auth.signOut();location.reload()}
 function startClock(){const tick=()=>{const d=new Date();$('todayDate').textContent=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});$('todayTime').textContent=d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});};tick();setInterval(tick,1000)}
