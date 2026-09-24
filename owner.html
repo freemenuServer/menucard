@@ -74,7 +74,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
 /* Modal */
 .modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;padding:18px;z-index:300}.modal.show{display:flex}.modalBox{background:#fff;border-radius:16px;width:min(650px,100%);max-height:90vh;overflow:auto;padding:20px}.modalHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.modalHead h3{margin:0;font-size:17px}.close{border:0;background:#f1f3f5;border-radius:8px;width:32px;height:32px}
-.previewFrame{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff}.previewTop{height:120px;background:linear-gradient(135deg,#461016,#9d2535);color:#fff;padding:25px}.previewTop strong{font-family:"Cormorant Garamond",serif;font-size:31px}.themeGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.colorField{display:flex;align-items:center;gap:8px;border:1px solid var(--border);padding:8px;border-radius:8px}.colorField input{width:38px;height:30px;padding:0;border:0;background:none}.colorField span{font-size:11px;font-weight:700}
+.previewFrame{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff}.previewTop{height:120px;background:linear-gradient(135deg,#461016,#9d2535);color:#fff;padding:25px}.previewTop strong{font-family:"Cormorant Garamond",serif;font-size:31px}.themeChoicePreview{display:flex;align-items:center;gap:12px;border:1px solid var(--border);border-radius:10px;padding:12px;background:#fafbfc}.themeSwatch{width:46px;height:46px;border-radius:10px;flex:0 0 auto;background:linear-gradient(135deg,#641219,#d8ad62);box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
 
 /* Toast */
 #toast{position:fixed;bottom:22px;right:22px;background:#172033;color:#fff;padding:11px 15px;border-radius:9px;font-size:12px;font-weight:700;opacity:0;transform:translateY(15px);transition:.25s;z-index:500}#toast.show{opacity:1;transform:none}
@@ -84,6 +84,31 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 @media(max-width:760px){
  .sidebar{transform:translateX(-100%);transition:.25s;width:250px}.sidebar.open{transform:none}.content{margin-left:0}.topbar{height:66px;padding:0 12px}.mobileMenu{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--border);background:#fff;border-radius:8px}.topActions .openToggle{display:none}.profile .profileName{display:none}.container{padding:15px 11px 35px}.grid4{grid-template-columns:1fr 1fr;gap:9px}.stat{padding:13px;min-height:94px}.statValue{font-size:20px}.threeCol,.categoryCards{grid-template-columns:1fr}.profileBox{grid-template-columns:1fr;text-align:center}.bigLogo{margin:auto}.mediaCover{height:150px}.menuTable{min-width:700px}.menuTableWrap{overflow:auto}.quickGrid{grid-template-columns:1fr}.heroHideMobile{display:none}}
 @media(max-width:430px){.grid4{grid-template-columns:1fr 1fr}.statLabel{font-size:9px}.statValue{font-size:18px}.restTitle{font-size:14px}.restAddress{font-size:9px}}
+/* ---------- Menu Reorder ---------- */
+.reorderModalBox{width:min(980px,100%);max-height:92vh;padding:20px}
+.reorderHelp{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border:1px solid #dbeafe;background:#f5f9ff;border-radius:10px;margin-bottom:14px;font-size:11px;color:#475569}
+.reorderHelp i{color:#3283e8;margin-top:1px}
+.reorderCategories{display:flex;flex-direction:column;gap:10px;max-height:62vh;overflow:auto;padding:2px}
+.reorderCategory{border:1px solid var(--border);border-radius:12px;background:#fff;box-shadow:0 4px 14px rgba(15,23,42,.04)}
+.reorderCategory.dragging{opacity:.55;border-style:dashed}
+.reorderCategoryHeader{display:flex;align-items:center;gap:10px;padding:11px 12px;background:#fafbfc;border-bottom:1px solid var(--border);border-radius:12px 12px 0 0}
+.reorderCatHandle,.reorderItemHandle{color:#94a3b8;cursor:grab;flex:0 0 auto}
+.reorderCatHandle:active,.reorderItemHandle:active{cursor:grabbing}
+.reorderCategoryTitle{font-size:13px;font-weight:900;flex:1}
+.reorderCategoryCount{font-size:10px;color:var(--muted);font-weight:700}
+.reorderItems{padding:8px;min-height:12px}
+.reorderItem{display:flex;align-items:center;gap:9px;padding:9px 10px;border:1px solid #edf0f4;border-radius:9px;background:#fff;margin-bottom:6px}
+.reorderItem:last-child{margin-bottom:0}
+.reorderItem.dragging{opacity:.5}
+.reorderItemName{font-size:12px;font-weight:800;flex:1;min-width:0}
+.reorderItemMeta{font-size:9px;color:var(--muted);white-space:nowrap}
+.reorderDropHint{font-size:10px;color:#94a3b8;text-align:center;padding:7px;border:1px dashed #d8dee8;border-radius:8px}
+.reorderBlocked{border-color:#f5b8b8!important;background:#fff7f7!important}
+.reorderFooter{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;padding-top:13px;border-top:1px solid var(--border)}
+#reorderSaveBtn{min-width:125px}
+
+
+.reorderMoveBtn{display:inline-flex;align-items:center;gap:6px;border:1px solid #d8dee8;background:#fff;border-radius:7px;padding:6px 9px;color:#475569;font-size:10px;font-weight:800;cursor:grab}.reorderMoveBtn:hover{background:#f1f5f9;border-color:#b8c2d1}.reorderMoveBtn:active{cursor:grabbing}
 </style>
 
 
@@ -289,7 +314,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     <a class="navItem" href="#analytics" data-section="analytics"><i class="fa-solid fa-chart-column"></i> Analytics</a>
     <a class="navItem" href="#settings" data-section="settings"><i class="fa-solid fa-gear"></i> Settings</a>
     <a class="navItem" href="#support" data-section="support"><i class="fa-regular fa-circle-question"></i> Help & Support</a>
-    <a class="navItem" href="/owner/plans.html" id="plansNavLink"><i class="fa-solid fa-crown"></i> Plans & Pricing</a>
+    <a class="navItem" href="javascript:void(0)" id="plansNavLink" onclick="openOwnerPlans()"><i class="fa-solid fa-crown"></i> Plans & Pricing</a>
   </nav>
   <div class="sidePromo">
     <i class="fa-solid fa-crown"></i><strong>Grow Your Business</strong>
@@ -330,7 +355,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
       <div class="planSummaryTitle">
         <div class="planCrown"><i class="fa-solid fa-crown"></i></div>
         <div>
-          <div class="planEyebrow">Current Plan</div>
+          <div class="planEyebrow">Current Plan <span id="customPlanBadge" class="hidden" style="display:inline-block;margin-left:6px;padding:3px 6px;border-radius:999px;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;font-size:8px;letter-spacing:.3px">CUSTOM MENU</span></div>
           <div class="planName" id="currentPlanName">Loading plan...</div>
           <div class="muted" id="currentPlanDescription" style="font-size:10px;margin-top:3px"></div>
         </div>
@@ -348,7 +373,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     </div>
     <div class="planFeatureList" id="currentPlanFeatures"></div>
     <div class="planSummaryActions">
-      <a class="btn sm" href="/owner/plans.html"><i class="fa-solid fa-list"></i> View Plans & Pricing</a>
+      <a class="btn sm" href="javascript:void(0)" onclick="openOwnerPlans()"><i class="fa-solid fa-list"></i> View Plans & Pricing</a>
       <span class="muted" id="currentPlanNote" style="font-size:10px">Plan details are controlled by FreeMenu Super Admin.</span>
     </div>
   </div>
@@ -385,7 +410,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
   <div class="twoCol">
     <div class="card">
-      <div class="cardTitle">Menu Management <button class="btn primary sm" id="openAdd"><i class="fa-solid fa-plus"></i> Add New Item</button></div>
+      <div class="cardTitle">Menu Management <div class="actions"><button class="btn blue sm" id="reorderMenuBtnDash"><i class="fa-solid fa-grip-vertical"></i> Reorder Menu</button><button class="btn primary sm" id="openAdd"><i class="fa-solid fa-plus"></i> Add New Item</button></div></div>
       <div class="menuToolbar">
         <input class="input" id="menuSearch" placeholder="Search food items...">
         <select class="select" id="menuCategoryFilter" style="max-width:160px"><option value="">All Categories</option></select>
@@ -424,7 +449,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 <!-- FULL MENU MANAGEMENT -->
 <section id="section-menu" class="hidden">
   <div class="card">
-    <div class="cardTitle">Menu Management <button class="btn primary" id="openAdd2"><i class="fa-solid fa-plus"></i> Add New Item</button></div>
+    <div class="cardTitle">Menu Management <div class="actions"><button class="btn blue" id="reorderMenuBtn"><i class="fa-solid fa-grip-vertical"></i> Reorder Menu</button><button class="btn primary" id="openAdd2"><i class="fa-solid fa-plus"></i> Add New Item</button></div></div>
     <div class="menuToolbar">
       <input class="input" id="fullSearch" placeholder="Search item, description or category...">
       <select class="select" id="fullCatFilter" style="max-width:190px"><option value="">All Categories</option></select>
@@ -571,29 +596,28 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 <section id="section-settings" class="hidden">
   <div class="twoCol">
     <div class="card">
-      <div class="cardTitle">Menu Theme <small>Live public menu branding</small></div>
-      <div class="themeGrid">
-        <label class="colorField"><input type="color" id="cPrimary" value="#641219"><span>Primary Color</span></label>
-        <label class="colorField"><input type="color" id="cPrimaryDark" value="#89142b"><span>Primary Dark</span></label>
-        <label class="colorField"><input type="color" id="cBg" value="#fffaf1"><span>Background Color</span></label>
-        <label class="colorField"><input type="color" id="cCard" value="#ffffff"><span>Card Color</span></label>
-        <label class="colorField"><input type="color" id="cText" value="#241719"><span>Text Color</span></label>
-        <label class="colorField"><input type="color" id="cAccent" value="#d8ad62"><span>Accent Color</span></label>
+      <div class="cardTitle">Menu Theme <small>Select a theme style</small></div>
+      <div class="formGroup">
+        <label for="themePreset">Theme Style</label>
+        <select class="select" id="themePreset">
+          <option value="classic">Classic Burgundy</option>
+          <option value="royal">Royal Green</option>
+          <option value="ocean">Ocean Blue</option>
+          <option value="midnight">Midnight Luxury</option>
+          <option value="cafe">Warm Cafe</option>
+        </select>
       </div>
-      <div class="formGroup" style="margin-top:14px">
-        <label>Card Radius <span class="muted" id="radiusValue">14px</span></label>
-        <input id="cRadius" type="range" min="0" max="32" step="1" value="14" style="width:100%">
+      <div class="themeChoicePreview" id="themeChoicePreview">
+        <div class="themeSwatch" id="themeSwatchPrimary"></div>
+        <div>
+          <strong id="themePresetName">Classic Burgundy</strong>
+          <div class="muted" id="themePresetDesc" style="font-size:10px;margin-top:3px">Premium burgundy and gold restaurant look</div>
+        </div>
       </div>
       <button class="btn primary" id="saveTheme" style="margin-top:12px"><i class="fa-solid fa-floppy-disk"></i> Save Theme</button>
-      <div class="previewFrame" style="margin-top:14px;background:var(--bg,#fff)">
+      <div class="previewFrame" style="margin-top:14px">
         <div class="previewTop" id="themePreview"><strong id="themeName">Restaurant</strong><div style="font-size:11px;margin-top:5px">Your digital menu preview</div></div>
-        <div id="themePreviewBody" style="padding:15px">
-          <div id="themePreviewCard" style="padding:14px;border:1px solid #eee;border-radius:14px">
-            <div style="font-weight:800">Menu Item</div>
-            <div style="font-size:11px;opacity:.72;margin-top:5px">Your restaurant theme preview</div>
-            <div style="margin-top:12px;font-weight:800" id="themePreviewPrice">₹299</div>
-          </div>
-        </div>
+        <div style="padding:15px"><div style="height:11px;width:55%;background:#eee;border-radius:8px"></div><div style="height:9px;width:85%;background:#f0f0f0;border-radius:8px;margin-top:13px"></div><div style="height:50px;background:#fffaf1;border:1px solid #eee;border-radius:10px;margin-top:14px"></div></div>
       </div>
       <p class="muted" style="font-size:11px;margin:12px 0 0">Theme changes are saved to your restaurant and appear on the live public menu.</p>
     </div>
@@ -629,8 +653,62 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
    <input class="input" type="number" id="mHalf" placeholder="Half ₹" min="0">
    <input class="input" type="number" id="mFull" placeholder="Full ₹" min="0">
   </div>
+  <div class="photoUploadBox" id="menuPhotoBox">
+    <label style="display:block;font-size:11px;font-weight:800;color:#64748b;margin-bottom:6px">Food Photo <span class="planBadgeInline planBadgePhotos">GROWTH • PHOTOS</span></label>
+    <div style="display:flex;gap:7px;align-items:center">
+      <input class="input" id="mPhotoUrl" placeholder="Food photo URL" readonly>
+      <input type="file" id="mPhotoFile" accept="image/*" hidden>
+      <button type="button" class="fileBtn" id="chooseMenuPhoto">Choose</button>
+      <button type="button" class="btn blue" id="uploadMenuPhoto">Upload</button>
+    </div>
+    <img id="mPhotoPreview" class="photoPreview" alt="Food photo preview">
+    <div class="muted" id="menuPhotoPlanText" style="font-size:9px;margin-top:5px">Growth plan required for food photos.</div>
+  </div>
+
+  <div class="arUploadBox" id="signature3DBox">
+    <label style="display:block;font-size:11px;font-weight:800;color:#64748b;margin-bottom:4px">Signature 3D / AR <span class="planBadgeInline planBadge3d">SIGNATURE 3D</span></label>
+    <div id="signature3DPlanText" class="muted" style="font-size:10px">Checking current plan…</div>
+    <div class="arUploadGrid" style="margin-top:9px">
+      <div>
+        <input type="file" id="mGlbFile" accept=".glb,model/gltf-binary" hidden>
+        <button type="button" class="fileBtn" id="chooseGlbFile">Choose GLB</button>
+        <div class="arFileName" id="glbFileName">No GLB selected</div>
+      </div>
+      <div>
+        <input type="file" id="mUsdzFile" accept=".usdz,model/vnd.usdz+zip" hidden>
+        <button type="button" class="fileBtn" id="chooseUsdzFile">Choose USDZ</button>
+        <div class="arFileName" id="usdzFileName">No USDZ selected</div>
+      </div>
+    </div>
+    <div class="muted" style="font-size:9px;margin-top:7px">GLB is used for 3D viewer/WebAR. USDZ is used by compatible iPhone/iPad Quick Look.</div>
+  </div>
+
   <div class="formGroup" style="margin-top:16px"><label>Menu Item Status</label><button type="button" class="menuStatusBtn on" id="mAvailableSwitch"><span class="dot"></span><span id="mAvailableText">ON • Visible</span></button></div>
   <div style="margin-top:18px;display:flex;justify-content:flex-end;gap:8px"><button class="btn" data-close="itemModal">Cancel</button><button class="btn primary" id="saveItem"><i class="fa-solid fa-floppy-disk"></i> Save Item</button></div>
+ </div>
+</div>
+
+
+<!-- MENU REORDER MODAL -->
+<div class="modal" id="reorderModal">
+ <div class="modalBox reorderModalBox">
+  <div class="modalHead">
+   <h3><i class="fa-solid fa-grip-vertical" style="color:var(--blue);margin-right:6px"></i> Reorder Menu</h3>
+   <button class="close" data-close="reorderModal"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="reorderHelp">
+   <i class="fa-solid fa-circle-info"></i>
+   <div>
+    <b>Category order:</b> drag categories up/down.
+    <br><b>Item order:</b> drag items only inside their own category.
+    <br><b>Important:</b> moving an item to a different category is blocked. Click <b>Save Order</b> to publish the new order.
+   </div>
+  </div>
+  <div id="reorderCategories" class="reorderCategories"></div>
+  <div class="reorderFooter">
+   <button class="btn" id="reorderCancelBtn">Cancel</button>
+   <button class="btn primary" id="reorderSaveBtn"><i class="fa-solid fa-floppy-disk"></i> Save Order</button>
+  </div>
  </div>
 </div>
 
@@ -659,7 +737,26 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 
 let session=null,currentRestaurant=null,currentRestaurantId=null,items=[],activeSection="dashboard";
 let mediaRules={max_mb:1,logo_enabled:true,banner_enabled:true,gallery_paid_enabled:false};
+let currentPlan=null;
+let signature3dLimit=0;
+let signature3dCount=0;
 let isPremiumRestaurant=false;
+
+/* ---------- Custom Menu assignment (Super Admin controlled) ----------
+   Custom Menu is stored directly on restaurants and takes precedence over
+   the normal plans.plan_id assignment. Nothing in the existing plan system
+   is removed; this only adds the custom-plan layer.
+*/
+let isCustomMenuPlan=false;
+let customMenuSettings={
+  photo_enabled:false,
+  gallery_enabled:false,
+  ar_enabled:false,
+  qr_stickers_max:null,
+  signature_3d_dishes_max:0,
+  features:[],
+  notes:""
+};
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
@@ -671,6 +768,7 @@ function publicUrl(){return new URL("menu.html?r="+encodeURIComponent(currentRes
 /* ---------- Navigation ---------- */
 const sections=["dashboard","restaurant","menu","categories","gallery","qr","preview","analytics","settings","orders","support"];
 function showSection(name){
+  if(currentRestaurantId) refreshOwnerPlan().catch(e=>console.warn("Plan refresh skipped:",e));
   activeSection=sections.includes(name)?name:"dashboard";
   sections.forEach(s=>$("section-"+s)?.classList.toggle("hidden",s!==activeSection));
   document.querySelectorAll(".navItem").forEach(a=>a.classList.toggle("active",a.dataset.section===activeSection));
@@ -753,6 +851,9 @@ async function ownerLogin(){
     hideOwnerLogin();
     $("loader").classList.remove("hidden");
     await init(true);
+    // Owner login must stay on the Owner Dashboard.
+    // Public/customer menus are opened separately from the dashboard.
+    return;
   }catch(e){
     console.error("Owner login failed:",e);
     showLoginForm();
@@ -945,6 +1046,7 @@ async function init(afterLogin=false){
     }
     fillProfile();
     await loadCurrentPlan();
+    startRestaurantPlanRealtime();
     await loadItems();
     await loadMediaRules();
     $("loader")?.classList.add("hidden");
@@ -994,13 +1096,19 @@ function fillProfile(){
   $("fDineIn").checked=r.dine_in!==false;
   $("fTakeaway").checked=r.takeaway!==false;
   $("fDelivery").checked=r.home_delivery!==false;
-  $("cPrimary").value=r.primary_color||r.theme_primary||"#641219";
-  $("cPrimaryDark").value=r.primary_dark||r.theme_primary_dark||"#89142b";
-  $("cBg").value=r.background_color||r.theme_background||"#fffaf1";
-  $("cCard").value=r.card_color||r.theme_card||"#ffffff";
-  $("cText").value=r.text_color||r.theme_text||"#241719";
-  $("cAccent").value=r.accent_color||r.theme_accent||"#d8ad62";
-  $("cRadius").value=Number(r.card_radius??r.theme_radius??14);
+  const savedPrimary=String(r.primary_color||r.theme_primary||"#641219").toLowerCase();
+  const savedDark=String(r.primary_dark||r.theme_primary_dark||"#89142b").toLowerCase();
+  const savedAccent=String(r.accent_color||r.theme_accent||"#d8ad62").toLowerCase();
+  const savedBg=String(r.background_color||r.theme_background||"#fffaf1").toLowerCase();
+  const savedCard=String(r.card_color||r.theme_card||"#ffffff").toLowerCase();
+  const savedText=String(r.text_color||r.theme_text||"#241719").toLowerCase();
+  const savedRadius=Number(r.card_radius??r.theme_radius??14);
+  const matched=Object.entries(THEME_PRESETS).find(([key,t])=>
+    t.primary.toLowerCase()===savedPrimary && t.dark.toLowerCase()===savedDark &&
+    t.accent.toLowerCase()===savedAccent && t.bg.toLowerCase()===savedBg &&
+    t.card.toLowerCase()===savedCard && t.text.toLowerCase()===savedText && t.radius===savedRadius
+  );
+  $("themePreset").value=matched?.[0]||"classic";
   updateTheme();
 
   const logoEl=$("topLogo");logoEl.src=logo||"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='100%25' height='100%25' rx='40' fill='%23641219'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' fill='white' font-size='30'%3E🍽%3C/text%3E%3C/svg%3E";
@@ -1010,17 +1118,72 @@ function fillProfile(){
   if(r.cover_url && $("fCover")) $("fCover").value=r.cover_url;
 }
 
+async function refreshCurrentRestaurantFromDB(){
+  if(!currentRestaurantId) return currentRestaurant;
+  const {data,error}=await supabaseClient
+    .from("restaurants")
+    .select("*")
+    .eq("id",currentRestaurantId)
+    .maybeSingle();
+  if(error){
+    console.warn("Restaurant refresh failed:",error.message);
+    return currentRestaurant;
+  }
+  if(data){
+    currentRestaurant=data;
+    currentRestaurantId=data.id;
+  }
+  return currentRestaurant;
+}
+
+let restaurantPlanRealtime=null;
+function startRestaurantPlanRealtime(){
+  if(restaurantPlanRealtime) return;
+  if(!currentRestaurantId) return;
+  restaurantPlanRealtime=supabaseClient
+    .channel("owner-restaurant-plan-"+currentRestaurantId)
+    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"restaurants",filter:"id=eq."+currentRestaurantId},async payload=>{
+      console.log("Restaurant updated from Admin:",payload.new?.plan_id);
+      currentRestaurant=payload.new||currentRestaurant;
+      await loadCurrentPlan();
+    })
+    .subscribe();
+}
+
+async function refreshOwnerPlan(){
+  await refreshCurrentRestaurantFromDB();
+  await loadCurrentPlan();
+}
+
 async function loadCurrentPlan(){
+  await refreshCurrentRestaurantFromDB();
   const nameEl=$("currentPlanName"), descEl=$("currentPlanDescription"), priceEl=$("currentPlanPrice"),
         statusEl=$("currentPlanStatus"), metricsEl=$("currentPlanMetrics"), featuresEl=$("currentPlanFeatures"), noteEl=$("currentPlanNote");
   if(!nameEl)return;
+
+  const customPlanBadge=$("customPlanBadge");
+  if(customPlanBadge) customPlanBadge.classList.toggle("hidden",!Boolean(currentRestaurant?.custom_plan_enabled));
 
   const money=n=>"₹"+Number(n||0).toLocaleString("en-IN");
   const period=v=>{
     const x=String(v||"/ month").trim();
     return x.startsWith("/")?x:"/ "+x.replace(/^\/\s*/,"");
   };
+
+  isCustomMenuPlan=Boolean(currentRestaurant?.custom_plan_enabled);
+  customMenuSettings={
+    photo_enabled:currentRestaurant?.custom_photo_enabled===true,
+    gallery_enabled:currentRestaurant?.custom_gallery_enabled===true,
+    ar_enabled:currentRestaurant?.custom_ar_enabled===true,
+    qr_stickers_max:currentRestaurant?.custom_qr_stickers_max??null,
+    signature_3d_dishes_max:Math.max(0,Number(currentRestaurant?.custom_signature_3d_dishes_max||0)),
+    features:Array.isArray(currentRestaurant?.custom_features)?currentRestaurant.custom_features:[],
+    notes:String(currentRestaurant?.custom_notes||"")
+  };
+
   const renderNoPlan=()=>{
+    currentPlan=null; isCustomMenuPlan=false; signature3dLimit=0; signature3dCount=0;
+    updateSignature3DUI(); updateMenuPhotoUI();
     nameEl.textContent="No plan assigned";
     descEl.textContent="Ask Super Admin to assign a plan to this restaurant.";
     priceEl.innerHTML='—';
@@ -1033,15 +1196,121 @@ async function loadCurrentPlan(){
 
   nameEl.textContent="Loading plan...";
   descEl.textContent="";featuresEl.innerHTML="";
+
+  /* ============================================================
+     NEW: Super Admin Custom Menu
+     Custom settings live on restaurants and are intentionally checked
+     before plan_id so the owner always receives the admin-assigned
+     custom configuration.
+     ============================================================ */
+  if(isCustomMenuPlan){
+    const customFeatures=customMenuSettings.features
+      .map(f=>typeof f==="string"?f:(f?.enabled===false?"":(f?.text||f?.name||"")))
+      .filter(Boolean);
+
+    currentPlan={
+      id:"custom-"+String(currentRestaurant?.id||""),
+      name:String(currentRestaurant?.custom_plan_name||"Custom Menu"),
+      slug:"custom-menu",
+      plan_type:"custom",
+      monthly_price:Number(currentRestaurant?.custom_monthly_price||0),
+      setup_fee:Number(currentRestaurant?.custom_setup_fee||0),
+      period_label:"/ month",
+      setup_fee_label:"One-Time",
+      description:"Custom Menu settings assigned by FreeMenu Super Admin.",
+      badge_text:"CUSTOM MENU • ADMIN ASSIGNED",
+      is_active:true,
+      qr_stickers_max:customMenuSettings.qr_stickers_max,
+      signature_3d_dishes_max:customMenuSettings.signature_3d_dishes_max,
+      features:customFeatures,
+      custom_photo_enabled:customMenuSettings.photo_enabled,
+      custom_gallery_enabled:customMenuSettings.gallery_enabled,
+      custom_ar_enabled:customMenuSettings.ar_enabled
+    };
+
+    signature3dLimit=customMenuSettings.ar_enabled ? customMenuSettings.signature_3d_dishes_max : 0;
+    await refreshSignature3DCount();
+    updateSignature3DUI();
+    updateMenuPhotoUI();
+
+    nameEl.textContent=currentPlan.name;
+    descEl.textContent=currentPlan.description;
+    priceEl.innerHTML=`${money(currentPlan.monthly_price)} <small>${esc(period(currentPlan.period_label))}</small>`;
+    statusEl.textContent="CUSTOM ACTIVE";
+    statusEl.style.background="#eef2ff";
+    statusEl.style.color="#4338ca";
+    statusEl.style.borderColor="#c7d2fe";
+
+    const setupText=Number(currentPlan.setup_fee||0)===0
+      ? "Free"
+      : `${money(currentPlan.setup_fee)} • ${currentPlan.setup_fee_label}`;
+
+    const qr=currentPlan.qr_stickers_max==null?"—":String(currentPlan.qr_stickers_max);
+    const dishes=currentPlan.signature_3d_dishes_max==null?"—":String(currentPlan.signature_3d_dishes_max);
+
+    metricsEl.innerHTML=`
+      <div class="planMetric"><div class="k">Setup Fee</div><div class="v">${esc(setupText)}</div></div>
+      <div class="planMetric"><div class="k">QR Stickers</div><div class="v">${esc(qr)}</div></div>
+      <div class="planMetric"><div class="k">3D Dishes</div><div class="v">${esc(dishes)}</div></div>
+      <div class="planMetric"><div class="k">Plan Type</div><div class="v">Custom</div></div>`;
+
+    featuresEl.innerHTML=customFeatures.slice(0,8)
+      .map(f=>`<span class="planFeatureChip"><i class="fa-solid fa-check"></i>${esc(f)}</span>`).join("");
+
+    noteEl.textContent=currentRestaurant?.custom_notes
+      ? String(currentRestaurant.custom_notes)
+      : "Custom Menu settings are controlled by FreeMenu Super Admin.";
+
+    console.log("FreeMenu Custom Menu settings:",{
+      restaurantId:currentRestaurant?.id,
+      custom_plan_name:currentRestaurant?.custom_plan_name,
+      monthly_price:currentRestaurant?.custom_monthly_price,
+      setup_fee:currentRestaurant?.custom_setup_fee,
+      qr_stickers_max:currentRestaurant?.custom_qr_stickers_max,
+      signature_3d_dishes_max:currentRestaurant?.custom_signature_3d_dishes_max,
+      photo_enabled:currentRestaurant?.custom_photo_enabled,
+      gallery_enabled:currentRestaurant?.custom_gallery_enabled,
+      ar_enabled:currentRestaurant?.custom_ar_enabled
+    });
+    return;
+  }
+
+  /* Existing standard plan resolution remains unchanged. */
   let plan=null, error=null;
 
+  /* Primary source: Super Admin assignment via restaurants.plan_id. */
   if(currentRestaurant?.plan_id){
     const res=await supabaseClient.from("plans").select("*").eq("id",currentRestaurant.plan_id).maybeSingle();
-    plan=res.data;error=res.error;
-  }else if(String(currentRestaurant?.plan||"").toLowerCase()==="free"){
-    const res=await supabaseClient.from("plans").select("*").eq("slug","free-starter").maybeSingle();
-    plan=res.data;error=res.error;
-  }else{
+    plan=res.data||null;error=res.error||null;
+  }
+
+  /* Backward compatibility: older admin records may only have restaurants.plan.
+     Resolve every known plan value to the real plans row before ever falling back to Free. */
+  if(!plan){
+    const legacy=String(currentRestaurant?.plan||"").trim().toLowerCase();
+    const legacySlugMap={
+      "free":"free-starter",
+      "starter":"free-starter",
+      "free-starter":"free-starter",
+      "growth":"growth-photos",
+      "premium":"growth-photos",
+      "growth-photos":"growth-photos",
+      "signature":"signature-3d",
+      "signature-3d":"signature-3d",
+      "signature_3d":"signature-3d",
+      "full-3d":"full-3d-experience",
+      "full_3d":"full-3d-experience",
+      "full-3d-experience":"full-3d-experience"
+    };
+    const slug=legacySlugMap[legacy]||legacy;
+    if(slug){
+      const res=await supabaseClient.from("plans").select("*").eq("slug",slug).maybeSingle();
+      if(!res.error && res.data) plan=res.data;
+      else if(res.error) error=res.error;
+    }
+  }
+
+  if(!plan){
     renderNoPlan();
     return;
   }
@@ -1058,6 +1327,20 @@ async function loadCurrentPlan(){
     noteEl.textContent="Check the plans SELECT/RLS policy if this plan was assigned by Super Admin.";
     return;
   }
+
+  currentPlan=plan;
+  console.log("FreeMenu current restaurant plan:",{
+    restaurantId:currentRestaurant?.id,
+    plan_id:currentRestaurant?.plan_id,
+    legacy_plan:currentRestaurant?.plan,
+    resolved_plan_id:plan?.id,
+    resolved_plan_slug:plan?.slug,
+    signature_3d_dishes_max:plan?.signature_3d_dishes_max
+  });
+  signature3dLimit=Math.max(0,Number(plan.signature_3d_dishes_max||0));
+  await refreshSignature3DCount();
+  updateSignature3DUI();
+  updateMenuPhotoUI();
 
   nameEl.textContent=plan.name||"Current Plan";
   descEl.textContent=plan.description||"";
@@ -1082,16 +1365,98 @@ async function loadCurrentPlan(){
   featuresEl.innerHTML=features.slice(0,8).map(f=>`<span class="planFeatureChip"><i class="fa-solid fa-check"></i>${esc(f)}</span>`).join("");
   noteEl.textContent=plan.badge_text?plan.badge_text+" • Plan assigned by Super Admin.":"Plan assigned by Super Admin.";
 }
+function isSignature3DPlan(){
+  if(isCustomMenuPlan) return customMenuSettings.ar_enabled===true && signature3dLimit>0;
+  return signature3dLimit>0 || /signature|full.*3d/i.test(`${currentPlan?.slug||""} ${currentPlan?.name||""}`);
+}
+async function refreshSignature3DCount(){
+  signature3dCount=0;
+  if(!currentRestaurantId || !signature3dLimit)return;
+  const {count,error}=await supabaseClient.from("menu_items").select("id",{count:"exact",head:true}).eq("restaurant_id",currentRestaurantId).eq("ar_enabled",true);
+  if(!error)signature3dCount=Number(count||0);
+}
+function updateSignature3DUI(){
+  const box=$("signature3DBox"),txt=$("signature3DPlanText");
+  const allowed=isSignature3DPlan();
+  if(box)box.classList.toggle("locked",!allowed);
+  if(txt){
+    if(allowed)txt.innerHTML=`<b>${esc(currentPlan?.name||"Signature 3D")}</b> • ${signature3dCount}/${signature3dLimit} Signature 3D dishes used.`;
+    else txt.textContent="Signature 3D / Full 3D plan required for AR model uploads.";
+  }
+}
+function isGrowthPhotoPlan(){
+  if(isCustomMenuPlan) return customMenuSettings.photo_enabled===true;
+  const key=`${currentPlan?.slug||""} ${currentPlan?.name||""}`.toLowerCase();
+  return key.includes("growth") || key.includes("signature") || key.includes("full 3d") || key.includes("3d-experience");
+}
+function updateMenuPhotoUI(){
+  const allowed=isGrowthPhotoPlan();
+  if($("chooseMenuPhoto"))$("chooseMenuPhoto").disabled=!allowed;
+  if($("uploadMenuPhoto"))$("uploadMenuPhoto").disabled=!allowed;
+  if($("menuPhotoPlanText"))$("menuPhotoPlanText").textContent=allowed?"Photo upload is available on Growth / Signature 3D / Full 3D plans.":"Growth (Photos) or higher plan required for food photos.";
+}
+async function uploadSignature3DAsset(file,itemId,assetType){
+  if(!file)throw new Error(`Choose a ${assetType.toUpperCase()} file first.`);
+  if(!itemId)throw new Error("Save the menu item first so the 3D model can be linked to it.");
+  if(!isSignature3DPlan())throw new Error("Signature 3D plan is required.");
+  if(file.size>20*1024*1024)throw new Error(`${assetType.toUpperCase()} file must be 20 MB or smaller.`);
+  const ext=(file.name.split(".").pop()||"").toLowerCase();
+  if(assetType==="glb"&&ext!=="glb")throw new Error("Please select a .glb file.");
+  if(assetType==="usdz"&&ext!=="usdz")throw new Error("Please select a .usdz file.");
+  const {data:{session:activeSession},error:sessionError}=await supabaseClient.auth.getSession();
+  if(sessionError||!activeSession?.access_token)throw new Error("Please login again.");
+  const fd=new FormData();
+  fd.append("file",file); fd.append("restaurant_id",currentRestaurantId); fd.append("menu_item_id",itemId); fd.append("asset_type",assetType);
+  const response=await fetch(`${SUPABASE_URL}/functions/v1/signature-3d-model-upload`,{method:"POST",headers:{Authorization:`Bearer ${activeSession.access_token}`,apikey:SUPABASE_ANON_KEY},body:fd});
+  let result={}; try{result=await response.json()}catch(e){}
+  if(!response.ok)throw new Error(result?.error||`3D R2 upload failed (${response.status})`);
+  const returnedUrl=String(result?.url||result?.public_url||result?.publicUrl||"").trim();
+  const returnedKey=String(result?.object_key||result?.key||result?.path||"").trim();
+  if(returnedUrl)return returnedUrl;
+  if(returnedKey)return `https://images.freemenu.in/${returnedKey.replace(/^\/+/,"")}`;
+  throw new Error(result?.message||"Cloudflare R2 uploaded the model but returned no public URL.");
+}
+async function uploadMenuPhoto(){
+  if(!isGrowthPhotoPlan())return toast("Growth (Photos) plan or higher is required for food photos.");
+  const file=$("mPhotoFile")?.files?.[0];
+  if(!file)return toast("Choose a food photo first.");
+  if(!file.type.startsWith("image/"))return toast("Only image files are allowed.");
+  if(file.size>10*1024*1024)return toast("Food photo must be 10 MB or smaller.");
+  try{
+    $("uploadMenuPhoto").disabled=true;$("uploadMenuPhoto").textContent="Uploading...";
+    const url=await uploadToR2(file,"menu-items");
+    $("mPhotoUrl").value=url;
+    if($("mPhotoPreview")){ $("mPhotoPreview").src=url; $("mPhotoPreview").style.display="block"; }
+    toast("Food photo uploaded to Cloudflare R2");
+  }catch(error){console.error("Menu photo upload error:",error);toast("Food photo upload failed: "+(error?.message||"Unknown error"));}
+  finally{ $("uploadMenuPhoto").disabled=!isGrowthPhotoPlan(); $("uploadMenuPhoto").textContent="Upload"; }
+}
 
 async function loadItems(){
-  const {data,error}=await supabaseClient.from("menu_items").select("*").eq("restaurant_id",currentRestaurantId).order("id",{ascending:false});
+  const {data,error}=await supabaseClient.from("menu_items").select("*").eq("restaurant_id",currentRestaurantId);
   if(error){toast(error.message);return}
-  items=data||[];renderAll();
+  items=data||[];
+  items.sort((a,b)=>{
+    const ao=Number(a.sort_order);
+    const bo=Number(b.sort_order);
+    const ah=Number.isFinite(ao), bh=Number.isFinite(bo);
+    if(ah&&bh&&ao!==bo)return ao-bo;
+    if(ah&&!bh)return -1;
+    if(!ah&&bh)return 1;
+    return String(a.id).localeCompare(String(b.id));
+  });
+  renderAll();
 }
 
 /* ---------- Rendering ---------- */
 function categories(){
-  return [...new Set(items.map(i=>(i.category||"General").trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const names=[...new Set(items.map(i=>(i.category||"General").trim()).filter(Boolean))];
+  const saved=Array.isArray(currentRestaurant?.category_order)?currentRestaurant.category_order.map(String):[];
+  const rank=new Map(saved.map((x,i)=>[x,i]));
+  return names.sort((a,b)=>{
+    const ar=rank.has(a)?rank.get(a):999999, br=rank.has(b)?rank.get(b):999999;
+    return ar-br || a.localeCompare(b);
+  });
 }
 function fillCategorySelects(){
   const opts=categories().map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
@@ -1110,14 +1475,14 @@ function filtered(source,search,cat,type){
   const q=(search||"").toLowerCase().trim();
   return source.filter(i=>(!cat||(i.category||"General")===cat)&&(!type||(i.item_type||"veg")===type)&&(!q||[i.name,i.description,i.category].filter(Boolean).join(" ").toLowerCase().includes(q)));
 }
-function rowActions(i){return `<div class="actions"><button class="btn blue sm editItem" data-id="${i.id}"><i class="fa-solid fa-pen"></i></button><button class="btn danger sm deleteItem" data-id="${i.id}"><i class="fa-solid fa-trash"></i></button></div>`}
+function rowActions(i){return `<div class="actions"><button type="button" class="btn blue sm editItem" data-id="${i.id}" title="Edit menu item"><i class="fa-solid fa-pen"></i> Edit</button><button type="button" class="btn danger sm deleteItem" data-id="${i.id}" title="Delete menu item"><i class="fa-solid fa-trash"></i> Delete</button>${i.ar_enabled&&i.ar_model_url?`<button type="button" class="btn green sm" onclick="openOwnerAR(\'${String(i.id).replace(/\'/g, "\\\'")}\')" title="View 3D AR"><i class="fa-solid fa-cube"></i> AR</button>`:""}</div>`}
 function renderDashboardTable(){
  const list=filtered(items,$("menuSearch").value,$("menuCategoryFilter").value,$("menuTypeFilter").value);
- $("dashboardItems").innerHTML=list.length?list.slice(0,8).map(i=>`<tr><td><div class="foodName">${esc(i.name)}</div><div class="foodCat">${esc(i.category||"General")}</div></td><td>${typeCell(i)}</td><td class="pricesMini">${esc(priceText(i))}</td><td><button type="button" class="menuStatusBtn ${i.is_available!==false?"on":"off"}" data-status="${i.id}" title="Click to turn menu item ${i.is_available!==false?"OFF":"ON"}"><span class="dot"></span><span>${i.is_available!==false?"ON • Visible":"OFF • Hidden"}</span></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="5" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
+ $("dashboardItems").innerHTML=list.length?list.slice(0,8).map(i=>`<tr><td><div class="foodName">${esc(i.name)} ${i.ar_enabled&&i.ar_model_url?`<span class="planBadgeInline planBadge3d">3D AR</span>`:""}</div><div class="foodCat">${esc(i.category||"General")}${i.image_url?` • Photo`:""}</div></td><td>${typeCell(i)}</td><td class="pricesMini">${esc(priceText(i))}</td><td><button type="button" class="menuStatusBtn ${i.is_available!==false?"on":"off"}" data-status="${i.id}" title="Click to turn menu item ${i.is_available!==false?"OFF":"ON"}"><span class="dot"></span><span>${i.is_available!==false?"ON • Visible":"OFF • Hidden"}</span></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="5" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
 }
 function renderFullTable(){
  const list=filtered(items,$("fullSearch").value,$("fullCatFilter").value,$("fullTypeFilter").value);
- $("fullItems").innerHTML=list.length?list.map(i=>`<tr><td><div class="foodName">${esc(i.name)}</div><div class="foodCat">${esc(i.description||"")}</div></td><td>${esc(i.category||"General")}</td><td>${typeCell(i)}</td><td>${i.price??"—"}</td><td>${i.price_quarter??"—"}</td><td>${i.price_half??"—"}</td><td>${i.price_full??"—"}</td><td><button type="button" class="menuStatusBtn ${i.is_available!==false?"on":"off"}" data-status="${i.id}" title="Click to turn menu item ${i.is_available!==false?"OFF":"ON"}"><span class="dot"></span><span>${i.is_available!==false?"ON • Visible":"OFF • Hidden"}</span></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="9" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
+ $("fullItems").innerHTML=list.length?list.map(i=>`<tr><td><div class="foodName">${esc(i.name)} ${i.ar_enabled&&i.ar_model_url?`<span class="planBadgeInline planBadge3d">3D AR</span>`:""}</div><div class="foodCat">${esc(i.description||"")}${i.image_url?` • Photo`:""}</div></td><td>${esc(i.category||"General")}</td><td>${typeCell(i)}</td><td>${i.price??"—"}</td><td>${i.price_quarter??"—"}</td><td>${i.price_half??"—"}</td><td>${i.price_full??"—"}</td><td><button type="button" class="menuStatusBtn ${i.is_available!==false?"on":"off"}" data-status="${i.id}" title="Click to turn menu item ${i.is_available!==false?"OFF":"ON"}"><span class="dot"></span><span>${i.is_available!==false?"ON • Visible":"OFF • Hidden"}</span></button></td><td>${rowActions(i)}</td></tr>`).join(""):`<tr><td colspan="9" style="text-align:center;padding:30px;color:#777">No menu items found.</td></tr>`;
 }
 function renderCategories(){
  const html=categories().map(c=>{
@@ -1128,6 +1493,7 @@ function renderCategories(){
  $("categoryCards").innerHTML=html||'<div class="muted" style="font-size:12px">No categories yet.</div>';
  $("categoryCardsFull").innerHTML=html||'<div class="muted" style="font-size:12px">No categories yet.</div>';
 }
+
 
 /* ---------- Item CRUD ---------- */
 function openItem(id=null){
@@ -1140,19 +1506,48 @@ function openItem(id=null){
  $("mAvailable").value=String(i?.is_available!==false);
  $("mAvailableSwitch").className=`switch ${i?.is_available!==false?"on":""}`;
  $("mAvailableText").textContent=i?.is_available!==false?"ON — Visible":"OFF — Hidden";
+ $("mPhotoUrl").value=i?.image_url||i?.photo_url||i?.image||i?.photo||"";
+ if($("mPhotoPreview")){const u=$("mPhotoUrl").value;$("mPhotoPreview").src=u;$("mPhotoPreview").style.display=u?"block":"none";}
+ $("mPhotoFile").value="";$("mGlbFile").value="";$("mUsdzFile").value="";
+ $("glbFileName").textContent=i?.ar_model_url?"Existing GLB linked — choose a new file to replace":"No GLB selected";
+ $("usdzFileName").textContent=i?.ar_usdz_url?"Existing USDZ linked — choose a new file to replace":"No USDZ selected";
+ updateSignature3DUI();updateMenuPhotoUI();
  $("itemModal").classList.add("show");
 }
 async function saveItem(){
  const id=$("editId").value,name=$("mName").value.trim(),category=$("mCategory").value.trim()||"General",description=$("mDesc").value.trim(),item_type=$("mType").value;
  if(!name)return toast("Item name is required");
+ const glbFile=$("mGlbFile")?.files?.[0]||null;
+ const usdzFile=$("mUsdzFile")?.files?.[0]||null;
+ const photoUrl=$("mPhotoUrl")?.value.trim()||null;
+ const existing=id?items.find(x=>String(x.id)===String(id)):null;
+ if((glbFile||usdzFile)&&!isSignature3DPlan())return toast("Signature 3D plan is required for 3D/AR uploads.");
+ if((glbFile||usdzFile)&&!existing&&signature3dCount>=signature3dLimit)return toast(`Signature 3D limit reached (${signature3dLimit} dishes).`);
  const payload={name,category,description,item_type,is_veg:item_type==="veg",price:cleanNum($("mPrice").value),price_quarter:cleanNum($("mQtr").value),price_half:cleanNum($("mHalf").value),price_full:cleanNum($("mFull").value),is_available:$("mAvailable").value!=="false"};
+ if(photoUrl)payload.image_url=photoUrl;
  $("saveItem").disabled=true;$("saveItem").textContent="Saving...";
- let res;
- if(id) res=await supabaseClient.from("menu_items").update(payload).eq("id",id).eq("restaurant_id",currentRestaurantId);
- else res=await supabaseClient.from("menu_items").insert([{restaurant_id:currentRestaurantId,...payload}]);
- $("saveItem").disabled=false;$("saveItem").innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Item';
- if(res.error){toast("Save failed: "+res.error.message);return}
- $("itemModal").classList.remove("show");toast(id?"Item updated":"Item added");await loadItems();
+ try{
+  let savedId=id;
+  if(id){
+    const res=await supabaseClient.from("menu_items").update(payload).eq("id",id).eq("restaurant_id",currentRestaurantId).select("id").single();
+    if(res.error)throw res.error;savedId=res.data.id;
+  }else{
+    const sameCategory=items.filter(i=>(i.category||"General").trim()===category);
+    const nextSort=sameCategory.reduce((m,i)=>Math.max(m,Number(i.sort_order)||0),0)+1;
+    const res=await supabaseClient.from("menu_items").insert([{restaurant_id:currentRestaurantId,...payload,sort_order:nextSort}]).select("id").single();
+    if(res.error)throw res.error;savedId=res.data.id;
+  }
+  let arModelUrl=existing?.ar_model_url||null,arUsdzUrl=existing?.ar_usdz_url||null;
+  if(glbFile){$("saveItem").textContent="Uploading GLB to Cloudflare...";arModelUrl=await uploadSignature3DAsset(glbFile,savedId,"glb");}
+  if(usdzFile){$("saveItem").textContent="Uploading USDZ to Cloudflare...";arUsdzUrl=await uploadSignature3DAsset(usdzFile,savedId,"usdz");}
+  if(glbFile||usdzFile){
+    const arUpdate={ar_enabled:true,signature_3d:true,ar_model_url:arModelUrl,ar_usdz_url:arUsdzUrl,ar_storage_provider:"cloudflare-r2"};
+    const arRes=await supabaseClient.from("menu_items").update(arUpdate).eq("id",savedId).eq("restaurant_id",currentRestaurantId);
+    if(arRes.error)throw arRes.error;
+  }
+  $("itemModal").classList.remove("show");toast(id?"Item updated":"Item added");await loadItems();await refreshSignature3DCount();updateSignature3DUI();
+ }catch(e){console.error(e);toast("Save failed: "+(e?.message||e));}
+ finally{$("saveItem").disabled=false;$("saveItem").innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Item';}
 }
 async function deleteItem(id){
  if(!confirm("Delete this menu item?"))return;
@@ -1179,6 +1574,13 @@ document.addEventListener("click",e=>{
  if(status)toggleAvailability(status.dataset.status,status);
 });
 $("saveItem").onclick=saveItem;$("openAdd").onclick=()=>openItem();$("openAdd2").onclick=()=>openItem();
+$("chooseMenuPhoto").onclick=()=>$("mPhotoFile").click();
+$("mPhotoFile").onchange=()=>{const f=$("mPhotoFile").files[0];if(f){$("mPhotoUrl").value="";$("mPhotoPreview").style.display="none";$("menuPhotoPlanText").textContent=f.name}};
+$("uploadMenuPhoto").onclick=uploadMenuPhoto;
+$("chooseGlbFile").onclick=()=>$("mGlbFile").click();
+$("mGlbFile").onchange=()=>{$("glbFileName").textContent=$("mGlbFile").files[0]?.name||"No GLB selected"};
+$("chooseUsdzFile").onclick=()=>$("mUsdzFile").click();
+$("mUsdzFile").onchange=()=>{$("usdzFileName").textContent=$("mUsdzFile").files[0]?.name||"No USDZ selected"};
 $("menuSearch").oninput=renderDashboardTable;$("menuCategoryFilter").onchange=renderDashboardTable;$("menuTypeFilter").onchange=renderDashboardTable;
 $("fullSearch").oninput=renderFullTable;$("fullCatFilter").onchange=renderFullTable;$("fullTypeFilter").onchange=renderFullTable;
 
@@ -1245,44 +1647,37 @@ $("downloadQR").onclick=()=>{const a=document.createElement("a");a.href=$("qrBox
 /* ---------- Public menu ---------- */
 function openPublic(){window.open(publicUrl(),"_blank","noopener")}
 ["publicTop","sidePublicBtn","quickPreview","openPublic2"].forEach(id=>$(id).onclick=openPublic);
-$("sidePlansBtn").onclick=()=>{window.location.href="/owner/plans.html"};
+$("sidePlansBtn").onclick=()=>openOwnerPlans();
 
-/* ---------- Theme preview ---------- */
+/* ---------- Theme preset selector ---------- */
+const THEME_PRESETS={
+ classic:{name:"Classic Burgundy",desc:"Premium burgundy and gold restaurant look",primary:"#641219",dark:"#89142b",accent:"#d8ad62",bg:"#fffaf1",card:"#ffffff",text:"#241719",radius:14},
+ royal:{name:"Royal Green",desc:"Fresh green and elegant cream combination",primary:"#146b4a",dark:"#0d4f38",accent:"#d6ad52",bg:"#f7fbf5",card:"#ffffff",text:"#18231d",radius:14},
+ ocean:{name:"Ocean Blue",desc:"Clean blue theme for a modern menu",primary:"#175a8a",dark:"#0e3f63",accent:"#4aa8d8",bg:"#f4f9fc",card:"#ffffff",text:"#17212b",radius:12},
+ midnight:{name:"Midnight Luxury",desc:"Dark premium style with warm gold accents",primary:"#171a24",dark:"#0c0f16",accent:"#d7ae5b",bg:"#11141c",card:"#1b202b",text:"#f5f1e8",radius:14},
+ cafe:{name:"Warm Cafe",desc:"Soft brown and warm beige hospitality look",primary:"#8a4b2a",dark:"#62331e",accent:"#d49a58",bg:"#fff8ef",card:"#ffffff",text:"#2b211b",radius:16}
+};
+function getThemePreset(){return THEME_PRESETS[$("themePreset")?.value]||THEME_PRESETS.classic}
 function updateTheme(){
- const p=$("cPrimary").value,
-       pd=$("cPrimaryDark").value,
-       bg=$("cBg").value,
-       card=$("cCard").value,
-       text=$("cText").value,
-       a=$("cAccent").value,
-       radius=Number($("cRadius").value||14);
- const header=$("themePreview");
- const cardEl=$("themePreviewCard");
- const body=$("themePreviewBody");
- if(header){
-   header.style.background=`linear-gradient(135deg,${pd},${p} 58%,${a})`;
-   header.style.color="#fff";
- }
- if(body){body.style.background=bg;body.style.color=text;}
- if(cardEl){
-   cardEl.style.background=card;
-   cardEl.style.color=text;
-   cardEl.style.borderRadius=radius+"px";
-   cardEl.style.borderColor=a;
- }
- if($("themePreviewPrice"))$("themePreviewPrice").style.color=p;
- if($("radiusValue"))$("radiusValue").textContent=radius+"px";
+ const t=getThemePreset();
+ $("themePreview").style.background=`linear-gradient(135deg,${t.primary},${t.accent})`;
+ $("themePreview").style.color="#fff";
+ $("themeChoicePreview").style.background=t.bg;
+ $("themeSwatchPrimary").style.background=`linear-gradient(135deg,${t.primary},${t.accent})`;
+ $("themePresetName").textContent=t.name;
+ $("themePresetDesc").textContent=t.desc;
 }
-["cPrimary","cPrimaryDark","cAccent","cBg","cCard","cText","cRadius"].forEach(id=>$(id)?.addEventListener("input",updateTheme));
+$("themePreset")?.addEventListener("change",updateTheme);
 $("saveTheme").onclick=async()=>{
+ const t=getThemePreset();
  const payload={
-   primary_color:$("cPrimary").value,
-   primary_dark:$("cPrimaryDark").value,
-   accent_color:$("cAccent").value,
-   background_color:$("cBg").value,
-   card_color:$("cCard").value,
-   text_color:$("cText").value,
-   card_radius:Number($("cRadius").value||14)
+   primary_color:t.primary,
+   primary_dark:t.dark,
+   accent_color:t.accent,
+   background_color:t.bg,
+   card_color:t.card,
+   text_color:t.text,
+   card_radius:t.radius
  };
  $("saveTheme").disabled=true;
  const {data,error}=await supabaseClient.from("restaurants").update(payload).eq("id",currentRestaurantId).select().single();
@@ -1290,7 +1685,7 @@ $("saveTheme").onclick=async()=>{
  if(error){toast("Theme save failed: "+error.message);return}
  currentRestaurant=data;
  fillProfile();
- toast("Theme saved — live menu updated");
+ toast(t.name+" theme saved — live menu updated");
 };
 $("quickTheme").onclick=()=>{showSection("settings");history.replaceState(null,"","#settings")};
 
@@ -1336,9 +1731,15 @@ async function refreshMediaPolicyUI(){
     String(r.subscription_status||"").toLowerCase()==="active" &&
     (!r.subscription_expires_at || new Date(r.subscription_expires_at)>new Date());
 
-  if($("galleryPaidBox"))$("galleryPaidBox").style.display=mediaRules.gallery_paid_enabled?"block":"none";
+  const customGalleryEnabled=isCustomMenuPlan && customMenuSettings.gallery_enabled===true;
+  const galleryEnabled=customGalleryEnabled || mediaRules.gallery_paid_enabled;
+
+  if($("galleryPaidBox"))$("galleryPaidBox").style.display=galleryEnabled?"block":"none";
   if($("galleryLocked")){
-    if(!mediaRules.gallery_paid_enabled){
+    if(customGalleryEnabled){
+      $("galleryLocked").innerHTML="✅ Custom Menu Gallery access is active. This setting is controlled by FreeMenu Super Admin.";
+      $("galleryUploadBox").style.display="block";
+    }else if(!mediaRules.gallery_paid_enabled){
       $("galleryLocked").textContent="Photo Gallery is disabled by Super Admin.";
       $("galleryUploadBox").style.display="none";
     }else if(!isPremiumRestaurant){
@@ -1350,6 +1751,7 @@ async function refreshMediaPolicyUI(){
     }
   }
   renderGalleryList();
+  updateSignature3DUI();updateMenuPhotoUI();
 }
 function validateMediaFile(file){
   if(!file)return "Choose an image first.";
@@ -1410,8 +1812,8 @@ $("uploadBannerMedia").onclick=()=>uploadMediaFile("banner");
 $("chooseGalleryMedia").onclick=()=>$("galleryMediaFile").click();
 $("galleryMediaFile").onchange=()=>{$("chooseGalleryMedia").textContent=$("galleryMediaFile").files[0]?.name?.slice(0,18)||"Choose"};
 $("uploadGalleryMedia").onclick=async()=>{
-  if(!mediaRules.gallery_paid_enabled)return toast("Gallery is disabled by Super Admin.");
-  if(!isPremiumRestaurant)return toast("Upgrade to Premium to use the Gallery.");
+  if(!(isCustomMenuPlan && customMenuSettings.gallery_enabled===true) && !mediaRules.gallery_paid_enabled)return toast("Gallery is disabled by Super Admin.");
+  if(!(isCustomMenuPlan && customMenuSettings.gallery_enabled===true) && !isPremiumRestaurant)return toast("Upgrade to Premium to use the Gallery.");
   const file=$("galleryMediaFile").files[0],bad=validateMediaFile(file);if(bad)return toast(bad);
   $("uploadGalleryMedia").disabled=true;$("uploadGalleryMedia").textContent="Uploading...";
   try{
@@ -1432,7 +1834,7 @@ function renderGalleryList(){
   el.innerHTML=g.length?g.map((u,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)"><img src="${esc(u)}" style="width:48px;height:38px;object-fit:cover;border-radius:7px"><span style="flex:1;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(u)}</span><button class="btn sm" type="button" onclick="removeGalleryImage(${i})">Remove</button></div>`).join(""):'<div class="muted" style="font-size:10px">No gallery images yet.</div>';
 }
 async function removeGalleryImage(i){
-  if(!mediaRules.gallery_paid_enabled||!isPremiumRestaurant)return toast("Gallery access is not available.");
+  if(!(isCustomMenuPlan && customMenuSettings.gallery_enabled===true) && (!mediaRules.gallery_paid_enabled||!isPremiumRestaurant))return toast("Gallery access is not available.");
   const g=Array.isArray(currentRestaurant?.gallery)?[...currentRestaurant.gallery]:[];
   g.splice(i,1);
   const {data,error}=await supabaseClient.from("restaurants").update({gallery:g}).eq("id",currentRestaurantId).select("*").single();
@@ -1447,6 +1849,16 @@ $("saveMedia").onclick=async()=>{
   if(error)return toast("Media save failed: "+error.message);
   currentRestaurant=data;fillProfile();toast("Image settings saved");
 };
+
+document.addEventListener("visibilitychange",()=>{
+  if(!document.hidden && currentRestaurantId) refreshOwnerPlan().catch(e=>console.warn("Plan refresh skipped:",e));
+});
+window.addEventListener("pageshow",()=>{
+  if(currentRestaurantId) refreshOwnerPlan().catch(e=>console.warn("Plan refresh skipped:",e));
+});
+setInterval(()=>{
+  if(!document.hidden && currentRestaurantId) refreshOwnerPlan().catch(e=>console.warn("Plan refresh skipped:",e));
+},30000);
 
 /* ---------- Logout ---------- */
 async function logout(){await supabaseClient.auth.signOut();showAuthChoice()}
@@ -1505,5 +1917,241 @@ window.addEventListener("load",function(){
 });
 </script>
 
+
+<script id="freemenu-menu-reorder">
+/* ---------- Menu Reorder ---------- */
+let reorderDrag=null;
+let reorderBlockedNoticeAt=0;
+
+function getReorderCategories(){
+  const names=categories();
+  return names.map(name=>({
+    name,
+    items:items
+      .filter(i=>(i.category||"General").trim()===name)
+      .sort((a,b)=>{
+        const ao=Number(a.sort_order),bo=Number(b.sort_order);
+        const ah=Number.isFinite(ao),bh=Number.isFinite(bo);
+        if(ah&&bh&&ao!==bo)return ao-bo;
+        if(ah&&!bh)return -1;
+        if(!ah&&bh)return 1;
+        return String(a.id).localeCompare(String(b.id));
+      })
+  }));
+}
+
+function buildReorderUI(){
+  const wrap=$("reorderCategories");
+  if(!wrap)return;
+  const groups=getReorderCategories();
+  wrap.innerHTML=groups.length?groups.map((g,gi)=>`
+    <div class="reorderCategory" draggable="true" data-category="${esc(g.name)}" data-cat-index="${gi}">
+      <div class="reorderCategoryHeader" data-category-handle>
+        <span class="reorderCatHandle" title="Drag category"><i class="fa-solid fa-grip-vertical"></i></span>
+        <span class="reorderCategoryTitle">${esc(g.name)}</span>
+        <span class="reorderCategoryCount">${g.items.length} item${g.items.length===1?"":"s"}</span>
+      </div>
+      <div class="reorderItems" data-item-list="${esc(g.name)}">
+        ${g.items.length?g.items.map(i=>`
+          <div class="reorderItem" draggable="true" data-item-id="${esc(i.id)}" data-item-category="${esc(g.name)}">
+            <span class="reorderItemHandle" title="Drag item"><i class="fa-solid fa-grip-lines"></i></span>
+            <span class="reorderItemName">${esc(i.name||"Unnamed item")}</span>
+            <span class="reorderItemMeta">${esc(priceText(i))}</span>
+          </div>`).join(""):'<div class="reorderDropHint">No items in this category</div>'}
+      </div>
+    </div>`).join(""):'<div class="muted" style="padding:25px;text-align:center">No menu categories/items found.</div>';
+
+  bindReorderDnD();
+}
+
+function bindReorderDnD(){
+  const wrap=$("reorderCategories");
+  if(!wrap)return;
+
+  wrap.querySelectorAll(".reorderCategory").forEach(cat=>{
+    cat.addEventListener("dragstart",e=>{
+      if(!e.target.closest("[data-category-handle]")){e.preventDefault();return}
+      reorderDrag={type:"category",category:cat.dataset.category};
+      cat.classList.add("dragging");
+      e.dataTransfer.effectAllowed="move";
+      e.dataTransfer.setData("text/plain",cat.dataset.category);
+    });
+    cat.addEventListener("dragend",()=>{
+      cat.classList.remove("dragging");
+      reorderDrag=null;
+      wrap.querySelectorAll(".reorderCategory").forEach(x=>x.classList.remove("reorderBlocked"));
+    });
+    cat.addEventListener("dragover",e=>{
+      if(reorderDrag?.type!=="category")return;
+      e.preventDefault();
+      const dragging=wrap.querySelector(".reorderCategory.dragging");
+      if(!dragging||dragging===cat)return;
+      const r=cat.getBoundingClientRect();
+      cat.parentNode.insertBefore(dragging,e.clientY<r.top+r.height/2?cat:cat.nextSibling);
+    });
+  });
+
+  wrap.querySelectorAll(".reorderItem").forEach(row=>{
+    row.addEventListener("dragstart",e=>{
+      e.stopPropagation();
+      reorderDrag={type:"item",id:String(row.dataset.itemId),category:row.dataset.itemCategory};
+      row.classList.add("dragging");
+      e.dataTransfer.effectAllowed="move";
+      e.dataTransfer.setData("text/plain",String(row.dataset.itemId));
+    });
+    row.addEventListener("dragend",()=>{
+      row.classList.remove("dragging");
+      reorderDrag=null;
+      wrap.querySelectorAll(".reorderBlocked").forEach(x=>x.classList.remove("reorderBlocked"));
+    });
+    row.addEventListener("dragover",e=>{
+      if(reorderDrag?.type!=="item")return;
+      const targetCategory=row.dataset.itemCategory;
+      if(targetCategory!==reorderDrag.category){
+        e.preventDefault();
+        row.classList.add("reorderBlocked");
+        if(Date.now()-reorderBlockedNoticeAt>900){
+          toast("Item category change is blocked. Drag within the same category only.");
+          reorderBlockedNoticeAt=Date.now();
+        }
+        return;
+      }
+      e.preventDefault();
+      row.classList.remove("reorderBlocked");
+      const dragging=wrap.querySelector(".reorderItem.dragging");
+      if(!dragging||dragging===row)return;
+      const r=row.getBoundingClientRect();
+      row.parentNode.insertBefore(dragging,e.clientY<r.top+r.height/2?row:row.nextSibling);
+    });
+    row.addEventListener("drop",e=>{
+      e.preventDefault();e.stopPropagation();
+      if(reorderDrag?.type==="item"&&row.dataset.itemCategory!==reorderDrag.category){
+        toast("Item category change is blocked.");
+      }
+    });
+  });
+
+  wrap.querySelectorAll(".reorderItems").forEach(list=>{
+    list.addEventListener("dragover",e=>{
+      if(reorderDrag?.type!=="item")return;
+      const targetCategory=list.dataset.itemList;
+      if(targetCategory!==reorderDrag.category){
+        e.preventDefault();
+        list.classList.add("reorderBlocked");
+        if(Date.now()-reorderBlockedNoticeAt>900){
+          toast("Item category change is blocked. Drag within the same category only.");
+          reorderBlockedNoticeAt=Date.now();
+        }
+        return;
+      }
+      e.preventDefault();
+      list.classList.remove("reorderBlocked");
+      const dragging=wrap.querySelector(".reorderItem.dragging");
+      if(!dragging)return;
+      if(e.target.closest(".reorderItem"))return;
+      list.appendChild(dragging);
+    });
+    list.addEventListener("dragleave",()=>list.classList.remove("reorderBlocked"));
+    list.addEventListener("drop",e=>{
+      e.preventDefault();e.stopPropagation();
+      const targetCategory=list.dataset.itemList;
+      if(reorderDrag?.type==="item"&&targetCategory!==reorderDrag.category){
+        toast("Item category change is blocked.");
+      }
+    });
+  });
+}
+
+async function openReorderMenu(){
+  if(!currentRestaurantId)return toast("Restaurant is not loaded yet.");
+  $("reorderModal").classList.add("show");
+  $("reorderCategories").innerHTML='<div class="muted" style="padding:25px;text-align:center">Loading current menu order...</div>';
+  await loadItems();
+  buildReorderUI();
+}
+
+function closeReorderMenu(){
+  $("reorderModal").classList.remove("show");
+  reorderDrag=null;
+}
+
+async function saveReorderMenu(){
+  const wrap=$("reorderCategories");
+  if(!wrap)return;
+  const categoryEls=[...wrap.querySelectorAll(":scope > .reorderCategory")];
+  if(!categoryEls.length)return toast("Nothing to save.");
+
+  const categoryOrder=categoryEls.map(el=>el.dataset.category);
+  const updates=[];
+  categoryEls.forEach((catEl,catIndex)=>{
+    const itemRows=[...catEl.querySelectorAll(":scope > .reorderItems > .reorderItem")];
+    itemRows.forEach((row,itemIndex)=>{
+      updates.push({
+        id:String(row.dataset.itemId),
+        category:row.dataset.itemCategory,
+        sort_order:(catIndex+1)*1000+(itemIndex+1)
+      });
+    });
+  });
+
+  const btn=$("reorderSaveBtn");
+  btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+  try{
+    const {data:restData,error:restError}=await supabaseClient
+      .from("restaurants")
+      .update({category_order:categoryOrder})
+      .eq("id",currentRestaurantId)
+      .select("*")
+      .single();
+    if(restError)throw restError;
+
+    if(updates.length){
+      const results=await Promise.all(updates.map(u=>
+        supabaseClient.from("menu_items")
+          .update({sort_order:u.sort_order})
+          .eq("id",u.id)
+          .eq("restaurant_id",currentRestaurantId)
+      ));
+      const itemError=results.find(r=>r.error)?.error;
+      if(itemError)throw itemError;
+    }
+
+    currentRestaurant=restData||{...currentRestaurant,category_order:categoryOrder};
+    const orderMap=new Map(updates.map(u=>[u.id,u.sort_order]));
+    items=items.map(i=>orderMap.has(String(i.id))?{...i,sort_order:orderMap.get(String(i.id))}:i);
+    categories();
+    closeReorderMenu();
+    renderAll();
+    toast("Menu order saved successfully.");
+  }catch(error){
+    console.error("Menu reorder save error:",error);
+    toast("Save Order failed: "+(error?.message||"Please check your Supabase columns."));
+  }finally{
+    btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Order';
+  }
+}
+
+$("reorderMenuBtn")?.addEventListener("click",openReorderMenu);
+$("reorderMenuBtnDash")?.addEventListener("click",openReorderMenu);
+$("reorderCancelBtn")?.addEventListener("click",closeReorderMenu);
+$("reorderSaveBtn")?.addEventListener("click",saveReorderMenu);
+
+function openOwnerPlans(){
+  try{
+    const token=(window.crypto&&crypto.randomUUID)
+      ? crypto.randomUUID()
+      : String(Date.now())+"-"+Math.random().toString(36).slice(2);
+    sessionStorage.setItem("fm_owner_plans_access",JSON.stringify({
+      token:token,
+      expiresAt:Date.now()+10*60*1000
+    }));
+    window.location.href="/plans.html?owner_plans="+encodeURIComponent(token);
+  }catch(e){
+    console.error("Plans access setup failed:",e);
+    toast("Plans page open nahi ho pa raha.");
+  }
+}
+
+</script>
 </body>
 </html>
