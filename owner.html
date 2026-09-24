@@ -468,7 +468,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     </div>
     <div class="card" id="categories">
       <div class="cardTitle">Menu Categories <div class="categoryArrangeActions"><button class="btn blue sm" id="arrangeCategoriesBtn"><i class="fa-solid fa-up-down"></i> Arrange</button><button class="btn primary sm" id="saveCategoryOrderBtn" style="display:none"><i class="fa-solid fa-floppy-disk"></i> Save Order</button><button class="btn sm" id="cancelCategoryOrderBtn" style="display:none">Cancel</button><button class="btn sm" id="addCategoryBtn"><i class="fa-solid fa-plus"></i> Category</button></div></div>
-      <p class="categoryArrangeHint" id="categoryArrangeHint">Click Arrange, then drag categories up/down.</p><div class="categoryCards" id="categoryCards"></div>
+      <p class="categoryArrangeHint" id="categoryArrangeHint">Click Arrange, drag categories into your preferred order, then Save Order.</p><div class="categoryCards" id="categoryCards"></div>
     </div>
   </div>
 
@@ -1631,14 +1631,80 @@ async function loadItems(){
 }
 
 /* ---------- Rendering ---------- */
+function getCurrentCategoryNames(){
+  return [...new Set(items.map(i=>(i.category||"General").trim()).filter(Boolean))];
+}
+
+/* Manual category order is the source of truth for display order.
+   Existing saved categories keep their position. Any category that is not
+   yet in category_order is appended at the end (never alphabetically inserted). */
 function categories(){
-  const names=[...new Set(items.map(i=>(i.category||"General").trim()).filter(Boolean))];
-  const saved=Array.isArray(currentRestaurant?.category_order)?currentRestaurant.category_order.map(String):[];
-  const rank=new Map(saved.map((x,i)=>[x,i]));
-  return names.sort((a,b)=>{
-    const ar=rank.has(a)?rank.get(a):999999, br=rank.has(b)?rank.get(b):999999;
-    return ar-br || a.localeCompare(b);
+  const names=getCurrentCategoryNames();
+  const nameSet=new Set(names);
+  const saved=Array.isArray(currentRestaurant?.category_order)
+    ? currentRestaurant.category_order.map(x=>String(x).trim()).filter(Boolean)
+    : [];
+  const ordered=[];
+  const seen=new Set();
+
+  saved.forEach(name=>{
+    if(nameSet.has(name)&&!seen.has(name)){
+      ordered.push(name);
+      seen.add(name);
+    }
   });
+
+  // New categories always go to the end, in the order they first appear in items.
+  names.forEach(name=>{
+    if(!seen.has(name)){
+      ordered.push(name);
+      seen.add(name);
+    }
+  });
+
+  return ordered;
+}
+
+async function syncManualCategoryOrder(){
+  if(!currentRestaurantId)return;
+  const actual=getCurrentCategoryNames();
+  const actualSet=new Set(actual);
+  const saved=Array.isArray(currentRestaurant?.category_order)
+    ? currentRestaurant.category_order.map(x=>String(x).trim()).filter(Boolean)
+    : [];
+  const next=[];
+  const seen=new Set();
+
+  saved.forEach(name=>{
+    if(actualSet.has(name)&&!seen.has(name)){
+      next.push(name);
+      seen.add(name);
+    }
+  });
+  actual.forEach(name=>{
+    if(!seen.has(name)){
+      next.push(name);
+      seen.add(name);
+    }
+  });
+
+  const currentSaved=saved.filter((name,i)=>saved.indexOf(name)===i);
+  const changed=JSON.stringify(currentSaved)!==JSON.stringify(next);
+  if(!changed)return next;
+
+  const {data,error}=await supabaseClient
+    .from("restaurants")
+    .update({category_order:next})
+    .eq("id",currentRestaurantId)
+    .select("*")
+    .single();
+
+  if(error){
+    console.error("Manual category order sync failed:",error);
+    return null;
+  }
+  currentRestaurant=data||{...currentRestaurant,category_order:next};
+  return next;
 }
 function fillCategorySelects(){
   const opts=categories().map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
@@ -1728,14 +1794,27 @@ async function saveItem(){
     const arRes=await supabaseClient.from("menu_items").update(arUpdate).eq("id",savedId).eq("restaurant_id",currentRestaurantId);
     if(arRes.error)throw arRes.error;
   }
-  $("itemModal").classList.remove("show");toast(id?"Item updated":"Item added");await loadItems();await refreshSignature3DCount();updateSignature3DUI();
+  $("itemModal").classList.remove("show");
+  await loadItems();
+  await syncManualCategoryOrder();
+  renderAll();
+  toast(id?"Item updated":"Item added");
+  await refreshSignature3DCount();
+  updateSignature3DUI();
  }catch(e){console.error(e);toast("Save failed: "+(e?.message||e));}
  finally{$("saveItem").disabled=false;$("saveItem").innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Item';}
 }
 async function deleteItem(id){
  if(!confirm("Delete this menu item?"))return;
  const {error}=await supabaseClient.from("menu_items").delete().eq("id",id).eq("restaurant_id",currentRestaurantId);
- if(error)toast("Delete failed: "+error.message);else{toast("Item deleted");await loadItems()}
+ if(error){
+   toast("Delete failed: "+error.message);
+ }else{
+   toast("Item deleted");
+   await loadItems();
+   await syncManualCategoryOrder();
+   renderAll();
+ }
 }
 async function toggleAvailability(id,btn){
  const item=items.find(i=>String(i.id)===String(id));if(!item)return;
@@ -1821,7 +1900,7 @@ function setCategoryArrangeMode(on){
   if(arrange) arrange.style.display=categoryArrangeMode?"none":"";
   if(save) save.style.display=categoryArrangeMode?"":"none";
   if(cancel) cancel.style.display=categoryArrangeMode?"":"none";
-  if(hint) hint.textContent=categoryArrangeMode?"Drag a category card left/right or up/down, then click Save Order.":"Click Arrange, then drag categories up/down.";
+  if(hint) hint.textContent=categoryArrangeMode?"Drag a category card left/right or up/down, then click Save Order.":"Click Arrange, drag categories into your preferred order, then Save Order.";
   if(!categoryArrangeMode){
     categoryDragName=null;
     wrap?.querySelectorAll(".categoryCard").forEach(el=>el.classList.remove("categoryDragging","categoryDragOver"));
@@ -1906,7 +1985,12 @@ $("saveCategory").onclick=async()=>{
  /* Existing schema has no category table. Create a zero-priced placeholder. */
  const {error}=await supabaseClient.from("menu_items").insert([{restaurant_id:currentRestaurantId,name:"New Item",category:cat,description:"",item_type:"veg",is_veg:true,price:null,price_quarter:null,price_half:null,price_full:null,is_available:true}]);
  if(error){toast("Could not create category: "+error.message);return}
- $("catModal").classList.remove("show");toast("Category created with a placeholder item");await loadItems();openItem(items.find(i=>i.category===cat)?.id);
+ $("catModal").classList.remove("show");
+ await loadItems();
+ await syncManualCategoryOrder();
+ renderAll();
+ toast("Category created and added to the end of the manual order");
+ openItem(items.find(i=>i.category===cat)?.id);
 };
 
 /* ---------- QR ---------- */
