@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FreeMenu Cloud Storage • R2 Drive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <style>
+    :root {
+      --bg: #090c10;
+      --panel: #11161d;
+      --panel-border: #1f2937;
+      --accent: #f59e0b;
+      --accent-hover: #d97706;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --green: #10b981;
+      --red: #ef4444;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* AUTH MODAL */
+    #authOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 10, 0.94);
+      backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 18px;
+    }
+    .auth-card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: var(--radius);
+      width: min(390px, 100%);
+      padding: 32px 26px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      text-align: center;
+    }
+    .auth-logo {
+      font-size: 38px;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .auth-title { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
+    .auth-sub { font-size: 12px; color: var(--muted); margin-bottom: 22px; }
+    .form-group { margin-bottom: 14px; text-align: left; }
+    .form-group label { font-size: 11px; font-weight: 700; color: var(--muted); display: block; margin-bottom: 6px; }
+    .input {
+      width: 100%;
+      background: #0d1117;
+      border: 1px solid var(--panel-border);
+      border-radius: 9px;
+      color: #fff;
+      padding: 12px 14px;
+      font-size: 13px;
+      outline: none;
+      transition: .2s;
+    }
+    .input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15); }
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 9px;
+      padding: 12px;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: .2s;
+    }
+    .btn-primary { background: var(--accent); color: #111; }
+    .btn-primary:hover { background: var(--accent-hover); }
+
+    /* DASHBOARD */
+    .header {
+      border-bottom: 1px solid var(--panel-border);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(17, 22, 29, 0.85);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; }
+    .brand span { color: var(--accent); }
+    .container { max-width: 960px; margin: 0 auto; width: 100%; padding: 24px 18px 60px; flex: 1; }
+
+    /* UPLOAD ZONE */
+    .drop-zone {
+      border: 2px dashed #2d3748;
+      background: var(--panel);
+      border-radius: var(--radius);
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: .25s;
+      margin-bottom: 24px;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(245, 158, 11, 0.04);
+    }
+    .drop-icon { font-size: 42px; color: var(--accent); margin-bottom: 12px; }
+    .drop-text { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .drop-sub { font-size: 12px; color: var(--muted); }
+
+    /* CONFIG BAR */
+    .config-bar {
+      display: flex;
+      gap: 12px;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .config-item { flex: 1; min-width: 180px; }
+
+    /* FILE LIST */
+    .list-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .file-card {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: grid;
+      grid-template-columns: 44px 1fr auto;
+      gap: 14px;
+      align-items: center;
+    }
+    .file-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: #0d1117;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      color: var(--accent);
+      overflow: hidden;
+    }
+    .file-icon img { width: 100%; height: 100%; object-fit: cover; }
+    .file-info { min-width: 0; }
+    .file-name { font-size: 13.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-url {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 3px;
+    }
+    .actions { display: flex; gap: 8px; }
+    .btn-action {
+      background: #0d1117;
+      border: 1px solid var(--panel-border);
+      color: var(--text);
+      border-radius: 7px;
+      padding: 8px 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-action:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* TOAST */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1f2937;
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 8px;
+      border: 1px solid #374151;
+      font-size: 13px;
+      font-weight: 700;
+      display: none;
+      z-index: 1100;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. LOGIN MODAL -->
+  <div id="authOverlay">
+    <div class="auth-card">
+      <div class="auth-logo"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+      <h2 class="auth-title">FreeMenu Cloud Drive</h2>
+      <p class="auth-sub">Secure direct access to Cloudflare R2</p>
+
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="loginUser" class="input" placeholder="Enter username" autofocus>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" class="input" placeholder="••••••••">
+      </div>
+      <div id="authError" style="color: var(--red); font-size: 11.5px; margin: 10px 0; display: none;"></div>
+      <button class="btn btn-primary" onclick="verifyLogin()" style="margin-top: 10px;">
+        <i class="fa-solid fa-lock"></i> Unlock Storage
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. MAIN DRIVE INTERFACE -->
+  <header class="header">
+    <div class="brand">
+      <i class="fa-solid fa-bolt" style="color:var(--accent);"></i>
+      FreeMenu <span>R2 Drive</span>
+    </div>
+    <div style="display:flex; gap:12px; align-items:center;">
+      <span id="sessionUser" style="font-size:12px; color:var(--muted); font-weight:700;"></span>
+      <button class="btn-action" onclick="logout()" title="Lock Drive">
+        <i class="fa-solid fa-right-from-bracket"></i> Lock
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- UPLOAD FOLDER CONFIG -->
+    <div class="config-bar">
+      <div class="config-item">
+        <label style="font-size:11px; font-weight:700; color:var(--muted); display:block; margin-bottom:4px;">Target Folder</label>
+        <select class="input" id="folderSelect">
+          <option value="menu-items">menu-items (Food Photos)</option>
+          <option value="models">models (3D / GLB / USDZ)</option>
+          <option value="branding">branding (Logos / Banners)</option>
+          <option value="gallery">gallery (Restaurant Photos)</option>
+          <option value="general">general (Documents & Files)</option>
+        </select>
+      </div>
+      <div class="config-item">
+        <label style="font-size:11px; font-weight:700; color:var(--muted); display:block; margin-bottom:4px;">Max Allowed Size</label>
+        <div style="font-size:13px; font-weight:700; padding:10px 0; color:var(--accent);">
+          20 MB (Cloudflare Edge Limit)
+        </div>
+      </div>
+    </div>
+
+    <!-- DROPZONE -->
+    <div class="drop-zone" id="dropZone" onclick="$('fileInput').click()">
+      <div class="drop-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+      <div class="drop-text" id="dropText">Click or Drag & Drop files here</div>
+      <div class="drop-sub">Images, GLB/USDZ models, PDF, PNG, JPG, WebP</div>
+      <input type="file" id="fileInput" multiple style="display:none" onchange="handleFileSelect(this.files)">
+    </div>
+
+    <!-- UPLOADS HISTORY -->
+    <div class="list-head">
+      <span>Uploaded Files in this Session</span>
+      <span id="uploadCount" style="color:var(--muted); font-size:12px;">0 items</span>
+    </div>
+
+    <div id="fileList">
+      <div style="text-align:center; padding:40px; color:var(--muted); font-size:13px; border:1px solid var(--panel-border); border-radius:12px;">
+        No files uploaded yet in this session.
+      </div>
+    </div>
+
+  </main>
+
+  <div id="toast"></div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+
+    /* ==============================================================
+       1. SECURITY & AUTH (CONFIGURED AS PER YOUR CREDENTIALS)
+       Username: 8510852828
+       Password: (9625447178 ka secure SHA-256 Hash lagaya gaya hai)
+    ================================================================ */
+    const AUTH_CONFIG = {
+      username: "8510852828",
+      passwordHash: "a52c3c6f059dd18d6fbb664c1c9c7e09aeeb1899fa7e06f1ae837a77e0e75525"
+    };
+
+    async function sha256(message) {
+      const msgBuffer = new TextEncoder().encode(message);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function verifyLogin() {
+      const u = $('loginUser').value.trim();
+      const p = $('loginPass').value.trim();
+      const err = $('authError');
+
+      if (!u || !p) {
+        err.textContent = "Please enter both username and password.";
+        err.style.display = "block";
+        return;
+      }
+
+      const inputHash = await sha256(p);
+      if (u === AUTH_CONFIG.username && inputHash === AUTH_CONFIG.passwordHash) {
+        sessionStorage.setItem("fm_drive_auth", "true");
+        sessionStorage.setItem("fm_drive_user", u);
+        $('authOverlay').style.display = "none";
+        $('sessionUser').textContent = `User: ${u}`;
+        showToast("Storage Unlocked Successfully!");
+      } else {
+        err.textContent = "Invalid Username or Password!";
+        err.style.display = "block";
+      }
+    }
+
+    function checkAuth() {
+      if (sessionStorage.getItem("fm_drive_auth") === "true") {
+        $('authOverlay').style.display = "none";
+        $('sessionUser').textContent = `User: ${sessionStorage.getItem("fm_drive_user") || "8510852828"}`;
+      } else {
+        $('authOverlay').style.display = "flex";
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem("fm_drive_auth");
+      sessionStorage.removeItem("fm_drive_user");
+      location.reload();
+    }
+
+    $('loginPass').addEventListener('keydown', e => { if (e.key === "Enter") verifyLogin(); });
+    $('loginUser').addEventListener('keydown', e => { if (e.key === "Enter") verifyLogin(); });
+
+    /* ==============================================================
+       2. CLOUDFLARE R2 UPLOAD LOGIC (Via Supabase Edge Worker)
+    ================================================================ */
+    const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+    const uploadedFiles = [];
+
+    async function uploadToCloudflareR2(file, folder) {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("folder", folder);
+
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/r2-upload`, {
+        method: "POST",
+        headers: { apikey: SUPABASE_ANON_KEY },
+        body: fd
+      });
+
+      let data = {};
+      try { data = await res.json(); } catch (_) {}
+
+      if (!res.ok) throw new Error(data.error || `R2 upload failed (${res.status})`);
+      
+      const fileUrl = data.url || data.public_url || (data.key ? `https://images.freemenu.in/${data.key.replace(/^\/+/,'')}` : '');
+      if (!fileUrl) throw new Error("R2 did not return a valid public link.");
+      return fileUrl;
+    }
+
+    async function handleFileSelect(files) {
+      if (!files || !files.length) return;
+      const folder = $('folderSelect').value;
+      const dropText = $('dropText');
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file.size > 20 * 1024 * 1024) {
+          showToast(`Skipped: ${file.name} is larger than 20 MB.`);
+          continue;
+        }
+
+        try {
+          dropText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Uploading ${file.name}...`;
+          const url = await uploadToCloudflareR2(file, folder);
+          
+          uploadedFiles.unshift({
+            name: file.name,
+            size: (file.size / 1024).toFixed(1) + " KB",
+            type: file.type,
+            url: url,
+            time: new Date().toLocaleTimeString()
+          });
+
+          renderUploadedFiles();
+          showToast(`Uploaded: ${file.name}`);
+        } catch (err) {
+          console.error(err);
+          showToast(`Error uploading ${file.name}: ${err.message}`);
+        }
+      }
+
+      dropText.innerHTML = "Click or Drag & Drop files here";
+      $('fileInput').value = "";
+    }
+
+    function renderUploadedFiles() {
+      const list = $('fileList');$('uploadCount').textContent = `${uploadedFiles.length} item${uploadedFiles.length === 1 ? '' : 's'}`;
+
+      if (!uploadedFiles.length) {
+        list.innerHTML = `<div style="text-align:center; padding:40px; color:var(--muted); font-size:13px; border:1px solid var(--panel-border); border-radius:12px;">No files uploaded yet.</div>`;
+        return;
+      }
+
+      list.innerHTML = uploadedFiles.map((f) => {
+        const isImg = f.type.startsWith("image/");
+        return `
+          <div class="file-card">
+            <div class="file-icon">
+              ${isImg ? `<img src="${f.url}" alt="">` : `<i class="fa-solid fa-file"></i>`}
+            </div>
+            <div class="file-info">
+              <div class="file-name">${f.name} <span style="font-size:11px; color:var(--muted);">(${f.size})</span></div>
+              <div class="file-url">${f.url}</div>
+            </div>
+            <div class="actions">
+              <button class="btn-action" onclick="copyLink('${f.url}')">
+                <i class="fa-solid fa-copy"></i> Copy Link
+              </button>
+              <a href="${f.url}" target="_blank" class="btn-action" style="text-decoration:none;">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function copyLink(url) {
+      navigator.clipboard.writeText(url);
+      showToast("Cloudflare URL copied to clipboard!");
+    }
+
+    function showToast(msg) {
+      const t = $('toast');
+      t.textContent = msg;
+      t.style.display = "block";
+      clearTimeout(t.timer);
+      t.timer = setTimeout(() => { t.style.display = "none"; }, 2500);
+    }
+
+    const dz = $('dropZone');
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('dragover'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+    dz.addEventListener('drop', e => {
+      e.preventDefault();
+      dz.classList.remove('dragover');
+      handleFileSelect(e.dataTransfer.files);
+    });
+
+    window.addEventListener('load', checkAuth);
+  </script>
+</body>
+</html>
