@@ -691,7 +691,7 @@ function renderQRs(){
   const list=qrCodes.filter(x=>{const r=restaurants.find(y=>y.id===x.restaurant_id);const hay=`${x.code} ${x.label||''} ${r?.name||''}`.toLowerCase();return (!q||hay.includes(q))&&(!st||x.status===st)&&(!rid||x.restaurant_id===rid)});
   $('qrTotal').textContent=qrCodes.length;$('qrAvailable').textContent=qrCodes.filter(x=>x.status==='available').length;$('qrAssigned').textContent=qrCodes.filter(x=>x.status==='assigned').length;
   $('qrRestaurantFilter').innerHTML='<option value="">All Restaurants</option>'+restaurants.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}</option>`).join('');
-  $('qrTable').innerHTML=`<table class="table"><thead><tr><th>QR ID</th><th>Status</th><th>Restaurant</th><th>Label</th><th>Action</th></tr></thead><tbody>${list.map(x=>{const r=restaurants.find(y=>y.id===x.restaurant_id);return `<tr><td><b>${esc(x.code)}</b></td><td>${pill(x.status||'available')}</td><td>${esc(r?.name||'—')}</td><td>${esc(x.label||'—')}</td><td><div style="display:flex;gap:6px;flex-wrap:wrap">${x.status==='assigned'?`<button class="iconbtn" onclick="unassignQR('${x.id}')">Unassign</button>`:`<button class="iconbtn" onclick="openAssignQR('${x.id}')">Assign</button>`}<button class="iconbtn" onclick="printSingleQR('${x.id}')">🖨 Print QR</button></div></td></tr>`}).join('')||'<tr><td colspan="5"><div class="empty">No QR codes found.</div></td></tr>'}</tbody></table>`;
+  $('qrTable').innerHTML=`<table class="table"><thead><tr><th>QR ID</th><th>Status</th><th>Restaurant</th><th>Label</th><th>Action</th></tr></thead><tbody>${list.map(x=>{const r=restaurants.find(y=>y.id===x.restaurant_id);return `<tr><td><b>${esc(x.code)}</b></td><td>${pill(x.status||'available')}</td><td>${esc(r?.name||'—')}</td><td>${esc(x.label||'—')}</td><td><div style="display:flex;gap:6px;flex-wrap:wrap">${x.status==='assigned'?`<button class="iconbtn" onclick="unassignQR('${x.id}')">Unassign</button><button class="iconbtn" onclick="openQRAdmin('${x.id}')">View QR Page</button>`:`<button class="iconbtn" onclick="openAssignQR('${x.id}')">Assign</button>`}<button class="iconbtn" onclick="printSingleQR('${x.id}')">🖨 Print QR</button></div></td></tr>`}).join('')||'<tr><td colspan="5"><div class="empty">No QR codes found.</div></td></tr>'}</tbody></table>`;
 }
 async function generateQRBatch(n=100){
   if(!confirm(`Generate the next ${n} QR codes?`))return;
@@ -711,6 +711,11 @@ async function assignQR(id){
 }
 async function unassignQR(id){if(!confirm('Unassign this QR? It will become available again.'))return;const x=qrCodes.find(q=>q.id===id);const r=await db.from('qr_codes').update({restaurant_id:null,label:null,status:'available',assigned_at:null,assigned_by:null}).eq('id',id);if(r.error)return toast(r.error.message);await logAction('Unassigned QR '+(x?.code||''));await loadQRs();toast('QR is available again')}
 function qrTargetURL(code){return new URL('/qr.html?code='+encodeURIComponent(code),location.origin).href}
+function openQRAdmin(id){
+  const x=qrCodes.find(q=>q.id===id);
+  if(!x)return toast('QR code not found.');
+  window.open('/qr.html?code='+encodeURIComponent(x.code)+'&admin=1','_blank');
+}
 
 const qrPrintDesignConfig={
   1:{name:'Premium Gold',dots:'#571b1d',corner:'#d8a73d',cornerDot:'#571b1d',dotType:'dots',cornerType:'extra-rounded',cornerDotType:'dot',bg:'#fff8e9',accent:'#7b1e22',accent2:'#d8a73d',border:'#e4b86b'},
