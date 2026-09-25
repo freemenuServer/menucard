@@ -2,271 +2,382 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>FreeMenu True WebAR Video</title>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>FreeMenu WebAR YouTube Player</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700;800&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
   <style>
+    :root {
+      --primary: #f59e0b;
+      --bg: #000;
+      --panel: rgba(18, 24, 32, 0.90);
+      --border: rgba(255, 255, 255, 0.20);
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #000;
-      color: #fff;
+    body, html {
+      width: 100%;
+      height: 100%;
       overflow: hidden;
-      width: 100vw;
-      height: 100vh;
+      background: var(--bg);
+      font-family: 'DM Sans', sans-serif;
+      color: #fff;
+      touch-action: none;
     }
 
-    #overlay {
+    /* 1. REAL LIVE CAMERA FEED */
+    #cameraFeed {
       position: fixed;
       inset: 0;
-      z-index: 10;
-      pointer-events: none;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 16px;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+      transform: scaleX(1);
     }
 
-    .interactive { pointer-events: auto; }
+    /* 2. AR VIEWPORT (3D PERSPECTIVE) */
+    .ar-viewport {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1000px;
+      pointer-events: none;
+    }
 
-    /* Top bar */
-    .top-panel {
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+    /* 3. AR 3D FLOATING SCREEN */
+    .ar-screen {
+      position: absolute;
+      width: min(88vw, 460px);
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 18px;
+      border: 3px solid var(--primary);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(245, 158, 11, 0.4);
+      transform-style: preserve-3d;
+      transition: transform 0.08s ease-out;
+      pointer-events: auto;
+      overflow: hidden;
+      cursor: grab;
+    }
+    .ar-screen:active { cursor: grabbing; }
+
+    .ar-screen iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      pointer-events: auto;
+    }
+
+    .ar-badge {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      z-index: 5;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(245, 158, 11, 0.6);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.5px;
+      pointer-events: none;
+    }
+    .ar-dot {
+      width: 6px;
+      height: 6px;
+      background: #ef4444;
+      border-radius: 50%;
+      animation: pulse 1s infinite alternate;
+    }
+    @keyframes pulse { to { opacity: 0.3; } }
+
+    /* 4. TOP BAR CONTROLS */
+    .top-bar {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      right: 14px;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: auto;
+    }
+    .btn-glass {
+      background: var(--panel);
+      border: 1px solid var(--border);
       backdrop-filter: blur(12px);
-      border-radius: 14px;
-      padding: 12px 16px;
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    /* 5. BOTTOM URL BAR */
+    .bottom-panel {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(92vw, 500px);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      border-radius: 18px;
+      padding: 12px 14px;
+      z-index: 10;
+      pointer-events: auto;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    }
+    .input-row {
       display: flex;
       gap: 8px;
-      align-items: center;
     }
-    .input-url {
+    .link-input {
       flex: 1;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border);
+      border-radius: 10px;
       color: #fff;
-      padding: 8px 12px;
-      font-size: 13px;
+      padding: 10px 12px;
+      font-size: 12.5px;
       outline: none;
     }
-    .btn {
-      background: #f59e0b;
+    .link-input:focus { border-color: var(--primary); }
+    .btn-play {
+      background: var(--primary);
       border: none;
-      color: #000;
+      border-radius: 10px;
+      color: #111;
+      padding: 10px 16px;
       font-weight: 800;
-      padding: 8px 14px;
-      border-radius: 8px;
-      cursor: pointer;
       font-size: 13px;
+      cursor: pointer;
       white-space: nowrap;
     }
 
-    /* Status tooltip */
-    #instruction {
-      background: rgba(0, 0, 0, 0.75);
-      border: 1px solid rgba(245, 158, 11, 0.5);
-      color: #fbbf24;
+    /* START PERMISSION OVERLAY */
+    #startScreen {
+      position: fixed;
+      inset: 0;
+      background: #090c10;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
       text-align: center;
-      padding: 10px 18px;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 700;
-      margin: 0 auto 20px;
-      display: none;
     }
-
-    /* Start AR button */
-    #startARBtn {
-      background: linear-gradient(135deg, #f59e0b, #d97706);
-      color: #111;
+    .start-card {
+      max-width: 360px;
+      background: #11161d;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 24px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.8);
+    }
+    .start-icon {
+      font-size: 48px;
+      color: #ef4444;
+      margin-bottom: 16px;
+    }
+    .start-btn {
+      width: 100%;
+      background: var(--primary);
       border: none;
-      padding: 16px 28px;
-      border-radius: 14px;
-      font-size: 16px;
+      border-radius: 12px;
+      color: #111;
+      padding: 14px;
+      font-size: 14px;
       font-weight: 800;
       cursor: pointer;
-      box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4);
-      margin: auto;
+      margin-top: 20px;
     }
-
-    #videoElement { display: none; }
   </style>
 </head>
 <body>
 
-  <!-- Hidden HTML5 Video for Texture Streaming -->
-  <video id="videoElement" loop playsinline webkit-playsinline crossorigin="anonymous"></video>
-
-  <div id="overlay">
-    <!-- Top URL input -->
-    <div class="top-panel interactive">
-      <input type="url" id="videoUrlInput" class="input-url" placeholder="Paste MP4 / Cloudflare Video URL...">
-      <button class="btn" onclick="applyVideoUrl()">Load Video</button>
+  <!-- CAMERA PERMISSION MODAL -->
+  <div id="startScreen">
+    <div class="start-card">
+      <div class="start-icon"><i class="fa-brands fa-youtube"></i></div>
+      <h2 style="font-size: 20px; margin-bottom: 8px;">YouTube AR Screen</h2>
+      <p style="font-size: 12px; color: #9ca3af; line-height: 1.6;">
+        Camera access is required to display your YouTube video floating in real AR space.
+      </p>
+      <button class="start-btn" onclick="startARExperience()">
+        <i class="fa-solid fa-camera"></i> Launch AR Camera
+      </button>
     </div>
+  </div>
 
-    <!-- Center Launch Button -->
-    <button id="startARBtn" class="interactive" onclick="initWebAR()">
-      📷 View in Augmented Reality (AR)
+  <!-- REAL CAMERA FEED BACKGROUND -->
+  <video id="cameraFeed" autoplay playsinline muted></video>
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="btn-glass" style="border-color: rgba(245, 158, 11, 0.4);">
+      <i class="fa-solid fa-cube" style="color:var(--primary);"></i> AR YouTube
+    </div>
+    <button class="btn-glass" onclick="resetARPosition()">
+      <i class="fa-solid fa-arrows-rotate"></i> Center Screen
     </button>
+  </div>
 
-    <!-- Floor scanning instruction -->
-    <div id="instruction">Point camera at table/floor and tap to place video</div>
+  <!-- FLOATING 3D AR YOUTUBE SCREEN -->
+  <div class="ar-viewport" id="viewport">
+    <div class="ar-screen" id="arScreen">
+      <div class="ar-badge">
+        <span class="ar-dot"></span> LIVE AR STREAM
+      </div>
+      <iframe id="ytIframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <!-- BOTTOM INPUT BAR -->
+  <div class="bottom-panel">
+    <div style="font-size: 11px; font-weight: 700; color: #9ca3af; margin-bottom: 6px;">
+      Paste Any YouTube Video Link (Shorts or Long)
+    </div>
+    <div class="input-row">
+      <input type="url" id="ytUrlInput" class="link-input" placeholder="https://www.youtube.com/watch?v=...">
+      <button class="btn-play" onclick="applyYouTubeLink()">
+        <i class="fa-solid fa-play"></i> Load in AR
+      </button>
+    </div>
   </div>
 
   <script>
-    let camera, scene, renderer;
-    let hitTestSource = null;
-    let hitTestSourceRequested = false;
-    let reticle, videoMesh = null;
-    let videoTexture;
+    const $ = id => document.getElementById(id);
+    const cameraFeed = $('cameraFeed');
+    const arScreen = $('arScreen');
+    const ytIframe = $('ytIframe');
 
-    const video = document.getElementById('videoElement');
-    const DEFAULT_VIDEO = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
+    // Default sample YouTube video
+    const DEFAULT_YT_URL = "https://www.youtube.com/watch?v=aqz-KE-bpKQ";
 
-    // URL parameter support: ?video=https://...
-    const params = new URLSearchParams(window.location.search);
-    const initialUrl = params.get('video') || DEFAULT_VIDEO;
-    document.getElementById('videoUrlInput').value = initialUrl;
-    video.src = initialUrl;
+    // 1. EXTRACT YOUTUBE ID (Supports Shorts, youtu.be, embed, desktop links)
+    function extractYouTubeID(url) {
+      if (!url) return null;
+      url = url.trim();
+      if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url; // Direct video ID
 
-    function applyVideoUrl() {
-      const url = document.getElementById('videoUrlInput').value.trim();
-      if (!url) return alert("Please enter a valid video link.");
-      video.src = url;
-      video.play().catch(() => {});
-      if (videoTexture) videoTexture.needsUpdate = true;
+      const regExp = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=|shorts\/)|youtu\.be\/)([^"&?\/\s]{11})/;
+      const match = url.match(regExp);
+      return match ? match[1] : null;
     }
 
-    async function initWebAR() {
-      if (!navigator.xr) {
-        alert("WebXR AR is not supported on this browser. Please open in Google Chrome on Android (with ARCore) or WebXR viewer.");
+    // 2. LOAD VIDEO IN AR
+    function loadYouTubeVideo(url) {
+      const vidId = extractYouTubeID(url);
+      if (!vidId) {
+        alert("Invalid YouTube Link. Please copy and paste a direct YouTube video URL.");
         return;
       }
+      // Autoplay + playsinline (Crucial for mobile AR viewing)
+      ytIframe.src = `https://www.youtube-nocookie.com/embed/${vidId}?autoplay=1&playsinline=1&enablejsapi=1&rel=0`;
+    }
 
-      const isSupported = await navigator.xr.isSessionSupported('immersive-ar');
-      if (!isSupported) {
-        alert("Augmented Reality (AR) session is not supported on this device/browser.");
-        return;
+    function applyYouTubeLink() {
+      const url = $('ytUrlInput').value.trim();
+      if (!url) return alert("Please enter a YouTube link.");
+      loadYouTubeVideo(url);
+    }
+
+    // 3. START CAMERA & SENSORS
+    async function startARExperience() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" } },
+          audio: false
+        });
+        cameraFeed.srcObject = stream;
+        $('startScreen').style.display = "none";
+
+        // URL query parameter support: ?v=URL
+        const params = new URLSearchParams(window.location.search);
+        const queryUrl = params.get("v") || params.get("video") || DEFAULT_YT_URL;
+        $('ytUrlInput').value = queryUrl;
+
+        loadYouTubeVideo(queryUrl);
+        initGyroAndGestures();
+      } catch (err) {
+        alert("Camera permission required for AR: " + err.message);
+      }
+    }
+
+    // 4. GYRO TRACKING & TOUCH MOVEMENT
+    let posX = 0, posY = 0, scale = 1;
+    let gyroRotX = 0, gyroRotY = 0;
+
+    function updateTransform() {
+      arScreen.style.transform = `translate3d(${posX}px, ${posY}px, 0) scale(${scale}) rotateX(${-gyroRotX}deg) rotateY(${gyroRotY}deg)`;
+    }
+
+    function resetARPosition() {
+      posX = 0; posY = 0; scale = 1;
+      updateTransform();
+    }
+
+    function initGyroAndGestures() {
+      // Gyro sensor for real-world tilt tracking
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission().catch(() => {});
       }
 
-      // Hide start button & show AR scanner guide
-      document.getElementById('startARBtn').style.display = 'none';
-      document.getElementById('instruction').style.display = 'block';
-
-      // 1. Setup Three.js Scene
-      scene = new THREE.Scene();
-      camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
-
-      const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
-      light.position.set(0.5, 1, 0.25);
-      scene.add(light);
-
-      // 2. Setup Video Texture
-      videoTexture = new THREE.VideoTexture(video);
-      videoTexture.minFilter = THREE.LinearFilter;
-      videoTexture.magFilter = THREE.LinearFilter;
-      videoTexture.format = THREE.RGBFormat;
-
-      // 3. Renderer with XR support
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.xr.enabled = true;
-      document.body.appendChild(renderer.domElement);
-
-      // 4. Reticle (Table surface indicator ring)
-      reticle = new THREE.Mesh(
-        new THREE.RingGeometry(0.12, 0.15, 32).rotateX(-Math.PI / 2),
-        new THREE.MeshBasicMaterial({ color: 0xf59e0b })
-      );
-      reticle.matrixAutoUpdate = false;
-      reticle.visible = false;
-      scene.add(reticle);
-
-      // 5. Start Immersive AR Session
-      const session = await navigator.xr.requestSession('immersive-ar', {
-        requiredFeatures: ['hit-test']
+      window.addEventListener('deviceorientation', (e) => {
+        const gamma = e.gamma || 0; // Left-right
+        const beta = e.beta || 0;   // Front-back
+        gyroRotX = Math.max(-25, Math.min(25, (beta - 45) * 0.4));
+        gyroRotY = Math.max(-25, Math.min(25, gamma * 0.4));
+        updateTransform();
       });
 
-      renderer.xr.setReferenceSpaceType('local');
-      await renderer.xr.setSession(session);
+      // Desktop Mouse Fallback
+      window.addEventListener('mousemove', (e) => {
+        gyroRotX = (e.clientY / window.innerHeight - 0.5) * -25;
+        gyroRotY = (e.clientX / window.innerWidth - 0.5) * 25;
+        updateTransform();
+      });
 
-      // Tap controller
-      const controller = renderer.xr.getController(0);
-      controller.addEventListener('select', onScreenTap);
-      scene.add(controller);
+      // Touch Drag (To position video anywhere in the room)
+      let isDragging = false;
+      let startX, startY;
 
-      renderer.setAnimationLoop(render);
+      arScreen.addEventListener('pointerdown', (e) => {
+        if (e.target.tagName.toLowerCase() === 'iframe') return; // Let user click YouTube play/pause
+        isDragging = true;
+        startX = e.clientX - posX;
+        startY = e.clientY - posY;
+      });
 
-      // Play video on user touch
-      video.play().catch(e => console.warn("Auto play waiting:", e));
-    }
+      window.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        posX = e.clientX - startX;
+        posY = e.clientY - startY;
+        updateTransform();
+      });
 
-    // Tap to lock video on table
-    function onScreenTap() {
-      if (!reticle.visible) return;
-
-      if (!videoMesh) {
-        // Create 16:9 AR video board
-        const width = 0.8;  // 80 cm wide in real world
-        const height = 0.45; // 45 cm high
-        const geometry = new THREE.PlaneGeometry(width, height);
-        
-        const material = new THREE.MeshBasicMaterial({
-          map: videoTexture,
-          side: THREE.DoubleSide
-        });
-
-        videoMesh = new THREE.Mesh(geometry, material);
-        scene.add(videoMesh);
-      }
-
-      // Position video in real world where reticle is pointing
-      reticle.matrix.decompose(videoMesh.position, videoMesh.quaternion, videoMesh.scale);
-      // Lift slightly off surface and face user
-      videoMesh.position.y += 0.25;
-      videoMesh.lookAt(camera.position.x, videoMesh.position.y, camera.position.z);
-
-      video.play();
-      document.getElementById('instruction').innerText = "Video anchored in AR! Walk around it.";
-    }
-
-    // Frame-by-frame surface tracking
-    function render(timestamp, frame) {
-      if (frame) {
-        const referenceSpace = renderer.xr.getReferenceSpace();
-        const session = frame.session;
-
-        if (!hitTestSourceRequested) {
-          session.requestReferenceSpace('viewer').then((referenceSpace) => {
-            session.requestHitTestSource({ space: referenceSpace }).then((source) => {
-              hitTestSource = source;
-            });
-          });
-          session.addEventListener('end', () => {
-            hitTestSourceRequested = false;
-            hitTestSource = null;
-          });
-          hitTestSourceRequested = true;
-        }
-
-        if (hitTestSource) {
-          const hitTestResults = frame.getHitTestResults(hitTestSource);
-          if (hitTestResults.length > 0) {
-            const hit = hitTestResults[0];
-            const pose = hit.getPose(referenceSpace);
-            reticle.visible = true;
-            reticle.matrix.fromArray(pose.transform.matrix);
-          } else {
-            reticle.visible = false;
-          }
-        }
-      }
-
-      renderer.render(scene, camera);
+      window.addEventListener('pointerup', () => { isDragging = false; });
     }
   </script>
 </body>
