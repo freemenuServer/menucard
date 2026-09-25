@@ -87,7 +87,7 @@
     width:300px;
     min-width:300px;
     display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
+    grid-template-columns:repeat(var(--price-count, 3),minmax(0,1fr));
     column-gap:12px;
     align-items:center;
   }
@@ -96,6 +96,10 @@
     flex:0 0 300px;
     margin-left:auto;
   }
+
+  .price-count-1{--price-count:1}
+  .price-count-2{--price-count:2}
+  .price-count-3{--price-count:3}
 
   .category-price-columns span{
     text-align:center;
@@ -218,6 +222,72 @@
   }
 </style>
 
+
+<style id="freemenu-responsive-category-nav">
+  @media (min-width:768px){
+    .category-tabs-mobile-hide{display:block!important}
+    .mobile-dock{display:none!important}
+  }
+  @media (max-width:767px){
+    .category-tabs-mobile-hide{display:none!important}
+    .mobile-dock{
+      display:block!important;
+      padding-bottom:calc(7px + env(safe-area-inset-bottom));
+    }
+    .mobile-dock-inner{
+      display:flex;
+      gap:8px;
+      overflow-x:auto;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+    }
+    .mobile-dock-inner::-webkit-scrollbar{display:none}
+    .mobile-category{
+      scroll-snap-align:start;
+      flex:0 0 72px;
+      text-align:center;
+      padding:5px 2px 3px;
+      border-radius:16px;
+      transition:.18s ease;
+    }
+    .mobile-category-icon{
+      width:46px;
+      height:46px;
+      margin:0 auto;
+      display:grid;
+      place-items:center;
+      border-radius:15px;
+      background:var(--surface2);
+      border:1px solid var(--border);
+      box-shadow:0 4px 14px rgba(0,0,0,.08);
+    }
+    .mobile-category-icon svg{
+      width:23px;
+      height:23px;
+    }
+    .mobile-category.is-active .mobile-category-icon{
+      color:var(--accent);
+      border-color:var(--accent);
+      box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 20%,transparent),0 7px 18px rgba(0,0,0,.12);
+      transform:translateY(-1px);
+    }
+    .mobile-category.is-active .mobile-category-label{
+      color:var(--accent);
+    }
+    .mobile-category-label{
+      display:block;
+      margin-top:5px;
+      font-size:10px;
+      line-height:12px;
+      font-weight:800;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+  }
+</style>
+
 </head>
 <body class="min-h-screen antialiased">
   <header class="max-w-7xl mx-auto px-3 sm:px-5 lg:px-6 pt-3 md:pt-6">
@@ -308,7 +378,7 @@
     </div>
   </header>
 
-  <main id="menu" class="max-w-7xl mx-auto px-3 sm:px-6 pb-32 md:pb-10" aria-live="polite"></main>
+  <main id="menu" class="max-w-7xl mx-auto px-3 sm:px-6 pb-36 md:pb-10" aria-live="polite"></main>
 
   <footer class="max-w-7xl mx-auto px-4 sm:px-6 pb-28 md:pb-8">
     <div class="surface rounded-3xl p-5 md:p-7 flex flex-col md:flex-row gap-4 justify-between">
@@ -476,23 +546,24 @@
       return item.is_available === false || item.available === false || item.unavailable === true || item.status === "unavailable" || item.status === "out_of_stock";
     }
 
-    function renderPrice(item) {
+    function renderPrice(item, priceTypes = ["qtr","half","full"]) {
       const clean = v =>
         (v !== null && v !== undefined && String(v).trim() !== "")
           ? String(v).trim()
           : "";
 
-      const q = clean(item.price_quarter);
-      const h = clean(item.price_half);
-      const f = clean(item.price_full) || clean(item.price);
+      const values = {
+        qtr: clean(item.price_quarter),
+        half: clean(item.price_half),
+        full: clean(item.price_full) || clean(item.price)
+      };
 
-      if (!q && !h && !f) return "";
+      const visible = priceTypes.filter(type => values[type]);
+      if (!visible.length) return "";
 
       return `
-        <div class="item-price-columns" aria-label="Item prices">
-          <span>${q ? "₹" + escapeHTML(q) : ""}</span>
-          <span>${h ? "₹" + escapeHTML(h) : ""}</span>
-          <span>${f ? "₹" + escapeHTML(f) : ""}</span>
+        <div class="item-price-columns price-count-${visible.length}" aria-label="Item prices">
+          ${visible.map(type => `<span>${"₹" + escapeHTML(values[type])}</span>`).join("")}
         </div>`;
     }
 
@@ -505,7 +576,7 @@
       return tags.length ? `<div class="flex flex-wrap gap-1.5 mt-2">${tags.join("")}</div>` : "";
     }
 
-    function renderItem(item) {
+    function renderItem(item, priceTypes) {
       const type = getItemType(item);
       const unavailable = isUnavailable(item);
       return `
@@ -518,7 +589,7 @@
             ${renderTags(item)}
             ${item.description ? `<p class="muted text-sm mt-1.5 leading-6">${escapeHTML(item.description)}</p>` : ""}
           </div>
-          ${renderPrice(item)}
+          ${renderPrice(item, priceTypes)}
         </article>`;
     }
 
@@ -557,28 +628,42 @@
     function renderCategoryChips() {
       const categories = getCategories(allItems);
       const dock = document.getElementById("mobileCategories");
+
+      const iconMarkup = (svgPath) => `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">${svgPath}</svg>`;
+
+      const allIcon = '<path d="M4 6h16M4 12h16M4 18h16"/><circle cx="7" cy="6" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="10" cy="18" r="1"/>';
+
       if (dock) {
+        dock.className = "mobile-dock-inner px-3 pt-2";
         dock.innerHTML = [
-          `<a href="#menu" data-category="all" class="snap-start shrink-0 w-[68px] text-center py-1.5 ${currentCategory === "all" ? "accent" : "muted"}">
-            <span class="mx-auto w-11 h-11 rounded-full category-icon grid place-items-center ${currentCategory === "all" ? "ring-2 ring-[color:var(--accent)]" : ""}">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-            </span>
-            <span class="block text-[10px] mt-1 font-semibold">All</span>
+          `<a href="#menu" data-category="all"
+              class="mobile-category ${currentCategory === "all" ? "is-active" : ""}"
+              aria-label="All menu">
+            <span class="mobile-category-icon">${iconMarkup(allIcon)}</span>
+            <span class="mobile-category-label">All</span>
           </a>`,
           ...categories.map(c => `
-            <a href="#${sectionId(c)}" data-category="${escapeHTML(c)}" class="snap-start shrink-0 w-[68px] text-center py-1.5 ${currentCategory === c ? "accent" : "muted"}">
-              <span class="mx-auto w-11 h-11 rounded-full category-icon grid place-items-center ${currentCategory === c ? "ring-2 ring-[color:var(--accent)]" : ""}">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8">${categoryIcon(c)}</svg>
-              </span>
-              <span class="block text-[10px] mt-1 font-semibold truncate">${escapeHTML(c)}</span>
-            </a>`)].join("");
+          <a href="#${sectionId(c)}" data-category="${escapeHTML(c)}"
+             class="mobile-category ${currentCategory === c ? "is-active" : ""}"
+             aria-label="${escapeHTML(c)}">
+            <span class="mobile-category-icon">${iconMarkup(categoryIcon(c))}</span>
+            <span class="mobile-category-label">${escapeHTML(c)}</span>
+          </a>`)]
+          .join("");
       }
 
       const tabs = document.getElementById("categoryTabs");
       if (tabs) {
         tabs.innerHTML = [
           `<a href="#menu" data-category="all" class="shrink-0 px-3.5 py-2 rounded-full text-sm font-semibold ${currentCategory === "all" ? "accent-bg" : "muted"}">All Menu</a>`,
-          ...categories.map(c => `<a href="#${sectionId(c)}" data-category="${escapeHTML(c)}" class="shrink-0 px-3.5 py-2 rounded-full text-sm font-semibold ${currentCategory === c ? "accent-bg" : "muted"}">${escapeHTML(c)}</a>`)
+          ...categories.map(c => `
+            <a href="#${sectionId(c)}" data-category="${escapeHTML(c)}"
+               class="shrink-0 px-3.5 py-2 rounded-full text-sm font-semibold ${currentCategory === c ? "accent-bg" : "muted"}">
+              ${escapeHTML(c)}
+            </a>`)
         ].join("");
       }
     }
@@ -630,6 +715,18 @@
         .map(category => {
           const items = grouped[category];
 
+          // Show only the price types that actually exist anywhere in this category.
+          const priceTypes = [];
+          if (items.some(x => String(x.price_quarter ?? "").trim() !== "")) priceTypes.push("qtr");
+          if (items.some(x => String(x.price_half ?? "").trim() !== "")) priceTypes.push("half");
+          if (items.some(x => String(x.price_full ?? x.price ?? "").trim() !== "")) priceTypes.push("full");
+
+          const priceLabels = {
+            qtr: "QTR",
+            half: "HALF",
+            full: "FULL"
+          };
+
           return `
           <section id="${sectionId(category)}"
                    data-category="${escapeHTML(category)}"
@@ -654,17 +751,15 @@
                 </div>
               </div>
 
-              <!-- ONE fixed price ruler for the whole category -->
-              <div class="category-price-columns" aria-label="Price types">
-                <span>QTR</span>
-                <span>HALF</span>
-                <span>FULL</span>
-              </div>
+              ${priceTypes.length ? `
+              <div class="category-price-columns price-count-${priceTypes.length}" aria-label="Available price types">
+                ${priceTypes.map(type => `<span>${priceLabels[type]}</span>`).join("")}
+              </div>` : ""}
 
             </div>
 
             <div class="surface rounded-2xl overflow-hidden shadow-theme item-card">
-              ${items.map(renderItem).join("")}
+              ${items.map(item => renderItem(item, priceTypes)).join("")}
             </div>
           </section>`;
         }).join("");
