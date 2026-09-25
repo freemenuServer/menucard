@@ -37,7 +37,13 @@
     .fm-settings-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:80;display:none}.fm-settings-backdrop.open{display:block}
     .fm-settings{position:fixed;right:0;top:0;bottom:0;width:min(430px,94vw);background:var(--surface);color:var(--text);z-index:90;transform:translateX(100%);transition:transform .25s ease;overflow:auto;border-left:1px solid var(--border);box-shadow:-20px 0 50px rgba(0,0,0,.2)}.fm-settings.open{transform:translateX(0)}
     .fm-input{width:100%;border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:12px;padding:10px 12px;outline:none}.fm-icon-btn{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;border:1px solid var(--border);background:var(--surface)}.fm-search{border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:14px;padding:12px 14px;width:100%;outline:none}.hero-img{object-fit:cover;width:100%;height:100%;display:block}
-  </style>
+  
+    .menu-state{max-width:720px;margin:18px auto;text-align:center}
+    .menu-loading{display:grid;gap:10px}
+    .menu-loading .sk{height:16px;border-radius:999px;background:linear-gradient(90deg,var(--surface2),var(--surface),var(--surface2));background-size:200% 100%;animation:fmShimmer 1.2s linear infinite}
+    .menu-loading .sk.wide{height:22px;width:62%;margin:auto}
+    @keyframes fmShimmer{to{background-position:-200% 0}}
+</style>
 </head>
 <body class="min-h-screen antialiased">
   <header class="max-w-7xl mx-auto px-3 sm:px-5 lg:px-6 pt-3 md:pt-6">
@@ -111,9 +117,6 @@
             <label class="sr-only" for="menuSearch">Search menu</label>
             <input id="menuSearch" class="fm-search" type="search" placeholder="Search dishes, categories…" autocomplete="off">
           </div>
-          <button id="settingsOpen" type="button" class="fm-icon-btn shrink-0 self-end sm:self-auto" aria-label="Open menu settings" title="Settings">
-            <svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="m19.4 15 .1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.8 1.8 0 0 0-3 .8v.2a2 2 0 1 1-4 0v-.2a1.8 1.8 0 0 0-3-.8l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.8 1.8 0 0 0-.8-3h-.2a2 2 0 1 1 0-4h.2a1.8 1.8 0 0 0 .8-3l-.1-.1A2 2 0 1 1 6.4 2l.1.1a1.8 1.8 0 0 0 3-.8v-.2a2 2 0 1 1 4 0v.2a1.8 1.8 0 0 0 3 .8l.1-.1A2 2 0 1 1 19.4 5l-.1.1a1.8 1.8 0 0 0 .8 3h.2a2 2 0 1 1 0 4h-.2a1.8 1.8 0 0 0-.7 2.9Z"/></svg>
-          </button>
         </div>
         <div class="mt-3 flex gap-2 justify-center sm:justify-start" aria-label="Dietary filters">
           <button data-filter="all" class="filter-btn accent-bg px-3.5 py-2 rounded-full text-sm font-semibold">All</button>
@@ -144,21 +147,9 @@
     </div>
   </footer>
 
-  <div class="fixed top-3 right-3 z-50">
-    <label class="sr-only" for="themeSelect">Choose theme</label>
-    <select id="themeSelect" class="surface rounded-xl px-3 py-2 text-sm shadow-theme outline-none">
-      <option value="spice">Theme 1 · Warm Spice</option>
-      <option value="minimal">Theme 2 · Modern Clean</option>
-      <option value="luxury">Theme 3 · Royal Luxury</option>
-      <option value="organic">Theme 4 · Fresh Organic</option>
-    </select>
-  </div>
-
   <nav class="mobile-dock fixed bottom-0 inset-x-0 z-40 dock bg-[color:var(--surface)]/95 backdrop-blur border-t border-theme">
     <div id="mobileCategories" class="flex gap-2 overflow-x-auto no-scrollbar snap-x px-3 pt-2"></div>
   </nav>
-
-  <div id="settingsBackdrop" class="fm-settings-backdrop" aria-hidden="true"></div><aside id="settingsPanel" class="fm-settings" aria-label="Restaurant menu settings" aria-hidden="true"><div class="p-5 md:p-6"><div class="flex items-center justify-between"><div><h2 class="text-xl font-black">Menu Settings</h2><p class="muted text-sm mt-1">Supabase + restaurant configuration</p></div><button id="settingsClose" class="fm-icon-btn" type="button" aria-label="Close settings">×</button></div><div class="mt-6 space-y-5"><section><h3 class="font-bold">Supabase</h3><div class="mt-3 space-y-3"><label class="block text-sm font-semibold">Project URL<input id="cfgSupabaseUrl" class="fm-input mt-1" type="url"></label><label class="block text-sm font-semibold">Anon / Publishable Key<input id="cfgSupabaseKey" class="fm-input mt-1" type="text" spellcheck="false"></label><label class="block text-sm font-semibold">Restaurant slug<input id="cfgRestaurantSlug" class="fm-input mt-1" type="text" placeholder="Uses URL ?r=slug if empty"></label></div></section><section><h3 class="font-bold">Display</h3><div class="mt-3 space-y-3"><label class="block text-sm font-semibold">Theme<select id="cfgTheme" class="fm-input mt-1"><option value="spice">Warm Spice & Amber</option><option value="minimal">Modern Clean</option><option value="luxury">Royal Luxury / Dark Gold</option><option value="organic">Fresh Organic</option></select></label><label class="flex items-center gap-3 text-sm"><input id="cfgUseLiveData" type="checkbox"> Load live data from Supabase</label></div></section><section><h3 class="font-bold">Existing data supported</h3><p class="muted text-sm mt-2 leading-6">Restaurant name, welcome/tagline, features, slogans, logo/banner URLs, phone, address, opening/closing time, open status, dine-in, takeaway, delivery, category order, theme colors/radius, maintenance mode, plans, custom plan, menu items, quarter/half/full pricing, veg/non-veg/egg, bestseller, recommended, spicy and unavailable states, plus platform ad settings.</p></section><div class="flex gap-2"><button id="settingsSave" class="accent-bg rounded-xl px-4 py-2.5 font-bold">Save & Reload</button><button id="settingsReset" class="surface border-theme rounded-xl px-4 py-2.5">Reset</button></div><p id="settingsNote" class="muted text-xs"></p></div></div></aside>
 
   <script id="menuData" type="application/json">
   {
@@ -203,16 +194,15 @@
 
   <script>
     /* =========================================================
-       SUPABASE CONFIG
-       Keep RLS enabled in Supabase. An anon/public key is safe to
-       expose only when your database policies are configured correctly.
+       PUBLIC DATA CLIENT
+       RLS must remain enabled in Supabase.
+       Credentials are implementation details and are never rendered in the UI.
     ========================================================== */
     const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
-    const savedSupabaseConfig = (() => { try { return JSON.parse(localStorage.getItem("freemenu-config") || "{}"); } catch (_) { return {}; } })();
-    const RUNTIME_SUPABASE_URL = savedSupabaseConfig.supabaseUrl || SUPABASE_URL;
-    const RUNTIME_SUPABASE_KEY = savedSupabaseConfig.supabaseAnonKey || SUPABASE_ANON_KEY;
-    const supabaseClient = window.supabase.createClient(RUNTIME_SUPABASE_URL, RUNTIME_SUPABASE_KEY);
+    // Public menu uses the fixed public Supabase project configured by the platform.
+    // Never render these values into the page UI.
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let restaurant = null;
     let allItems = [];
@@ -278,28 +268,17 @@
     }
 
     function showLoading() {
-      $("menu").innerHTML = `
-        <div class="loading-list" aria-label="Loading menu">
-          ${[1,2,3,4].map(() => `
-            <div class="loading-row">
-              <div style="flex:1; padding-top:4px;">
-                <div class="skeleton sk-title sk-line"></div>
-                <div class="skeleton sk-text sk-line"></div>
-                <div class="skeleton sk-price sk-line"></div>
-              </div>
-            </div>
-          `).join("")}
-        </div>
-      `;
+      const menuEl = $("menu");
+      if (menuEl) {
+        menuEl.innerHTML = `<div class="surface rounded-2xl p-8 menu-state"><div class="menu-loading" aria-label="Loading menu"><div class="sk wide"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div></div></div>`;
+      }
     }
 
     function showState(title, message) {
-      $("menu").innerHTML = `
-        <div class="state-card">
-          <strong>${escapeHTML(title)}</strong>
-          <span>${escapeHTML(message)}</span>
-        </div>
-      `;
+      const menuEl = $("menu");
+      if (menuEl) {
+        menuEl.innerHTML = `<div class="surface rounded-2xl p-8 menu-state"><div class="w-12 h-12 mx-auto rounded-2xl category-icon grid place-items-center accent mb-3"><svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8v4"/><circle cx="12" cy="16" r=".8" fill="currentColor"/><path d="M10.3 3.8 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z"/></svg></div><h2 class="text-lg font-black">${escapeHTML(title)}</h2><p class="muted text-sm mt-1">${escapeHTML(message)}</p></div>`;
+      }
     }
 
     function logoFallback() {
@@ -491,7 +470,7 @@
       };
 
       setOptionalText("rest-welcome", rest.welcome_text);
-      $("rest-name").textContent = restaurantName;
+      const legacyName = $("rest-name"); if (legacyName) legacyName.textContent = restaurantName;
       const visibleName = document.getElementById("restaurant-name");
       if (visibleName) visibleName.textContent = restaurantName;
       const visibleAddress = document.getElementById("rest-address-new");
@@ -755,28 +734,12 @@
       }
     }
 
-    const APP_CONFIG = (() => {
-      const defaults = {
-        supabaseUrl: SUPABASE_URL,
-        supabaseAnonKey: SUPABASE_ANON_KEY,
-        restaurantSlug: "",
-        theme: localStorage.getItem("freemenu-theme") || "spice",
-        useLiveData: true
-      };
-      try {
-        const saved = JSON.parse(localStorage.getItem("freemenu-config") || "{}");
-        return {...defaults, ...saved};
-      } catch (_) {
-        return defaults;
-      }
-    })();
-
     async function loadPublicMenu() {
       showLoading();
 
       try {
         const params = new URLSearchParams(window.location.search);
-        const slug = (params.get("r") || APP_CONFIG.restaurantSlug || "").trim().toLowerCase();
+        const slug = (params.get("r") || "").trim().toLowerCase();
 
         let query = supabaseClient.from("restaurants").select("*");
         if (slug) query = query.eq("slug", slug);
@@ -785,7 +748,7 @@
         if (restError) throw restError;
 
         if (!restaurants || !restaurants.length) {
-          $("rest-name").textContent = "Restaurant Not Found";
+          const nameEl = $("restaurant-name"); if (nameEl) nameEl.textContent = "Restaurant Not Found";
           $("categoryTabs").innerHTML = "";
           if ($("menuSummary")) $("menuSummary").style.display = "none";
           showState("Restaurant not found", "Please check the menu link and try again.");
@@ -891,11 +854,43 @@
         setupCategoryObserver();
       } catch (error) {
         console.error("Menu load error:", error);
-        const nameEl = $("rest-name");
+
+        // Keep the public page usable during a temporary API/network failure.
+        // The local JSON is only a presentation fallback; live Supabase data is
+        // still used whenever the connection succeeds.
+        try {
+          const demo = JSON.parse(document.getElementById("menuData")?.textContent || "{}");
+          if (Array.isArray(demo.categories) && demo.categories.length) {
+            restaurant = {
+              id: "demo",
+              name: "Restaurant Menu",
+              tagline: "",
+              welcome_text: "",
+              is_open: true,
+              is_active: true
+            };
+            allItems = demo.categories.flatMap(cat =>
+              (cat.items || []).map((item, index) => ({
+                ...item,
+                category: cat.name,
+                sort_order: index
+              }))
+            );
+            renderRestaurant(restaurant);
+            renderCategoryChips();
+            renderMenu();
+            setupCategoryObserver();
+            showState("Demo menu", "Live menu data is temporarily unavailable.");
+            return;
+          }
+        } catch (fallbackError) {
+          console.warn("Local menu fallback failed:", fallbackError);
+        }
+
+        const nameEl = $("restaurant-name");
         if (nameEl) nameEl.textContent = "Menu Unavailable";
         $("categoryTabs").innerHTML = "";
-        if ($("menuSummary")) $("menuSummary").style.display = "none";
-        showState("Unable to load menu", "Please refresh the page or try again shortly.");
+        showState("Unable to load menu", "Please refresh the page or check your connection.");
       }
     }
 
@@ -983,29 +978,7 @@
       });
     };
 
-    document.getElementById("themeSelect")?.addEventListener("change", (e) => {
-      document.documentElement.dataset.theme = e.target.value;
-      localStorage.setItem("freemenu-theme", e.target.value);
-    });
-
-    function initSettings(){
-      document.documentElement.dataset.theme = APP_CONFIG.theme;
-      const select=document.getElementById("themeSelect"); if(select) select.value=APP_CONFIG.theme;
-      const set=(id,v)=>{const e=$(id);if(e)e.value=v??""};
-      set("cfgSupabaseUrl",RUNTIME_SUPABASE_URL); set("cfgSupabaseKey",RUNTIME_SUPABASE_KEY); set("cfgRestaurantSlug",APP_CONFIG.restaurantSlug); set("cfgTheme",APP_CONFIG.theme);
-      const live=$("cfgUseLiveData"); if(live) live.checked=APP_CONFIG.useLiveData!==false;
-      const panel=$("settingsPanel"), back=$("settingsBackdrop");
-      const open=()=>{panel.classList.add("open");back.classList.add("open");panel.setAttribute("aria-hidden","false");back.setAttribute("aria-hidden","false");};
-      const close=()=>{panel.classList.remove("open");back.classList.remove("open");panel.setAttribute("aria-hidden","true");back.setAttribute("aria-hidden","true");};
-      $("settingsOpen")?.addEventListener("click",open); $("settingsClose")?.addEventListener("click",close); back?.addEventListener("click",close);
-      $("settingsSave")?.addEventListener("click",()=>{
-        const cfg={supabaseUrl:$("cfgSupabaseUrl").value.trim(),supabaseAnonKey:$("cfgSupabaseKey").value.trim(),restaurantSlug:$("cfgRestaurantSlug").value.trim(),theme:$("cfgTheme").value,useLiveData:$("cfgUseLiveData").checked};
-        localStorage.setItem("freemenu-config",JSON.stringify(cfg)); localStorage.setItem("freemenu-theme",cfg.theme); $("settingsNote").textContent="Saved. Reloading…"; setTimeout(()=>location.reload(),250);
-      });
-      $("settingsReset")?.addEventListener("click",()=>{localStorage.removeItem("freemenu-config");$("settingsNote").textContent="Reset to built-in configuration. Reloading…";setTimeout(()=>location.reload(),250);});
-    }
-
-    window.addEventListener("load", ()=>{initSettings(); loadPublicMenu();});
+    window.addEventListener("load", () => { loadPublicMenu(); });
   </script>
 
   <div id="legacyCompat" hidden>
