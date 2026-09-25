@@ -765,8 +765,8 @@
       btn.hidden = !hasNonVeg;
       btn.style.display = hasNonVeg ? "" : "none";
 
-      if (!hasNonVeg && activeDietFilter === "nonveg") {
-        activeDietFilter = "all";
+      if (!hasNonVeg && window.dietaryFilter === "nonveg") {
+        window.dietaryFilter = "all";
       }
     }
 
@@ -1324,17 +1324,16 @@
 
     document.addEventListener("click", (event) => {
       const filter = event.target.closest(".filter-btn");
-      if (!filter) return;
-    }
+      if (!filter || filter.hidden) return;
 
-    document.querySelectorAll(".filter-btn").forEach(btn => {
+      document.querySelectorAll(".filter-btn").forEach(btn => {
         btn.classList.remove("accent-bg");
         btn.classList.add("surface");
       });
+
       filter.classList.add("accent-bg");
       filter.classList.remove("surface");
-      const value = filter.dataset.filter || "all";
-      window.dietaryFilter = value;
+      window.dietaryFilter = filter.dataset.filter || "all";
       renderMenu();
     });
 
