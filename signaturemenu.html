@@ -34,7 +34,7 @@
 
     .hero{position:relative;min-height:320px;color:#fff;overflow:hidden;background:
       linear-gradient(90deg,rgba(5,5,5,.92) 0%,rgba(5,5,5,.74) 42%,rgba(5,5,5,.18) 72%,rgba(5,5,5,.36) 100%),
-      url('https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1800&q=88') center/cover no-repeat;}
+      #171411 center/cover no-repeat;}
     .hero-inner{padding:42px 44px;display:grid;grid-template-columns:1.1fr .9fr;gap:20px;align-items:center;min-height:320px}
     .brand-row{display:flex;align-items:center;gap:18px}
     .logo{width:78px;height:78px;border:2px solid #fff;border-radius:50%;display:grid;place-items:center;font-size:37px;background:rgba(159,22,32,.55);backdrop-filter:blur(5px)}
@@ -216,6 +216,14 @@
     const op=fmt(restaurant?.opening_time),cl=fmt(restaurant?.closing_time);$('restaurantHours').textContent=op&&cl?`◷ ${op} - ${cl}`:'';
     const ph=String(restaurant?.phone||'').trim();if(ph){$('restaurantPhone').href=`tel:${ph.replace(/[^\d+]/g,'')}`;$('restaurantPhone').textContent=`☎ ${ph}`;}else{$('restaurantPhone').style.display='none';}
     $('restaurantQuote').textContent=restaurant?.slogan_1||restaurant?.welcome_text||'Food Brings People Together';
+
+    const banner=safeUrl(restaurant?.banner_url);
+    const hero=document.querySelector('.hero');
+    if(hero){
+      hero.style.backgroundImage=banner
+        ? `linear-gradient(90deg,rgba(5,5,5,.92) 0%,rgba(5,5,5,.74) 42%,rgba(5,5,5,.18) 72%,rgba(5,5,5,.36) 100%),url("${banner}")`
+        : 'linear-gradient(90deg,rgba(5,5,5,.92) 0%,rgba(5,5,5,.74) 42%,rgba(5,5,5,.18) 72%,rgba(5,5,5,.36) 100%),#171411';
+    }
   }
   const typeIcon=(type,mini=false)=>`<span class="${mini?'mini-type':'type-icon'} ${type}"></span>`;
   const badgeHTML=b=>b?`<span class="badge ${b==='Bestseller'||b==='Recommended'?'red':'gold'}">${esc(b)}</span>`:'';
