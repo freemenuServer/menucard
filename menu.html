@@ -13,7 +13,7 @@
       --accent:#f59e0b;--accent2:#d97706;--border:rgba(255,255,255,.09);--shadow:0 12px 35px rgba(0,0,0,.16);
       --font:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
     }
-    html{scroll-behavior:smooth;scroll-padding-top:145px}
+    html{scroll-behavior:smooth;scroll-padding-top:110px}
     body{background:var(--bg);color:var(--text);font-family:var(--font)}
     [data-theme="minimal"]{--bg:#f8faf9;--surface:#fff;--surface2:#f0f5f2;--text:#18201b;--muted:#64706a;--accent:#059669;--accent2:#047857;--border:rgba(15,23,42,.09);--shadow:0 10px 30px rgba(15,23,42,.07)}
     [data-theme="luxury"]{--bg:#0b0a09;--surface:#151311;--surface2:#211d18;--text:#f5ead0;--muted:#b9aa8e;--accent:#d7b56d;--accent2:#a98443;--border:rgba(215,181,109,.18);--shadow:0 15px 40px rgba(0,0,0,.35);--font:Georgia,"Times New Roman",serif}
@@ -30,7 +30,7 @@
     .veg-dot{width:12px;height:12px;border:2px solid currentColor;border-radius:3px;display:inline-flex;align-items:center;justify-content:center}
     .veg-dot:after{content:"";width:4px;height:4px;border-radius:50%;background:currentColor}
     .veg{color:#22c55e}.nonveg{color:#ef4444}
-    .dock{padding-bottom:calc(10px + env(safe-area-inset-bottom))}
+    .dock{padding-bottom:calc(8px + env(safe-area-inset-bottom))}.category-section{scroll-margin-top:118px}.category-icon{background:var(--surface2);border:1px solid var(--border)}.item-card{background:var(--surface)}.mobile-dock{box-shadow:0 -12px 30px rgba(0,0,0,.12)}
     @media(min-width:768px){.mobile-dock{display:none}.desktop-only{display:flex}}
     @media(max-width:767px){.desktop-only{display:none}}
   
@@ -40,56 +40,96 @@
   </style>
 </head>
 <body class="min-h-screen antialiased">
-  <header class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 md:pt-6">
-    <div class="surface shadow-theme rounded-3xl overflow-hidden">
-      <div class="hero-placeholder h-40 sm:h-56 md:h-72 relative overflow-hidden">
-        <img src="https://placehold.co/1600x600/2a2521/f8f3ea?text=Restaurant+Hero+Image"
-             id="heroImage" alt="Restaurant banner" class="w-full h-full object-cover opacity-65" loading="eager">
-        <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"></div>
-        <div class="absolute left-4 bottom-4 md:left-7 md:bottom-7">
-          <span class="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-black/45 backdrop-blur border border-white/15">
-            <span class="w-2 h-2 rounded-full accent-bg"></span> Open today · 11:00 AM–11:00 PM
-          </span>
+  <header class="max-w-7xl mx-auto px-3 sm:px-5 lg:px-6 pt-3 md:pt-6">
+    <div class="surface shadow-theme rounded-[28px] overflow-hidden">
+      <!-- Brand / Restaurant details FIRST -->
+      <section class="px-4 py-5 sm:px-6 sm:py-7 md:px-8 text-center" aria-labelledby="restaurant-name">
+        <div class="mx-auto w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-[28px] logo-placeholder overflow-hidden shadow-theme">
+          <img
+            src="https://placehold.co/256x256/211e1b/f59e0b?text=LOGO"
+            id="logoImage"
+            alt="Restaurant logo"
+            class="w-full h-full object-cover"
+            loading="eager"
+            decoding="async">
         </div>
-      </div>
 
-      <div class="p-4 md:p-7">
-        <div class="flex gap-4 md:gap-6 items-start">
-          <div class="logo-placeholder shrink-0 w-20 h-20 md:w-28 md:h-28 rounded-2xl grid place-items-center overflow-hidden">
-            <img src="https://placehold.co/256x256/211e1b/f59e0b?text=LOGO" id="logoImage" alt="Restaurant logo" class="w-full h-full object-cover">
+        <div class="mt-4">
+          <div class="flex items-center justify-center gap-2 flex-wrap">
+            <h1 id="restaurant-name" class="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight">The Spice Table</h1>
+            <span class="text-[10px] uppercase tracking-widest px-2 py-1 rounded-full border border-theme muted">Digital Menu</span>
           </div>
-          <div class="min-w-0 flex-1">
-            <div class="flex flex-wrap items-center gap-2">
-              <h1 class="text-2xl md:text-4xl font-black tracking-tight">The Spice Table</h1>
-              <span class="text-[10px] uppercase tracking-widest px-2 py-1 rounded-full border border-theme muted">Digital Menu</span>
-            </div>
-            <p id="rest-subtitle-visible" class="mt-1 accent font-semibold"></p>
-            <p id="rest-welcome-visible" class="mt-2 text-sm muted max-w-2xl"></p>
+          <p id="rest-subtitle-visible" class="mt-1.5 accent font-semibold"></p>
+          <p id="rest-welcome-visible" class="mt-2 text-sm md:text-base muted max-w-2xl mx-auto"></p>
+        </div>
+
+        <div class="mt-4 flex flex-wrap justify-center gap-2 text-xs sm:text-sm">
+          <span id="rest-status-visible" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-full surface border-theme font-semibold"></span>
+          <span id="rest-hours-visible" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-full surface border-theme muted"></span>
+          <span id="rest-address-new" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-full surface border-theme muted"></span>
+        </div>
+
+        <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
+          <a id="callBtnVisible" href="#" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full accent-bg font-bold" aria-label="Call restaurant">
+            <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7A2 2 0 0 1 22 16.9Z"/></svg>
+            Call
+          </a>
+          <a id="whatsappBtnVisible" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full surface border-theme font-semibold">
+            <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.5 11.8a8.5 8.5 0 0 1-12.6 7.4L3 21l1.8-4.7A8.5 8.5 0 1 1 20.5 11.8Z"/><path d="M8.8 8.2c.2-.4.4-.4.7-.4h.5c.2 0 .4.1.5.4l.7 1.7c.1.3.1.5-.1.7l-.6.7c.7 1.2 1.7 2.2 2.9 2.9l.7-.6c.2-.2.4-.2.7-.1l1.7.7c.3.1.4.3.4.5v.5c0 .3 0 .5-.4.7-.5.3-1.2.5-1.9.3-2.2-.7-4.1-2.1-5.6-3.8-1.2-1.3-2.1-2.8-2.5-4.4-.2-.7 0-1.4.3-1.8Z"/></svg>
+            WhatsApp
+          </a>
+          <a id="directionsBtnVisible" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full surface border-theme font-semibold">
+            <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s7-6.1 7-12a7 7 0 1 0-14 0c0 5.9 7 12 7 12Z"/><circle cx="12" cy="9" r="2.3"/></svg>
+            Directions
+          </a>
+        </div>
+      </section>
+
+      <!-- Hero/banner SECOND -->
+      <section class="px-3 pb-3 sm:px-4 sm:pb-4" aria-label="Restaurant showcase">
+        <div class="hero-placeholder h-44 sm:h-60 md:h-80 rounded-[22px] relative overflow-hidden">
+          <img
+            src="https://placehold.co/1600x700/2a2521/f8f3ea?text=Restaurant+Hero+Image"
+            id="heroImage"
+            alt="Restaurant banner"
+            class="w-full h-full object-cover opacity-75"
+            loading="eager"
+            decoding="async">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/5 to-transparent"></div>
+          <div class="absolute left-4 bottom-4 sm:left-6 sm:bottom-6">
+            <span id="heroOpenPill" class="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold px-3 py-2 rounded-full bg-black/50 backdrop-blur border border-white/15 text-white">
+              <span class="w-2 h-2 rounded-full accent-bg"></span> Open today
+            </span>
           </div>
         </div>
+      </section>
 
-        <div class="mt-5 flex flex-wrap gap-3 text-sm">
-          <a id="callBtnVisible" href="#" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl accent-bg font-bold">Call</a>
-          <a id="whatsappBtnVisible" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl surface border-theme">WhatsApp</a>
-          <a id="directionsBtnVisible" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl surface border-theme">Directions</a>
-          <span id="rest-address-new" class="inline-flex items-center px-2 py-2.5 muted"></span><span id="rest-hours-visible" class="inline-flex items-center px-2 py-2.5 muted"></span><span id="rest-status-visible" class="inline-flex items-center px-2 py-2.5 font-semibold"></span>
-        </div>
-
-        <div class="mt-5 flex flex-col md:flex-row gap-3 md:items-center"><div class="relative flex-1"><label class="sr-only" for="menuSearch">Search menu</label><input id="menuSearch" class="fm-search" type="search" placeholder="Search dishes, categories…" autocomplete="off"></div><button id="settingsOpen" type="button" class="fm-icon-btn shrink-0" aria-label="Open menu settings" title="Settings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="m19.4 15 .1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.8 1.8 0 0 0-3 .8v.2a2 2 0 1 1-4 0v-.2a1.8 1.8 0 0 0-3-.8l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.8 1.8 0 0 0-.8-3h-.2a2 2 0 1 1 0-4h.2a1.8 1.8 0 0 0 .8-3l-.1-.1A2 2 0 1 1 6.4 2l.1.1a1.8 1.8 0 0 0 3-.8v-.2a2 2 0 1 1 4 0v.2a1.8 1.8 0 0 0 3 .8l.1-.1A2 2 0 1 1 19.4 5l-.1.1a1.8 1.8 0 0 0 .8 3h.2a2 2 0 1 1 0 4h-.2a1.8 1.8 0 0 0-.7 2.9Z"/></svg></button></div>
-
-        <div class="desktop-only mt-5 items-center justify-between gap-4">
-          <nav id="categoryTabs" class="flex gap-2 overflow-x-auto no-scrollbar"></nav>
-          <div class="flex gap-2 shrink-0" aria-label="Dietary filters">
-            <button data-filter="all" class="filter-btn accent-bg px-3 py-2 rounded-xl text-sm font-semibold">All</button>
-            <button data-filter="veg" class="filter-btn surface px-3 py-2 rounded-xl text-sm font-semibold">Veg</button>
-            <button data-filter="nonveg" class="filter-btn surface px-3 py-2 rounded-xl text-sm font-semibold">Non-Veg</button>
+      <!-- Search + dietary filters -->
+      <section class="px-4 pb-4 sm:px-6 md:px-8" aria-label="Menu tools">
+        <div class="flex flex-col sm:flex-row gap-2.5">
+          <div class="relative flex-1">
+            <label class="sr-only" for="menuSearch">Search menu</label>
+            <input id="menuSearch" class="fm-search" type="search" placeholder="Search dishes, categories…" autocomplete="off">
           </div>
+          <button id="settingsOpen" type="button" class="fm-icon-btn shrink-0 self-end sm:self-auto" aria-label="Open menu settings" title="Settings">
+            <svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="m19.4 15 .1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.8 1.8 0 0 0-3 .8v.2a2 2 0 1 1-4 0v-.2a1.8 1.8 0 0 0-3-.8l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.8 1.8 0 0 0-.8-3h-.2a2 2 0 1 1 0-4h.2a1.8 1.8 0 0 0 .8-3l-.1-.1A2 2 0 1 1 6.4 2l.1.1a1.8 1.8 0 0 0 3-.8v-.2a2 2 0 1 1 4 0v.2a1.8 1.8 0 0 0 3 .8l.1-.1A2 2 0 1 1 19.4 5l-.1.1a1.8 1.8 0 0 0 .8 3h.2a2 2 0 1 1 0 4h-.2a1.8 1.8 0 0 0-.7 2.9Z"/></svg>
+          </button>
         </div>
-      </div>
+        <div class="mt-3 flex gap-2 justify-center sm:justify-start" aria-label="Dietary filters">
+          <button data-filter="all" class="filter-btn accent-bg px-3.5 py-2 rounded-full text-sm font-semibold">All</button>
+          <button data-filter="veg" class="filter-btn surface px-3.5 py-2 rounded-full text-sm font-semibold">Veg</button>
+          <button data-filter="nonveg" class="filter-btn surface px-3.5 py-2 rounded-full text-sm font-semibold">Non-Veg</button>
+        </div>
+      </section>
+
+      <!-- Sticky category navigation BELOW banner -->
+      <nav id="categoryTabsWrap" class="sticky top-0 z-30 border-t border-theme bg-[color:var(--surface)]/95 backdrop-blur" aria-label="Menu categories">
+        <div id="categoryTabs" class="max-w-7xl mx-auto flex gap-2 overflow-x-auto no-scrollbar px-4 sm:px-6 py-2.5"></div>
+      </nav>
     </div>
   </header>
 
-  <main id="menu" class="max-w-7xl mx-auto px-4 sm:px-6 pb-28 md:pb-10"></main>
+  <main id="menu" class="max-w-7xl mx-auto px-3 sm:px-6 pb-32 md:pb-10" aria-live="polite"></main>
 
   <footer class="max-w-7xl mx-auto px-4 sm:px-6 pb-28 md:pb-8">
     <div class="surface rounded-3xl p-5 md:p-7 flex flex-col md:flex-row gap-4 justify-between">
@@ -100,7 +140,7 @@
       <div class="flex flex-wrap gap-4 text-sm muted">
         <a href="#">Terms</a><a href="#">Privacy</a><a href="#">Instagram</a><a href="#">Facebook</a>
       </div>
-      <div class="text-sm muted">© 2026 The Spice Table</div>
+      <div class="text-sm muted">© <span id="footerYear">2026</span> <span id="footerRestaurantName">The Spice Table</span></div>
     </div>
   </footer>
 
@@ -169,7 +209,10 @@
     ========================================================== */
     const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const savedSupabaseConfig = (() => { try { return JSON.parse(localStorage.getItem("freemenu-config") || "{}"); } catch (_) { return {}; } })();
+    const RUNTIME_SUPABASE_URL = savedSupabaseConfig.supabaseUrl || SUPABASE_URL;
+    const RUNTIME_SUPABASE_KEY = savedSupabaseConfig.supabaseAnonKey || SUPABASE_ANON_KEY;
+    const supabaseClient = window.supabase.createClient(RUNTIME_SUPABASE_URL, RUNTIME_SUPABASE_KEY);
 
     let restaurant = null;
     let allItems = [];
@@ -338,15 +381,43 @@
       return getSavedCategoryOrder(restaurant, items);
     }
 
+    function categoryIcon(category) {
+      const c = String(category || "").toLowerCase();
+      if (c.includes("starter")) return '<path d="M4 19h16M6 16h12M8 13h8M10 4h4M8 7h8l1 6H7l1-6Z"/>';
+      if (c.includes("main") || c.includes("curry")) return '<path d="M5 12h14a7 7 0 0 1-14 0Z"/><path d="M8 9V6M12 9V4M16 9V6"/>';
+      if (c.includes("bread") || c.includes("roti") || c.includes("naan")) return '<path d="M5 17c0-4 3-7 7-7s7 3 7 7H5Z"/><path d="M8 10c.3-3 1.7-5 4-6 2.3 1 3.7 3 4 6"/>';
+      if (c.includes("dessert") || c.includes("sweet")) return '<path d="M6 12h12l-1 8H7l-1-8Z"/><path d="M8 9a4 4 0 0 1 8 0v3H8V9Z"/><path d="M12 4v3"/>';
+      if (c.includes("beverage") || c.includes("drink") || c.includes("tea") || c.includes("coffee")) return '<path d="M6 7h10v8a4 4 0 0 1-4 4H10a4 4 0 0 1-4-4V7Z"/><path d="M16 9h2a2 2 0 0 1 0 4h-2"/><path d="M9 3c0 1 1 1 1 2M13 3c0 1 1 1 1 2"/>';
+      return '<path d="m12 3 2.2 5.2L20 10l-5.8 1.8L12 17l-2.2-5.2L4 10l5.8-1.8L12 3Z"/>';
+    }
+
     function renderCategoryChips() {
       const categories = getCategories(allItems);
-      const cats = getCategories(allItems);
       const dock = document.getElementById("mobileCategories");
-      if (dock) dock.innerHTML = cats.map(c => `<a href="#${sectionId(c)}" data-category="${escapeHTML(c)}" class="snap-start shrink-0 w-16 text-center py-1.5"><span class="mx-auto w-10 h-10 rounded-full surface grid place-items-center accent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M3 12h18"/></svg></span><span class="block text-[10px] mt-1 font-semibold">${escapeHTML(c)}</span></a>`).join("");
-      $("categoryTabs").innerHTML = [
-        `<a href="#menu" data-category="all" class="shrink-0 px-3 py-2 rounded-xl text-sm font-semibold ${currentCategory === "all" ? "accent-bg" : "muted"}">All Menu</a>`,
-        ...categories.map(category => `<a href="#${sectionId(category)}" data-category="${escapeHTML(category)}" class="shrink-0 px-3 py-2 rounded-xl text-sm font-semibold ${currentCategory === category ? "accent-bg" : "muted"}">${escapeHTML(category)}</a>`)
-      ].join("");
+      if (dock) {
+        dock.innerHTML = [
+          `<a href="#menu" data-category="all" class="snap-start shrink-0 w-[68px] text-center py-1.5 ${currentCategory === "all" ? "accent" : "muted"}">
+            <span class="mx-auto w-11 h-11 rounded-full category-icon grid place-items-center ${currentCategory === "all" ? "ring-2 ring-[color:var(--accent)]" : ""}">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+            </span>
+            <span class="block text-[10px] mt-1 font-semibold">All</span>
+          </a>`,
+          ...categories.map(c => `
+            <a href="#${sectionId(c)}" data-category="${escapeHTML(c)}" class="snap-start shrink-0 w-[68px] text-center py-1.5 ${currentCategory === c ? "accent" : "muted"}">
+              <span class="mx-auto w-11 h-11 rounded-full category-icon grid place-items-center ${currentCategory === c ? "ring-2 ring-[color:var(--accent)]" : ""}">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8">${categoryIcon(c)}</svg>
+              </span>
+              <span class="block text-[10px] mt-1 font-semibold truncate">${escapeHTML(c)}</span>
+            </a>`)].join("");
+      }
+
+      const tabs = document.getElementById("categoryTabs");
+      if (tabs) {
+        tabs.innerHTML = [
+          `<a href="#menu" data-category="all" class="shrink-0 px-3.5 py-2 rounded-full text-sm font-semibold ${currentCategory === "all" ? "accent-bg" : "muted"}">All Menu</a>`,
+          ...categories.map(c => `<a href="#${sectionId(c)}" data-category="${escapeHTML(c)}" class="shrink-0 px-3.5 py-2 rounded-full text-sm font-semibold ${currentCategory === c ? "accent-bg" : "muted"}">${escapeHTML(c)}</a>`)
+        ].join("");
+      }
     }
 
     function getFilteredItems() {
@@ -386,17 +457,18 @@
       }
 
       menuEl.innerHTML = orderedCategories.filter(c => grouped[c]).map(category => `
-        <section id="${sectionId(category)}" data-category="${escapeHTML(category)}" class="category-section scroll-mt-36 mb-10">
-          <div class="surface shadow-theme rounded-2xl p-4 mb-3 flex items-center justify-between gap-4">
-            <div>
-              <h2 class="text-xl md:text-2xl font-black">${escapeHTML(category)}</h2>
-              <p class="muted text-sm">${grouped[category].length} item${grouped[category].length === 1 ? "" : "s"}</p>
+        <section id="${sectionId(category)}" data-category="${escapeHTML(category)}" class="category-section mb-9">
+          <div class="surface shadow-theme rounded-2xl p-4 sm:p-5 mb-3 flex items-center justify-between gap-4">
+            <div class="min-w-0">
+              <p class="text-[10px] uppercase tracking-[0.18em] accent font-bold">Menu Collection</p>
+              <h2 class="text-xl md:text-2xl font-black mt-0.5">${escapeHTML(category)}</h2>
+              <p class="muted text-sm mt-0.5">${grouped[category].length} item${grouped[category].length === 1 ? "" : "s"}</p>
             </div>
-            <div class="w-11 h-11 rounded-xl accent-bg grid place-items-center" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 16 9 5 9-5"/></svg>
+            <div class="w-14 h-14 rounded-2xl category-icon grid place-items-center accent shrink-0" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6">${categoryIcon(category)}</svg>
             </div>
           </div>
-          <div class="surface rounded-2xl overflow-hidden shadow-theme">
+          <div class="surface rounded-2xl overflow-hidden shadow-theme item-card">
             ${grouped[category].map(renderItem).join("")}
           </div>
         </section>`).join("");
@@ -420,7 +492,7 @@
 
       setOptionalText("rest-welcome", rest.welcome_text);
       $("rest-name").textContent = restaurantName;
-      const visibleName = document.querySelector("h1");
+      const visibleName = document.getElementById("restaurant-name");
       if (visibleName) visibleName.textContent = restaurantName;
       const visibleAddress = document.getElementById("rest-address-new");
       if (visibleAddress) visibleAddress.textContent = rest.address ? `• ${rest.address}` : "";
@@ -441,7 +513,7 @@
       const slogans = $("rest-slogans");
       if (slogans) slogans.style.display = (hasSlogan1 || hasSlogan2) ? "flex" : "none";
 
-      document.title = `${restaurantName} • Menu`;
+      document.title = `${restaurantName} • Menu`; if ($("footerRestaurantName")) $("footerRestaurantName").textContent = restaurantName; if ($("footerYear")) $("footerYear").textContent = new Date().getFullYear();
 
       const logoUrl = safeUrl(rest.logo_url);
       const visibleLogo = $("logoImage"); if (visibleLogo) { visibleLogo.src = logoUrl || "https://placehold.co/256x256/211e1b/f59e0b?text=LOGO"; visibleLogo.alt = `${restaurantName} logo`; }
@@ -517,7 +589,7 @@
         const statusText = statusEl.querySelector("span:last-child");
         if (statusText) statusText.textContent = isOpen ? "Open" : "Closed";
       }
-      const openPill = $("rest-open-pill");
+      const openPill = $("heroOpenPill") || $("rest-open-pill");
       if(openPill){
         openPill.textContent = isOpen ? "● Open Now" : "● Closed";
         openPill.style.background = isOpen ? "#12964e" : "#b4232e";
@@ -683,6 +755,22 @@
       }
     }
 
+    const APP_CONFIG = (() => {
+      const defaults = {
+        supabaseUrl: SUPABASE_URL,
+        supabaseAnonKey: SUPABASE_ANON_KEY,
+        restaurantSlug: "",
+        theme: localStorage.getItem("freemenu-theme") || "spice",
+        useLiveData: true
+      };
+      try {
+        const saved = JSON.parse(localStorage.getItem("freemenu-config") || "{}");
+        return {...defaults, ...saved};
+      } catch (_) {
+        return defaults;
+      }
+    })();
+
     async function loadPublicMenu() {
       showLoading();
 
@@ -800,6 +888,7 @@
 
         renderCategoryChips();
         renderMenu();
+        setupCategoryObserver();
       } catch (error) {
         console.error("Menu load error:", error);
         const nameEl = $("rest-name");
@@ -847,6 +936,53 @@
       if (target) target.scrollIntoView({behavior:"smooth", block:"start"});
     });
 
+
+    // Scroll-aware category highlighting.
+    let categoryObserver = null;
+    function setupCategoryObserver() {
+      if (categoryObserver) categoryObserver.disconnect();
+      const sections = [...document.querySelectorAll("#menu .category-section")];
+      if (!sections.length) return;
+      categoryObserver = new IntersectionObserver((entries) => {
+        const visible = entries
+          .filter(entry => entry.isIntersecting)
+          .sort((a,b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible || searchText.trim()) return;
+        const category = visible.target.dataset.category;
+        if (category && category !== currentCategory) {
+          currentCategory = category;
+          renderCategoryChips();
+        }
+      }, { rootMargin: "-18% 0px -65% 0px", threshold: [0.05, 0.2, 0.5] });
+      sections.forEach(section => categoryObserver.observe(section));
+    }
+
+    document.addEventListener("click", (event) => {
+      const filter = event.target.closest(".filter-btn");
+      if (!filter) return;
+      document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.classList.remove("accent-bg");
+        btn.classList.add("surface");
+      });
+      filter.classList.add("accent-bg");
+      filter.classList.remove("surface");
+      const value = filter.dataset.filter || "all";
+      window.dietaryFilter = value;
+      renderMenu();
+    });
+
+    // Apply dietary filter without changing the existing Supabase item schema.
+    const _getFilteredItems = getFilteredItems;
+    getFilteredItems = function() {
+      const base = _getFilteredItems();
+      const filter = window.dietaryFilter || "all";
+      if (filter === "all") return base;
+      return base.filter(item => {
+        const type = getItemType(item);
+        return filter === type;
+      });
+    };
+
     document.getElementById("themeSelect")?.addEventListener("change", (e) => {
       document.documentElement.dataset.theme = e.target.value;
       localStorage.setItem("freemenu-theme", e.target.value);
@@ -856,7 +992,7 @@
       document.documentElement.dataset.theme = APP_CONFIG.theme;
       const select=document.getElementById("themeSelect"); if(select) select.value=APP_CONFIG.theme;
       const set=(id,v)=>{const e=$(id);if(e)e.value=v??""};
-      set("cfgSupabaseUrl",APP_CONFIG.supabaseUrl); set("cfgSupabaseKey",APP_CONFIG.supabaseAnonKey); set("cfgRestaurantSlug",APP_CONFIG.restaurantSlug); set("cfgTheme",APP_CONFIG.theme);
+      set("cfgSupabaseUrl",RUNTIME_SUPABASE_URL); set("cfgSupabaseKey",RUNTIME_SUPABASE_KEY); set("cfgRestaurantSlug",APP_CONFIG.restaurantSlug); set("cfgTheme",APP_CONFIG.theme);
       const live=$("cfgUseLiveData"); if(live) live.checked=APP_CONFIG.useLiveData!==false;
       const panel=$("settingsPanel"), back=$("settingsBackdrop");
       const open=()=>{panel.classList.add("open");back.classList.add("open");panel.setAttribute("aria-hidden","false");back.setAttribute("aria-hidden","false");};
