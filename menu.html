@@ -288,6 +288,55 @@
   }
 </style>
 
+
+<style id="freemenu-exact-price-ruler">
+  /* Exact compact ruler: only the price types that exist take space. */
+  .category-price-columns.price-count-1,
+  .item-price-columns.price-count-1{
+    width:90px!important;
+    min-width:90px!important;
+  }
+  .category-price-columns.price-count-2,
+  .item-price-columns.price-count-2{
+    width:190px!important;
+    min-width:190px!important;
+  }
+  .category-price-columns.price-count-3,
+  .item-price-columns.price-count-3{
+    width:290px!important;
+    min-width:290px!important;
+  }
+
+  .category-price-columns.price-count-1{flex-basis:90px!important}
+  .category-price-columns.price-count-2{flex-basis:190px!important}
+  .category-price-columns.price-count-3{flex-basis:290px!important}
+
+  .item-price-columns.price-count-1{flex-basis:90px!important}
+  .item-price-columns.price-count-2{flex-basis:190px!important}
+  .item-price-columns.price-count-3{flex-basis:290px!important}
+
+  @media(max-width:767px){
+    .category-price-columns.price-count-1,
+    .item-price-columns.price-count-1{
+      width:58px!important;
+      min-width:58px!important;
+      flex-basis:58px!important;
+    }
+    .category-price-columns.price-count-2,
+    .item-price-columns.price-count-2{
+      width:122px!important;
+      min-width:122px!important;
+      flex-basis:122px!important;
+    }
+    .category-price-columns.price-count-3,
+    .item-price-columns.price-count-3{
+      width:180px!important;
+      min-width:180px!important;
+      flex-basis:180px!important;
+    }
+  }
+</style>
+
 </head>
 <body class="min-h-screen antialiased">
   <header class="max-w-7xl mx-auto px-3 sm:px-5 lg:px-6 pt-3 md:pt-6">
