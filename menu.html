@@ -67,6 +67,8 @@
           </div>
           <p id="rest-subtitle-visible" class="mt-1.5 accent font-semibold"></p>
           <p id="rest-welcome-visible" class="mt-2 text-sm md:text-base muted max-w-2xl mx-auto"></p>
+          <div id="visibleFeatures" class="mt-3 flex flex-wrap justify-center gap-2"></div>
+          <div id="visibleSlogans" class="mt-3 text-sm md:text-base italic muted"></div>
         </div>
 
         <div class="mt-4 flex flex-wrap justify-center gap-2 text-xs sm:text-sm">
@@ -269,16 +271,14 @@
 
     function showLoading() {
       const menuEl = $("menu");
-      if (menuEl) {
-        menuEl.innerHTML = `<div class="surface rounded-2xl p-8 menu-state"><div class="menu-loading" aria-label="Loading menu"><div class="sk wide"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div></div></div>`;
-      }
+      if (!menuEl) return;
+      menuEl.innerHTML = `<div class="surface rounded-2xl p-8 menu-state"><div class="menu-loading" aria-label="Loading menu"><div class="sk wide"></div><div class="sk"></div><div class="sk"></div><div class="sk"></div></div></div>`;
     }
 
     function showState(title, message) {
       const menuEl = $("menu");
-      if (menuEl) {
-        menuEl.innerHTML = `<div class="surface rounded-2xl p-8 menu-state"><div class="w-12 h-12 mx-auto rounded-2xl category-icon grid place-items-center accent mb-3"><svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8v4"/><circle cx="12" cy="16" r=".8" fill="currentColor"/><path d="M10.3 3.8 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z"/></svg></div><h2 class="text-lg font-black">${escapeHTML(title)}</h2><p class="muted text-sm mt-1">${escapeHTML(message)}</p></div>`;
-      }
+      if (!menuEl) return;
+      menuEl.innerHTML = `<div class="surface rounded-2xl p-8 menu-state"><div class="w-12 h-12 mx-auto rounded-2xl category-icon grid place-items-center accent mb-3"><svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8v4"/><circle cx="12" cy="16" r=".8" fill="currentColor"/><path d="M10.3 3.8 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.8a2 2 0 0 0-3.4 0Z"/></svg></div><h2 class="text-lg font-black">${escapeHTML(title)}</h2><p class="muted text-sm mt-1">${escapeHTML(message)}</p></div>`;
     }
 
     function logoFallback() {
@@ -299,7 +299,7 @@
     }
 
     function isUnavailable(item) {
-      return item.is_available === false || item.available === false || item.status === "unavailable" || item.status === "out_of_stock";
+      return item.is_available === false || item.available === false || item.unavailable === true || item.status === "unavailable" || item.status === "out_of_stock";
     }
 
     function renderPrice(item) {
@@ -307,9 +307,14 @@
       const q = clean(item.price_quarter);
       const h = clean(item.price_half);
       const f = clean(item.price_full) || clean(item.price);
-      const prices = [q,h,f].filter(Boolean);
-      if (!prices.length) return "";
-      return `<div class="text-right font-black whitespace-nowrap">${prices.map((p,i)=>`<div class="text-sm">₹${escapeHTML(p)}</div>`).join("")}</div>`;
+      if (!q && !h && !f) return "";
+      const labels = [q ? "Quarter" : "", h ? "Half" : "", f ? "Full" : ""];
+      const values = [q,h,f];
+      const hasPortions = q || h;
+      if (!hasPortions) return `<div class="text-right font-black whitespace-nowrap"><span class="text-sm">₹${escapeHTML(f)}</span></div>`;
+      return `<div class="grid grid-cols-3 gap-1 min-w-[150px] text-right">
+        ${values.map((p,i)=>`<div class="text-center"><div class="text-[9px] uppercase tracking-wide muted">${labels[i]}</div><div class="text-sm font-black">${p ? "₹"+escapeHTML(p) : "—"}</div></div>`).join("")}
+      </div>`;
     }
 
     function renderTags(item) {
@@ -694,21 +699,18 @@
     }
 
     function showMenuMaintenance(){
-      $("categoryTabs").innerHTML = "";
-      if ($("menuSummary")) $("menuSummary").style.display = "none";
-      $("menu").innerHTML = `
-        <section class="fm-menu-maintenance" aria-live="polite">
-          <div class="fm-maintenance-card">
-            <div class="fm-maintenance-icon">🛠️</div>
-            <h2 class="fm-maintenance-title">Price Now Updating</h2>
-            <p class="fm-maintenance-text">
-              Menu will be available soon.<br>
-              Please check again in a little while.
-            </p>
-            <div class="fm-maintenance-badge">Menu Temporarily Offline</div>
-          </div>
-        </section>
-      `;
+      if ($("categoryTabs")) $("categoryTabs").innerHTML = "";
+      if ($("mobileCategories")) $("mobileCategories").innerHTML = "";
+      const menuEl = $("menu");
+      if (!menuEl) return;
+      menuEl.innerHTML = `<section class="surface rounded-3xl p-8 md:p-12 text-center shadow-theme">
+        <div class="mx-auto w-14 h-14 rounded-2xl category-icon grid place-items-center accent mb-4">
+          <span class="text-2xl" aria-hidden="true">🛠️</span>
+        </div>
+        <h2 class="text-2xl md:text-3xl font-black">Price Now Updating</h2>
+        <p class="muted mt-2 leading-6">Menu will be available soon.<br>Please check again in a little while.</p>
+        <span class="inline-flex mt-5 px-3 py-1.5 rounded-full border-theme accent text-xs font-bold uppercase tracking-wider">Menu Temporarily Offline</span>
+      </section>`;
     }
 
     async function checkMenuMaintenance(){
@@ -734,6 +736,15 @@
       }
     }
 
+    // Owner/Super-Admin settings consumed by the public menu.
+    // These remain data-driven and are never exposed as a public settings panel.
+    const PUBLIC_MENU_SETTINGS = Object.freeze({
+      restaurant: ["name","slug","welcome_text","tagline","subtitle_text","feature_1","feature_2","feature_3","slogan_1","slogan_2","logo_url","banner_url","cover_url","cover_image","phone","call_button_text","address","is_open","status","is_active","opening_time","closing_time","dine_in","takeaway","home_delivery","category_order","primary_color","primary_dark","background_color","card_color","text_color","accent_color","card_radius","theme_primary","theme_primary_dark","theme_background","theme_card","theme_text","theme_accent","theme_radius","menu_update_mode","plan","plan_id","custom_plan_enabled"],
+      menuItem: ["name","description","category","item_type","is_veg","is_available","available","unavailable","status","price","price_quarter","price_half","price_full","is_bestseller","bestseller","is_recommended","recommended","is_spicy","spicy","sort_order","position"],
+      platform: ["adsense_client_id","ads_default_slot","free_plan_ads","premium_plan_ads","ads_position"],
+      subscription: ["plan","status","expiry_date"]
+    });
+
     async function loadPublicMenu() {
       showLoading();
 
@@ -749,8 +760,8 @@
 
         if (!restaurants || !restaurants.length) {
           const nameEl = $("restaurant-name"); if (nameEl) nameEl.textContent = "Restaurant Not Found";
-          $("categoryTabs").innerHTML = "";
-          if ($("menuSummary")) $("menuSummary").style.display = "none";
+          if ($("categoryTabs")) $("categoryTabs").innerHTML = "";
+          if ($("mobileCategories")) $("mobileCategories").innerHTML = "";
           showState("Restaurant not found", "Please check the menu link and try again.");
           return;
         }
@@ -843,8 +854,8 @@
         });
 
         if (!allItems.length) {
-          $("categoryTabs").innerHTML = "";
-          if ($("menuSummary")) $("menuSummary").style.display = "none";
+          if ($("categoryTabs")) $("categoryTabs").innerHTML = "";
+          if ($("mobileCategories")) $("mobileCategories").innerHTML = "";
           showState("Menu is being prepared", "No menu items have been added yet.");
           return;
         }
@@ -855,41 +866,10 @@
       } catch (error) {
         console.error("Menu load error:", error);
 
-        // Keep the public page usable during a temporary API/network failure.
-        // The local JSON is only a presentation fallback; live Supabase data is
-        // still used whenever the connection succeeds.
-        try {
-          const demo = JSON.parse(document.getElementById("menuData")?.textContent || "{}");
-          if (Array.isArray(demo.categories) && demo.categories.length) {
-            restaurant = {
-              id: "demo",
-              name: "Restaurant Menu",
-              tagline: "",
-              welcome_text: "",
-              is_open: true,
-              is_active: true
-            };
-            allItems = demo.categories.flatMap(cat =>
-              (cat.items || []).map((item, index) => ({
-                ...item,
-                category: cat.name,
-                sort_order: index
-              }))
-            );
-            renderRestaurant(restaurant);
-            renderCategoryChips();
-            renderMenu();
-            setupCategoryObserver();
-            showState("Demo menu", "Live menu data is temporarily unavailable.");
-            return;
-          }
-        } catch (fallbackError) {
-          console.warn("Local menu fallback failed:", fallbackError);
-        }
-
         const nameEl = $("restaurant-name");
         if (nameEl) nameEl.textContent = "Menu Unavailable";
-        $("categoryTabs").innerHTML = "";
+        if ($("categoryTabs")) $("categoryTabs").innerHTML = "";
+        if ($("mobileCategories")) $("mobileCategories").innerHTML = "";
         showState("Unable to load menu", "Please refresh the page or check your connection.");
       }
     }
@@ -920,7 +900,7 @@
       if (target) target.scrollIntoView({behavior:"smooth", block:"start"});
     });
 
-    document.getElementById("categoryTabs").addEventListener("click", (event) => {
+    document.getElementById("categoryTabs")?.addEventListener("click", (event) => {
       const btn = event.target.closest("[data-category]");
       if (!btn) return;
       event.preventDefault();
