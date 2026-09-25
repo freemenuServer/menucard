@@ -74,7 +74,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
 /* Modal */
 .modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;padding:18px;z-index:300}.modal.show{display:flex}.modalBox{background:#fff;border-radius:16px;width:min(650px,100%);max-height:90vh;overflow:auto;padding:20px}.modalHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.modalHead h3{margin:0;font-size:17px}.close{border:0;background:#f1f3f5;border-radius:8px;width:32px;height:32px}
-.previewFrame{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff}.previewTop{height:120px;background:linear-gradient(135deg,#461016,#9d2535);color:#fff;padding:25px}.previewTop strong{font-family:"Cormorant Garamond",serif;font-size:31px}.themeGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.colorField{display:flex;align-items:center;gap:8px;border:1px solid var(--border);padding:8px;border-radius:8px}.colorField input{width:38px;height:30px;padding:0;border:0;background:none}.colorField span{font-size:11px;font-weight:700}
+.previewFrame{border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#fff}.previewTop{min-height:116px;background:linear-gradient(135deg,#7c2d12,#d97706);color:#fff;padding:22px}.previewTop strong{font-family:"Cormorant Garamond",serif;font-size:29px;line-height:1}.themeGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.colorField{display:flex;align-items:center;gap:8px;border:1px solid var(--border);padding:8px;border-radius:8px;background:#fff}.colorField input{width:38px;height:30px;padding:0;border:0;background:none}.colorField span{font-size:11px;font-weight:700}.themeSettingsCard{overflow:hidden}.themePlanBadge{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:999px;background:#ecfdf3;color:#067647;border:1px solid #abefc6;font-size:9px;font-weight:900;white-space:nowrap}.themeSelectWrap{padding:13px;border:1px solid var(--border);background:#f8fafc;border-radius:12px}.themeSelectWrap>label{display:block;font-size:11px;font-weight:800;color:#475569;margin-bottom:7px}.themeSelectRow{display:flex;align-items:center;gap:8px}.themeSelectRow .select{height:42px;font-weight:800;background:#fff;cursor:pointer}.themeSelectIcon{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:10px;background:#172033;color:#fff}.themePresetMeta{font-size:10px;color:var(--muted);line-height:1.55;margin-top:7px}.themeSwatches{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px}.themeSwatch{border:1px solid var(--border);border-radius:9px;padding:7px;background:#fff}.themeSwatchColor{height:24px;border-radius:6px;margin-bottom:5px}.themeSwatch span{font-size:8px;font-weight:800;color:#64748b}.themeAdvanced{margin-top:10px;border:1px solid var(--border);border-radius:10px;padding:9px 10px;background:#fff}.themeAdvanced summary{cursor:pointer;font-size:10px;font-weight:800;color:#475569;list-style:none}.themeAdvanced summary::-webkit-details-marker{display:none}.themeAdvanced summary i{margin-right:5px}.themeAdvancedNote{font-size:9px;color:var(--muted);line-height:1.5;margin-top:8px}.themeSaveBtn{margin-top:12px;min-width:130px}.professionalPreview .previewTop{display:flex;align-items:center;justify-content:space-between;gap:12px}.previewBrand{display:flex;align-items:center;gap:10px}.previewDot{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);display:grid;place-items:center}.previewSub{font-size:10px;opacity:.82;margin-top:4px}.previewBadge{font-size:8px;font-weight:900;letter-spacing:.6px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.24)}.previewBody{padding:15px;background:#fff}.previewSectionTitle{display:flex;align-items:center;justify-content:space-between;font-size:10px;font-weight:900;margin-bottom:9px}.previewSectionTitle i{font-size:9px;opacity:.65}.previewItem{display:flex;justify-content:space-between;gap:12px;padding:11px;border:1px solid #eceff3;border-radius:10px;margin-top:7px;background:#fff}.previewItem strong{font-size:11px;display:block}.previewItem small{font-size:8px;color:#8a94a6;display:block;margin-top:3px}.previewItem b{font-size:11px;white-space:nowrap}.previewAction{width:100%;margin-top:9px;border:0;border-radius:9px;padding:10px;color:#fff;font-size:10px;font-weight:900}.themeSwatchColor,.previewAction{transition:.18s}.themeAdvanced[open]{box-shadow:0 4px 14px rgba(15,23,42,.04)}
+@media(max-width:560px){.themeSwatches{grid-template-columns:repeat(2,1fr)}.themeGrid{grid-template-columns:1fr}.themePlanBadge{font-size:8px}.themeSelectIcon{display:none}.themeSelectRow .select{height:40px}}
 
 /* Toast */
 #toast{position:fixed;bottom:22px;right:22px;background:#172033;color:#fff;padding:11px 15px;border-radius:9px;font-size:12px;font-weight:700;opacity:0;transform:translateY(15px);transition:.25s;z-index:500}#toast.show{opacity:1;transform:none}
@@ -653,19 +654,54 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 <!-- SETTINGS -->
 <section id="section-settings" class="hidden">
   <div class="twoCol">
-    <div class="card">
-      <div class="cardTitle">Menu Theme <small>Preview settings</small></div>
-      <div class="themeGrid">
-        <label class="colorField"><input type="color" id="cPrimary" value="#641219"><span>Primary</span></label>
-        <label class="colorField"><input type="color" id="cAccent" value="#d8ad62"><span>Accent</span></label>
-        <label class="colorField"><input type="color" id="cBg" value="#fffaf1"><span>Background</span></label>
+    <div class="card themeSettingsCard">
+      <div class="cardTitle">
+        <span>Menu Theme <small>Professional presets for every plan</small></span>
+        <span class="themePlanBadge"><i class="fa-solid fa-unlock"></i> All Plans</span>
       </div>
-      <button class="btn primary" id="saveTheme" style="margin-top:12px"><i class="fa-solid fa-floppy-disk"></i> Save Theme</button>
-      <div class="previewFrame" style="margin-top:14px">
-        <div class="previewTop" id="themePreview"><strong id="themeName">Restaurant</strong><div style="font-size:11px;margin-top:5px">Your digital menu preview</div></div>
-        <div style="padding:15px"><div style="height:11px;width:55%;background:#eee;border-radius:8px"></div><div style="height:9px;width:85%;background:#f0f0f0;border-radius:8px;margin-top:13px"></div><div style="height:50px;background:#fffaf1;border:1px solid #eee;border-radius:10px;margin-top:14px"></div></div>
+
+      <div class="themeSelectWrap">
+        <label for="themePreset">Choose a theme</label>
+        <div class="themeSelectRow">
+          <div class="themeSelectIcon"><i class="fa-solid fa-palette"></i></div>
+          <select class="select themePresetSelect" id="themePreset" aria-label="Choose menu theme"></select>
+        </div>
+        <div class="themePresetMeta" id="themePresetMeta">Select a professional color system for your live menu.</div>
       </div>
-      <p class="muted" style="font-size:11px;margin:12px 0 0">Theme changes are saved to your restaurant and appear on the live public menu.</p>
+
+      <div class="themeSwatches" id="themeSwatches" aria-label="Theme colors"></div>
+
+      <details class="themeAdvanced">
+        <summary><i class="fa-solid fa-sliders"></i> Advanced colors</summary>
+        <div class="themeGrid" style="margin-top:10px">
+          <label class="colorField"><input type="color" id="cPrimary" value="#7C2D12"><span>Primary</span></label>
+          <label class="colorField"><input type="color" id="cAccent" value="#D97706"><span>Accent</span></label>
+          <label class="colorField"><input type="color" id="cBg" value="#FFF7ED"><span>Background</span></label>
+        </div>
+        <div class="themeAdvancedNote">Use this only when you want to fine-tune the selected preset. The saved colors are used by the live public menu.</div>
+      </details>
+
+      <button class="btn primary themeSaveBtn" id="saveTheme"><i class="fa-solid fa-floppy-disk"></i> Save Theme</button>
+
+      <div class="previewFrame professionalPreview" style="margin-top:14px" id="themePreviewFrame">
+        <div class="previewTop" id="themePreview">
+          <div class="previewBrand"><span class="previewDot"><i class="fa-solid fa-utensils"></i></span><div><strong id="themeName">Restaurant</strong><div class="previewSub">Your digital menu</div></div></div>
+          <span class="previewBadge" id="themePreviewBadge">OPEN</span>
+        </div>
+        <div class="previewBody" id="themePreviewBody">
+          <div class="previewSectionTitle"><span id="themePreviewAccent">Chef's Specials</span><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="previewItem">
+            <div><strong>Signature Dish</strong><small>Fresh ingredients • Chef special</small></div>
+            <b id="themePreviewPrice">₹299</b>
+          </div>
+          <div class="previewItem">
+            <div><strong>Classic Platter</strong><small>Popular choice for every table</small></div>
+            <b id="themePreviewPrice2">₹449</b>
+          </div>
+          <button class="previewAction" id="themePreviewButton"><i class="fa-solid fa-phone"></i> Call Restaurant</button>
+        </div>
+      </div>
+      <p class="muted" style="font-size:11px;line-height:1.6;margin:12px 0 0"><i class="fa-solid fa-circle-check" style="color:#16a34a"></i> Theme settings are available to every restaurant owner, regardless of plan. Saved colors are applied to the live public menu wherever theme variables are supported.</p>
     </div>
     <div class="card">
       <div class="cardTitle">Account & Security</div>
@@ -1207,6 +1243,7 @@ function fail(msg){
 }
 
 function fillProfile(){
+  renderThemePresetOptions();
   const r=currentRestaurant;
   const name=r.name||"Restaurant",logo=r.logo_url||"";
   $("topName").textContent=name;$("profileName").textContent=name;$("statusName").textContent=name;$("themeName").textContent=name;
@@ -1230,9 +1267,10 @@ function fillProfile(){
   $("fDineIn").checked=r.dine_in!==false;
   $("fTakeaway").checked=r.takeaway!==false;
   $("fDelivery").checked=r.home_delivery!==false;
-  $("cPrimary").value=r.primary_color||r.theme_primary||"#641219";
-  $("cAccent").value=r.accent_color||"#d8ad62";
-  $("cBg").value=r.background_color||r.theme_background||"#fffaf1";
+  $("cPrimary").value=r.primary_color||r.theme_primary||"#7C2D12";
+  $("cAccent").value=r.accent_color||"#D97706";
+  $("cBg").value=r.background_color||r.theme_background||"#FFF7ED";
+  renderThemePresetOptions();
   updateTheme();
 
   const logoEl=$("topLogo");logoEl.src=logo||"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='100%25' height='100%25' rx='40' fill='%23641219'/%3E%3Ctext x='50%25' y='56%25' text-anchor='middle' fill='white' font-size='30'%3E🍽%3C/text%3E%3C/svg%3E";
@@ -2034,29 +2072,95 @@ function openPublic(){window.open(publicUrl(),"_blank","noopener")}
 ["publicTop","sidePublicBtn","quickPreview","openPublic2"].forEach(id=>$(id).onclick=openPublic);
 $("sidePlansBtn").onclick=()=>openOwnerPlans();
 
-/* ---------- Theme preview ---------- */
+/* ---------- Professional Theme System ---------- */
+const THEME_PRESETS={
+  warm:{name:"Warm Spice",description:"Premium restaurant warmth with rich spice tones and a welcoming cream background.",primary:"#7C2D12",primaryDark:"#5B1F0E",accent:"#D97706",background:"#FFF7ED",card:"#FFFFFF",text:"#2B1B16"},
+  minimal:{name:"Modern Clean",description:"Clean, neutral and contemporary — designed to keep food and content in focus.",primary:"#1F2937",primaryDark:"#111827",accent:"#2563EB",background:"#F8FAFC",card:"#FFFFFF",text:"#111827"},
+  luxury:{name:"Royal Luxury",description:"Deep, elegant tones with a refined gold accent for premium dining brands.",primary:"#1F1B2D",primaryDark:"#11101A",accent:"#C9A227",background:"#F8F5EE",card:"#FFFFFF",text:"#211F26"},
+  organic:{name:"Fresh Organic",description:"Fresh greens and natural neutrals for cafés, healthy food and modern casual dining.",primary:"#166534",primaryDark:"#14532D",accent:"#65A30D",background:"#F7FBEF",card:"#FFFFFF",text:"#17251A"},
+  ocean:{name:"Coastal Blue",description:"Trustworthy blue tones with a warm coral accent for a fresh contemporary menu.",primary:"#0F4C5C",primaryDark:"#0B3440",accent:"#E76F51",background:"#F4FAFC",card:"#FFFFFF",text:"#102A33"},
+  rose:{name:"Elegant Rose",description:"Sophisticated berry tones with a soft rose accent for cafés and modern dining.",primary:"#7F1D4E",primaryDark:"#5B1538",accent:"#DB2777",background:"#FFF7FB",card:"#FFFFFF",text:"#2D1723"}
+};
+
+function hexNorm(v){return String(v||"").trim().toLowerCase()}
+function getThemePresetKey(){
+ const p=hexNorm($("cPrimary")?.value),a=hexNorm($("cAccent")?.value),b=hexNorm($("cBg")?.value);
+ return Object.keys(THEME_PRESETS).find(k=>{const t=THEME_PRESETS[k];return hexNorm(t.primary)===p&&hexNorm(t.accent)===a&&hexNorm(t.background)===b})||"custom";
+}
+function renderThemePresetOptions(){
+ const select=$("themePreset");if(!select)return;
+ select.innerHTML='<option value="custom">Custom colors</option>'+Object.entries(THEME_PRESETS).map(([key,t])=>`<option value="${key}">${esc(t.name)}</option>`).join("");
+ const key=getThemePresetKey();select.value=key;
+ updateThemePresetMeta(key);
+}
+function updateThemePresetMeta(key){
+ const meta=$("themePresetMeta");if(!meta)return;
+ if(key==="custom"){meta.textContent="Custom colors are active. Choose a professional preset or fine-tune the colors below.";return}
+ const t=THEME_PRESETS[key];meta.textContent=t? t.description : "Select a professional color system for your live menu.";
+}
+function renderThemeSwatches(){
+ const wrap=$("themeSwatches");if(!wrap)return;
+ const p=$("cPrimary").value,a=$("cAccent").value,b=$("cBg").value;
+ wrap.innerHTML=[
+  ["Primary",p],["Accent",a],["Background",b],["Text",THEME_PRESETS[getThemePresetKey()]?.text||"#241719"]
+ ].map(([label,color])=>`<div class="themeSwatch"><div class="themeSwatchColor" style="background:${esc(color)}"></div><span>${label} • ${esc(color.toUpperCase())}</span></div>`).join("");
+}
 function updateTheme(){
  const p=$("cPrimary").value,a=$("cAccent").value,b=$("cBg").value;
+ const key=getThemePresetKey(),t=THEME_PRESETS[key]||THEME_PRESETS.warm;
+ const text=t.text||"#241719";
+ const card=t.card||"#ffffff";
  $("themePreview").style.background=`linear-gradient(135deg,${p},${a})`;
  $("themePreview").style.color="#fff";
+ $("themePreviewBody").style.background=b;
+ $("themePreviewAccent").style.color=a;
+ $("themePreviewButton").style.background=p;
+ $("themePreviewPrice").style.color=p;
+ $("themePreviewPrice2").style.color=p;
+ $("themePreviewFrame").style.background=card;
+ $("themePreviewFrame").style.setProperty("--theme-preview-text",text);
+ $("themePreviewFrame").querySelectorAll(".previewItem").forEach(el=>{el.style.background=card;el.style.color=text});
+ $("themePreset").value=key;
+ updateThemePresetMeta(key);
+ renderThemeSwatches();
 }
-["cPrimary","cAccent","cBg"].forEach(id=>$(id).addEventListener("input",updateTheme));
+function applyThemePreset(key){
+ const t=THEME_PRESETS[key];if(!t)return;
+ $("cPrimary").value=t.primary;
+ $("cAccent").value=t.accent;
+ $("cBg").value=t.background;
+ updateTheme();
+}
+if($("themePreset")){
+ $("themePreset").addEventListener("change",()=>{
+   const key=$("themePreset").value;
+   if(key!=="custom")applyThemePreset(key);else updateTheme();
+ });
+}
+["cPrimary","cAccent","cBg"].forEach(id=>$(id).addEventListener("input",()=>{
+ const key=getThemePresetKey();
+ if($("themePreset"))$("themePreset").value=key;
+ updateTheme();
+}));
 $("saveTheme").onclick=async()=>{
+ const key=getThemePresetKey(),t=THEME_PRESETS[key];
  const payload={
    primary_color:$("cPrimary").value,
-   primary_dark:$("cPrimary").value,
+   primary_dark:t?.primaryDark||$("cPrimary").value,
    accent_color:$("cAccent").value,
    background_color:$("cBg").value,
-   card_color:"#ffffff",
-   text_color:"#241719"
+   card_color:t?.card||"#ffffff",
+   text_color:t?.text||"#241719"
  };
  $("saveTheme").disabled=true;
+ $("saveTheme").innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
  const {data,error}=await supabaseClient.from("restaurants").update(payload).eq("id",currentRestaurantId).select().single();
  $("saveTheme").disabled=false;
+ $("saveTheme").innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Theme';
  if(error){toast("Theme save failed: "+error.message);return}
  currentRestaurant=data;
  fillProfile();
- toast("Theme saved — live menu updated");
+ toast((t?.name||"Custom theme")+" saved — live menu updated");
 };
 $("quickTheme").onclick=()=>{showSection("settings");history.replaceState(null,"","#settings")};
 
