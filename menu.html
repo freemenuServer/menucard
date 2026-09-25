@@ -6,6 +6,7 @@
   <meta name="description" content="Digital restaurant menu">
   <title>Freemenu — Digital Restaurant Menu</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root{
       --bg:#171513;--surface:#211e1b;--surface2:#2a2521;--text:#f8f3ea;--muted:#b9afa4;
@@ -32,6 +33,10 @@
     .dock{padding-bottom:calc(10px + env(safe-area-inset-bottom))}
     @media(min-width:768px){.mobile-dock{display:none}.desktop-only{display:flex}}
     @media(max-width:767px){.desktop-only{display:none}}
+  
+    .fm-settings-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:80;display:none}.fm-settings-backdrop.open{display:block}
+    .fm-settings{position:fixed;right:0;top:0;bottom:0;width:min(430px,94vw);background:var(--surface);color:var(--text);z-index:90;transform:translateX(100%);transition:transform .25s ease;overflow:auto;border-left:1px solid var(--border);box-shadow:-20px 0 50px rgba(0,0,0,.2)}.fm-settings.open{transform:translateX(0)}
+    .fm-input{width:100%;border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:12px;padding:10px 12px;outline:none}.fm-icon-btn{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:12px;border:1px solid var(--border);background:var(--surface)}.fm-search{border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:14px;padding:12px 14px;width:100%;outline:none}.hero-img{object-fit:cover;width:100%;height:100%;display:block}
   </style>
 </head>
 <body class="min-h-screen antialiased">
@@ -39,7 +44,7 @@
     <div class="surface shadow-theme rounded-3xl overflow-hidden">
       <div class="hero-placeholder h-40 sm:h-56 md:h-72 relative overflow-hidden">
         <img src="https://placehold.co/1600x600/2a2521/f8f3ea?text=Restaurant+Hero+Image"
-             alt="Restaurant banner placeholder" class="w-full h-full object-cover opacity-65" loading="eager">
+             id="heroImage" alt="Restaurant banner" class="w-full h-full object-cover opacity-65" loading="eager">
         <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"></div>
         <div class="absolute left-4 bottom-4 md:left-7 md:bottom-7">
           <span class="inline-flex items-center gap-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-black/45 backdrop-blur border border-white/15">
@@ -51,24 +56,26 @@
       <div class="p-4 md:p-7">
         <div class="flex gap-4 md:gap-6 items-start">
           <div class="logo-placeholder shrink-0 w-20 h-20 md:w-28 md:h-28 rounded-2xl grid place-items-center overflow-hidden">
-            <img src="https://placehold.co/256x256/211e1b/f59e0b?text=LOGO" alt="Restaurant logo placeholder" class="w-full h-full object-cover">
+            <img src="https://placehold.co/256x256/211e1b/f59e0b?text=LOGO" id="logoImage" alt="Restaurant logo" class="w-full h-full object-cover">
           </div>
           <div class="min-w-0 flex-1">
             <div class="flex flex-wrap items-center gap-2">
               <h1 class="text-2xl md:text-4xl font-black tracking-tight">The Spice Table</h1>
               <span class="text-[10px] uppercase tracking-widest px-2 py-1 rounded-full border border-theme muted">Digital Menu</span>
             </div>
-            <p class="mt-1 accent font-semibold">Modern Indian dining · family recipes · fresh every day</p>
-            <p class="mt-2 text-sm muted max-w-2xl">A warm neighborhood kitchen serving Indian classics with a contemporary touch.</p>
+            <p id="rest-subtitle-visible" class="mt-1 accent font-semibold"></p>
+            <p id="rest-welcome-visible" class="mt-2 text-sm muted max-w-2xl"></p>
           </div>
         </div>
 
         <div class="mt-5 flex flex-wrap gap-3 text-sm">
-          <a href="tel:+911234567890" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl accent-bg font-bold">Call</a>
-          <a href="https://wa.me/911234567890" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl surface border-theme">WhatsApp</a>
-          <a href="https://maps.google.com/?q=The+Spice+Table" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl surface border-theme">Directions</a>
-          <span id="rest-address-new" class="inline-flex items-center px-2 py-2.5 muted"></span>
+          <a id="callBtnVisible" href="#" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl accent-bg font-bold">Call</a>
+          <a id="whatsappBtnVisible" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl surface border-theme">WhatsApp</a>
+          <a id="directionsBtnVisible" href="#" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl surface border-theme">Directions</a>
+          <span id="rest-address-new" class="inline-flex items-center px-2 py-2.5 muted"></span><span id="rest-hours-visible" class="inline-flex items-center px-2 py-2.5 muted"></span><span id="rest-status-visible" class="inline-flex items-center px-2 py-2.5 font-semibold"></span>
         </div>
+
+        <div class="mt-5 flex flex-col md:flex-row gap-3 md:items-center"><div class="relative flex-1"><label class="sr-only" for="menuSearch">Search menu</label><input id="menuSearch" class="fm-search" type="search" placeholder="Search dishes, categories…" autocomplete="off"></div><button id="settingsOpen" type="button" class="fm-icon-btn shrink-0" aria-label="Open menu settings" title="Settings"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="m19.4 15 .1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.8 1.8 0 0 0-3 .8v.2a2 2 0 1 1-4 0v-.2a1.8 1.8 0 0 0-3-.8l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.8 1.8 0 0 0-.8-3h-.2a2 2 0 1 1 0-4h.2a1.8 1.8 0 0 0 .8-3l-.1-.1A2 2 0 1 1 6.4 2l.1.1a1.8 1.8 0 0 0 3-.8v-.2a2 2 0 1 1 4 0v.2a1.8 1.8 0 0 0 3 .8l.1-.1A2 2 0 1 1 19.4 5l-.1.1a1.8 1.8 0 0 0 .8 3h.2a2 2 0 1 1 0 4h-.2a1.8 1.8 0 0 0-.7 2.9Z"/></svg></button></div>
 
         <div class="desktop-only mt-5 items-center justify-between gap-4">
           <nav id="categoryTabs" class="flex gap-2 overflow-x-auto no-scrollbar"></nav>
@@ -110,6 +117,8 @@
   <nav class="mobile-dock fixed bottom-0 inset-x-0 z-40 dock bg-[color:var(--surface)]/95 backdrop-blur border-t border-theme">
     <div id="mobileCategories" class="flex gap-2 overflow-x-auto no-scrollbar snap-x px-3 pt-2"></div>
   </nav>
+
+  <div id="settingsBackdrop" class="fm-settings-backdrop" aria-hidden="true"></div><aside id="settingsPanel" class="fm-settings" aria-label="Restaurant menu settings" aria-hidden="true"><div class="p-5 md:p-6"><div class="flex items-center justify-between"><div><h2 class="text-xl font-black">Menu Settings</h2><p class="muted text-sm mt-1">Supabase + restaurant configuration</p></div><button id="settingsClose" class="fm-icon-btn" type="button" aria-label="Close settings">×</button></div><div class="mt-6 space-y-5"><section><h3 class="font-bold">Supabase</h3><div class="mt-3 space-y-3"><label class="block text-sm font-semibold">Project URL<input id="cfgSupabaseUrl" class="fm-input mt-1" type="url"></label><label class="block text-sm font-semibold">Anon / Publishable Key<input id="cfgSupabaseKey" class="fm-input mt-1" type="text" spellcheck="false"></label><label class="block text-sm font-semibold">Restaurant slug<input id="cfgRestaurantSlug" class="fm-input mt-1" type="text" placeholder="Uses URL ?r=slug if empty"></label></div></section><section><h3 class="font-bold">Display</h3><div class="mt-3 space-y-3"><label class="block text-sm font-semibold">Theme<select id="cfgTheme" class="fm-input mt-1"><option value="spice">Warm Spice & Amber</option><option value="minimal">Modern Clean</option><option value="luxury">Royal Luxury / Dark Gold</option><option value="organic">Fresh Organic</option></select></label><label class="flex items-center gap-3 text-sm"><input id="cfgUseLiveData" type="checkbox"> Load live data from Supabase</label></div></section><section><h3 class="font-bold">Existing data supported</h3><p class="muted text-sm mt-2 leading-6">Restaurant name, welcome/tagline, features, slogans, logo/banner URLs, phone, address, opening/closing time, open status, dine-in, takeaway, delivery, category order, theme colors/radius, maintenance mode, plans, custom plan, menu items, quarter/half/full pricing, veg/non-veg/egg, bestseller, recommended, spicy and unavailable states, plus platform ad settings.</p></section><div class="flex gap-2"><button id="settingsSave" class="accent-bg rounded-xl px-4 py-2.5 font-bold">Save & Reload</button><button id="settingsReset" class="surface border-theme rounded-xl px-4 py-2.5">Reset</button></div><p id="settingsNote" class="muted text-xs"></p></div></div></aside>
 
   <script id="menuData" type="application/json">
   {
@@ -331,7 +340,10 @@
 
     function renderCategoryChips() {
       const categories = getCategories(allItems);
-      const cats = getCategories(allItems);\n      const dock = document.getElementById("mobileCategories");\n      if (dock) dock.innerHTML = cats.map(c => `<a href="#${sectionId(c)}" data-category="${escapeHTML(c)}" class="snap-start shrink-0 w-16 text-center py-1.5"><span class="mx-auto w-10 h-10 rounded-full surface grid place-items-center accent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M3 12h18"/></svg></span><span class="block text-[10px] mt-1 font-semibold">${escapeHTML(c)}</span></a>`).join("");\n      $("categoryTabs").innerHTML = [
+      const cats = getCategories(allItems);
+      const dock = document.getElementById("mobileCategories");
+      if (dock) dock.innerHTML = cats.map(c => `<a href="#${sectionId(c)}" data-category="${escapeHTML(c)}" class="snap-start shrink-0 w-16 text-center py-1.5"><span class="mx-auto w-10 h-10 rounded-full surface grid place-items-center accent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M3 12h18"/></svg></span><span class="block text-[10px] mt-1 font-semibold">${escapeHTML(c)}</span></a>`).join("");
+      $("categoryTabs").innerHTML = [
         `<a href="#menu" data-category="all" class="shrink-0 px-3 py-2 rounded-xl text-sm font-semibold ${currentCategory === "all" ? "accent-bg" : "muted"}">All Menu</a>`,
         ...categories.map(category => `<a href="#${sectionId(category)}" data-category="${escapeHTML(category)}" class="shrink-0 px-3 py-2 rounded-xl text-sm font-semibold ${currentCategory === category ? "accent-bg" : "muted"}">${escapeHTML(category)}</a>`)
       ].join("");
@@ -412,6 +424,8 @@
       if (visibleName) visibleName.textContent = restaurantName;
       const visibleAddress = document.getElementById("rest-address-new");
       if (visibleAddress) visibleAddress.textContent = rest.address ? `• ${rest.address}` : "";
+      const subVisible = $("rest-subtitle-visible"); if (subVisible) { subVisible.textContent = rest.tagline || rest.subtitle_text || ""; subVisible.style.display = (rest.tagline || rest.subtitle_text) ? "block" : "none"; }
+      const welcomeVisible = $("rest-welcome-visible"); if (welcomeVisible) { welcomeVisible.textContent = rest.welcome_text || ""; welcomeVisible.style.display = rest.welcome_text ? "block" : "none"; }
 
       setOptionalText("rest-subtitle", rest.tagline || rest.subtitle_text);
 
@@ -430,6 +444,7 @@
       document.title = `${restaurantName} • Menu`;
 
       const logoUrl = safeUrl(rest.logo_url);
+      const visibleLogo = $("logoImage"); if (visibleLogo) { visibleLogo.src = logoUrl || "https://placehold.co/256x256/211e1b/f59e0b?text=LOGO"; visibleLogo.alt = `${restaurantName} logo`; }
       const brandMark = null;
       $("logo-container").innerHTML = logoUrl
         ? `<img src="${escapeHTML(logoUrl)}" alt="${escapeHTML(rest.name || "Restaurant")} logo" onerror="this.parentElement.innerHTML=logoFallback()" />`
@@ -452,6 +467,7 @@
           <text x="600" y="315" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" letter-spacing="6" fill="white" opacity=".78">FOOD • FLAVOUR • EXPERIENCE</text>
         </svg>`)} `;
       $("rest-cover").src = coverUrl || dummyBanner;
+      const visibleHero = $("heroImage"); if (visibleHero) { visibleHero.src = coverUrl || dummyBanner; visibleHero.alt = `${restaurantName} banner`; }
       $("rest-cover").style.display = "block";
 
       // Contact details: show only values actually available in Supabase.
@@ -488,6 +504,10 @@
         addressEl.style.display = "none";
         addressEl.textContent = "";
       }
+      const phoneClean = phoneRaw.replace(/[^+\d]/g, "");
+      const callVisible = $("callBtnVisible"); if (callVisible) { callVisible.href = phoneClean ? `tel:${phoneClean}` : "#"; callVisible.style.display = phoneClean ? "inline-flex" : "none"; }
+      const waVisible = $("whatsappBtnVisible"); if (waVisible) { waVisible.href = phoneClean ? `https://wa.me/${phoneClean.replace(/^\+/,"")}` : "#"; waVisible.style.display = phoneClean ? "inline-flex" : "none"; }
+      const dirVisible = $("directionsBtnVisible"); if (dirVisible) { dirVisible.href = rest.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(rest.address)}` : "#"; dirVisible.style.display = rest.address ? "inline-flex" : "none"; }
 
       const isOpen = rest.is_open !== false && rest.status !== "closed" && rest.is_active !== false;
       // The old top status element was removed; keep only the service-strip pill.
@@ -516,6 +536,8 @@
         hoursEl.textContent = opening && closing ? `${opening} – ${closing}` : "";
         hoursEl.style.display = opening && closing ? "inline-flex" : "none";
       }
+      const hoursVisible=$("rest-hours-visible"); if(hoursVisible){hoursVisible.textContent=opening&&closing?`• ${opening} – ${closing}`:""; hoursVisible.style.display=opening&&closing?"inline-flex":"none";}
+      const statusVisible=$("rest-status-visible"); if(statusVisible){statusVisible.textContent=isOpen?"● Open Now":"● Closed"; statusVisible.style.color=isOpen?"#16a34a":"#dc2626";}
       if($("svc-dine")) $("svc-dine").style.display=rest.dine_in===false?"none":"inline-flex";
       if($("svc-take")) $("svc-take").style.display=rest.takeaway===false?"none":"inline-flex";
       if($("svc-delivery")) $("svc-delivery").style.display=rest.home_delivery===false?"none":"inline-flex";
@@ -622,7 +644,7 @@
 
     function showMenuMaintenance(){
       $("categoryTabs").innerHTML = "";
-      $("menuSummary").style.display = "none";
+      if ($("menuSummary")) $("menuSummary").style.display = "none";
       $("menu").innerHTML = `
         <section class="fm-menu-maintenance" aria-live="polite">
           <div class="fm-maintenance-card">
@@ -666,7 +688,7 @@
 
       try {
         const params = new URLSearchParams(window.location.search);
-        const slug = (params.get("r") || "").trim().toLowerCase();
+        const slug = (params.get("r") || APP_CONFIG.restaurantSlug || "").trim().toLowerCase();
 
         let query = supabaseClient.from("restaurants").select("*");
         if (slug) query = query.eq("slug", slug);
@@ -677,7 +699,7 @@
         if (!restaurants || !restaurants.length) {
           $("rest-name").textContent = "Restaurant Not Found";
           $("categoryTabs").innerHTML = "";
-          $("menuSummary").style.display = "none";
+          if ($("menuSummary")) $("menuSummary").style.display = "none";
           showState("Restaurant not found", "Please check the menu link and try again.");
           return;
         }
@@ -771,7 +793,7 @@
 
         if (!allItems.length) {
           $("categoryTabs").innerHTML = "";
-          $("menuSummary").style.display = "none";
+          if ($("menuSummary")) $("menuSummary").style.display = "none";
           showState("Menu is being prepared", "No menu items have been added yet.");
           return;
         }
@@ -783,7 +805,7 @@
         const nameEl = $("rest-name");
         if (nameEl) nameEl.textContent = "Menu Unavailable";
         $("categoryTabs").innerHTML = "";
-        $("menuSummary").style.display = "none";
+        if ($("menuSummary")) $("menuSummary").style.display = "none";
         showState("Unable to load menu", "Please refresh the page or try again shortly.");
       }
     }
@@ -830,8 +852,25 @@
       localStorage.setItem("freemenu-theme", e.target.value);
     });
 
-    window.addEventListener("load", loadPublicMenu);
+    function initSettings(){
+      document.documentElement.dataset.theme = APP_CONFIG.theme;
+      const select=document.getElementById("themeSelect"); if(select) select.value=APP_CONFIG.theme;
+      const set=(id,v)=>{const e=$(id);if(e)e.value=v??""};
+      set("cfgSupabaseUrl",APP_CONFIG.supabaseUrl); set("cfgSupabaseKey",APP_CONFIG.supabaseAnonKey); set("cfgRestaurantSlug",APP_CONFIG.restaurantSlug); set("cfgTheme",APP_CONFIG.theme);
+      const live=$("cfgUseLiveData"); if(live) live.checked=APP_CONFIG.useLiveData!==false;
+      const panel=$("settingsPanel"), back=$("settingsBackdrop");
+      const open=()=>{panel.classList.add("open");back.classList.add("open");panel.setAttribute("aria-hidden","false");back.setAttribute("aria-hidden","false");};
+      const close=()=>{panel.classList.remove("open");back.classList.remove("open");panel.setAttribute("aria-hidden","true");back.setAttribute("aria-hidden","true");};
+      $("settingsOpen")?.addEventListener("click",open); $("settingsClose")?.addEventListener("click",close); back?.addEventListener("click",close);
+      $("settingsSave")?.addEventListener("click",()=>{
+        const cfg={supabaseUrl:$("cfgSupabaseUrl").value.trim(),supabaseAnonKey:$("cfgSupabaseKey").value.trim(),restaurantSlug:$("cfgRestaurantSlug").value.trim(),theme:$("cfgTheme").value,useLiveData:$("cfgUseLiveData").checked};
+        localStorage.setItem("freemenu-config",JSON.stringify(cfg)); localStorage.setItem("freemenu-theme",cfg.theme); $("settingsNote").textContent="Saved. Reloading…"; setTimeout(()=>location.reload(),250);
+      });
+      $("settingsReset")?.addEventListener("click",()=>{localStorage.removeItem("freemenu-config");$("settingsNote").textContent="Reset to built-in configuration. Reloading…";setTimeout(()=>location.reload(),250);});
+    }
 
+    window.addEventListener("load", ()=>{initSettings(); loadPublicMenu();});
+  </script>
 
   <div id="legacyCompat" hidden>
     <span id="rest-welcome"></span><span id="rest-subtitle"></span>
