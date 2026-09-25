@@ -190,6 +190,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .authCombinedForm .signupCard.active{display:block!important}
 .authCombinedForm .loginCard.active{display:block!important}
 .authCombinedForm #resetPasswordCard.active{display:block!important}
+.authCombinedForm #loginCard{display:block!important}.authCombinedForm #signupCard{display:none!important}.authCombinedForm #resetPasswordCard{display:none!important}.authCombinedForm #signupCard.active{display:block!important}.authCombinedForm #loginCard.active{display:block!important}.authCombinedForm #resetPasswordCard.active{display:block!important}
 @media(max-width:760px){.ownerAuthSplit{grid-template-columns:1fr!important}.freemenu-login-brand{display:block!important;min-height:250px}.freemenu-login-brand-inner{padding:28px}.freemenu-login-brand h1{font-size:36px}.authRightPanel{min-height:auto!important;padding:28px 22px!important}}
 </style>
 
@@ -248,7 +249,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
       </div>
       <div class="authCombinedForm">
 <!-- LOGIN FORM -->
-  <div class="ownerAuthCard authFormCard" id="loginCard" style="display:none">
+  <div class="ownerAuthCard authFormCard" id="loginCard" style="display:block">
     <button type="button" class="authBack" id="backLoginBtn">← Back</button>
     <div class="authBrand">🔐</div><div class="authKicker">FreeMenu Owner Portal</div>
     <h1>Owner Login</h1>
