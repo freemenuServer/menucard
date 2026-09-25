@@ -44,137 +44,171 @@
     .menu-loading .sk.wide{height:22px;width:62%;margin:auto}
     @keyframes fmShimmer{to{background-position:-200% 0}}
 
-<style id="freemenu-category-price-alignment">
-  .category-header-with-prices{
+
+
+
+<style id="freemenu-price-alignment">
+  /* Category heading and item prices share the EXACT same three columns. */
+  .category-header{
     display:grid!important;
-    grid-template-columns:minmax(0,1fr) 210px;
+    grid-template-columns:minmax(0,1fr) 300px;
     align-items:center;
-    gap:16px;
+    column-gap:24px;
+    min-height:108px;
   }
 
-  .category-header-title{
+  .category-header-main{
+    min-width:0;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    gap:12px;
+    gap:18px;
+  }
+
+  .category-header-copy{
     min-width:0;
   }
 
-  .category-price-ruler,
-  .menu-price-ruler{
-    width:210px;
-    min-width:210px;
+  .category-icon-box{
+    width:50px;
+    height:50px;
+    flex:0 0 50px;
+    border-radius:16px;
     display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:8px;
+    place-items:center;
+    color:var(--accent);
+    background:var(--surface2);
+    border:1px solid var(--border);
+  }
+
+  .category-price-columns,
+  .item-price-columns{
+    width:300px;
+    min-width:300px;
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    column-gap:12px;
     align-items:center;
   }
 
-  .category-price-ruler span{
+  .category-price-columns span{
     text-align:center;
-    font-size:10px;
-    line-height:1.1;
-    font-weight:800;
-    text-transform:uppercase;
-    letter-spacing:.06em;
     color:var(--muted);
+    font-size:11px;
+    line-height:1;
+    font-weight:900;
+    letter-spacing:.08em;
     white-space:nowrap;
   }
 
-  .menu-price-ruler{
+  .item-price-columns{
     align-self:center;
+    flex:0 0 300px;
   }
 
-  .menu-price-ruler .price-value{
+  .item-price-columns span{
+    display:block;
+    min-height:20px;
     text-align:center;
-    font-size:14px;
-    line-height:1.2;
+    color:var(--text);
+    font-size:15px;
+    line-height:20px;
     font-weight:900;
-    color:var(--primary);
     font-variant-numeric:tabular-nums;
     white-space:nowrap;
-    min-height:17px;
   }
 
-  @media(max-width:767px){
-    .category-tabs-mobile-hide{display:none!important}
-
-    .category-header-with-prices{
-      grid-template-columns:minmax(0,1fr) 174px;
-      gap:10px;
-      padding:13px 12px!important;
-    }
-
-    .category-price-ruler,
-    .menu-price-ruler{
-      width:174px;
-      min-width:174px;
-      grid-template-columns:repeat(3, 1fr);
-      gap:4px;
-    }
-
-    .category-price-ruler span{
-      font-size:8px;
-      letter-spacing:.03em;
-    }
-
-    .menu-price-ruler .price-value{
-      font-size:12px;
-    }
-
-    .category-header-title .category-icon{
-      display:none;
-    }
+  .menu-item-row{
+    align-items:center!important;
   }
 
-  @media(max-width:430px){
-    .category-header-with-prices{
-      grid-template-columns:minmax(0,1fr) 150px;
-    }
-
-    .category-price-ruler,
-    .menu-price-ruler{
-      width:150px;
-      min-width:150px;
-      gap:3px;
-    }
-
-    .category-price-ruler span{
-      font-size:7.5px;
-    }
-
-    .menu-price-ruler .price-value{
-      font-size:11px;
-    }
-  }
-</style>
-
-</style>
-
-<style id="freemenu-menu-row-alignment">
   .menu-item-row > .min-w-0{
     min-width:0;
     flex:1 1 auto;
   }
-  .menu-item-row .menu-price-ruler{
-    flex:0 0 210px;
+
+  @media(max-width:1100px) and (min-width:768px){
+    .category-header{
+      grid-template-columns:minmax(0,1fr) 255px;
+      column-gap:16px;
+    }
+
+    .category-price-columns,
+    .item-price-columns{
+      width:255px;
+      min-width:255px;
+    }
+
+    .item-price-columns{
+      flex-basis:255px;
+    }
   }
+
   @media(max-width:767px){
+    .category-header{
+      grid-template-columns:minmax(0,1fr) 180px;
+      column-gap:10px;
+      padding:13px 12px!important;
+      min-height:82px;
+    }
+
+    .category-header-main{
+      gap:8px;
+    }
+
+    .category-icon-box{
+      display:none;
+    }
+
+    .category-price-columns,
+    .item-price-columns{
+      width:180px;
+      min-width:180px;
+      column-gap:3px;
+    }
+
+    .item-price-columns{
+      flex-basis:180px;
+    }
+
+    .category-price-columns span{
+      font-size:8px;
+      letter-spacing:.03em;
+    }
+
+    .item-price-columns span{
+      font-size:12px;
+      line-height:18px;
+      min-height:18px;
+    }
+
     .menu-item-row{
-      gap:10px!important;
+      gap:8px!important;
       padding:13px 12px!important;
     }
-    .menu-item-row .menu-price-ruler{
-      flex-basis:174px;
-      width:174px;
-      min-width:174px;
-    }
   }
+
   @media(max-width:430px){
-    .menu-item-row .menu-price-ruler{
-      flex-basis:150px;
-      width:150px;
-      min-width:150px;
+    .category-header{
+      grid-template-columns:minmax(0,1fr) 156px;
+    }
+
+    .category-price-columns,
+    .item-price-columns{
+      width:156px;
+      min-width:156px;
+    }
+
+    .item-price-columns{
+      flex-basis:156px;
+    }
+
+    .category-price-columns span{
+      font-size:7px;
+    }
+
+    .item-price-columns span{
+      font-size:11px;
     }
   }
 </style>
@@ -438,16 +472,23 @@
     }
 
     function renderPrice(item) {
-      const clean = v => (v !== null && v !== undefined && String(v).trim() !== "") ? String(v).trim() : "";
+      const clean = v =>
+        (v !== null && v !== undefined && String(v).trim() !== "")
+          ? String(v).trim()
+          : "";
+
       const q = clean(item.price_quarter);
       const h = clean(item.price_half);
       const f = clean(item.price_full) || clean(item.price);
+
       if (!q && !h && !f) return "";
-      return `<div class="menu-price-ruler" aria-label="Prices">
-        <span class="price-value">${q ? "₹" + escapeHTML(q) : ""}</span>
-        <span class="price-value">${h ? "₹" + escapeHTML(h) : ""}</span>
-        <span class="price-value">${f ? "₹" + escapeHTML(f) : ""}</span>
-      </div>`;
+
+      return `
+        <div class="item-price-columns" aria-label="Item prices">
+          <span>${q ? "₹" + escapeHTML(q) : ""}</span>
+          <span>${h ? "₹" + escapeHTML(h) : ""}</span>
+          <span>${f ? "₹" + escapeHTML(f) : ""}</span>
+        </div>`;
     }
 
     function renderTags(item) {
@@ -550,61 +591,78 @@
     function renderMenu() {
       const filtered = getFilteredItems();
       const grouped = {};
+
       filtered.forEach(item => {
         const category = categoryKey(item.category);
         if (!grouped[category]) grouped[category] = [];
         grouped[category].push(item);
       });
 
-      const orderedCategories = getSavedCategoryOrder(restaurant, Object.values(grouped).flat());
+      const orderedCategories = getSavedCategoryOrder(
+        restaurant,
+        Object.values(grouped).flat()
+      );
+
       orderedCategories.forEach(category => {
         if (grouped[category]) {
           grouped[category].sort((a,b) => {
             const ao = Number(a.sort_order ?? a.position ?? 999999);
             const bo = Number(b.sort_order ?? b.position ?? 999999);
-            return ao - bo || String(a.name||"").localeCompare(String(b.name||""));
+            return ao - bo || String(a.name || "").localeCompare(String(b.name || ""));
           });
         }
       });
 
       const menuEl = $("menu");
+
       if (!filtered.length) {
         menuEl.innerHTML = `<div class="surface rounded-2xl p-8 text-center muted">Nothing found. Try another search or category.</div>`;
         return;
       }
 
-      menuEl.innerHTML = orderedCategories.filter(c => grouped[c]).map(category => {
-        const items = grouped[category];
-        const hasQ = items.some(x => String(x.price_quarter ?? "").trim() !== "");
-        const hasH = items.some(x => String(x.price_half ?? "").trim() !== "");
-        const hasF = items.some(x => String(x.price_full ?? x.price ?? "").trim() !== "");
+      menuEl.innerHTML = orderedCategories
+        .filter(category => grouped[category])
+        .map(category => {
+          const items = grouped[category];
 
-        return `
-        <section id="${sectionId(category)}" data-category="${escapeHTML(category)}" class="category-section mb-9">
-          <div class="surface shadow-theme rounded-2xl p-4 sm:p-5 mb-3 category-header-with-prices">
-            <div class="category-header-title min-w-0">
-              <div>
-                <p class="text-[10px] uppercase tracking-[0.18em] accent font-bold">Menu Collection</p>
-                <h2 class="text-xl md:text-2xl font-black mt-0.5">${escapeHTML(category)}</h2>
-                <p class="muted text-sm mt-0.5">${items.length} item${items.length === 1 ? "" : "s"}</p>
+          return `
+          <section id="${sectionId(category)}"
+                   data-category="${escapeHTML(category)}"
+                   class="category-section mb-9">
+
+            <div class="surface shadow-theme rounded-2xl p-4 sm:p-5 mb-3 category-header">
+
+              <div class="category-header-main">
+                <div class="category-header-copy">
+                  <p class="text-[10px] uppercase tracking-[0.18em] accent font-bold">Menu Collection</p>
+                  <h2 class="text-xl md:text-2xl font-black mt-0.5">${escapeHTML(category)}</h2>
+                  <p class="muted text-sm mt-0.5">
+                    ${items.length} item${items.length === 1 ? "" : "s"}
+                  </p>
+                </div>
+
+                <div class="category-icon-box" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="24" height="24"
+                       fill="none" stroke="currentColor" stroke-width="1.6">
+                    ${categoryIcon(category)}
+                  </svg>
+                </div>
               </div>
-              <div class="w-11 h-11 rounded-2xl category-icon grid place-items-center accent shrink-0" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6">${categoryIcon(category)}</svg>
+
+              <!-- ONE fixed price ruler for the whole category -->
+              <div class="category-price-columns" aria-label="Price types">
+                <span>QTR</span>
+                <span>HALF</span>
+                <span>FULL</span>
               </div>
+
             </div>
 
-            <div class="category-price-ruler" aria-label="Price types">
-              <span>${hasQ ? "Quarter" : ""}</span>
-              <span>${hasH ? "Half" : ""}</span>
-              <span>${hasF ? "Full" : ""}</span>
+            <div class="surface rounded-2xl overflow-hidden shadow-theme item-card">
+              ${items.map(renderItem).join("")}
             </div>
-          </div>
-
-          <div class="surface rounded-2xl overflow-hidden shadow-theme item-card">
-            ${items.map(renderItem).join("")}
-          </div>
-        </section>`;
-      }).join("");
+          </section>`;
+        }).join("");
     }
 
     function renderRestaurant(rest) {
