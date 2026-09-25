@@ -752,8 +752,25 @@
       });
     }
 
+
+    function updateNonVegFilter() {
+      const btn = document.querySelector('.filter-btn[data-filter="nonveg"]');
+      if (!btn) return;
+
+      const hasNonVeg = Array.isArray(allItems) && allItems.some(item => {
+        const type = String(getItemType(item) || "").toLowerCase();
+        return type === "nonveg";
+      });
+
+      btn.hidden = !hasNonVeg;
+      btn.style.display = hasNonVeg ? "" : "none";
+
+      if (!hasNonVeg && activeDietFilter === "nonveg") {
+        activeDietFilter = "all";
+      }
+    }
+
     function renderMenu() {
-      refreshDietFilterVisibility();
       const filtered = getFilteredItems();
       const grouped = {};
 
@@ -1234,6 +1251,7 @@
 
         renderCategoryChips();
         renderMenu();
+        updateNonVegFilter();
         setupCategoryObserver();
       } catch (error) {
         console.error("Menu load error:", error);
@@ -1307,37 +1325,6 @@
     document.addEventListener("click", (event) => {
       const filter = event.target.closest(".filter-btn");
       if (!filter) return;
-    function hasNonVegItems() {
-      if (!Array.isArray(allItems)) return false;
-      return allItems.some(item => {
-        const raw = String(
-          item.type ?? item.food_type ?? item.item_type ?? item.category_type ?? item.veg_nonveg ?? item.dietary_type ?? ""
-        ).trim().toLowerCase();
-
-        // Existing old-menu getItemType() is the final authority where available.
-        let detected = "";
-        try { detected = String(getItemType(item) || "").trim().toLowerCase(); } catch (_) {}
-
-        return detected === "nonveg" ||
-          ["non-veg","non veg","nonveg","non_veg","nv","n","chicken","mutton","fish","egg","non vegetarian"].includes(raw);
-      });
-    }
-
-    function refreshDietFilterVisibility() {
-      const nonVegButton = document.querySelector('.filter-btn[data-filter="nonveg"]');
-      if (!nonVegButton) return;
-
-      const show = hasNonVegItems();
-      nonVegButton.hidden = !show;
-      nonVegButton.style.display = show ? "" : "none";
-      nonVegButton.setAttribute("aria-hidden", show ? "false" : "true");
-
-      if (!show && activeDietFilter === "nonveg") {
-        activeDietFilter = "all";
-        document.querySelectorAll(".filter-btn").forEach(btn => {
-          btn.classList.toggle("accent-bg", btn.dataset.filter === "all");
-        });
-      }
     }
 
     document.querySelectorAll(".filter-btn").forEach(btn => {
