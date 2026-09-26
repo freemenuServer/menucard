@@ -1124,6 +1124,55 @@ html,body{width:100%;min-width:0}
   .bulk-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
 
+
+/* ===== LAST OVERRIDE: COMPACT, DETERMINISTIC ADMIN GRID ===== */
+html,body{width:100%!important;min-width:0!important;overflow-x:hidden!important}
+.app{width:100%!important;min-width:0!important}
+.sidebar{width:238px!important;min-width:238px!important}
+.main{margin-left:238px!important;width:calc(100% - 238px)!important;min-width:0!important;box-sizing:border-box!important}
+.content{width:100%!important;max-width:none!important;min-width:0!important;box-sizing:border-box!important;padding:24px 30px!important;overflow-x:hidden!important}
+.page{width:100%!important;max-width:none!important;min-width:0!important;box-sizing:border-box!important}
+
+/* Dashboard: always fill rows left-to-right on desktop/tablet. */
+#dashboard .stats,
+#dashboard .grid3,
+#dashboard .bottom3{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important;width:100%!important;margin-left:0!important;margin-right:0!important}
+#dashboard .stats>.stat,
+#dashboard .grid3>.card,
+#dashboard .bottom3>.card{width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;box-sizing:border-box!important;flex:none!important}
+#dashboard .lower{display:grid!important;grid-template-columns:minmax(0,2.3fr) minmax(280px,1fr)!important;gap:14px!important;width:100%!important;margin-left:0!important;margin-right:0!important}
+#dashboard .lower>.card{width:100%!important;min-width:0!important;box-sizing:border-box!important;margin:0!important}
+#dashboard .charts{width:100%!important;min-width:0!important;height:180px!important}
+#dashboard .charts canvas{display:block!important;width:100%!important;height:180px!important}
+
+/* All normal admin page grids. */
+.grid3,.bottom3{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
+.formgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}
+#subscriptions .formgrid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
+.bulk-import-grid{display:grid!important;grid-template-columns:minmax(280px,1fr) minmax(0,1.8fr)!important;gap:16px!important}
+.bulk-summary{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px!important}
+
+/* Prevent cards/tables from creating phantom tracks. */
+.card,.stat,.bulk-import-card,.tablewrap,.toolbar,.subpage-head{min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+.tablewrap{width:100%!important;overflow-x:auto!important}
+
+@media (max-width:900px) and (min-width:601px){
+  /* Keep 3 compact columns instead of the old staggered 2-column flex rules. */
+  #dashboard .stats,#dashboard .grid3,#dashboard .bottom3{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .grid3,.bottom3{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .content{padding:20px!important}
+}
+@media (max-width:600px){
+  .sidebar{transform:translateX(-100%)!important}
+  .sidebar.open{transform:translateX(0)!important}
+  .main{margin-left:0!important;width:100%!important}
+  .content{padding:16px 12px!important}
+  #dashboard .stats,#dashboard .grid3,#dashboard .bottom3,
+  .grid3,.bottom3,.lower,.formgrid,#subscriptions .formgrid{grid-template-columns:1fr!important}
+  .bulk-import-grid{grid-template-columns:1fr!important}
+  .bulk-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+
 </style></head><body>
 <div class="toolbar">
   <span style="font-size:12px;font-weight:900;margin-right:4px">QR Design:</span>
