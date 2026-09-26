@@ -123,6 +123,44 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
   #dashboard .stats,#dashboard .grid3,#dashboard .lower,#dashboard .bottom3{grid-template-columns:1fr!important}
   #subscriptions .formgrid{grid-template-columns:1fr!important}
 }
+
+/* ===== GLOBAL RESPONSIVE LAYOUT FIX =====
+   Keep the desktop admin workspace dense and aligned even when browser zoom
+   reduces the CSS viewport. Collapse only when the actual workspace is narrow. */
+@media (min-width:701px){
+  .main{margin-left:238px!important;width:calc(100% - 238px)!important;min-width:0!important}
+  .content{width:100%!important;max-width:none!important;min-width:0!important;padding:24px 30px!important}
+
+  .stats{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
+  .grid3{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
+  .bottom3{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
+  .lower{display:grid!important;grid-template-columns:minmax(0,2fr) minmax(240px,1fr)!important;gap:14px!important}
+
+  .formgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}
+  #subscriptions .formgrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+
+  .bulk-import-grid{grid-template-columns:minmax(260px,1fr) minmax(0,1.8fr)!important}
+  .bulk-summary{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+
+  /* Common inline grid blocks used inside admin cards */
+  #plans .card [style*="display:grid"],
+  #mediaRules .card [style*="display:grid"]{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+}
+
+@media (max-width:700px){
+  .main{margin-left:0!important;width:100%!important}
+  .content{padding:16px 12px!important}
+  .stats,.grid3,.bottom3,.lower{grid-template-columns:1fr!important}
+  .formgrid,#subscriptions .formgrid{grid-template-columns:1fr!important}
+  .bulk-import-grid{grid-template-columns:1fr!important}
+  .bulk-summary{grid-template-columns:1fr 1fr!important}
+}
+
+/* Prevent tables/cards from creating phantom horizontal tracks */
+.page,.card,.stat,.tablewrap,.subpage-head,.toolbar{min-width:0!important;max-width:100%!important}
+.tablewrap{width:100%!important;overflow-x:auto!important}
 </style>
 </head>
 <body>
