@@ -162,7 +162,68 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
 .page,.card,.stat,.tablewrap,.subpage-head,.toolbar{min-width:0!important;max-width:100%!important}
 .tablewrap{width:100%!important;overflow-x:auto!important}
 </style>
-</head>
+<style>
+/* ===== CLEAN COMPACT SPACING - FINAL ===== */
+html,body{margin:0!important;padding:0!important;width:100%!important;overflow-x:hidden!important}
+.app{display:block!important;width:100%!important;min-height:100vh!important}
+.sidebar{position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:238px!important;min-width:238px!important}
+.main{margin-left:238px!important;width:calc(100% - 238px)!important;min-width:0!important;box-sizing:border-box!important}
+.topbar{height:62px!important;padding:0 20px!important}
+.content{padding:16px 20px!important;width:100%!important;max-width:none!important;box-sizing:border-box!important}
+.page{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
+.welcome{margin:0 0 10px!important}
+.welcome h1{margin:0 0 2px!important}
+.welcome p{margin:0!important}
+/* Dashboard stats: compact 3 x 2, explicit placement */
+#dashboard .stats{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(2,auto)!important;grid-auto-flow:row!important;gap:10px!important;margin:0!important;padding:0!important;width:100%!important}
+#dashboard .stats>.stat{grid-column:auto!important;grid-row:auto!important;width:100%!important;min-width:0!important;max-width:none!important;min-height:92px!important;height:auto!important;margin:0!important;padding:12px!important;box-sizing:border-box!important}
+#dashboard .stats>.stat:nth-child(1){grid-column:1!important;grid-row:1!important}
+#dashboard .stats>.stat:nth-child(2){grid-column:2!important;grid-row:1!important}
+#dashboard .stats>.stat:nth-child(3){grid-column:3!important;grid-row:1!important}
+#dashboard .stats>.stat:nth-child(4){grid-column:1!important;grid-row:2!important}
+#dashboard .stats>.stat:nth-child(5){grid-column:2!important;grid-row:2!important}
+#dashboard .stats>.stat:nth-child(6){grid-column:3!important;grid-row:2!important}
+.stat-top{gap:9px!important}
+.ico{width:40px!important;height:40px!important}
+.stat h2{font-size:20px!important}
+.stat p{font-size:11px!important}
+.trend{margin-top:6px!important}
+/* Dashboard sections */
+#dashboard .grid3,#dashboard .bottom3{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important;width:100%!important;margin:10px 0 0!important;padding:0!important}
+#dashboard .grid3>.card,#dashboard .bottom3>.card{width:100%!important;min-width:0!important;margin:0!important;padding:12px!important;box-sizing:border-box!important}
+#dashboard .lower{display:grid!important;grid-template-columns:minmax(0,2fr) minmax(260px,1fr)!important;gap:10px!important;width:100%!important;margin:10px 0 0!important;padding:0!important}
+#dashboard .lower>.card{width:100%!important;min-width:0!important;margin:0!important;padding:12px!important;box-sizing:border-box!important}
+.card-head{margin-bottom:8px!important}
+.charts{height:160px!important}
+#dashboard .charts canvas{height:160px!important}
+/* All normal admin pages: remove artificial gaps */
+.subpage-head{margin:0 0 10px!important}
+.card{padding:12px!important}
+.grid3,.bottom3{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}
+.formgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+#subscriptions .formgrid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}
+.tablewrap{width:100%!important;overflow-x:auto!important}
+.table th,.table td{padding:8px!important}
+/* Bulk importer */
+.bulk-import-grid{gap:10px!important}
+.bulk-summary{gap:8px!important}
+/* Only genuinely narrow screens collapse */
+@media(max-width:900px){
+ .main{margin-left:238px!important;width:calc(100% - 238px)!important}
+ #dashboard .stats,#dashboard .grid3,#dashboard .bottom3{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #dashboard .stats>.stat:nth-child(n),#dashboard .grid3>.card,#dashboard .bottom3>.card{grid-column:auto!important;grid-row:auto!important}
+ #dashboard .lower{grid-template-columns:1fr!important}
+ .grid3,.bottom3{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #subscriptions .formgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:600px){
+ .sidebar{transform:translateX(-100%)!important}
+ .sidebar.open{transform:translateX(0)!important}
+ .main{margin-left:0!important;width:100%!important}
+ .content{padding:12px!important}
+ #dashboard .stats,#dashboard .grid3,#dashboard .bottom3,.grid3,.bottom3,.formgrid,#subscriptions .formgrid{grid-template-columns:1fr!important}
+}
+</style></head>
 <body>
 
 <div id="loginScreen" style="position:fixed;inset:0;background:#f6f8fb;z-index:100;display:grid;place-items:center;padding:20px">
@@ -1173,6 +1234,67 @@ html,body{width:100%!important;min-width:0!important;overflow-x:hidden!important
   .bulk-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
 
+</style><style>
+/* ===== CLEAN COMPACT SPACING - FINAL ===== */
+html,body{margin:0!important;padding:0!important;width:100%!important;overflow-x:hidden!important}
+.app{display:block!important;width:100%!important;min-height:100vh!important}
+.sidebar{position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:238px!important;min-width:238px!important}
+.main{margin-left:238px!important;width:calc(100% - 238px)!important;min-width:0!important;box-sizing:border-box!important}
+.topbar{height:62px!important;padding:0 20px!important}
+.content{padding:16px 20px!important;width:100%!important;max-width:none!important;box-sizing:border-box!important}
+.page{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
+.welcome{margin:0 0 10px!important}
+.welcome h1{margin:0 0 2px!important}
+.welcome p{margin:0!important}
+/* Dashboard stats: compact 3 x 2, explicit placement */
+#dashboard .stats{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(2,auto)!important;grid-auto-flow:row!important;gap:10px!important;margin:0!important;padding:0!important;width:100%!important}
+#dashboard .stats>.stat{grid-column:auto!important;grid-row:auto!important;width:100%!important;min-width:0!important;max-width:none!important;min-height:92px!important;height:auto!important;margin:0!important;padding:12px!important;box-sizing:border-box!important}
+#dashboard .stats>.stat:nth-child(1){grid-column:1!important;grid-row:1!important}
+#dashboard .stats>.stat:nth-child(2){grid-column:2!important;grid-row:1!important}
+#dashboard .stats>.stat:nth-child(3){grid-column:3!important;grid-row:1!important}
+#dashboard .stats>.stat:nth-child(4){grid-column:1!important;grid-row:2!important}
+#dashboard .stats>.stat:nth-child(5){grid-column:2!important;grid-row:2!important}
+#dashboard .stats>.stat:nth-child(6){grid-column:3!important;grid-row:2!important}
+.stat-top{gap:9px!important}
+.ico{width:40px!important;height:40px!important}
+.stat h2{font-size:20px!important}
+.stat p{font-size:11px!important}
+.trend{margin-top:6px!important}
+/* Dashboard sections */
+#dashboard .grid3,#dashboard .bottom3{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important;width:100%!important;margin:10px 0 0!important;padding:0!important}
+#dashboard .grid3>.card,#dashboard .bottom3>.card{width:100%!important;min-width:0!important;margin:0!important;padding:12px!important;box-sizing:border-box!important}
+#dashboard .lower{display:grid!important;grid-template-columns:minmax(0,2fr) minmax(260px,1fr)!important;gap:10px!important;width:100%!important;margin:10px 0 0!important;padding:0!important}
+#dashboard .lower>.card{width:100%!important;min-width:0!important;margin:0!important;padding:12px!important;box-sizing:border-box!important}
+.card-head{margin-bottom:8px!important}
+.charts{height:160px!important}
+#dashboard .charts canvas{height:160px!important}
+/* All normal admin pages: remove artificial gaps */
+.subpage-head{margin:0 0 10px!important}
+.card{padding:12px!important}
+.grid3,.bottom3{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}
+.formgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+#subscriptions .formgrid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}
+.tablewrap{width:100%!important;overflow-x:auto!important}
+.table th,.table td{padding:8px!important}
+/* Bulk importer */
+.bulk-import-grid{gap:10px!important}
+.bulk-summary{gap:8px!important}
+/* Only genuinely narrow screens collapse */
+@media(max-width:900px){
+ .main{margin-left:238px!important;width:calc(100% - 238px)!important}
+ #dashboard .stats,#dashboard .grid3,#dashboard .bottom3{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #dashboard .stats>.stat:nth-child(n),#dashboard .grid3>.card,#dashboard .bottom3>.card{grid-column:auto!important;grid-row:auto!important}
+ #dashboard .lower{grid-template-columns:1fr!important}
+ .grid3,.bottom3{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #subscriptions .formgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:600px){
+ .sidebar{transform:translateX(-100%)!important}
+ .sidebar.open{transform:translateX(0)!important}
+ .main{margin-left:0!important;width:100%!important}
+ .content{padding:12px!important}
+ #dashboard .stats,#dashboard .grid3,#dashboard .bottom3,.grid3,.bottom3,.formgrid,#subscriptions .formgrid{grid-template-columns:1fr!important}
+}
 </style></head><body>
 <div class="toolbar">
   <span style="font-size:12px;font-weight:900;margin-right:4px">QR Design:</span>
