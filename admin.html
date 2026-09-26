@@ -1045,6 +1045,85 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;margin:0;background:#f3f5f7;co
 .poster.design-4{background:#fff4e8;color:#5a2b18;border-color:#e4a26b}.design-4 .orange{background:#ef7c28}.design-4 .green{background:#6b8d3a}.design-4 .red{background:#9c3f26}.design-4 .note{color:#9a5d3d}.design-4 .smallTitle{font-family:Georgia,serif}.design-4 .bigTitle{font-family:Georgia,serif;color:#bd4e1f}.design-4 .lines .g{background:#6b8d3a}.design-4 .lines .o{background:#ef7c28}.design-4 .lines .r{background:#9c3f26}.design-4 .qrBox{border:2px solid #bd4e1f;border-radius:18px;box-shadow:0 12px 30px rgba(120,55,25,.14)}.design-4 .scan{color:#7a4a33}.design-4 .brandName{color:#7b321c}.design-4 .brandName span{color:#ef7c28}.design-4 .tag,.design-4 .footer2{color:#95664d}.design-4 .brandLines .g{background:#6b8d3a}.design-4 .brandLines .o{background:#ef7c28}.design-4 .brandLines .r{background:#9c3f26}
 @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.grid{grid-template-columns:1fr}.poster{max-width:360px}}
 @media print{@page{size:A4;margin:8mm}body{background:#fff}.toolbar{display:none!important}.page{padding:0}.grid{grid-template-columns:repeat(3,1fr);gap:7mm}.poster{max-width:none;box-shadow:none;break-inside:avoid;min-height:92mm;padding:10mm 4mm 7mm;border-radius:6mm}.qrBox{width:44mm;padding:2.5mm}.qrbox{width:39mm;height:39mm}.qrbox svg,.qrbox canvas{width:39mm!important;height:39mm!important}.restaurant{font-size:10pt}.code{font-size:7pt}.smallTitle{font-size:16pt}.bigTitle{font-size:32pt}.brandName{font-size:19pt}}
+
+
+/* ===== FINAL LAYOUT STABILITY OVERRIDE =====
+   Keep the admin shell usable even when browser zoom changes the CSS viewport.
+   The sidebar remains available on desktop/tablet widths; cards always flow
+   left-to-right without phantom/centered grid tracks. */
+html,body{width:100%;min-width:0}
+.app{width:100%;min-width:0}
+.sidebar{width:238px!important;min-width:238px!important}
+.main{margin-left:238px!important;width:calc(100% - 238px)!important;min-width:0!important}
+.content{box-sizing:border-box!important;width:100%!important;min-width:0!important;max-width:none!important;overflow-x:hidden!important}
+
+/* Dashboard/stat cards: deterministic 3-column desktop flow */
+#dashboard .stats{
+  display:flex!important;flex-wrap:wrap!important;align-items:stretch!important;
+  justify-content:flex-start!important;gap:14px!important;width:100%!important;
+}
+#dashboard .stats>.stat{
+  flex:0 0 calc((100% - 28px)/3)!important;
+  width:calc((100% - 28px)/3)!important;
+  max-width:calc((100% - 28px)/3)!important;
+  margin:0!important;
+}
+
+/* Dashboard content cards */
+#dashboard .grid3,
+#dashboard .bottom3{
+  display:flex!important;flex-wrap:wrap!important;align-items:stretch!important;
+  justify-content:flex-start!important;gap:14px!important;width:100%!important;
+}
+#dashboard .grid3>.card,
+#dashboard .bottom3>.card{
+  flex:0 0 calc((100% - 28px)/3)!important;
+  width:calc((100% - 28px)/3)!important;
+  max-width:calc((100% - 28px)/3)!important;
+  margin:0!important;
+}
+#dashboard .lower{
+  display:grid!important;
+  grid-template-columns:minmax(0,2.3fr) minmax(280px,1fr)!important;
+  gap:14px!important;width:100%!important;
+}
+#dashboard .lower>.card{min-width:0!important;width:100%!important;margin:0!important}
+
+/* Keep charts fluid */
+#dashboard .charts{width:100%!important;min-width:0!important;height:180px!important}
+#dashboard .charts canvas{width:100%!important;max-width:100%!important;height:180px!important}
+
+/* Generic page grids */
+.formgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important;width:100%!important}
+#subscriptions .formgrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.bulk-import-grid{display:grid!important;grid-template-columns:minmax(280px,1fr) minmax(0,1.8fr)!important;gap:16px!important;width:100%!important}
+.bulk-summary{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px!important;width:100%!important}
+
+/* Prevent individual cards/tables from forcing the page wider */
+.page,.card,.stat,.tablewrap,.subpage-head,.toolbar,.bulk-import-card{min-width:0!important;max-width:100%!important}
+.tablewrap{width:100%!important;overflow-x:auto!important}
+
+/* Use a compact desktop layout until the actual CSS viewport is genuinely small. */
+@media(max-width:900px){
+  .sidebar{transform:none!important;position:fixed!important;left:0!important;top:0!important;bottom:0!important}
+  .main{margin-left:238px!important;width:calc(100% - 238px)!important}
+  #dashboard .stats>.stat{flex-basis:calc((100% - 14px)/2)!important;width:calc((100% - 14px)/2)!important;max-width:calc((100% - 14px)/2)!important}
+  #dashboard .grid3>.card,#dashboard .bottom3>.card{flex-basis:calc((100% - 14px)/2)!important;width:calc((100% - 14px)/2)!important;max-width:calc((100% - 14px)/2)!important}
+  #dashboard .lower{grid-template-columns:1fr!important}
+  #subscriptions .formgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:600px){
+  .sidebar{transform:translateX(-100%)!important}
+  .sidebar.open{transform:translateX(0)!important}
+  .main{margin-left:0!important;width:100%!important}
+  .content{padding:16px 12px!important}
+  #dashboard .stats>.stat,#dashboard .grid3>.card,#dashboard .bottom3>.card{flex-basis:100%!important;width:100%!important;max-width:100%!important}
+  #dashboard .lower{grid-template-columns:1fr!important}
+  .formgrid,#subscriptions .formgrid{grid-template-columns:1fr!important}
+  .bulk-import-grid{grid-template-columns:1fr!important}
+  .bulk-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+
 </style></head><body>
 <div class="toolbar">
   <span style="font-size:12px;font-weight:900;margin-right:4px">QR Design:</span>
