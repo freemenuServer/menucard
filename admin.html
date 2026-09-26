@@ -5,11 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FreeMenu.in — Super Admin</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.3/papaparse.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.3/papaparse.min.js"></script>
 <style>
-
 :root{--nav:#0d1929;--nav2:#132238;--red:#ef3340;--red2:#ff5662;--ink:#101828;--muted:#667085;--line:#e7eaf0;--bg:#f6f8fb;--white:#fff;--green:#12b76a;--orange:#f79009;--blue:#1570ef;--purple:#7f56d9}
 *{box-sizing:border-box}body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--ink)}
 button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:flex;min-height:100vh}.sidebar{width:238px;background:linear-gradient(180deg,#0b1727,#122238);color:#d8e0ea;position:fixed;inset:0 auto 0 0;z-index:20;overflow:auto}.brand{height:74px;background:#fff;color:#111;display:flex;align-items:center;padding:10px 18px;gap:9px}.brand-mark{font-size:32px;color:var(--red)}.brand strong{font-size:24px;letter-spacing:-1px}.brand span{color:var(--red)}.tag{display:block;font-size:9px;color:#64748b;margin-top:-4px}.nav{padding:10px}.nav-title{font-size:12px;color:#91a0b5;padding:14px 11px 7px}.nav button{width:100%;border:0;background:transparent;color:#dbe4ef;text-align:left;padding:10px 11px;border-radius:8px;display:flex;align-items:center;gap:12px;font-size:14px;margin:2px 0}.nav button:hover{background:#1c3048}.nav button.active{background:linear-gradient(90deg,#ed2637,#f13d4c);color:#fff;box-shadow:0 4px 10px #0002}.nav svg{width:18px;height:18px}.badge{margin-left:auto;background:#f04444;color:#fff;border-radius:20px;padding:2px 7px;font-size:10px}.promo{margin:20px 16px;background:linear-gradient(145deg,#5d2631,#231a28);border:1px solid #d23b50;border-radius:10px;padding:18px;color:#fff;min-height:130px}.promo .crown{font-size:32px}.main{margin-left:238px;width:calc(100% - 238px)}.topbar{height:62px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 25px;gap:20px;position:sticky;top:0;z-index:15}.hamb{border:0;background:none}.search{height:38px;background:#f3f6fa;border:1px solid #e2e7ef;border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 12px;flex:1;max-width:555px;color:#98a2b3}.search input{border:0;outline:0;background:transparent;width:100%;color:#344054}.admin{margin-left:auto;display:flex;align-items:center;gap:10px}.avatar{width:38px;height:38px;border-radius:50%;background:#e9eef5;display:grid;place-items:center;font-weight:800}.admin small{display:block;color:#667085}.bell{position:relative}.bell b{position:absolute;top:-4px;right:-4px;background:#ef3340;color:#fff;border-radius:50%;font-size:9px;padding:3px 5px}.content{padding:24px 27px}.page{display:none}.page.active{display:block}.welcome{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:15px}.welcome h1{font-size:29px;margin:0 0 3px;letter-spacing:-.8px}.welcome p{margin:0;color:#667085;font-size:17px}.date{text-align:right;color:#344054}.date strong{display:block;font-size:14px}.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}.stat{background:#fff;border:1px solid #edf0f4;border-radius:9px;padding:14px;min-height:104px;box-shadow:0 2px 8px #10182805}.stat-top{display:flex;gap:10px;align-items:center}.ico{width:43px;height:43px;border-radius:50%;display:grid;place-items:center}.ico.red{background:#ffe4e6;color:#e11d48}.ico.green{background:#dcfce7;color:#16a34a}.ico.orange{background:#ffedd5;color:#ea580c}.ico.blue{background:#dbeafe;color:#2563eb}.ico.purple{background:#ede9fe;color:#6d28d9}.stat h2{margin:0;font-size:20px}.stat p{margin:2px 0 0;color:#667085;font-size:11px}.trend{font-size:10px;margin:8px 0 0;color:var(--green)}.trend.down{color:#ef4444}.grid3{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:12px;margin-top:12px}.card{background:#fff;border:1px solid #e9edf3;border-radius:9px;box-shadow:0 2px 8px #10182805;padding:15px}.card h3{font-size:15px;margin:0}.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.select,.smallbtn{border:1px solid #e4e7ec;background:#fff;border-radius:7px;padding:7px 10px;font-size:11px;color:#344054}.charts{height:180px}.donut-wrap{display:flex;align-items:center;justify-content:center;gap:25px;height:180px}.legend{font-size:12px;line-height:2}.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:7px}.revenue-row{display:flex;gap:10px;align-items:center;margin:12px 0}.revicon{width:42px;height:42px;border-radius:9px;background:#f4f6f8;display:grid;place-items:center}.revenue-row strong{font-size:17px}.revenue-row small{display:block;color:#667085}.lower{display:grid;grid-template-columns:2.3fr 1fr;gap:12px;margin-top:12px}.tabs{display:flex;gap:24px;border-bottom:1px solid var(--line);margin:-15px -15px 10px;padding:0 15px}.tab{border:0;background:none;padding:13px 4px 10px;color:#475467;font-size:12px}.tab.active{color:#e11d2e;border-bottom:2px solid #e11d2e;font-weight:700}.tablewrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:11px}.table th{background:#f8fafc;color:#475467;text-align:left;padding:9px}.table td{padding:9px;border-bottom:1px solid #eef1f5;vertical-align:middle}.pill{display:inline-flex;align-items:center;gap:5px;border-radius:15px;padding:4px 8px;font-size:10px}.pill.green{background:#e7f8ef;color:#087443}.pill.orange{background:#fff1dc;color:#b54708}.pill.red{background:#feeceb;color:#b42318}.actions{display:flex;gap:5px}.iconbtn{border:1px solid #e4e7ec;background:#fff;border-radius:6px;padding:5px;color:#475467}.quick{display:grid;grid-template-columns:1fr 1fr;gap:8px}.quick button{background:#fff;border:1px solid #e4e7ec;border-radius:8px;padding:12px 8px;text-align:left;font-size:11px;color:#344054}.quick button:hover{border-color:#cbd5e1;background:#f8fafc}.quick svg{vertical-align:middle;margin-right:6px}.bottom3{display:grid;grid-template-columns:1.2fr 1.2fr 1.3fr;gap:12px;margin-top:12px}.bars .bar{display:flex;align-items:center;gap:8px;margin:12px 0;font-size:11px}.barbg{height:8px;background:#edf1f6;border-radius:20px;flex:1}.barfg{height:100%;background:#ef3340;border-radius:20px}.activity{font-size:11px}.activity div{display:flex;gap:8px;padding:9px 0;border-bottom:1px solid #eef1f5}.activity i{width:8px;height:8px;border-radius:50%;margin-top:4px}.subpage-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.subpage-head h2{margin:0}.toolbar{display:flex;gap:8px;flex-wrap:wrap}.input{border:1px solid #dfe3ea;border-radius:7px;padding:9px 10px;background:#fff;outline:0}.primary{background:#ef3340;color:#fff;border:0;border-radius:7px;padding:9px 13px;font-weight:700}.danger{background:#fff;border:1px solid #f1b8bc;color:#c81e2d;border-radius:7px;padding:7px 9px}.modal{position:fixed;inset:0;background:#0b122080;display:none;place-items:center;z-index:50;padding:20px}.modal.show{display:grid}.modalbox{background:#fff;width:min(680px,100%);max-height:90vh;overflow:auto;border-radius:12px;padding:20px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field label{font-size:11px;color:#475467;display:block;margin-bottom:5px}.field input,.field select,.field textarea{width:100%;padding:9px;border:1px solid #dfe3ea;border-radius:7px;outline:0}.field.full{grid-column:1/-1}.modalfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}.notice{padding:12px;background:#fff8e7;border:1px solid #fedf89;color:#925b00;border-radius:8px;font-size:12px;margin-bottom:12px}.empty{padding:25px;text-align:center;color:#667085}.toast{position:fixed;right:20px;bottom:20px;background:#101828;color:#fff;padding:11px 15px;border-radius:8px;display:none;z-index:80;font-size:12px}.toast.show{display:block}.mobile-only{display:none}.restaurant-direct-link{color:#111;text-decoration:none}.restaurant-direct-link:hover{text-decoration:underline;color:#e11d2e}
@@ -33,83 +32,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
 .restaurant-direct-link{color:inherit;text-decoration:none;cursor:pointer}
 .restaurant-direct-link b{transition:opacity .15s}
 .restaurant-direct-link:hover b{opacity:.72;text-decoration:underline}
-
-/* Bulk CSV Menu Importer */
-.bulk-import-grid{display:grid;grid-template-columns:1.05fr 1.95fr;gap:16px;align-items:start}
-.bulk-import-card{padding:18px}
-.bulk-import-card .card-head{margin-bottom:12px}
-.bulk-drop{border:1.5px dashed #cbd5e1;border-radius:14px;padding:28px 18px;text-align:center;background:#f8fafc;cursor:pointer;transition:.15s}
-.bulk-drop:hover,.bulk-drop.dragover{border-color:#ef3340;background:#fff5f6}
-.bulk-drop .drop-icon{width:42px;height:42px;border-radius:12px;background:#fff0f1;color:#ef3340;display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
-.bulk-drop strong{display:block;color:#101828;margin-bottom:4px}.bulk-drop span{font-size:12px;color:#667085}
-.bulk-file{display:none;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;margin-top:10px;border:1px solid #eaecf0;border-radius:10px;background:#fff;font-size:12px}
-.bulk-file.show{display:flex}.bulk-file-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.bulk-file-size{color:#667085;white-space:nowrap}
-.bulk-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.bulk-actions .smallbtn{min-height:38px}
-.bulk-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
-.bulk-stat{border:1px solid #eaecf0;border-radius:11px;padding:12px;background:#fff}.bulk-stat span{display:block;color:#667085;font-size:11px}.bulk-stat b{display:block;font-size:20px;margin-top:3px;color:#101828}
-.bulk-status{display:none;padding:10px 12px;border-radius:10px;margin-top:12px;font-size:12px}.bulk-status.show{display:block}.bulk-status.success{background:#ecfdf3;color:#027a48;border:1px solid #abefc6}.bulk-status.error{background:#fef3f2;color:#b42318;border:1px solid #fecdca}.bulk-status.info{background:#eff8ff;color:#175cd3;border:1px solid #b2ddff}
-.bulk-preview-wrap{overflow:auto;border:1px solid #eaecf0;border-radius:10px}.bulk-preview{min-width:1100px}.bulk-preview th,.bulk-preview td{white-space:nowrap}.bulk-preview .desc{max-width:220px;overflow:hidden;text-overflow:ellipsis}.bulk-ok{color:#027a48;font-weight:700}.bulk-err{color:#b42318;font-weight:700}.bulk-row-error{background:#fff7f7}.bulk-error-list{margin:10px 0 0;padding-left:20px;color:#b42318;font-size:12px;max-height:150px;overflow:auto}
-.bulk-help{font-size:12px;color:#667085;line-height:1.55}.bulk-help code{background:#f2f4f7;padding:2px 5px;border-radius:5px;color:#344054}.bulk-required{color:#b42318}.bulk-progress{height:7px;background:#eaecf0;border-radius:999px;overflow:hidden;margin-top:10px;display:none}.bulk-progress.show{display:block}.bulk-progress>div{height:100%;width:0;background:#ef3340;transition:width .2s}
-@media(max-width:1000px){.bulk-import-grid{grid-template-columns:1fr}.bulk-summary{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.bulk-summary{grid-template-columns:1fr 1fr}.bulk-import-card{padding:14px}}
-
-
-
-/* ===== FINAL ADMIN LAYOUT ===== */
-html,body{margin:0;padding:0;width:100%;min-width:0;overflow-x:hidden}
-*{box-sizing:border-box}
-.app{display:block;min-height:100vh;width:100%}
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:238px;min-width:238px;overflow-y:auto;overflow-x:hidden}
-.main{margin-left:238px;width:calc(100% - 238px);min-width:0}
-.topbar{width:100%;height:62px;padding:0 20px}
-.content{width:100%;max-width:none;min-width:0;padding:18px 22px;overflow-x:hidden}
-.page{width:100%;min-width:0}
-
-/* Dashboard */
-#dashboard .welcome{width:100%;margin:0 0 14px;display:flex;justify-content:space-between;align-items:flex-start}
-#dashboard .stats{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important;width:100%!important;margin:0!important}
-#dashboard .stat{width:100%;min-width:0;min-height:100px;padding:13px}
-#dashboard .grid3{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important;width:100%!important;margin-top:12px!important}
-#dashboard .grid3>.card{width:100%;min-width:0}
-#dashboard .lower{display:grid!important;grid-template-columns:minmax(0,2fr) minmax(250px,1fr)!important;gap:12px!important;width:100%!important;margin-top:12px!important}
-#dashboard .lower>.card{width:100%;min-width:0}
-#dashboard .bottom3{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important;width:100%!important;margin-top:12px!important}
-#dashboard .bottom3>.card{width:100%;min-width:0}
-#dashboard .charts{width:100%;height:180px;min-width:0}
-#dashboard .charts canvas{display:block;width:100%!important;height:100%!important}
-#dashboard .donut-wrap{width:100%;min-width:0}
-
-/* All other admin pages */
-.subpage-head{width:100%;min-width:0;margin-bottom:12px}
-.card{width:100%;min-width:0}
-.tablewrap{width:100%;max-width:100%;overflow-x:auto}
-.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-#subscriptions .formgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.bulk-import-grid{gap:12px!important}
-.bulk-summary{gap:8px!important}
-
-/* Keep common inline dashboard/admin grids from becoming huge or staggered */
-#plans .card [style*="display:grid"],#mediaRules .card [style*="display:grid"]{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important}
-
-@media(max-width:1100px){
-  #dashboard .stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-  #dashboard .grid3,#dashboard .bottom3{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-  #dashboard .lower{grid-template-columns:1fr!important}
-  #subscriptions .formgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-  .grid3,.bottom3{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-}
-@media(max-width:800px){
-  .sidebar{transform:translateX(-100%);transition:transform .2s ease}
-  .sidebar.open{transform:translateX(0)}
-  .main{margin-left:0;width:100%}
-  .topbar{padding:0 12px}
-  .content{padding:14px 12px}
-  #dashboard .stats,#dashboard .grid3,#dashboard .bottom3,#dashboard .lower{grid-template-columns:1fr!important}
-  .grid3,.bottom3,.formgrid,#subscriptions .formgrid{grid-template-columns:1fr!important}
-  .search{display:none}
-  .mobile-only{display:block}
-}
-
+</style>
+<style>
+.bulk-import-card{overflow:hidden}.bulk-import-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:end}.bulk-import-actions{display:flex;gap:8px;align-items:center}.bulk-help{display:block;color:#667085;font-size:11px;margin-top:5px}.bulk-dropzone{margin-top:16px;border:1.5px dashed #cbd5e1;border-radius:10px;background:#f8fafc;min-height:150px;padding:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center;cursor:pointer}.bulk-dropzone:hover,.bulk-dropzone.dragover{border-color:#ef3340;background:#fff7f8}.bulk-dropzone strong{font-size:14px}.bulk-dropzone span{font-size:11px;color:#667085}.bulk-drop-icon{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#ffe4e6;color:#ef3340;font-size:20px;font-weight:800}.bulk-file-info{margin-top:10px;padding:9px 11px;border:1px solid #e4e7ec;border-radius:8px;background:#fff;font-size:12px;display:flex;justify-content:space-between;gap:10px}.bulk-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}.bulk-summary>div{border:1px solid #e7eaf0;border-radius:8px;padding:10px 12px;background:#fff}.bulk-summary strong{display:block;font-size:18px}.bulk-summary span{font-size:10px;color:#667085}.bulk-message{margin-top:12px;padding:10px 12px;border-radius:8px;font-size:12px}.bulk-message.error{background:#fff1f0;color:#b42318;border:1px solid #fecdca}.bulk-message.success{background:#ecfdf3;color:#067647;border:1px solid #abefc6}.bulk-preview-head{display:flex;align-items:center;justify-content:space-between;margin:16px 0 8px}.bulk-preview-head h3{margin:0;font-size:14px}.bulk-preview-head span{font-size:11px;color:#667085}.bulk-preview{border:1px solid #e7eaf0;border-radius:8px;max-height:420px}.bulk-preview .table{min-width:980px}.bulk-preview td,.bulk-preview th{white-space:nowrap}.bulk-preview .bulk-error-cell{color:#b42318;font-weight:600;white-space:normal;min-width:220px}.bulk-row-error{background:#fff8f7}.bulk-status-ok{color:#067647;font-weight:700}.bulk-import-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}.bulk-progress-text{font-size:11px;color:#667085}@media(max-width:700px){.bulk-import-grid{grid-template-columns:1fr}.bulk-import-actions{justify-content:flex-start}.bulk-summary{grid-template-columns:1fr 1fr}.bulk-import-footer{align-items:stretch;flex-direction:column}.bulk-import-footer .primary{width:100%}}
 </style>
 </head>
 <body>
@@ -199,35 +124,25 @@ html,body{margin:0;padding:0;width:100%;min-width:0;overflow-x:hidden}
 <div id="qrManagement" class="page"><div class="subpage-head"><div><h2>QR Management</h2><p style="color:#667085">Generate QR codes in lots of 100, identify each QR by its printed number, assign up to 10 QR codes to each restaurant, and print any individual QR.</p></div><div class="toolbar"><button class="iconbtn" onclick="loadQRs()">↻ Refresh</button><label class="smallbtn" style="display:flex;align-items:center;gap:7px">QR Design <select id="qrPrintDesign" style="border:0;outline:0;background:transparent;font-size:11px;font-weight:700"><option value="1">① Premium Gold</option><option value="2">② Black Luxury</option><option value="3">③ Fresh Green</option><option value="4">④ Warm Classic</option></select></label><button class="primary" onclick="generateQRBatch(100)">＋ Generate Next 100</button><button class="primary" onclick="printAvailableQRs()">🖨 Print Available</button></div></div><div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:12px"><div class="stat"><div class="stat-top"><div class="ico blue">📱</div><div><h2 id="qrTotal">0</h2><p>Total QR Codes</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico green">✓</div><div><h2 id="qrAvailable">0</h2><p>Available</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico orange">↗</div><div><h2 id="qrAssigned">0</h2><p>Assigned</p></div></div></div><div class="stat"><div class="stat-top"><div class="ico purple">10</div><div><h2>10</h2><p>Max per Restaurant</p></div></div></div></div><div class="card"><div class="toolbar"><input class="input" id="qrSearch" placeholder="Search QR ID, restaurant, label..."><select class="input" id="qrStatus"><option value="">All Status</option><option value="available">Available</option><option value="assigned">Assigned</option></select><select class="input" id="qrRestaurantFilter"><option value="">All Restaurants</option></select></div><div id="qrTable" class="tablewrap" style="margin-top:12px"></div></div></div><div id="owners" class="page"><div class="subpage-head"><h2>Restaurant Owners</h2></div><div class="card"><div class="toolbar"><input class="input" id="ownerSearch" placeholder="Search owner email/name..."></div><div id="ownersTable" class="tablewrap" style="margin-top:12px"></div></div></div>
 
 <div id="menu" class="page"><div class="subpage-head"><h2>Menu Management</h2></div><div class="card"><div class="toolbar"><select class="input" id="menuRestaurantFilter"><option value="">All Restaurants</option></select><input class="input" id="menuSearch" placeholder="Search item/category..."><button class="primary" onclick="openMenuModal()">+ Add Menu Item</button></div><div id="menuTable" class="tablewrap" style="margin-top:12px"></div></div></div>
+
 <div id="bulkImport" class="page">
-  <div class="subpage-head"><div><h2>Bulk CSV Menu Import</h2><p style="margin:4px 0 0;color:#667085;font-size:12px">Import multiple menu items into <code>public.menu_items</code> without changing the existing Menu Management workflow.</p></div></div>
-  <div class="notice" style="margin-bottom:14px"><b>CSV columns:</b> <code>name</code>, <code>category</code>, <code>description</code>, <code>price_full</code> or <code>price</code>, <code>price_half</code>, <code>price_quarter</code>, <code>is_veg</code>, <code>is_bestseller</code>, <code>sort_order</code>. Restaurant is selected below and applied to every imported row.</div>
-  <div class="bulk-import-grid">
-    <div class="card bulk-import-card">
-      <div class="card-head"><h3>1. Select Restaurant</h3></div>
-      <div class="field"><label>Restaurant <span class="bulk-required">*</span></label><select class="input" id="bulkRestaurant"></select></div>
-      <div class="card-head" style="margin-top:18px"><h3>2. Upload CSV</h3></div>
-      <input type="file" id="bulkCsvInput" accept=".csv,text/csv" hidden>
-      <div class="bulk-drop" id="bulkDropZone" tabindex="0" role="button" aria-label="Upload CSV">
-        <div class="drop-icon"><i data-lucide="upload-cloud"></i></div>
-        <strong>Drag & drop your CSV here</strong><span>or click to browse • UTF-8 CSV recommended</span>
-      </div>
-      <div class="bulk-file" id="bulkFileBox"><div class="bulk-file-name" id="bulkFileName"></div><div class="bulk-file-size" id="bulkFileSize"></div></div>
-      <div class="bulk-actions"><button class="smallbtn" type="button" onclick="downloadBulkTemplate()"><i data-lucide="download"></i> Download Template</button><button class="smallbtn" type="button" onclick="clearBulkImport()">Clear</button><button class="primary" type="button" id="bulkParseBtn" onclick="parseBulkCsv()" disabled>Parse & Preview</button></div>
-      <div class="bulk-help" style="margin-top:12px">Required: <code>name</code>, <code>category</code>, and at least one of <code>price_full</code>/<code>price</code>. Blank <code>sort_order</code> values are auto-numbered after the restaurant's current maximum.</div>
-      <div class="bulk-status" id="bulkStatus"></div>
+  <div class="subpage-head"><div><h2>Bulk CSV Menu Import</h2><p style="color:#667085;margin:4px 0 0">Import menu items into the selected restaurant without changing the existing menu structure.</p></div></div>
+  <div class="notice"><b>Supported columns:</b> name, category, description, price_full, price, price_half, price_quarter, is_veg, is_bestseller, sort_order. <b>name</b> and <b>category</b> are required. Restaurant is selected below and applied to every imported row.</div>
+  <div class="bulk-import-card card">
+    <div class="bulk-import-grid">
+      <div class="field"><label>Restaurant</label><select class="input" id="bulkImportRestaurant"><option value="">Select restaurant...</option></select><small class="bulk-help">All CSV rows will be assigned to this restaurant.</small></div>
+      <div class="bulk-import-actions"><button class="iconbtn" type="button" onclick="downloadBulkImportTemplate()">↓ CSV Template</button><button class="iconbtn" type="button" onclick="clearBulkImport()">Clear</button></div>
     </div>
-    <div class="card bulk-import-card">
-      <div class="card-head"><h3>3. Validate & Import</h3><span id="bulkPreviewHint" style="font-size:11px;color:#667085">No CSV parsed yet</span></div>
-      <div class="bulk-summary"><div class="bulk-stat"><span>Total rows</span><b id="bulkTotal">0</b></div><div class="bulk-stat"><span>Valid rows</span><b id="bulkValid">0</b></div><div class="bulk-stat"><span>Errors</span><b id="bulkErrors">0</b></div><div class="bulk-stat"><span>Categories</span><b id="bulkCategories">0</b></div></div>
-      <div class="toolbar" style="margin-bottom:10px"><button class="primary" type="button" id="bulkImportBtn" onclick="importBulkRows()" disabled>Import Valid Rows</button></div>
-      <div class="bulk-progress" id="bulkProgress"><div id="bulkProgressBar"></div></div>
-      <div id="bulkErrorList"></div>
-      <div class="bulk-preview-wrap" id="bulkPreviewWrap"><table class="table bulk-preview"><thead><tr><th>Row</th><th>Name</th><th>Category</th><th>Description</th><th>Full</th><th>Price</th><th>Half</th><th>Quarter</th><th>Veg</th><th>Bestseller</th><th>Sort</th><th>Status</th></tr></thead><tbody id="bulkPreviewBody"><tr><td colspan="12"><div class="empty">Upload and parse a CSV to preview menu items.</div></td></tr></tbody></table></div>
-    </div>
+    <input id="bulkImportFile" type="file" accept=".csv,text/csv" hidden>
+    <div id="bulkImportDropzone" class="bulk-dropzone" tabindex="0"><div class="bulk-drop-icon">↑</div><strong>Drop your CSV here</strong><span>or click to browse from your computer</span><button class="primary" type="button" onclick="document.getElementById('bulkImportFile').click();event.stopPropagation()">Choose CSV File</button></div>
+    <div id="bulkImportFileInfo" class="bulk-file-info" hidden></div>
+    <div class="bulk-summary"><div><strong id="bulkTotal">0</strong><span>Total rows</span></div><div><strong id="bulkValid">0</strong><span>Valid rows</span></div><div><strong id="bulkErrors">0</strong><span>Rows with errors</span></div><div><strong id="bulkCategories">0</strong><span>Categories</span></div></div>
+    <div id="bulkImportMessage" class="bulk-message" hidden></div>
+    <div class="bulk-preview-head"><h3>Preview</h3><span id="bulkPreviewCount">No CSV loaded</span></div>
+    <div id="bulkImportPreview" class="tablewrap bulk-preview"><div class="empty">Upload a CSV to preview your menu items.</div></div>
+    <div class="bulk-import-footer"><span id="bulkImportProgress" class="bulk-progress-text"></span><button id="bulkImportButton" class="primary" type="button" onclick="runBulkImport()" disabled>Import Valid Rows</button></div>
   </div>
 </div>
-
 
 <div id="categories" class="page"><div class="subpage-head"><h2>Categories</h2><button class="primary" onclick="openCategoryModal()">+ Add Category</button></div><div class="card"><div id="categoriesTable" class="tablewrap"></div></div></div>
 <div id="approvals" class="page"><div class="subpage-head"><h2>Pending Approvals</h2></div><div class="card"><div id="approvalsTable" class="tablewrap"></div></div></div>
@@ -302,7 +217,6 @@ const SUPABASE_URL='https://pfsrpowopbrevocwsuii.supabase.co';
 const SUPABASE_KEY='sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE';
 const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let session=null, restaurants=[], menuItems=[], profiles=[], subscriptions=[], plans=[], charts={};
-let bulkCsvFile=null, bulkCsvRows=[], bulkCsvValidRows=[], bulkCsvErrors=[], bulkNextSort=1;
 let planExpiryTimer=null;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
@@ -419,87 +333,6 @@ async function saveMenu(id){
 }
 function num(id){const v=$(id).value;return v===''?null:Number(v)}
 async function deleteMenu(id){if(!confirm('Delete this menu item?'))return;const r=await db.from('menu_items').delete().eq('id',id);if(r.error)return toast(r.error.message);toast('Item deleted');await loadAll()}
-
-function populateBulkImportRestaurants(){
- const s=$('bulkRestaurant');if(!s)return;
- const current=s.value;
- s.innerHTML='<option value="">Select restaurant...</option>'+restaurants.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('');
- if(current&&restaurants.some(r=>r.id===current))s.value=current;
-}
-function bulkNormalizeHeader(v){return String(v??'').trim().toLowerCase().replace(/[\s-]+/g,'_').replace(/[^a-z0-9_]/g,'')}
-function bulkValue(row,aliases){for(const a of aliases){const k=bulkNormalizeHeader(a);if(Object.prototype.hasOwnProperty.call(row,k))return row[k]}return ''}
-function bulkParseNumber(value){
- if(value===null||value===undefined||String(value).trim()==='')return null;
- const cleaned=String(value).trim().replace(/[₹,\s]/g,'');const n=Number(cleaned);return Number.isFinite(n)&&n>=0?n:NaN;
-}
-function bulkParseBoolean(value,field){
- if(value===null||value===undefined||String(value).trim()==='')return false;
- const v=String(value).trim().toLowerCase();
- if(['true','1','yes','y','on'].includes(v))return true;
- if(['false','0','no','n','off'].includes(v))return false;
- if(field==='is_veg'&&['veg','vegetarian'].includes(v))return true;
- if(field==='is_veg'&&['non-veg','nonveg','non_veg','non vegetarian','nonvegetarian'].includes(v))return false;
- return null;
-}
-function bulkFormatSize(bytes){if(bytes<1024)return bytes+' B';if(bytes<1048576)return (bytes/1024).toFixed(1)+' KB';return (bytes/1048576).toFixed(1)+' MB'}
-function bulkSetStatus(message,type='info'){const el=$('bulkStatus');if(!el)return;el.textContent=message;el.className='bulk-status show '+type}
-function bulkResetPreview(){
- $('bulkTotal').textContent='0';$('bulkValid').textContent='0';$('bulkErrors').textContent='0';$('bulkCategories').textContent='0';$('bulkPreviewHint').textContent='No CSV parsed yet';$('bulkPreviewBody').innerHTML='<tr><td colspan="12"><div class="empty">Upload and parse a CSV to preview menu items.</div></td></tr>';$('bulkErrorList').innerHTML='';$('bulkImportBtn').disabled=true;$('bulkProgress').classList.remove('show');$('bulkProgressBar').style.width='0%';
-}
-function clearBulkImport(){
- bulkCsvFile=null;bulkCsvRows=[];bulkCsvValidRows=[];bulkCsvErrors=[];bulkNextSort=1;
- const input=$('bulkCsvInput');if(input)input.value='';$('bulkFileBox')?.classList.remove('show');$('bulkParseBtn').disabled=true;bulkResetPreview();$('bulkStatus').className='bulk-status';
-}
-function handleBulkFile(file){
- if(!file)return;if(!/\.csv$/i.test(file.name)&&file.type!=='text/csv'){bulkSetStatus('Please select a CSV file.','error');return}
- bulkCsvFile=file;$('bulkFileName').textContent=file.name;$('bulkFileSize').textContent=bulkFormatSize(file.size);$('bulkFileBox').classList.add('show');$('bulkParseBtn').disabled=false;bulkSetStatus('CSV selected. Click “Parse & Preview” to validate it.','info');
-}
-function downloadBulkTemplate(){
- const rows=[['name','category','description','price_full','price','price_half','price_quarter','is_veg','is_bestseller','sort_order'],['Paneer Tikka','Starters','Smoky cottage cheese skewers','249','','199','149','true','true',''],['Veg Hakka Noodles','Main Course','Wok tossed noodles','','219','','','true','false','']];
- const csv=rows.map(row=>row.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='freemenu-menu-import-template.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-}
-function parseBulkCsv(){
- const rid=$('bulkRestaurant')?.value;if(!rid)return bulkSetStatus('Select a restaurant before parsing the CSV.','error');if(!bulkCsvFile)return bulkSetStatus('Please choose a CSV file.','error');if(typeof Papa==='undefined')return bulkSetStatus('PapaParse could not be loaded. Check your internet connection and reload the page.','error');
- bulkSetStatus('Parsing and validating CSV…','info');bulkCsvRows=[];bulkCsvValidRows=[];bulkCsvErrors=[];bulkNextSort=1;
- const maxExisting=menuItems.filter(m=>m.restaurant_id===rid).reduce((max,m)=>Math.max(max,Number.isFinite(Number(m.sort_order))?Number(m.sort_order):0),0);bulkNextSort=maxExisting+1;
- Papa.parse(bulkCsvFile,{header:true,skipEmptyLines:'greedy',transformHeader:bulkNormalizeHeader,complete:result=>processBulkParsedRows(result.data||[],result.errors||[]),error:err=>bulkSetStatus('CSV parse failed: '+(err?.message||err),'error')});
-}
-function processBulkParsedRows(rows,parseErrors){
- if(parseErrors.length){bulkCsvErrors=parseErrors.map(e=>({row:(e.row??0)+2,message:e.message||'CSV parsing error'}));}
- bulkCsvRows=rows;const rid=$('bulkRestaurant').value;const valid=[];const rowResults=[];
- rows.forEach((row,i)=>{
-  const csvRow=i+2,errors=[];const name=String(bulkValue(row,['name','item_name'])).trim();const category=String(bulkValue(row,['category','category_name'])).trim();const description=String(bulkValue(row,['description'])).trim();
-  if(!name)errors.push('name is required');if(!category)errors.push('category is required');
-  const rawFull=bulkValue(row,['price_full','full_price']);const rawPrice=bulkValue(row,['price','single_price']);const rawHalf=bulkValue(row,['price_half','half_price']);const rawQuarter=bulkValue(row,['price_quarter','quarter_price']);
-  const priceFull=bulkParseNumber(rawFull),price=bulkParseNumber(rawPrice),priceHalf=bulkParseNumber(rawHalf),priceQuarter=bulkParseNumber(rawQuarter);
-  if(priceFull!==null&&Number.isNaN(priceFull))errors.push('price_full must be numeric');if(price!==null&&Number.isNaN(price))errors.push('price must be numeric');if(priceHalf!==null&&Number.isNaN(priceHalf))errors.push('price_half must be numeric');if(priceQuarter!==null&&Number.isNaN(priceQuarter))errors.push('price_quarter must be numeric');if(priceFull===null&&price===null)errors.push('price_full or price is required');
-  const veg=bulkParseBoolean(bulkValue(row,['is_veg','veg','vegetarian']),'is_veg');const bestseller=bulkParseBoolean(bulkValue(row,['is_bestseller','bestseller','best_seller']),'is_bestseller');if(veg===null)errors.push('is_veg must be true/false');if(bestseller===null)errors.push('is_bestseller must be true/false');
-  const rawSort=bulkValue(row,['sort_order','sort','order']);let sortOrder;if(String(rawSort??'').trim()===''){sortOrder=bulkNextSort++;}else{const n=Number(String(rawSort).trim());if(!Number.isInteger(n)||n<0)errors.push('sort_order must be a non-negative integer');else sortOrder=n;}
-  const formatted={restaurant_id:rid,name,category,description:description||null,price_full:priceFull===null?null:priceFull,price:price===null?null:price,price_half:priceHalf===null?null:priceHalf,price_quarter:priceQuarter===null?null:priceQuarter,is_veg:veg===true,is_bestseller:bestseller===true,sort_order:sortOrder};
-  const result={csvRow,formatted,errors};rowResults.push(result);if(!errors.length)valid.push(formatted);
- });
- bulkCsvValidRows=valid;bulkCsvErrors=[...bulkCsvErrors,...rowResults.filter(x=>x.errors.length).map(x=>({row:x.csvRow,message:x.errors.join('; ')}))];renderBulkPreview(rowResults);bulkSetStatus(bulkCsvErrors.length?`Parsed ${rows.length} rows: ${valid.length} valid, ${bulkCsvErrors.length} with errors. Fix the CSV and re-upload if needed.`:`Parsed ${rows.length} rows successfully. Ready to import.`,bulkCsvErrors.length?'error':'success');
-}
-function renderBulkPreview(results){
- $('bulkTotal').textContent=results.length;$('bulkValid').textContent=results.filter(x=>!x.errors.length).length;$('bulkErrors').textContent=results.filter(x=>x.errors.length).length;$('bulkCategories').textContent=new Set(results.filter(x=>!x.errors.length).map(x=>x.formatted.category)).size;$('bulkPreviewHint').textContent=results.length>200?`Showing first 200 of ${results.length} rows`:`${results.length} rows parsed`;
- const visible=results.slice(0,200);$('bulkPreviewBody').innerHTML=visible.map(x=>{const p=x.formatted;return `<tr class="${x.errors.length?'bulk-row-error':''}"><td>${x.csvRow}</td><td><b>${esc(p.name)}</b></td><td>${esc(p.category)}</td><td class="desc" title="${esc(p.description||'')}">${esc(p.description||'—')}</td><td>${p.price_full??'—'}</td><td>${p.price??'—'}</td><td>${p.price_half??'—'}</td><td>${p.price_quarter??'—'}</td><td>${p.is_veg?'true':'false'}</td><td>${p.is_bestseller?'true':'false'}</td><td>${p.sort_order??'—'}</td><td class="${x.errors.length?'bulk-err':'bulk-ok'}">${x.errors.length?'Error':'Ready'}${x.errors.length?`<br><small>${esc(x.errors.join('; '))}</small>`:''}</td></tr>`}).join('')||'<tr><td colspan="12"><div class="empty">No data rows found in CSV.</div></td></tr>';
- if(bulkCsvErrors.length){$('bulkErrorList').innerHTML='<div class="bulk-help"><b>Validation errors</b></div><ul class="bulk-error-list">'+bulkCsvErrors.slice(0,50).map(e=>`<li>Row ${e.row}: ${esc(e.message)}</li>`).join('')+(bulkCsvErrors.length>50?`<li>…and ${bulkCsvErrors.length-50} more</li>`:'')+'</ul>'}else $('bulkErrorList').innerHTML='';
- $('bulkImportBtn').disabled=bulkCsvValidRows.length===0||bulkCsvErrors.length>0;
-}
-async function importBulkRows(){
- const rid=$('bulkRestaurant')?.value;if(!rid)return bulkSetStatus('Select a restaurant first.','error');if(!bulkCsvValidRows.length)return bulkSetStatus('There are no valid rows to import.','error');if(bulkCsvErrors.length)return bulkSetStatus('Please fix all CSV errors before importing.','error');
- const restaurant=restaurants.find(r=>r.id===rid);if(!confirm(`Import ${bulkCsvValidRows.length} menu item(s) into ${restaurant?.name||'selected restaurant'}?`))return;
- const btn=$('bulkImportBtn');btn.disabled=true;$('bulkProgress').classList.add('show');$('bulkProgressBar').style.width='25%';bulkSetStatus(`Importing ${bulkCsvValidRows.length} menu item(s)…`,'info');
- try{
-  const formattedRows=bulkCsvValidRows.map(row=>({...row,restaurant_id:rid}));
-  const {data,error}=await db.from('menu_items').insert(formattedRows).select();if(error)throw error;
-  $('bulkProgressBar').style.width='100%';await logAction(`Bulk imported ${formattedRows.length} menu items`,rid);bulkSetStatus(`Success: ${data?.length??formattedRows.length} menu item(s) imported into ${restaurant?.name||'the selected restaurant'}.`,'success');toast(`${formattedRows.length} menu items imported`);await loadAll();
- }catch(e){$('bulkProgressBar').style.width='0%';bulkSetStatus('Import failed: '+(e?.message||e),'error');btn.disabled=false}
-}
-(function initBulkImporter(){
- const input=$('bulkCsvInput'),drop=$('bulkDropZone');if(!input||!drop)return;drop.addEventListener('click',()=>input.click());drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click()}});input.addEventListener('change',e=>handleBulkFile(e.target.files?.[0]));['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('dragover')}));['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('dragover')}));drop.addEventListener('drop',e=>handleBulkFile(e.dataTransfer.files?.[0]));
-})();
-
 function renderCategories(){const c={};menuItems.forEach(m=>{if(m.category)c[m.category]=(c[m.category]||0)+1});$('categoriesTable').innerHTML=`<table class="table"><thead><tr><th>Category</th><th>Items</th><th>Restaurants</th></tr></thead><tbody>${Object.entries(c).sort((a,b)=>b[1]-a[1]).map(([n,v])=>`<tr><td><b>${esc(n)}</b></td><td>${v}</td><td>${new Set(menuItems.filter(m=>m.category===n).map(m=>m.restaurant_id)).size}</td></tr>`).join('')||'<tr><td colspan="3"><div class="empty">Categories come from menu_items.category. Add one by creating a menu item.</div></td></tr>'}</tbody></table>`}
 function openCategoryModal(){modal('Add Category',`<div class="formgrid"><div class="field"><label>Restaurant</label><select id="cf_rest">${restaurants.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('')}</select></div><div class="field"><label>Category Name</label><input id="cf_name" placeholder="Main Course"></div></div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveCategory()">Create</button></div>`)}
 async function saveCategory(){const rid=$('cf_rest').value,n=$('cf_name').value.trim();if(!n)return;const first=menuItems.find(m=>m.restaurant_id===rid);if(first){const p={...first};delete p.id;p.category=n;delete p.created_at;const r=await db.from('menu_items').insert({...p,name:'New Item'});if(r.error)return toast(r.error.message)}closeModal();toast('Category created by adding a starter menu item');await loadAll()}
@@ -994,195 +827,6 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;margin:0;background:#f3f5f7;co
 .poster.design-4{background:#fff4e8;color:#5a2b18;border-color:#e4a26b}.design-4 .orange{background:#ef7c28}.design-4 .green{background:#6b8d3a}.design-4 .red{background:#9c3f26}.design-4 .note{color:#9a5d3d}.design-4 .smallTitle{font-family:Georgia,serif}.design-4 .bigTitle{font-family:Georgia,serif;color:#bd4e1f}.design-4 .lines .g{background:#6b8d3a}.design-4 .lines .o{background:#ef7c28}.design-4 .lines .r{background:#9c3f26}.design-4 .qrBox{border:2px solid #bd4e1f;border-radius:18px;box-shadow:0 12px 30px rgba(120,55,25,.14)}.design-4 .scan{color:#7a4a33}.design-4 .brandName{color:#7b321c}.design-4 .brandName span{color:#ef7c28}.design-4 .tag,.design-4 .footer2{color:#95664d}.design-4 .brandLines .g{background:#6b8d3a}.design-4 .brandLines .o{background:#ef7c28}.design-4 .brandLines .r{background:#9c3f26}
 @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.grid{grid-template-columns:1fr}.poster{max-width:360px}}
 @media print{@page{size:A4;margin:8mm}body{background:#fff}.toolbar{display:none!important}.page{padding:0}.grid{grid-template-columns:repeat(3,1fr);gap:7mm}.poster{max-width:none;box-shadow:none;break-inside:avoid;min-height:92mm;padding:10mm 4mm 7mm;border-radius:6mm}.qrBox{width:44mm;padding:2.5mm}.qrbox{width:39mm;height:39mm}.qrbox svg,.qrbox canvas{width:39mm!important;height:39mm!important}.restaurant{font-size:10pt}.code{font-size:7pt}.smallTitle{font-size:16pt}.bigTitle{font-size:32pt}.brandName{font-size:19pt}}
-
-
-/* ===== FINAL LAYOUT STABILITY OVERRIDE =====
-   Keep the admin shell usable even when browser zoom changes the CSS viewport.
-   The sidebar remains available on desktop/tablet widths; cards always flow
-   left-to-right without phantom/centered grid tracks. */
-html,body{width:100%;min-width:0}
-.app{width:100%;min-width:0}
-.sidebar{width:238px!important;min-width:238px!important}
-.main{margin-left:238px!important;width:calc(100% - 238px)!important;min-width:0!important}
-.content{box-sizing:border-box!important;width:100%!important;min-width:0!important;max-width:none!important;overflow-x:hidden!important}
-
-/* Dashboard/stat cards: deterministic 3-column desktop flow */
-#dashboard .stats{
-  display:flex!important;flex-wrap:wrap!important;align-items:stretch!important;
-  justify-content:flex-start!important;gap:14px!important;width:100%!important;
-}
-#dashboard .stats>.stat{
-  flex:0 0 calc((100% - 28px)/3)!important;
-  width:calc((100% - 28px)/3)!important;
-  max-width:calc((100% - 28px)/3)!important;
-  margin:0!important;
-}
-
-/* Dashboard content cards */
-#dashboard .grid3,
-#dashboard .bottom3{
-  display:flex!important;flex-wrap:wrap!important;align-items:stretch!important;
-  justify-content:flex-start!important;gap:14px!important;width:100%!important;
-}
-#dashboard .grid3>.card,
-#dashboard .bottom3>.card{
-  flex:0 0 calc((100% - 28px)/3)!important;
-  width:calc((100% - 28px)/3)!important;
-  max-width:calc((100% - 28px)/3)!important;
-  margin:0!important;
-}
-#dashboard .lower{
-  display:grid!important;
-  grid-template-columns:minmax(0,2.3fr) minmax(280px,1fr)!important;
-  gap:14px!important;width:100%!important;
-}
-#dashboard .lower>.card{min-width:0!important;width:100%!important;margin:0!important}
-
-/* Keep charts fluid */
-#dashboard .charts{width:100%!important;min-width:0!important;height:180px!important}
-#dashboard .charts canvas{width:100%!important;max-width:100%!important;height:180px!important}
-
-/* Generic page grids */
-.formgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important;width:100%!important}
-#subscriptions .formgrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
-.bulk-import-grid{display:grid!important;grid-template-columns:minmax(280px,1fr) minmax(0,1.8fr)!important;gap:16px!important;width:100%!important}
-.bulk-summary{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px!important;width:100%!important}
-
-/* Prevent individual cards/tables from forcing the page wider */
-.page,.card,.stat,.tablewrap,.subpage-head,.toolbar,.bulk-import-card{min-width:0!important;max-width:100%!important}
-.tablewrap{width:100%!important;overflow-x:auto!important}
-
-/* Use a compact desktop layout until the actual CSS viewport is genuinely small. */
-@media(max-width:900px){
-  .sidebar{transform:none!important;position:fixed!important;left:0!important;top:0!important;bottom:0!important}
-  .main{margin-left:238px!important;width:calc(100% - 238px)!important}
-  #dashboard .stats>.stat{flex-basis:calc((100% - 14px)/2)!important;width:calc((100% - 14px)/2)!important;max-width:calc((100% - 14px)/2)!important}
-  #dashboard .grid3>.card,#dashboard .bottom3>.card{flex-basis:calc((100% - 14px)/2)!important;width:calc((100% - 14px)/2)!important;max-width:calc((100% - 14px)/2)!important}
-  #dashboard .lower{grid-template-columns:1fr!important}
-  #subscriptions .formgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-}
-@media(max-width:600px){
-  .sidebar{transform:translateX(-100%)!important}
-  .sidebar.open{transform:translateX(0)!important}
-  .main{margin-left:0!important;width:100%!important}
-  .content{padding:16px 12px!important}
-  #dashboard .stats>.stat,#dashboard .grid3>.card,#dashboard .bottom3>.card{flex-basis:100%!important;width:100%!important;max-width:100%!important}
-  #dashboard .lower{grid-template-columns:1fr!important}
-  .formgrid,#subscriptions .formgrid{grid-template-columns:1fr!important}
-  .bulk-import-grid{grid-template-columns:1fr!important}
-  .bulk-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-}
-
-
-/* ===== LAST OVERRIDE: COMPACT, DETERMINISTIC ADMIN GRID ===== */
-html,body{width:100%!important;min-width:0!important;overflow-x:hidden!important}
-.app{width:100%!important;min-width:0!important}
-.sidebar{width:238px!important;min-width:238px!important}
-.main{margin-left:238px!important;width:calc(100% - 238px)!important;min-width:0!important;box-sizing:border-box!important}
-.content{width:100%!important;max-width:none!important;min-width:0!important;box-sizing:border-box!important;padding:24px 30px!important;overflow-x:hidden!important}
-.page{width:100%!important;max-width:none!important;min-width:0!important;box-sizing:border-box!important}
-
-/* Dashboard: always fill rows left-to-right on desktop/tablet. */
-#dashboard .stats,
-#dashboard .grid3,
-#dashboard .bottom3{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important;width:100%!important;margin-left:0!important;margin-right:0!important}
-#dashboard .stats>.stat,
-#dashboard .grid3>.card,
-#dashboard .bottom3>.card{width:100%!important;max-width:none!important;min-width:0!important;margin:0!important;box-sizing:border-box!important;flex:none!important}
-#dashboard .lower{display:grid!important;grid-template-columns:minmax(0,2.3fr) minmax(280px,1fr)!important;gap:14px!important;width:100%!important;margin-left:0!important;margin-right:0!important}
-#dashboard .lower>.card{width:100%!important;min-width:0!important;box-sizing:border-box!important;margin:0!important}
-#dashboard .charts{width:100%!important;min-width:0!important;height:180px!important}
-#dashboard .charts canvas{display:block!important;width:100%!important;height:180px!important}
-
-/* All normal admin page grids. */
-.grid3,.bottom3{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
-.formgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}
-#subscriptions .formgrid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
-.bulk-import-grid{display:grid!important;grid-template-columns:minmax(280px,1fr) minmax(0,1.8fr)!important;gap:16px!important}
-.bulk-summary{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px!important}
-
-/* Prevent cards/tables from creating phantom tracks. */
-.card,.stat,.bulk-import-card,.tablewrap,.toolbar,.subpage-head{min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
-.tablewrap{width:100%!important;overflow-x:auto!important}
-
-@media (max-width:900px) and (min-width:601px){
-  /* Keep 3 compact columns instead of the old staggered 2-column flex rules. */
-  #dashboard .stats,#dashboard .grid3,#dashboard .bottom3{grid-template-columns:repeat(3,minmax(0,1fr))!important}
-  .grid3,.bottom3{grid-template-columns:repeat(3,minmax(0,1fr))!important}
-  .content{padding:20px!important}
-}
-@media (max-width:600px){
-  .sidebar{transform:translateX(-100%)!important}
-  .sidebar.open{transform:translateX(0)!important}
-  .main{margin-left:0!important;width:100%!important}
-  .content{padding:16px 12px!important}
-  #dashboard .stats,#dashboard .grid3,#dashboard .bottom3,
-  .grid3,.bottom3,.lower,.formgrid,#subscriptions .formgrid{grid-template-columns:1fr!important}
-  .bulk-import-grid{grid-template-columns:1fr!important}
-  .bulk-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-}
-
-</style><style>
-/* ===== CLEAN COMPACT SPACING - FINAL ===== */
-html,body{margin:0!important;padding:0!important;width:100%!important;overflow-x:hidden!important}
-.app{display:block!important;width:100%!important;min-height:100vh!important}
-.sidebar{position:fixed!important;left:0!important;top:0!important;bottom:0!important;width:238px!important;min-width:238px!important}
-.main{margin-left:238px!important;width:calc(100% - 238px)!important;min-width:0!important;box-sizing:border-box!important}
-.topbar{height:62px!important;padding:0 20px!important}
-.content{padding:16px 20px!important;width:100%!important;max-width:none!important;box-sizing:border-box!important}
-.page{width:100%!important;max-width:none!important;margin:0!important;padding:0!important}
-.welcome{margin:0 0 10px!important}
-.welcome h1{margin:0 0 2px!important}
-.welcome p{margin:0!important}
-/* Dashboard stats: compact 3 x 2, explicit placement */
-#dashboard .stats{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(2,auto)!important;grid-auto-flow:row!important;gap:10px!important;margin:0!important;padding:0!important;width:100%!important}
-#dashboard .stats>.stat{grid-column:auto!important;grid-row:auto!important;width:100%!important;min-width:0!important;max-width:none!important;min-height:92px!important;height:auto!important;margin:0!important;padding:12px!important;box-sizing:border-box!important}
-#dashboard .stats>.stat:nth-child(1){grid-column:1!important;grid-row:1!important}
-#dashboard .stats>.stat:nth-child(2){grid-column:2!important;grid-row:1!important}
-#dashboard .stats>.stat:nth-child(3){grid-column:3!important;grid-row:1!important}
-#dashboard .stats>.stat:nth-child(4){grid-column:1!important;grid-row:2!important}
-#dashboard .stats>.stat:nth-child(5){grid-column:2!important;grid-row:2!important}
-#dashboard .stats>.stat:nth-child(6){grid-column:3!important;grid-row:2!important}
-.stat-top{gap:9px!important}
-.ico{width:40px!important;height:40px!important}
-.stat h2{font-size:20px!important}
-.stat p{font-size:11px!important}
-.trend{margin-top:6px!important}
-/* Dashboard sections */
-#dashboard .grid3,#dashboard .bottom3{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important;width:100%!important;margin:10px 0 0!important;padding:0!important}
-#dashboard .grid3>.card,#dashboard .bottom3>.card{width:100%!important;min-width:0!important;margin:0!important;padding:12px!important;box-sizing:border-box!important}
-#dashboard .lower{display:grid!important;grid-template-columns:minmax(0,2fr) minmax(260px,1fr)!important;gap:10px!important;width:100%!important;margin:10px 0 0!important;padding:0!important}
-#dashboard .lower>.card{width:100%!important;min-width:0!important;margin:0!important;padding:12px!important;box-sizing:border-box!important}
-.card-head{margin-bottom:8px!important}
-.charts{height:160px!important}
-#dashboard .charts canvas{height:160px!important}
-/* All normal admin pages: remove artificial gaps */
-.subpage-head{margin:0 0 10px!important}
-.card{padding:12px!important}
-.grid3,.bottom3{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}
-.formgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
-#subscriptions .formgrid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}
-.tablewrap{width:100%!important;overflow-x:auto!important}
-.table th,.table td{padding:8px!important}
-/* Bulk importer */
-.bulk-import-grid{gap:10px!important}
-.bulk-summary{gap:8px!important}
-/* Only genuinely narrow screens collapse */
-@media(max-width:900px){
- .main{margin-left:238px!important;width:calc(100% - 238px)!important}
- #dashboard .stats,#dashboard .grid3,#dashboard .bottom3{grid-template-columns:repeat(2,minmax(0,1fr))!important}
- #dashboard .stats>.stat:nth-child(n),#dashboard .grid3>.card,#dashboard .bottom3>.card{grid-column:auto!important;grid-row:auto!important}
- #dashboard .lower{grid-template-columns:1fr!important}
- .grid3,.bottom3{grid-template-columns:repeat(2,minmax(0,1fr))!important}
- #subscriptions .formgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
-}
-@media(max-width:600px){
- .sidebar{transform:translateX(-100%)!important}
- .sidebar.open{transform:translateX(0)!important}
- .main{margin-left:0!important;width:100%!important}
- .content{padding:12px!important}
- #dashboard .stats,#dashboard .grid3,#dashboard .bottom3,.grid3,.bottom3,.formgrid,#subscriptions .formgrid{grid-template-columns:1fr!important}
-}
 </style></head><body>
 <div class="toolbar">
   <span style="font-size:12px;font-weight:900;margin-right:4px">QR Design:</span>
@@ -1217,11 +861,26 @@ window.onload=()=>applyDesign(selectedDesign);
 
 $('qrPrintDesign')?.addEventListener('change',e=>setQRPrintDesign(e.target.value));setQRPrintDesign(qrPrintDesign);$('qrSearch')?.addEventListener('input',renderQRs);$('qrStatus')?.addEventListener('change',renderQRs);$('qrRestaurantFilter')?.addEventListener('change',renderQRs);
 function exportRestaurantsCSV(){const rows=[['id','name','slug','phone','address','status'],...restaurants.map(r=>[r.id,r.name,r.slug,r.phone,r.address,statusOf(r)])];const csv=rows.map(row=>row.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='freemenu-restaurants.csv';a.click()}
+let bulkImportFile=null,bulkImportRows=[],bulkImportValidRows=[],bulkImportErrors=[];
+function populateBulkImportRestaurants(){const el=$('bulkImportRestaurant');if(!el)return;const current=el.value;el.innerHTML='<option value="">Select restaurant...</option>'+restaurants.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}${r.slug?` — ${esc(r.slug)}`:''}</option>`).join('');if(current&&restaurants.some(r=>String(r.id)===String(current)))el.value=current;}
+function bulkNormalizeHeader(v){return String(v??'').trim().toLowerCase().replace(/[\s-]+/g,'_').replace(/[^a-z0-9_]/g,'');}
+function bulkPick(row,aliases){for(const k of aliases)if(Object.prototype.hasOwnProperty.call(row,k))return row[k];return '';}
+function bulkParseNumber(v){const raw=String(v??'').trim();if(!raw)return{value:null,error:null};const n=Number(raw.replace(/[₹,$\s]/g,''));return Number.isFinite(n)&&n>=0?{value:n,error:null}:{value:null,error:`Invalid number: ${raw}`};}
+function bulkParseBoolean(v,field){const raw=String(v??'').trim().toLowerCase();if(!raw)return{value:false,error:null};if(['true','1','yes','y','on'].includes(raw))return{value:true,error:null};if(['false','0','no','n','off'].includes(raw))return{value:false,error:null};if(field==='is_veg'&&['veg','vegetarian'].includes(raw))return{value:true,error:null};if(field==='is_veg'&&['non-veg','nonveg','non_veg'].includes(raw))return{value:false,error:null};return{value:false,error:`Use true/false for ${field}`};}
+function bulkCurrentMaxSort(rid){let max=-1;menuItems.filter(x=>String(x.restaurant_id)===String(rid)).forEach(x=>{const n=Number(x.sort_order);if(Number.isInteger(n)&&n>=0)max=Math.max(max,n);});return max;}
+function bulkFormatRow(raw,index,next){const row={};Object.keys(raw||{}).forEach(k=>row[bulkNormalizeHeader(k)]=raw[k]);const errors=[];const name=String(bulkPick(row,['name','item_name','menu_item_name'])).trim();const category=String(bulkPick(row,['category','category_name'])).trim();const description=String(bulkPick(row,['description'])).trim();if(!name)errors.push('Name is required');if(!category)errors.push('Category is required');const full=bulkParseNumber(bulkPick(row,['price_full','full_price'])),price=bulkParseNumber(bulkPick(row,['price','single_price'])),half=bulkParseNumber(bulkPick(row,['price_half','half_price'])),quarter=bulkParseNumber(bulkPick(row,['price_quarter','quarter_price']));[full,price,half,quarter].forEach(x=>{if(x.error)errors.push(x.error);});if(full.value===null&&price.value===null)errors.push('price_full or price is required');const veg=bulkParseBoolean(bulkPick(row,['is_veg','veg','vegetarian']),'is_veg'),best=bulkParseBoolean(bulkPick(row,['is_bestseller','bestseller','best_seller']),'is_bestseller');if(veg.error)errors.push(veg.error);if(best.error)errors.push(best.error);const sortRaw=String(bulkPick(row,['sort_order','sort','order'])).trim();let sortOrder;if(sortRaw==='')sortOrder=next.value++;else{const n=Number(sortRaw);if(!Number.isInteger(n)||n<0)errors.push('sort_order must be a non-negative integer');sortOrder=n;}const payload={restaurant_id:$('bulkImportRestaurant')?.value||'',name,category,description:description||null,is_veg:veg.value,is_bestseller:best.value,sort_order:sortOrder};if(full.value!==null)payload.price_full=full.value;if(price.value!==null)payload.price=price.value;if(half.value!==null)payload.price_half=half.value;if(quarter.value!==null)payload.price_quarter=quarter.value;return{rowNumber:index+2,name,category,price_full:full.value,price:price.value,price_half:half.value,price_quarter:quarter.value,is_veg:veg.value,is_bestseller:best.value,sort_order:sortOrder,errors,payload};}
+function bulkRenderSummary(){$('bulkTotal').textContent=bulkImportRows.length;$('bulkValid').textContent=bulkImportValidRows.length;$('bulkErrors').textContent=bulkImportErrors.length;$('bulkCategories').textContent=new Set(bulkImportValidRows.map(x=>x.category.toLowerCase()).filter(Boolean)).size;}
+function renderBulkImportPreview(){const box=$('bulkImportPreview');if(!bulkImportRows.length){box.innerHTML='<div class="empty">Upload a CSV to preview your menu items.</div>';$('bulkPreviewCount').textContent='No CSV loaded';return;}const shown=bulkImportRows.slice(0,200);box.innerHTML=`<table class="table"><thead><tr><th>Row</th><th>Name</th><th>Category</th><th>Full</th><th>Price</th><th>Half</th><th>Quarter</th><th>Veg</th><th>Bestseller</th><th>Sort</th><th>Status / Error</th></tr></thead><tbody>${shown.map(x=>`<tr class="${x.errors.length?'bulk-row-error':''}"><td>${x.rowNumber}</td><td>${esc(x.name)}</td><td>${esc(x.category)}</td><td>${x.price_full??'—'}</td><td>${x.price??'—'}</td><td>${x.price_half??'—'}</td><td>${x.price_quarter??'—'}</td><td>${x.is_veg?'true':'false'}</td><td>${x.is_bestseller?'true':'false'}</td><td>${x.sort_order}</td><td class="${x.errors.length?'bulk-error-cell':'bulk-status-ok'}">${x.errors.length?esc(x.errors.join(' • ')):'Ready to import'}</td></tr>`).join('')}</tbody></table>${bulkImportRows.length>200?`<div class="empty">Showing first 200 of ${bulkImportRows.length} rows.</div>`:''}`;$('bulkPreviewCount').textContent=`Showing ${shown.length} of ${bulkImportRows.length} rows`;}
+function parseBulkImportFile(file){if(!file)return;if(!/\.csv$/i.test(file.name)){toast('Please select a CSV file');return;}bulkImportFile=file;$('bulkImportFileInfo').hidden=false;$('bulkImportFileInfo').innerHTML=`<span>📄 <b>${esc(file.name)}</b> · ${(file.size/1024).toFixed(1)} KB</span><span>Ready to parse</span>`;Papa.parse(file,{header:true,skipEmptyLines:'greedy',transformHeader:bulkNormalizeHeader,complete:results=>{if(results.errors?.length){bulkImportRows=[];bulkImportValidRows=[];bulkImportErrors=[];bulkRenderSummary();renderBulkImportPreview();$('bulkImportMessage').hidden=false;$('bulkImportMessage').className='bulk-message error';$('bulkImportMessage').textContent=`CSV parsing error: ${results.errors[0].message}`;return;}const rid=$('bulkImportRestaurant')?.value||'';const next={value:bulkCurrentMaxSort(rid)+1};bulkImportRows=(results.data||[]).filter(r=>Object.values(r||{}).some(v=>String(v??'').trim()!=='')).map((r,i)=>bulkFormatRow(r,i,next));bulkImportValidRows=bulkImportRows.filter(x=>!x.errors.length);bulkImportErrors=bulkImportRows.filter(x=>x.errors.length);bulkRenderSummary();renderBulkImportPreview();$('bulkImportButton').disabled=!rid||!bulkImportValidRows.length;$('bulkImportMessage').hidden=false;$('bulkImportMessage').className=bulkImportErrors.length?'bulk-message error':'bulk-message success';$('bulkImportMessage').textContent=bulkImportErrors.length?`${bulkImportValidRows.length} valid row(s) ready. ${bulkImportErrors.length} row(s) need correction.`:`All ${bulkImportValidRows.length} row(s) are valid and ready to import.`;},error:err=>{$('bulkImportMessage').hidden=false;$('bulkImportMessage').className='bulk-message error';$('bulkImportMessage').textContent='CSV parsing failed: '+err.message;}});}
+function downloadBulkImportTemplate(){const rows=[['name','category','description','price_full','price','price_half','price_quarter','is_veg','is_bestseller','sort_order'],['Paneer Tikka','Starters','Char-grilled cottage cheese',249,'',149,99,true,true,''],['Veg Biryani','Main Course','Aromatic basmati rice',199,'',129,89,true,false,'']];const csv=rows.map(row=>row.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='freemenu-menu-import-template.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
+function clearBulkImport(){bulkImportFile=null;bulkImportRows=[];bulkImportValidRows=[];bulkImportErrors=[];if($('bulkImportFile'))$('bulkImportFile').value='';if($('bulkImportFileInfo')){$('bulkImportFileInfo').hidden=true;$('bulkImportFileInfo').innerHTML='';}if($('bulkImportMessage'))$('bulkImportMessage').hidden=true;if($('bulkImportProgress'))$('bulkImportProgress').textContent='';if($('bulkImportButton'))$('bulkImportButton').disabled=true;bulkRenderSummary();renderBulkImportPreview();}
+async function runBulkImport(){const rid=$('bulkImportRestaurant')?.value||'';if(!rid){toast('Select a restaurant');return;}if(!bulkImportValidRows.length){toast('No valid rows to import');return;}const rows=bulkImportValidRows.map(x=>x.payload),btn=$('bulkImportButton');btn.disabled=true;$('bulkImportProgress').textContent=`Importing ${rows.length} item(s)...`;try{const{error}=await db.from('menu_items').insert(rows);if(error)throw error;await logAction(`Bulk imported ${rows.length} menu items`,rid);$('bulkImportProgress').textContent=`Successfully imported ${rows.length} item(s).`;$('bulkImportMessage').hidden=false;$('bulkImportMessage').className='bulk-message success';$('bulkImportMessage').textContent=`Success — ${rows.length} menu item(s) imported.`;toast(`${rows.length} menu items imported`);await loadAll();}catch(e){$('bulkImportProgress').textContent='Import failed.';$('bulkImportMessage').hidden=false;$('bulkImportMessage').className='bulk-message error';$('bulkImportMessage').textContent='Import failed: '+(e?.message||e);btn.disabled=false;}}
+function initBulkImportUI(){const input=$('bulkImportFile'),drop=$('bulkImportDropzone'),restaurant=$('bulkImportRestaurant');if(!input||!drop||!restaurant)return;input.addEventListener('change',e=>parseBulkImportFile(e.target.files?.[0]));drop.addEventListener('click',e=>{if(e.target.closest('button'))return;input.click();});['dragenter','dragover'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add('dragover');}));['dragleave','drop'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('dragover');}));drop.addEventListener('drop',e=>parseBulkImportFile(e.dataTransfer.files?.[0]));restaurant.addEventListener('change',()=>{if(bulkImportFile)parseBulkImportFile(bulkImportFile);});}
 async function logout(){await db.auth.signOut();location.reload()}
 function startClock(){const tick=()=>{const d=new Date();$('todayDate').textContent=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});$('todayTime').textContent=d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});};tick();setInterval(tick,1000)}
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('globalSearch').focus()}});
 $('globalSearch').addEventListener('input',e=>{const v=e.target.value.toLowerCase();const found=restaurants.filter(r=>`${r.name} ${r.slug} ${r.address}`.toLowerCase().includes(v));if(v){showPage('restaurants');$('restaurantSearch').value=v;renderRestaurantPage()}})
-window.addEventListener('load',async()=>{lucide.createIcons();startClock();try{if(await adminCheck()){await loadAll();buildCharts();updateStats();}}catch(e){console.error(e);alert('Supabase error: '+e.message)}})
+window.addEventListener('load',async()=>{lucide.createIcons();initBulkImportUI();startClock();try{if(await adminCheck()){await loadAll();buildCharts();updateStats();}}catch(e){console.error(e);alert('Supabase error: '+e.message)}})
 
 
 </script>
