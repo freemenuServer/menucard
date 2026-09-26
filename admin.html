@@ -84,6 +84,39 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
   .stats{grid-template-columns:1fr}
   .content{padding:14px 10px}
 }
+
+/* FINAL RESPONSIVE GAP FIX */
+.main{min-width:0!important;width:calc(100% - 238px)!important}
+.content{padding:24px 30px!important;width:100%!important;max-width:none!important;overflow-x:hidden!important}
+.page{width:100%!important;max-width:none!important}
+#dashboard .stats{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:14px!important;width:100%!important}
+#dashboard .stat{width:100%!important;min-width:0!important}
+#dashboard .grid3{display:grid!important;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr) minmax(0,1fr)!important;gap:14px!important;width:100%!important}
+#dashboard .lower{display:grid!important;grid-template-columns:minmax(0,2.3fr) minmax(280px,1fr)!important;gap:14px!important;width:100%!important}
+#dashboard .bottom3{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important;width:100%!important}
+#subscriptions .formgrid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important;width:100%!important}
+#subscriptions .field{width:100%!important;min-width:0!important}
+#subscriptions .field select,#subscriptions .field input{width:100%!important;min-width:0!important}
+#subscriptions .card{width:100%!important}
+@media(max-width:1250px){
+  #dashboard .stats{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+  #dashboard .grid3{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #dashboard .grid3>.card:first-child{grid-column:1/-1}
+  #dashboard .bottom3{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #dashboard .bottom3>.card:last-child{grid-column:1/-1}
+  #subscriptions .formgrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media(max-width:900px){
+  #dashboard .stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #dashboard .grid3,#dashboard .lower,#dashboard .bottom3{grid-template-columns:1fr!important}
+  #dashboard .grid3>.card:first-child,#dashboard .bottom3>.card:last-child{grid-column:auto}
+  #subscriptions .formgrid{grid-template-columns:1fr!important}
+}
+@media(max-width:800px){
+  .main{width:100%!important;margin-left:0!important}
+  .content{padding:16px 12px!important}
+}
+
 </style>
 </head>
 <body>
