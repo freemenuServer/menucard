@@ -110,7 +110,6 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
 
 .reorderMoveBtn{display:inline-flex;align-items:center;gap:6px;border:1px solid #d8dee8;background:#fff;border-radius:7px;padding:6px 9px;color:#475569;font-size:10px;font-weight:800;cursor:grab}.reorderMoveBtn:hover{background:#f1f5f9;border-color:#b8c2d1}.reorderMoveBtn:active{cursor:grabbing}
-.freemenu-login-logo-img{width:190px;max-width:75%;height:auto;display:block;margin:0 auto 14px;object-fit:contain}
 </style>
 
 
@@ -218,14 +217,17 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
   .menuLiveSwitch.off{background:#dc8b2c}
   .menuLiveState{font-size:10px;font-weight:850;white-space:nowrap}
   .menuLiveState.on{color:#087443}.menuLiveState.off{color:#b45309}
+
+.profileSecurityBox{margin:18px 0;padding:16px;border:1px solid var(--border);border-radius:12px;background:#fafafa}
+.profileSecurityTitle{font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px;color:var(--text)}
+.profileSecurityTitle i{color:#d91f35}
+.profileSecuritySub{font-size:11px;color:var(--muted);line-height:1.5;margin:5px 0 14px}
+.profilePasswordMsg{font-size:12px;line-height:1.5;padding:10px 12px;border-radius:8px;margin:0 0 12px}
+.profilePasswordMsg.success{background:#ecfdf3;color:#087443;border:1px solid #bbf7d0}
+.profilePasswordMsg.error{background:#fff1f2;color:#b42318;border:1px solid #fecdd3}
+.profileSecurityBox button:disabled{opacity:.65;cursor:not-allowed}
 </style>
 
-
-  <!-- FreeMenu Brand / Favicon -->
-  <link rel="icon" type="image/png" sizes="512x512" href="favicon-512x512.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 </head>
 
 <body>
@@ -238,7 +240,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
   <div class="ownerAuthCard ownerAuthSplit" id="authChoiceCard">
     <div class="freemenu-login-brand">
       <div class="freemenu-login-brand-inner">
-        <img class="freemenu-login-logo-img" src="./freemenu-logo.png" alt="FreeMenu.in">
+        <div class="freemenu-login-logo">FM</div>
         <div class="fm-kicker">RESTAURANT PARTNER</div>
         <h1>FreeMenu</h1>
         <p class="fm-tagline">Your restaurant menu, profile, QR and daily menu management — all in one simple owner panel.</p>
@@ -681,9 +683,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
       <details class="themeAdvanced">
         <summary><i class="fa-solid fa-sliders"></i> Advanced colors</summary>
         <div class="themeGrid" style="margin-top:10px">
-          <label class="colorField"><input type="color" id="cPrimary" value="#7C2D12"><span>Primary</span></label>
-          <label class="colorField"><input type="color" id="cAccent" value="#D97706"><span>Accent</span></label>
-          <label class="colorField"><input type="color" id="cBg" value="#FFF7ED"><span>Background</span></label>
+          <label class="colorField"><input type="color" id="cPrimary" value="#7c2d12"><span>Primary</span></label>
+          <label class="colorField"><input type="color" id="cAccent" value="#d97706"><span>Accent</span></label>
+          <label class="colorField"><input type="color" id="cBg" value="#fffaf0"><span>Background</span></label>
         </div>
         <div class="themeAdvancedNote">Use this only when you want to fine-tune the selected preset. The saved colors are used by the live public menu.</div>
       </details>
@@ -713,6 +715,29 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     <div class="card">
       <div class="cardTitle">Account & Security</div>
       <div class="formGroup"><label>Logged-in Email</label><input class="input" id="accountEmail" disabled></div>
+
+      <div class="profileSecurityBox">
+        <div class="profileSecurityTitle"><i class="fa-solid fa-key"></i> Change Password</div>
+        <div class="profileSecuritySub">Update your Owner account password without leaving the Profile page.</div>
+
+        <div class="formGroup">
+          <label>Current Password</label>
+          <input class="input" id="profileCurrentPassword" type="password" autocomplete="current-password" placeholder="Enter current password">
+        </div>
+        <div class="twoCol" style="gap:12px">
+          <div class="formGroup">
+            <label>New Password</label>
+            <input class="input" id="profileNewPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Minimum 6 characters">
+          </div>
+          <div class="formGroup">
+            <label>Confirm New Password</label>
+            <input class="input" id="profileConfirmPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Repeat new password">
+          </div>
+        </div>
+        <div id="profilePasswordMsg" class="profilePasswordMsg" style="display:none"></div>
+        <button class="btn primary" id="changeProfilePassword"><i class="fa-solid fa-lock"></i> Change Password</button>
+      </div>
+
       <button class="btn danger" id="logout2"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
     </div>
   </div>
@@ -998,6 +1023,51 @@ async function updateOwnerPassword(){
   }
 }
 
+async function changeProfilePassword(){
+  const current=$("profileCurrentPassword")?.value||"";
+  const next=$("profileNewPassword")?.value||"";
+  const confirm=$("profileConfirmPassword")?.value||"";
+  const msg=$("profilePasswordMsg");
+  const btn=$("changeProfilePassword");
+  const showMsg=(text,type)=>{ if(!msg)return; msg.textContent=text; msg.className="profilePasswordMsg "+type; msg.style.display="block"; };
+
+  if(!current){ showMsg("Please enter your current password.","error"); return; }
+  if(next.length<6){ showMsg("New password must be at least 6 characters.","error"); return; }
+  if(next!==confirm){ showMsg("New passwords do not match.","error"); return; }
+  if(current===next){ showMsg("New password must be different from your current password.","error"); return; }
+
+  btn.disabled=true;
+  btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Changing Password...';
+  if(msg) msg.style.display="none";
+  try{
+    const user=supabaseClient.auth.getUser ? (await supabaseClient.auth.getUser()).data?.user : null;
+    const email=(user?.email||$("accountEmail")?.value||"").trim();
+    if(!email) throw new Error("Unable to identify the logged-in email.");
+
+    // Re-authenticate first so a stale/forgotten current password cannot be used to change it.
+    const {error:loginError}=await supabaseClient.auth.signInWithPassword({email,password:current});
+    if(loginError) throw new Error("Current password is incorrect.");
+
+    const {error}=await supabaseClient.auth.updateUser({password:next});
+    if(error) throw error;
+
+    $("profileCurrentPassword").value="";
+    $("profileNewPassword").value="";
+    $("profileConfirmPassword").value="";
+    showMsg("Password changed successfully.","success");
+    toast("Password changed successfully");
+  }catch(e){
+    console.error("Profile password change failed:",e);
+    showMsg(e?.message||"Unable to change password. Please try again.","error");
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML='<i class="fa-solid fa-lock"></i> Change Password';
+  }
+}
+
+$("changeProfilePassword")?.addEventListener("click",changeProfilePassword);
+["profileCurrentPassword","profileNewPassword","profileConfirmPassword"].forEach(id=>$(id)?.addEventListener("keydown",e=>{if(e.key==="Enter")changeProfilePassword()}));
+
 async function ownerLogin(){
   const email=$("loginEmailNew").value.trim();
   const password=$("loginPasswordNew").value;
@@ -1274,9 +1344,9 @@ function fillProfile(){
   $("fDineIn").checked=r.dine_in!==false;
   $("fTakeaway").checked=r.takeaway!==false;
   $("fDelivery").checked=r.home_delivery!==false;
-  $("cPrimary").value=r.primary_color||r.theme_primary||"#7C2D12";
-  $("cAccent").value=r.accent_color||"#D97706";
-  $("cBg").value=r.background_color||r.theme_background||"#FFF7ED";
+  $("cPrimary").value=r.primary_color||r.theme_primary||"#641219";
+  $("cAccent").value=r.accent_color||"#d8ad62";
+  $("cBg").value=r.background_color||r.theme_background||"#fff7ed";
   renderThemePresetOptions();
   updateTheme();
 
