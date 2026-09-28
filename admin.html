@@ -448,7 +448,7 @@ async function saveRestaurantLogin(){
   if(password.length<6)return showAssignLoginMessage('Password must be at least 6 characters.');
   assignLoginSaving=true; saveBtn.disabled=true; cancelBtn.disabled=true; saveBtn.textContent='Saving...';
   try{
-    const {data,error}=await db.rpc('assign_restaurant_login',{p_restaurant_id:restaurantId,p_email:email,p_password:password});
+    const {data,error}=await db.functions.invoke('assign-restaurant-login',{body:{restaurant_id:restaurantId,email,password}});
     if(error)throw error;
     if(!data||data.status!=='success')throw new Error(data?.message||'Unable to assign restaurant login.');
     showAssignLoginMessage('Restaurant login saved successfully.','success');
