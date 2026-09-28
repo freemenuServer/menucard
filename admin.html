@@ -1207,83 +1207,147 @@ function aiFileToBase64(file){
   });
 }
 async function runAIMenuScan(){
-  const rid=$('aiRestaurant')?.value||'';
-  if(!rid){toast('Select a restaurant first');return;}
-  if(!aiMenuFile){toast('Upload a menu image first');return;}
+  const rid = $('aiRestaurant')?.value;
+  if(!rid){ showAIMessage('Please select a restaurant first.', true); return; }
+  if(!aiMenuFile){ showAIMessage('Please upload a menu image first.', true); return; }
 
-  const btn=$('aiScanButton');
-  btn.disabled=true;
-  btn.textContent='⏳ Scanning menu...';
-  aiSetProgress('Reading the menu image securely…');
-  if($('aiMessage'))$('aiMessage').className='ai-message';
+  const btn = $('aiScanButton');
+  const originalText = btn?.textContent || 'Scan Menu';
+  if(btn){ btn.disabled = true; btn.textContent = 'Scanning…'; }
 
   try{
-    const base64=await aiFileToBase64(aiMenuFile);
-    if(!base64)throw new Error('Could not read the selected image.');
+    aiSetProgress(10, 'Preparing image…');
 
-    aiSetProgress('Gemini is reading the menu…');
+    const base64 = await aiFileToBase64(aiMenuFile);
+    const { data: sessionData, error: sessionError } = await db.auth.getSession();
+    if(sessionError) throw sessionError;
 
-    const {data:sessionData,error:sessionError}=await db.auth.getSession();
-    if(sessionError)throw new Error('Could not read Supabase session: '+sessionError.message);
+    const accessToken = sessionData?.session?.access_token;
+    if(!accessToken) throw new Error('Your session has expired. Please sign in again.');
 
-    const accessToken=sessionData?.session?.access_token;
-    if(!accessToken)throw new Error('Super Admin session expired. Please logout and login again.');
+    const selectedModel = $('aiModel')?.value || 'gemini-3.8-flash';
 
-    const edgeUrl=`${SUPABASE_URL}/functions/v1/scan-menu`;
-    const response=await fetch(edgeUrl,{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':`Bearer ${accessToken}`,
-        'apikey':SUPABASE_KEY
-      },
-      body:JSON.stringify({
-        model:$('aiModel')?.value || 'gemini-3.8-flash',
-        restaurant_id:rid,
-        images:[{
-          mime_type:aiMenuFile.type || 'image/jpeg',
-          data:base64
-        }]
-      })
-    });
+    // Primary model first, then retry it once, then use fallback models.
+    // This specifically handles Gemini temporary 503/high-demand responses.
+    const models = [
+      selectedModel,
+      ...(selectedModel !== 'gemini-3.8-flash' ? ['gemini-3.8-flash'] : []),
+      'gemini-3.7-flash',
+      'gemini-3.6-flash'
+    ].filter((model, index, arr) => model && arr.indexOf(model) === index);
 
-    const raw=await response.text();
-    let data=null;
-    try{data=raw?JSON.parse(raw):null}catch(_){}
+    const endpoint = `${SUPABASE_URL}/functions/v1/scan-menu`;
+    const payload = {
+      restaurant_id: rid,
+      images: [{
+        mime_type: aiMenuFile.type || 'image/jpeg',
+        data: base64
+      }]
+    };
 
-    if(!response.ok){
-      const detail=data?.detail || data?.error || raw || 'Unknown Edge Function error';
-      throw new Error(`Edge Function ${response.status}: ${detail}`);
+    let response = null;
+    let lastError = null;
+
+    for(let i = 0; i < models.length; i++){
+      const model = models[i];
+
+      // Retry the same model once when the Edge Function reports a temporary 502/503.
+      for(let attempt = 0; attempt < 2; attempt++){
+        try{
+          aiSetProgress(
+            25 + Math.min(i * 18 + attempt * 8, 65),
+            i === 0 && attempt === 0
+              ? `Scanning with ${model}…`
+              : `Retrying ${model}…`
+          );
+
+          response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`,
+              'apikey': SUPABASE_KEY
+            },
+            body: JSON.stringify({
+              ...payload,
+              model
+            })
+          });
+
+          const raw = await response.text();
+          let data = null;
+          try{ data = raw ? JSON.parse(raw) : null; }catch(_){}
+
+          if(response.ok){
+            const items = Array.isArray(data?.items) ? data.items : [];
+            if(!items.length){
+              throw new Error('AI scan completed but no menu items were detected.');
+            }
+
+            aiScannedRows = items.map(aiNormalizeRow);
+            aiRenderReview();
+            aiSetProgress(100, `Scan complete — ${aiScannedRows.length} item(s) found.`);
+            showAIMessage(
+              data?.model && data.model !== selectedModel
+                ? `Scan successful using fallback model: ${data.model}`
+                : `Scan successful — ${aiScannedRows.length} item(s) found.`
+            );
+            logAction?.('AI Menu Scan', `Scanned ${aiScannedRows.length} menu items`);
+            return;
+          }
+
+          const detail =
+            data?.error?.message ||
+            data?.message ||
+            raw ||
+            `HTTP ${response.status}`;
+
+          lastError = new Error(`Edge Function ${response.status}: ${detail}`);
+
+          // Only retry/fallback temporary availability/server failures.
+          const temporary =
+            response.status === 502 ||
+            response.status === 503 ||
+            response.status === 504 ||
+            /high demand|temporarily|unavailable|overloaded|capacity/i.test(detail);
+
+          if(!temporary){
+            throw lastError;
+          }
+
+          if(attempt === 0){
+            await new Promise(resolve => setTimeout(resolve, 1200));
+          }
+        }catch(err){
+          lastError = err;
+          if(response && response.ok) throw err;
+
+          const msg = String(err?.message || err);
+          const temporary =
+            /Edge Function (502|503|504)/i.test(msg) ||
+            /high demand|temporarily|unavailable|overloaded|capacity/i.test(msg);
+
+          if(!temporary) throw err;
+          if(attempt === 0){
+            await new Promise(resolve => setTimeout(resolve, 1200));
+          }
+        }
+      }
     }
 
-    if(data?.error)throw new Error(data.error);
-    const rawItems=data?.items||data?.menu_items||data?.results;
-    if(!Array.isArray(rawItems)||!rawItems.length){
-      throw new Error('Gemini did not return any menu items. Try a clearer, well-lit menu image.');
-    }
-
-    aiScanRows=rawItems
-      .map(aiNormalizeRow)
-      .filter(x=>x.name||x.category);
-
-    if(!aiScanRows.length){
-      throw new Error('No readable menu items were detected in this image.');
-    }
-
-    aiRenderReview();
-    aiSetProgress(`Scan complete — ${aiScanRows.length} item(s) detected. Review before saving.`);
-    aiShowMessage(`Menu scanned successfully. ${aiScanRows.length} item(s) detected. Review every item and price before saving.`,'success');
-    await logAction(`AI scanned ${aiScanRows.length} menu items`,rid);
-  }catch(e){
-    console.error('AI menu scan failed:',e);
-    const msg=String(e?.message||e);
-    aiSetProgress('Scan failed.',true);
-    aiShowMessage('Scan failed: '+msg,'error');
+    throw lastError || new Error('AI scan failed. Please try again.');
+  }catch(err){
+    console.error('AI menu scan failed:', err);
+    aiSetProgress(0, '');
+    showAIMessage(err?.message || 'AI scan failed. Please try again.', true);
   }finally{
-    btn.disabled=false;
-    btn.textContent='🔍 Scan Menu with Gemini';
+    if(btn){
+      btn.disabled = false;
+      btn.textContent = originalText;
+    }
   }
 }
+
 async function saveAIScannedMenu(){
   const rid=$('aiRestaurant')?.value||'';
   if(!rid){toast('Select a restaurant');return;}
