@@ -254,7 +254,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
   <div class="subpage-head">
     <div>
       <h2>AI Menu Scanner</h2>
-      <p style="color:#667085;margin:4px 0 0">Upload a paper menu, scan it with Gemini, review the detected items, then save them to <b>menu_items</b>.</p>
+      <p style="color:#667085;margin:4px 0 0">Upload a paper menu, scan it securely with Gemini, review the detected items, then save them to <b>menu_items</b>.</p>
     </div>
   </div>
 
@@ -1210,34 +1210,79 @@ async function runAIMenuScan(){
   const rid=$('aiRestaurant')?.value||'';
   if(!rid){toast('Select a restaurant first');return;}
   if(!aiMenuFile){toast('Upload a menu image first');return;}
-  const btn=$('aiScanButton');btn.disabled=true;
-  aiSetProgress('Uploading image to the secure Supabase Edge Function…');
+
+  const btn=$('aiScanButton');
+  btn.disabled=true;
+  btn.textContent='⏳ Scanning menu...';
+  aiSetProgress('Reading the menu image securely…');
   if($('aiMessage'))$('aiMessage').className='ai-message';
+
   try{
     const base64=await aiFileToBase64(aiMenuFile);
+    if(!base64)throw new Error('Could not read the selected image.');
+
     aiSetProgress('Gemini is reading the menu…');
-    const {data,error}=await db.functions.invoke('scan-menu',{
-      body:{
+
+    const {data:sessionData,error:sessionError}=await db.auth.getSession();
+    if(sessionError)throw new Error('Could not read Supabase session: '+sessionError.message);
+
+    const accessToken=sessionData?.session?.access_token;
+    if(!accessToken)throw new Error('Super Admin session expired. Please logout and login again.');
+
+    const edgeUrl=`${SUPABASE_URL}/functions/v1/scan-menu`;
+    const response=await fetch(edgeUrl,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':`Bearer ${accessToken}`,
+        'apikey':SUPABASE_KEY
+      },
+      body:JSON.stringify({
+        model:$('aiModel')?.value || 'gemini-3.8-flash',
         restaurant_id:rid,
-        image_base64:base64,
-        mime_type:aiMenuFile.type,
-        filename:aiMenuFile.name
-      }
+        images:[{
+          mime_type:aiMenuFile.type || 'image/jpeg',
+          data:base64
+        }]
+      })
     });
-    if(error)throw error;
+
+    const raw=await response.text();
+    let data=null;
+    try{data=raw?JSON.parse(raw):null}catch(_){}
+
+    if(!response.ok){
+      const detail=data?.detail || data?.error || raw || 'Unknown Edge Function error';
+      throw new Error(`Edge Function ${response.status}: ${detail}`);
+    }
+
     if(data?.error)throw new Error(data.error);
-    const raw=data?.items||data?.menu_items||data?.results||data?.data||data;
-    const items=Array.isArray(raw)?raw:(Array.isArray(raw?.items)?raw.items:[]);
-    if(!items.length)throw new Error('Gemini did not return any menu items. Try a clearer image.');
-    aiScanRows=items.map(aiNormalizeRow).filter(x=>x.name||x.category);
+    const rawItems=data?.items||data?.menu_items||data?.results;
+    if(!Array.isArray(rawItems)||!rawItems.length){
+      throw new Error('Gemini did not return any menu items. Try a clearer, well-lit menu image.');
+    }
+
+    aiScanRows=rawItems
+      .map(aiNormalizeRow)
+      .filter(x=>x.name||x.category);
+
+    if(!aiScanRows.length){
+      throw new Error('No readable menu items were detected in this image.');
+    }
+
     aiRenderReview();
     aiSetProgress(`Scan complete — ${aiScanRows.length} item(s) detected. Review before saving.`);
-    aiShowMessage('Menu scanned successfully. Please review every item and price before saving.','success');
+    aiShowMessage(`Menu scanned successfully. ${aiScanRows.length} item(s) detected. Review every item and price before saving.`,'success');
+    await logAction(`AI scanned ${aiScanRows.length} menu items`,rid);
   }catch(e){
     console.error('AI menu scan failed:',e);
+    const msg=String(e?.message||e);
     aiSetProgress('Scan failed.',true);
-    aiShowMessage('Scan failed: '+(e?.message||e),'error');
-  }finally{btn.disabled=false;}
+    aiShowMessage('Scan failed: '+msg,'error');
+  }finally{
+    btn.disabled=false;
+    btn.textContent='🔍 Scan Menu with Gemini';
+  }
 }
 async function saveAIScannedMenu(){
   const rid=$('aiRestaurant')?.value||'';
