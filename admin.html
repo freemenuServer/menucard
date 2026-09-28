@@ -145,6 +145,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
     <button data-page="owners"><i data-lucide="users"></i>Restaurant Owners</button>
     <button data-page="menu"><i data-lucide="book-open"></i>Menu Management</button>
     <button data-page="bulkImport"><i data-lucide="file-up"></i>Bulk CSV Import</button>
+    <button data-page="aiScanner"><i data-lucide="scan-line"></i>AI Menu Scanner <b class="badge" style="background:#7f56d9">AI</b></button>
     <button data-page="categories"><i data-lucide="layers"></i>Categories</button>
     <button data-page="approvals"><i data-lucide="clock-3"></i>Pending Approvals <b class="badge" id="approvalBadge">0</b></button>
     <button data-page="ads"><i data-lucide="badge-dollar-sign"></i>Advertisements</button><button data-page="mediaRules"><i data-lucide="image"></i>Media Upload Rules</button>
@@ -249,6 +250,97 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
   </div>
 </div>
 
+<div id="aiScanner" class="page">
+  <div class="subpage-head">
+    <div>
+      <h2>AI Menu Scanner</h2>
+      <p style="color:#667085;margin:4px 0 0">Upload a paper menu, scan it with Gemini, review the detected items, then save them to <b>menu_items</b>.</p>
+    </div>
+  </div>
+
+  <div class="ai-scanner-card">
+    <div class="ai-scanner-head">
+      <div>
+        <h2>🤖 Scan Paper Menu</h2>
+        <p>AI will extract categories, item names, descriptions and available prices. You can edit everything before saving.</p>
+      </div>
+      <span class="ai-badge">✦ Gemini AI</span>
+    </div>
+
+    <div class="ai-upload-grid">
+      <div>
+        <div class="field" style="margin-bottom:12px">
+          <label>Restaurant</label>
+          <select class="input" id="aiRestaurant">
+            <option value="">Select restaurant...</option>
+          </select>
+          <small style="display:block;color:#667085;font-size:10px;margin-top:5px">All scanned items will be assigned to this restaurant.</small>
+        </div>
+
+        <input id="aiMenuFile" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" hidden>
+        <div id="aiDropzone" class="ai-dropzone" tabindex="0">
+          <div class="ai-drop-icon"><i data-lucide="scan-line"></i></div>
+          <strong>Upload menu image</strong>
+          <span>JPG, PNG or WebP · Clear, readable photos work best</span>
+          <button type="button" class="smallbtn" style="margin-top:12px" onclick="document.getElementById('aiMenuFile').click();event.stopPropagation()">Choose Image</button>
+          <div id="aiFileName" class="ai-file-name"></div>
+        </div>
+
+        <div class="ai-scan-actions">
+          <button type="button" class="smallbtn" onclick="clearAIScanner()">Clear</button>
+          <button type="button" id="aiScanButton" class="primary" onclick="runAIMenuScan()">🔍 Scan Menu with Gemini</button>
+        </div>
+
+        <div id="aiProgress" class="ai-progress"></div>
+        <div id="aiMessage" class="ai-message"></div>
+      </div>
+
+      <div class="ai-side">
+        <h3>What AI extracts</h3>
+        <ul>
+          <li>Category</li>
+          <li>Item name</li>
+          <li>Description</li>
+          <li>Single / Full price</li>
+          <li>Half price</li>
+          <li>Quarter price</li>
+          <li>Veg / Non-Veg when visible</li>
+          <li>Bestseller when clearly marked</li>
+        </ul>
+        <div class="notice" style="margin:14px 0 0;font-size:10px">
+          <b>Important:</b> Always review the AI result before saving. Handwritten or blurry menus may need manual correction.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="aiReview" class="ai-scanner-card ai-review">
+    <div class="ai-review-toolbar">
+      <div>
+        <h3>Preview & Edit</h3>
+        <span id="aiReviewCount" class="ai-review-count">0 items detected</span>
+      </div>
+      <button type="button" class="ai-add-row" onclick="aiAddRow()">＋ Add Item</button>
+    </div>
+
+    <div class="ai-review-wrap">
+      <table class="ai-review-table" id="aiReviewTable">
+        <thead>
+          <tr>
+            <th>Category</th><th>Name</th><th>Description</th><th>Full</th><th>Price</th><th>Half</th><th>Quarter</th><th>Veg</th><th>Best</th><th>Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="ai-save-bar">
+      <span id="aiSaveStatus" class="ai-save-status"></span>
+      <button type="button" id="aiSaveButton" class="primary" onclick="saveAIScannedMenu()">💾 Save All to Menu</button>
+    </div>
+  </div>
+</div>
+
 <div id="categories" class="page"><div class="subpage-head"><h2>Categories</h2><button class="primary" onclick="openCategoryModal()">+ Add Category</button></div><div class="card"><div id="categoriesTable" class="tablewrap"></div></div></div>
 <div id="approvals" class="page"><div class="subpage-head"><h2>Pending Approvals</h2></div><div class="card"><div id="approvalsTable" class="tablewrap"></div></div></div>
 <div id="ads" class="page"><div class="subpage-head"><h2>Advertisements</h2></div><div class="card"><div class="notice">Free plan ads can be enabled here. Premium restaurants should automatically stop showing public-menu ads while their active subscription is valid.</div><div class="formgrid"><div class="field"><label>Google AdSense Client ID</label><input id="adsClient" placeholder="ca-pub-xxxxxxxx"></div><div class="field"><label>Default Ad Slot</label><input id="adsSlot" placeholder="1234567890"></div><div class="field"><label>Ads on Free Menus</label><select id="adsFree"><option value="true">Enabled</option><option value="false">Disabled</option></select></div><div class="field"><label>Ads on Premium Menus</label><select id="adsPremium"><option value="false">Disabled</option><option value="true">Enabled</option></select></div><div class="field"><label>Menu Ad Position</label><select id="adsPosition"><option value="after_2_categories">After every 2 categories</option><option value="after_1_category">After every category</option></select></div></div><div class="modalfoot"><button class="primary" onclick="saveAdSettings()">Save Ad Settings</button></div></div></div>
@@ -327,7 +419,7 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 function toast(m){$('toast').textContent=m;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2400)}
 function toggleSidebar(){$('sidebar').classList.toggle('open')}
-function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$(id)?.classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(innerWidth<800)$('sidebar').classList.remove('open');if(id==='restaurants')renderRestaurantPage();if(id==='owners')renderOwners();if(id==='menu')renderMenu();if(id==='bulkImport')populateBulkImportRestaurants();if(id==='categories')renderCategories();if(id==='approvals')renderApprovals();if(id==='subscriptions')renderSubscriptions();if(id==='plans')renderPlans();if(id==='admins')renderAdmins();if(id==='logs')renderLogs();if(id==='analytics')renderAnalytics();if(id==='qrManagement')loadQRs()}
+function showPage(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$(id)?.classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));if(innerWidth<800)$('sidebar').classList.remove('open');if(id==='restaurants')renderRestaurantPage();if(id==='owners')renderOwners();if(id==='menu')renderMenu();if(id==='bulkImport')populateBulkImportRestaurants();if(id==='categories')renderCategories();if(id==='approvals')renderApprovals();if(id==='subscriptions')renderSubscriptions();if(id==='plans')renderPlans();if(id==='admins')renderAdmins();if(id==='logs')renderLogs();if(id==='analytics')renderAnalytics();if(id==='qrManagement')loadQRs();if(id==='aiScanner')populateAIRestaurants()}
 document.querySelectorAll('.nav button[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
 function closeModal(){$('modal').classList.remove('show')}
 $('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeModal()});
@@ -363,7 +455,7 @@ async function loadAll(){
   profiles=await q('profiles');
   subscriptions=await q('subscriptions');
   await loadPlans();
-  updateStats();renderDashboardTable();renderCities();renderPopularCats();await renderActivity();populateRestaurantFilters();populateBulkImportRestaurants();renderRestaurantPage();renderMenu();renderCategories();renderApprovals();renderSubscriptions();renderOwners();renderAdmins();await renderLogs();renderAnalytics();await loadSettings();await loadAdSettings();await loadMediaRules();await loadQRs();
+  updateStats();renderDashboardTable();renderCities();renderPopularCats();await renderActivity();populateRestaurantFilters();populateBulkImportRestaurants();populateAIRestaurants();renderRestaurantPage();renderMenu();renderCategories();renderApprovals();renderSubscriptions();renderOwners();renderAdmins();await renderLogs();renderAnalytics();await loadSettings();await loadAdSettings();await loadMediaRules();await loadQRs();
  }catch(e){console.error('loadAll failed',e);toast('Dashboard refresh failed: '+(e?.message||e));}
 
   startPlanExpiryWatcher();
@@ -1022,6 +1114,187 @@ window.onload=()=>applyDesign(selectedDesign);
 
 $('qrPrintDesign')?.addEventListener('change',e=>setQRPrintDesign(e.target.value));setQRPrintDesign(qrPrintDesign);$('qrSearch')?.addEventListener('input',renderQRs);$('qrStatus')?.addEventListener('change',renderQRs);$('qrRestaurantFilter')?.addEventListener('change',renderQRs);
 function exportRestaurantsCSV(){const rows=[['id','name','slug','phone','address','status'],...restaurants.map(r=>[r.id,r.name,r.slug,r.phone,r.address,statusOf(r)])];const csv=rows.map(row=>row.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(',')).join('\\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='freemenu-restaurants.csv';a.click()}
+
+// ==================== AI MENU SCANNER ====================
+let aiMenuFile=null, aiScanRows=[];
+
+function populateAIRestaurants(){
+  const el=$('aiRestaurant'); if(!el)return;
+  const current=el.value;
+  el.innerHTML='<option value="">Select restaurant...</option>'+
+    restaurants.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}${r.slug?` — ${esc(r.slug)}`:''}</option>`).join('');
+  if(current && restaurants.some(r=>String(r.id)===String(current))) el.value=current;
+}
+
+function aiShowMessage(message,type='success'){
+  const el=$('aiMessage'); if(!el)return;
+  el.textContent=message;el.className='ai-message show '+type;
+}
+function aiSetProgress(message,show=true){
+  const el=$('aiProgress');if(!el)return;
+  el.textContent=message;el.classList.toggle('show',show);
+}
+function aiNormalizeNumber(v){
+  if(v===null||v===undefined||String(v).trim()==='')return null;
+  const n=Number(String(v).replace(/[₹,$\s]/g,''));
+  return Number.isFinite(n)&&n>=0?n:null;
+}
+function aiNormalizeRow(x={}){
+  return {
+    category:String(x.category??x.category_name??'').trim(),
+    name:String(x.name??x.item_name??x.menu_item_name??'').trim(),
+    description:String(x.description??'').trim(),
+    price_full:aiNormalizeNumber(x.price_full??x.full_price),
+    price:aiNormalizeNumber(x.price??x.single_price),
+    price_half:aiNormalizeNumber(x.price_half??x.half_price),
+    price_quarter:aiNormalizeNumber(x.price_quarter??x.quarter_price),
+    is_veg:typeof x.is_veg==='boolean'?x.is_veg:!['false','no','non-veg','nonveg','non_veg'].includes(String(x.is_veg??'').toLowerCase()),
+    is_bestseller:typeof x.is_bestseller==='boolean'?x.is_bestseller:!!x.bestseller,
+    confidence:x.confidence??null
+  };
+}
+function aiRenderReview(){
+  const body=$('aiReviewTable')?.querySelector('tbody');if(!body)return;
+  body.innerHTML=aiScanRows.map((x,i)=>`
+    <tr class="${Number(x.confidence)<0.65?'ai-low-confidence':''}">
+      <td><input data-ai="category" data-i="${i}" value="${esc(x.category)}"></td>
+      <td><input data-ai="name" data-i="${i}" value="${esc(x.name)}"></td>
+      <td><textarea data-ai="description" data-i="${i}">${esc(x.description)}</textarea></td>
+      <td><input class="ai-num" type="number" min="0" step="0.01" data-ai="price_full" data-i="${i}" value="${x.price_full??''}"></td>
+      <td><input class="ai-num" type="number" min="0" step="0.01" data-ai="price" data-i="${i}" value="${x.price??''}"></td>
+      <td><input class="ai-num" type="number" min="0" step="0.01" data-ai="price_half" data-i="${i}" value="${x.price_half??''}"></td>
+      <td><input class="ai-num" type="number" min="0" step="0.01" data-ai="price_quarter" data-i="${i}" value="${x.price_quarter??''}"></td>
+      <td><select data-ai="is_veg" data-i="${i}"><option value="true" ${x.is_veg?'selected':''}>Yes</option><option value="false" ${!x.is_veg?'selected':''}>No</option></select></td>
+      <td><select data-ai="is_bestseller" data-i="${i}"><option value="true" ${x.is_bestseller?'selected':''}>Yes</option><option value="false" ${!x.is_bestseller?'selected':''}>No</option></select></td>
+      <td><button type="button" class="ai-remove" onclick="aiRemoveRow(${i})">🗑</button></td>
+    </tr>`).join('');
+  $('aiReviewCount').textContent=`${aiScanRows.length} item(s) detected`;
+  $('aiReview').classList.toggle('show',aiScanRows.length>0);
+  body.querySelectorAll('[data-ai]').forEach(el=>{
+    el.addEventListener('input',()=>aiSyncField(el));
+    el.addEventListener('change',()=>aiSyncField(el));
+  });
+}
+function aiSyncField(el){
+  const i=Number(el.dataset.i),field=el.dataset.ai;
+  if(!aiScanRows[i])return;
+  let v=el.value;
+  if(['price_full','price','price_half','price_quarter'].includes(field))v=aiNormalizeNumber(v);
+  if(['is_veg','is_bestseller'].includes(field))v=v==='true';
+  aiScanRows[i][field]=v;
+}
+function aiAddRow(){
+  aiScanRows.push({category:'',name:'',description:'',price_full:null,price:null,price_half:null,price_quarter:null,is_veg:true,is_bestseller:false,confidence:1});
+  aiRenderReview();
+}
+function aiRemoveRow(i){aiScanRows.splice(i,1);aiRenderReview();}
+function clearAIScanner(){
+  aiMenuFile=null;aiScanRows=[];
+  if($('aiMenuFile'))$('aiMenuFile').value='';
+  if($('aiFileName'))$('aiFileName').textContent='';
+  $('aiDropzone')?.classList.remove('has-file');
+  $('aiReview')?.classList.remove('show');
+  aiSetProgress('',false);
+  if($('aiMessage'))$('aiMessage').className='ai-message';
+  if($('aiSaveStatus'))$('aiSaveStatus').textContent='';
+}
+function aiFileToBase64(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(String(reader.result||'').split(',')[1]||'');
+    reader.onerror=reject;
+    reader.readAsDataURL(file);
+  });
+}
+async function runAIMenuScan(){
+  const rid=$('aiRestaurant')?.value||'';
+  if(!rid){toast('Select a restaurant first');return;}
+  if(!aiMenuFile){toast('Upload a menu image first');return;}
+  const btn=$('aiScanButton');btn.disabled=true;
+  aiSetProgress('Uploading image to the secure Supabase Edge Function…');
+  if($('aiMessage'))$('aiMessage').className='ai-message';
+  try{
+    const base64=await aiFileToBase64(aiMenuFile);
+    aiSetProgress('Gemini is reading the menu…');
+    const {data,error}=await db.functions.invoke('scan-menu',{
+      body:{
+        restaurant_id:rid,
+        image_base64:base64,
+        mime_type:aiMenuFile.type,
+        filename:aiMenuFile.name
+      }
+    });
+    if(error)throw error;
+    if(data?.error)throw new Error(data.error);
+    const raw=data?.items||data?.menu_items||data?.results||data?.data||data;
+    const items=Array.isArray(raw)?raw:(Array.isArray(raw?.items)?raw.items:[]);
+    if(!items.length)throw new Error('Gemini did not return any menu items. Try a clearer image.');
+    aiScanRows=items.map(aiNormalizeRow).filter(x=>x.name||x.category);
+    aiRenderReview();
+    aiSetProgress(`Scan complete — ${aiScanRows.length} item(s) detected. Review before saving.`);
+    aiShowMessage('Menu scanned successfully. Please review every item and price before saving.','success');
+  }catch(e){
+    console.error('AI menu scan failed:',e);
+    aiSetProgress('Scan failed.',true);
+    aiShowMessage('Scan failed: '+(e?.message||e),'error');
+  }finally{btn.disabled=false;}
+}
+async function saveAIScannedMenu(){
+  const rid=$('aiRestaurant')?.value||'';
+  if(!rid){toast('Select a restaurant');return;}
+  if(!aiScanRows.length){toast('No scanned items to save');return;}
+  const invalid=aiScanRows.filter(x=>!x.name||!x.category);
+  if(invalid.length){toast(`${invalid.length} item(s) need a name and category`);return;}
+  const btn=$('aiSaveButton');btn.disabled=true;
+  $('aiSaveStatus').textContent=`Saving ${aiScanRows.length} item(s)…`;
+  try{
+    const maxSort=menuItems.filter(x=>String(x.restaurant_id)===String(rid)).reduce((m,x)=>Math.max(m,Number.isInteger(Number(x.sort_order))?Number(x.sort_order):-1),-1);
+    const rows=aiScanRows.map((x,i)=>{
+      const p={
+        restaurant_id:rid,name:x.name.trim(),category:x.category.trim(),
+        description:x.description?.trim()||null,is_veg:!!x.is_veg,is_bestseller:!!x.is_bestseller,
+        sort_order:maxSort+i+1
+      };
+      if(x.price_full!==null)p.price_full=x.price_full;
+      if(x.price!==null)p.price=x.price;
+      if(x.price_half!==null)p.price_half=x.price_half;
+      if(x.price_quarter!==null)p.price_quarter=x.price_quarter;
+      return p;
+    });
+    const {error}=await db.from('menu_items').insert(rows);
+    if(error)throw error;
+    await logAction(`AI scanned and imported ${rows.length} menu items`,rid);
+    $('aiSaveStatus').textContent=`Successfully saved ${rows.length} item(s) to menu_items.`;
+    aiShowMessage(`Success — ${rows.length} menu item(s) saved to the selected restaurant.`,'success');
+    toast(`${rows.length} menu items saved`);
+    aiScanRows=[];aiRenderReview();
+    await loadAll();
+  }catch(e){
+    console.error('AI menu save failed:',e);
+    $('aiSaveStatus').textContent='Save failed.';
+    aiShowMessage('Save failed: '+(e?.message||e),'error');
+  }finally{btn.disabled=false;}
+}
+function initAIScannerUI(){
+  const input=$('aiMenuFile'),drop=$('aiDropzone');
+  if(!input||!drop)return;
+  input.addEventListener('change',e=>{
+    const f=e.target.files?.[0];if(!f)return;
+    aiMenuFile=f;$('aiFileName').textContent=`${f.name} · ${(f.size/1024/1024).toFixed(2)} MB`;
+    drop.classList.add('has-file');
+  });
+  drop.addEventListener('click',e=>{if(e.target.closest('button'))return;input.click();});
+  ['dragenter','dragover'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add('dragover');}));
+  ['dragleave','drop'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('dragover');}));
+  drop.addEventListener('drop',e=>{
+    const f=e.dataTransfer.files?.[0];if(!f)return;
+    if(!/^image\//.test(f.type)){toast('Please drop an image file');return;}
+    aiMenuFile=f;$('aiFileName').textContent=`${f.name} · ${(f.size/1024/1024).toFixed(2)} MB`;
+    drop.classList.add('has-file');
+  });
+  $('aiRestaurant')?.addEventListener('change',()=>{});
+}
+
 let bulkImportFile=null,bulkImportRows=[],bulkImportValidRows=[],bulkImportErrors=[];
 function populateBulkImportRestaurants(){const el=$('bulkImportRestaurant');if(!el)return;const current=el.value;el.innerHTML='<option value="">Select restaurant...</option>'+restaurants.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}${r.slug?` — ${esc(r.slug)}`:''}</option>`).join('');if(current&&restaurants.some(r=>String(r.id)===String(current)))el.value=current;}
 function bulkNormalizeHeader(v){return String(v??'').trim().toLowerCase().replace(/[\s-]+/g,'_').replace(/[^a-z0-9_]/g,'');}
@@ -1041,7 +1314,7 @@ async function logout(){await db.auth.signOut();location.reload()}
 function startClock(){const tick=()=>{const d=new Date();$('todayDate').textContent=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});$('todayTime').textContent=d.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});};tick();setInterval(tick,1000)}
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('globalSearch').focus()}});
 $('globalSearch').addEventListener('input',e=>{const v=e.target.value.toLowerCase();const found=restaurants.filter(r=>`${r.name} ${r.slug} ${r.address}`.toLowerCase().includes(v));if(v){showPage('restaurants');$('restaurantSearch').value=v;renderRestaurantPage()}})
-window.addEventListener('load',async()=>{lucide.createIcons();initBulkImportUI();startClock();try{if(await adminCheck()){await loadAll();buildCharts();updateStats();}}catch(e){console.error(e);alert('Supabase error: '+e.message)}})
+window.addEventListener('load',async()=>{lucide.createIcons();initBulkImportUI();initAIScannerUI();startClock();try{if(await adminCheck()){await loadAll();buildCharts();updateStats();}}catch(e){console.error(e);alert('Supabase error: '+e.message)}})
 
 
 </script>
