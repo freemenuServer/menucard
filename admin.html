@@ -422,7 +422,7 @@ function openAssignModal(restaurantId){
   if(!r)return toast('Restaurant not found');
   $('assignLoginRestaurantId').value=r.id||'';
   $('assignLoginRestaurantName').textContent=r.name||'Restaurant';
-  $('assignLoginEmail').value=(r.email||'').trim();
+  $('assignLoginEmail').value='';
   $('assignLoginPassword').value='';
   const msg=$('assignLoginMessage'); msg.className='assign-login-message'; msg.textContent='';
   $('assignLoginOverlay').classList.add('show');
