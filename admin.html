@@ -449,6 +449,14 @@ async function saveRestaurantLogin(){
   assignLoginSaving=true; saveBtn.disabled=true; cancelBtn.disabled=true; saveBtn.textContent='Saving...';
   try{
     const {data,error}=await db.functions.invoke('assign-restaurant-login',{body:{restaurant_id:restaurantId,email,password}});
+    if(error){
+      let detail='';
+      try{ if(error.context){ const raw=await error.context.text(); if(raw) detail=raw; } }catch(_){}
+      try{ if(!detail && data) detail=typeof data==='string'?data:JSON.stringify(data); }catch(_){}
+      let message=error.message||'Edge Function request failed.';
+      try{ const parsed=detail?JSON.parse(detail):null; if(parsed?.message) message=parsed.message; }catch(_){}
+      throw new Error(message);
+    }
     if(error)throw error;
     if(!data||data.status!=='success')throw new Error(data?.message||'Unable to assign restaurant login.');
     showAssignLoginMessage('Restaurant login saved successfully.','success');
