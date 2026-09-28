@@ -105,6 +105,22 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+<style>
+/* Restaurant Login Assignment - added without changing existing pages */
+.assign-login-overlay{position:fixed;inset:0;z-index:10000;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;padding:20px}
+.assign-login-overlay.show{display:flex}
+.assign-login-card{width:min(520px,100%);background:#fff;border-radius:16px;box-shadow:0 24px 70px rgba(15,23,42,.25);overflow:hidden}
+.assign-login-head{display:flex;align-items:flex-start;justify-content:space-between;padding:20px;border-bottom:1px solid #e5e7eb}
+.assign-login-head h3{margin:0;font-size:18px}.assign-login-head p{margin:6px 0 0;color:#667085;font-size:13px}
+.assign-login-close{border:0;background:transparent;font-size:28px;line-height:1;color:#667085;cursor:pointer}
+.assign-login-body{padding:20px}.assign-login-field{margin-bottom:16px}.assign-login-field label{display:block;font-weight:700;font-size:13px;margin-bottom:7px;color:#344054}
+.assign-login-field input{width:100%;box-sizing:border-box;border:1px solid #d0d5dd;border-radius:9px;padding:11px 12px;font:inherit;outline:none}
+.assign-login-field input:focus{border-color:#ef3340;box-shadow:0 0 0 3px rgba(239,51,64,.10)}
+.assign-login-help{font-size:12px;color:#98a2b3;margin-top:6px}.assign-login-message{display:none;padding:10px 12px;border-radius:9px;font-size:13px;margin-top:12px}.assign-login-message.success{display:block;background:#ecfdf3;color:#027a48;border:1px solid #abefc6}.assign-login-message.error{display:block;background:#fef3f2;color:#b42318;border:1px solid #fecdca}
+.assign-login-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 20px;border-top:1px solid #eaecf0}
+.assign-login-save:disabled,.assign-login-cancel:disabled{opacity:.6;cursor:not-allowed}
+</style>
 </head>
 <body>
 
@@ -365,7 +381,7 @@ function renderDashboardTable(list=restaurants.slice(-5).reverse()){
  list=list||[];
  $('dashTable').innerHTML=`<table class="table"><thead><tr><th>#</th><th>Logo</th><th>Restaurant</th><th>Owner</th><th>Location</th><th>Items</th><th>Status</th><th>Action</th></tr></thead><tbody>${list.map((r,i)=>{const owner=profiles.find(p=>p.id===r.owner_id);const cnt=menuItems.filter(m=>m.restaurant_id===r.id).length;return `<tr><td>${i+1}</td><td>${r.logo_url?`<img src="${esc(r.logo_url)}" style="width:30px;height:30px;border-radius:50%;object-fit:cover">`:'🍽️'}</td><td><a href="javascript:void(0)" class="restaurant-direct-link" title="Open Owner Panel" onclick="openOwnerPanel('${r.id}')"><b>${esc(r.name)}</b></a><br><small>${esc(r.phone||'')}</small></td><td>${esc(owner?.name||owner?.full_name||owner?.email||'—')}</td><td>${esc(r.address||'—')}</td><td>${cnt}</td><td>${pill(statusOf(r))}</td><td>${actionBtns(r)}</td></tr>`}).join('')}</tbody></table>`}
 function pill(s){return `<span class="pill ${s==='active'?'green':s==='pending'?'orange':'red'}">● ${esc(s)}</span>`}
-function actionBtns(r){return `<div class="actions"><button class="iconbtn" title="Open Owner Panel (Super Admin)" aria-label="Open Owner Panel" onclick="openOwnerPanel('${r.id}')">🔑</button><button class="iconbtn" title="Public Menu" onclick="openPublic('${esc(r.slug)}')">👁</button><button class="iconbtn" onclick="openRestaurantModal('${r.id}')">✎</button><button class="iconbtn" onclick="setRestaurantStatus('${r.id}','${statusOf(r)==='blocked'?'active':'blocked'}')">${statusOf(r)==='blocked'?'✓':'⊘'}</button><button class="iconbtn" onclick="deleteRestaurant('${r.id}')">⋯</button></div>`}
+function actionBtns(r){return `<div class="actions"><button class="iconbtn" title="Set/Edit Restaurant Login" aria-label="Set Restaurant Login" onclick="openAssignModal('${r.id}')">🔐</button><button class="iconbtn" title="Open Owner Panel (Super Admin)" aria-label="Open Owner Panel" onclick="openOwnerPanel('${r.id}')">🔑</button><button class="iconbtn" title="Public Menu" onclick="openPublic('${esc(r.slug)}')">👁</button><button class="iconbtn" onclick="openRestaurantModal('${r.id}')">✎</button><button class="iconbtn" onclick="setRestaurantStatus('${r.id}','${statusOf(r)==='blocked'?'active':'blocked'}')">${statusOf(r)==='blocked'?'✓':'⊘'}</button><button class="iconbtn" onclick="deleteRestaurant('${r.id}')">⋯</button></div>`}
 function openOwnerPanel(id){if(!session?.user?.id)return toast('Super Admin session expired. Please login again.');const url=`owner.html?admin_restaurant=${encodeURIComponent(id)}&admin=1`;window.open(url,'_blank','noopener,noreferrer')}
 function openPublic(slug){window.open(`menu.html?r=${encodeURIComponent(slug)}`,'_blank')}
 function renderCities(){
@@ -400,6 +416,53 @@ async function saveRestaurant(id){
 }
 async function setRestaurantStatus(id,status){const r=await db.from('restaurants').update({status}).eq('id',id);if(r.error)return toast(r.error.message);await logAction(`Changed restaurant status to ${status}`,id);toast('Status updated');await loadAll()}
 async function deleteRestaurant(id){if(!confirm('Delete this restaurant?'))return;const r=await db.from('restaurants').delete().eq('id',id);if(r.error)return toast(r.error.message);await logAction('Deleted restaurant',id);toast('Restaurant deleted');await loadAll()}
+let assignLoginSaving=false;
+function openAssignModal(restaurantId){
+  const r=restaurants.find(x=>String(x.id)===String(restaurantId));
+  if(!r)return toast('Restaurant not found');
+  $('assignLoginRestaurantId').value=r.id||'';
+  $('assignLoginRestaurantName').textContent=r.name||'Restaurant';
+  $('assignLoginEmail').value=(r.email||'').trim();
+  $('assignLoginPassword').value='';
+  const msg=$('assignLoginMessage'); msg.className='assign-login-message'; msg.textContent='';
+  $('assignLoginOverlay').classList.add('show');
+  setTimeout(()=>$('assignLoginEmail').focus(),50);
+}
+function closeAssignModal(){
+  $('assignLoginOverlay')?.classList.remove('show');
+  if($('assignLoginPassword'))$('assignLoginPassword').value='';
+  assignLoginSaving=false;
+}
+function showAssignLoginMessage(text,type='error'){
+  const msg=$('assignLoginMessage'); if(!msg)return; msg.textContent=text; msg.className='assign-login-message '+type;
+}
+async function saveRestaurantLogin(){
+  if(assignLoginSaving)return;
+  const restaurantId=($('assignLoginRestaurantId')?.value||'').trim();
+  const email=($('assignLoginEmail')?.value||'').trim().toLowerCase();
+  const password=$('assignLoginPassword')?.value||'';
+  const saveBtn=$('assignLoginSaveBtn'),cancelBtn=$('assignLoginCancelBtn');
+  if(!restaurantId)return showAssignLoginMessage('Restaurant ID is missing.');
+  if(!email)return showAssignLoginMessage('Please enter the login email.');
+  if(!/^\S+@\S+\.\S+$/.test(email))return showAssignLoginMessage('Please enter a valid email address.');
+  if(password.length<6)return showAssignLoginMessage('Password must be at least 6 characters.');
+  assignLoginSaving=true; saveBtn.disabled=true; cancelBtn.disabled=true; saveBtn.textContent='Saving...';
+  try{
+    const {data,error}=await db.rpc('assign_restaurant_login',{p_restaurant_id:restaurantId,p_email:email,p_password:password});
+    if(error)throw error;
+    if(!data||data.status!=='success')throw new Error(data?.message||'Unable to assign restaurant login.');
+    showAssignLoginMessage('Restaurant login saved successfully.','success');
+    await logAction('Assigned/updated restaurant login',restaurantId);
+    await loadAll();
+    toast('Restaurant login saved successfully');
+    setTimeout(()=>{assignLoginSaving=false;saveBtn.disabled=false;cancelBtn.disabled=false;saveBtn.textContent='🔐 Save Login';closeAssignModal()},500);
+  }catch(e){
+    console.error('assignRestaurantLogin',e);
+    showAssignLoginMessage(e?.message||'Something went wrong while saving the login.');
+    assignLoginSaving=false; saveBtn.disabled=false; cancelBtn.disabled=false; saveBtn.textContent='🔐 Save Login';
+  }
+}
+
 function populateRestaurantFilters(){const s=$('menuRestaurantFilter');if(!s)return;s.innerHTML='<option value="">All Restaurants</option>'+restaurants.map(r=>`<option value="${r.id}">${esc(r.name)}</option>`).join('')}
 function renderMenu(){
  const rid=$('menuRestaurantFilter')?.value||'',search=($('menuSearch')?.value||'').toLowerCase();let list=menuItems.filter(m=>(!rid||m.restaurant_id===rid)&&`${m.name} ${m.category} ${m.description}`.toLowerCase().includes(search));
@@ -944,7 +1007,8 @@ function applyDesign(n){
   });
 }
 window.onload=()=>applyDesign(selectedDesign);
-<\/script></body></html>`);
+<\/script>
+</body></html>`);
   w.document.close();
 }
 
@@ -972,6 +1036,36 @@ $('globalSearch').addEventListener('input',e=>{const v=e.target.value.toLowerCas
 window.addEventListener('load',async()=>{lucide.createIcons();initBulkImportUI();startClock();try{if(await adminCheck()){await loadAll();buildCharts();updateStats();}}catch(e){console.error(e);alert('Supabase error: '+e.message)}})
 
 
+</script>
+<!-- Restaurant Login Assignment -->
+<div id="assignLoginOverlay" class="assign-login-overlay" role="dialog" aria-modal="true" aria-labelledby="assignLoginTitle">
+  <div class="assign-login-card">
+    <div class="assign-login-head">
+      <div><h3 id="assignLoginTitle">🔐 Set Restaurant Login</h3><p id="assignLoginRestaurantName">Restaurant</p></div>
+      <button type="button" class="assign-login-close" onclick="closeAssignModal()" aria-label="Close">×</button>
+    </div>
+    <div class="assign-login-body">
+      <input type="hidden" id="assignLoginRestaurantId">
+      <div class="assign-login-field">
+        <label for="assignLoginEmail">Login Email</label>
+        <input id="assignLoginEmail" type="email" autocomplete="email" placeholder="owner@example.com">
+      </div>
+      <div class="assign-login-field">
+        <label for="assignLoginPassword">New Password</label>
+        <input id="assignLoginPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Minimum 6 characters">
+        <div class="assign-login-help">Minimum 6 characters. Saving creates or updates the restaurant login.</div>
+      </div>
+      <div id="assignLoginMessage" class="assign-login-message"></div>
+    </div>
+    <div class="assign-login-foot">
+      <button id="assignLoginCancelBtn" type="button" class="smallbtn assign-login-cancel" onclick="closeAssignModal()">Cancel</button>
+      <button id="assignLoginSaveBtn" type="button" class="primary assign-login-save" onclick="saveRestaurantLogin()">🔐 Save Login</button>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('assignLoginOverlay')?.classList.contains('show'))closeAssignModal()});
+$('assignLoginOverlay')?.addEventListener('click',e=>{if(e.target.id==='assignLoginOverlay')closeAssignModal()});
 </script>
 </body>
 </html>
