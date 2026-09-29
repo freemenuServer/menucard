@@ -1748,7 +1748,7 @@ function getSavedCategoryOrder(rest, items) {
         const slug = (params.get("r") || "").trim().toLowerCase();
 
         let query = supabaseClient.from("restaurants").select("*");
-        if (slug) query = query.ilike("slug", slug);
+        if (slug) query = query.eq("slug", slug);
 
         const { data: restaurants, error: restError } = await query.limit(1);
         if (restError) throw restError;
@@ -1762,6 +1762,49 @@ function getSavedCategoryOrder(rest, items) {
         }
 
         const rest = restaurants[0];
+
+        // PLAN-BASED PUBLIC MENU ROUTING
+        // Free Starter/default -> this menu.html template
+        // Growth (Photos) -> menugrowth.html
+        // Signature 3D -> signaturemenu.html
+        if (rest.plan_id) {
+          const { data: assignedPlan, error: planError } = await supabaseClient
+            .from("plans")
+            .select("id,name,slug,is_active")
+            .eq("id", rest.plan_id)
+            .maybeSingle();
+
+          if (!planError && assignedPlan && assignedPlan.is_active !== false) {
+            const planKey = `${assignedPlan.slug || ""} ${assignedPlan.name || ""}`.toLowerCase().trim();
+
+            const isSignature3D =
+              planKey.includes("signature 3d") ||
+              planKey.includes("signature-3d") ||
+              planKey.includes("signature_3d") ||
+              (planKey.includes("signature") && planKey.includes("3d"));
+
+            if (isSignature3D) {
+              const signatureUrl = new URL("/signaturemenu.html", window.location.origin);
+              signatureUrl.searchParams.set("r", rest.slug);
+              window.location.replace(signatureUrl.href);
+              return;
+            }
+
+            const isGrowthPhotos =
+              planKey.includes("growth") ||
+              planKey.includes("growth-photos") ||
+              planKey.includes("growth photos") ||
+              planKey.includes("photo_menu_v1");
+
+            if (isGrowthPhotos) {
+              const growthUrl = new URL("/menugrowth.html", window.location.origin);
+              growthUrl.searchParams.set("r", rest.slug);
+              window.location.replace(growthUrl.href);
+              return;
+            }
+          }
+        }
+
         renderRestaurant(rest);
 
         const { data: items, error: itemsError } = await supabaseClient
