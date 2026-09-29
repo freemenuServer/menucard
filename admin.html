@@ -1146,6 +1146,7 @@ function aiNormalizeRow(x={}){
     category:String(x.category??x.category_name??'').trim(),
     name:String(x.name??x.item_name??x.menu_item_name??'').trim(),
     description:String(x.description??'').trim(),
+    item_type:String(x.item_type??x.type??'').trim().toLowerCase() || null,
     price_full:aiNormalizeNumber(x.price_full??x.full_price),
     price:aiNormalizeNumber(x.price??x.single_price),
     price_half:aiNormalizeNumber(x.price_half??x.half_price),
@@ -1368,6 +1369,7 @@ async function saveAIScannedMenu(){
     const rows=aiScanRows.map((x,i)=>{
       const p={
         restaurant_id:rid,name:x.name.trim(),category:x.category.trim(),
+        item_type:x.item_type || (x.is_veg ? 'veg' : 'nonveg'),
         description:x.description?.trim()||null,is_veg:!!x.is_veg,is_bestseller:!!x.is_bestseller,
         sort_order:maxSort+i+1
       };
@@ -1387,8 +1389,14 @@ async function saveAIScannedMenu(){
     await loadAll();
   }catch(e){
     console.error('AI menu save failed:',e);
-    $('aiSaveStatus').textContent='Save failed.';
-    aiShowMessage('Save failed: '+(e?.message||e),'error');
+    const detail = [
+      e?.message,
+      e?.details,
+      e?.hint,
+      e?.code ? `code=${e.code}` : ''
+    ].filter(Boolean).join(' | ');
+    $('aiSaveStatus').textContent='Save failed: '+(detail||'Unknown database error');
+    aiShowMessage('Save failed: '+(detail||'Unknown database error'),'error');
   }finally{btn.disabled=false;}
 }
 function initAIScannerUI(){
