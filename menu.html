@@ -1152,7 +1152,10 @@
         if (restaurantId) {
           query = query.eq("id", restaurantId);
         } else if (slug) {
-          query = query.eq("slug", slug);
+          // QR/public links are normalized to lowercase, while older/newly-created
+          // restaurant records may contain an uppercase/mixed-case slug.
+          // Use case-insensitive matching so the assigned QR always resolves.
+          query = query.ilike("slug", slug);
         }
 
         const { data: restaurants, error: restError } = await query.limit(1);
