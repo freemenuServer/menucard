@@ -1227,15 +1227,15 @@ async function runAIMenuScan(){
     const accessToken = sessionData?.session?.access_token;
     if(!accessToken) throw new Error('Your session has expired. Please sign in again.');
 
-    const selectedModel = $('aiModel')?.value || 'gemini-3.8-flash';
+    const selectedModel = $('aiModel')?.value || 'gemini-3.7-flash';
 
     // Primary model first, then retry it once, then use fallback models.
     // This specifically handles Gemini temporary 503/high-demand responses.
     const models = [
       selectedModel,
-      ...(selectedModel !== 'gemini-3.8-flash' ? ['gemini-3.8-flash'] : []),
       'gemini-3.7-flash',
-      'gemini-3.6-flash'
+      'gemini-3.6-flash',
+      'gemini-3.5-flash-lite'
     ].filter((model, index, arr) => model && arr.indexOf(model) === index);
 
     const endpoint = `${SUPABASE_URL}/functions/v1/scan-menu`;
@@ -1324,7 +1324,7 @@ async function runAIMenuScan(){
           if(!retryable) throw lastError;
 
           if(attempt === 0){
-            await new Promise(resolve => setTimeout(resolve, 1200));
+            await new Promise(resolve => setTimeout(resolve, 1800));
           }
         }catch(err){
           lastError = err;
@@ -1336,7 +1336,7 @@ async function runAIMenuScan(){
           if(!retryable) throw err;
 
           if(attempt === 0){
-            await new Promise(resolve => setTimeout(resolve, 1200));
+            await new Promise(resolve => setTimeout(resolve, 1800));
           }
         }
       }
