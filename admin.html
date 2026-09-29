@@ -1196,7 +1196,7 @@ function clearAIScanner(){
   if($('aiFileName'))$('aiFileName').textContent='';
   $('aiDropzone')?.classList.remove('has-file');
   $('aiReview')?.classList.remove('show');
-  aiSetProgress('',false);
+  aiSetProgress(0, '');
   if($('aiMessage'))$('aiMessage').className='ai-message';
   if($('aiSaveStatus'))$('aiSaveStatus').textContent='';
 }
@@ -1210,8 +1210,8 @@ function aiFileToBase64(file){
 }
 async function runAIMenuScan(){
   const rid = $('aiRestaurant')?.value;
-  if(!rid){ aiShowMessage('Please select a restaurant first.', true); return; }
-  if(!aiMenuFile){ aiShowMessage('Please upload a menu image first.', true); return; }
+  if(!rid){ aiShowMessage('Please select a restaurant first.', 'error'); return; }
+  if(!aiMenuFile){ aiShowMessage('Please upload a menu image first.', 'error'); return; }
 
   const btn = $('aiScanButton');
   const originalText = btn?.textContent || 'Scan Menu';
@@ -1286,15 +1286,15 @@ async function runAIMenuScan(){
               throw new Error('AI scan completed but no menu items were detected.');
             }
 
-            aiScannedRows = items.map(aiNormalizeRow);
+            aiScanRows = items.map(aiNormalizeRow);
             aiRenderReview();
-            aiSetProgress(100, `Scan complete — ${aiScannedRows.length} item(s) found.`);
+            aiSetProgress(100, `Scan complete — ${aiScanRows.length} item(s) found.`);
             aiShowMessage(
               data?.model && data.model !== selectedModel
                 ? `Scan successful using fallback model: ${data.model}`
-                : `Scan successful — ${aiScannedRows.length} item(s) found.`
+                : `Scan successful — ${aiScanRows.length} item(s) found.`
             );
-            logAction?.('AI Menu Scan', `Scanned ${aiScannedRows.length} menu items`);
+            logAction?.('AI Menu Scan', `Scanned ${aiScanRows.length} menu items`);
             return;
           }
 
