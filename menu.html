@@ -1145,31 +1145,74 @@
 
       try {
         const params = new URLSearchParams(window.location.search);
-        const slug = (params.get("r") || "").trim().toLowerCase();
-        const restaurantId = (params.get("rid") || "").trim();
 
-        let query = supabaseClient.from("restaurants").select("*");
-        if (restaurantId) {
-          query = query.eq("id", restaurantId);
-        } else if (slug) {
-          // QR/public links are normalized to lowercase, while older/newly-created
-          // restaurant records may contain an uppercase/mixed-case slug.
-          // Use case-insensitive matching so the assigned QR always resolves.
-          query = query.ilike("slug", slug);
+        // Accept all public-menu link formats used by FreeMenu:
+        //   menu.html?r=slug
+        //   menu.html?r=restaurant-id
+        //   menu.html?restaurant_id=restaurant-id
+        //   /menu/slug
+        //   /menu/restaurant-id
+        let key =
+          (params.get("r") ||
+           params.get("slug") ||
+           params.get("restaurant_id") ||
+           params.get("id") ||
+           "").trim();
+
+        if (!key) {
+          const parts = window.location.pathname.split("/").filter(Boolean);
+          const menuIndex = parts.findIndex(p => p.toLowerCase() === "menu");
+          if (menuIndex >= 0 && parts[menuIndex + 1]) {
+            key = decodeURIComponent(parts[menuIndex + 1]).trim();
+          }
         }
 
-        const { data: restaurants, error: restError } = await query.limit(1);
-        if (restError) throw restError;
-
-        if (!restaurants || !restaurants.length) {
-          const nameEl = $("restaurant-name"); if (nameEl) nameEl.textContent = "Restaurant Not Found";
+        if (!key) {
+          const nameEl = $("restaurant-name");
+          if (nameEl) nameEl.textContent = "Restaurant Not Found";
           if ($("categoryTabs")) $("categoryTabs").innerHTML = "";
           if ($("mobileCategories")) $("mobileCategories").innerHTML = "";
-          showState("Restaurant not found", "Please check the menu link and try again.");
+          showState("Restaurant not found", "No restaurant identifier was provided.");
           return;
         }
 
-        const rest = restaurants[0];
+        let rest = null;
+
+        // 1) If the key is a UUID/id, resolve by id first. This prevents a
+        // different restaurant from being selected when slugs are duplicated.
+        const byId = await supabaseClient
+          .from("restaurants")
+          .select("*")
+          .eq("id", key)
+          .maybeSingle();
+
+        if (!byId.error && byId.data) {
+          rest = byId.data;
+        }
+
+        // 2) Otherwise resolve by exact slug.
+        if (!rest) {
+          const bySlug = await supabaseClient
+            .from("restaurants")
+            .select("*")
+            .eq("slug", key.toLowerCase())
+            .limit(1);
+
+          if (bySlug.error) throw bySlug.error;
+          rest = Array.isArray(bySlug.data) ? bySlug.data[0] : null;
+        }
+
+        if (!rest) {
+          const nameEl = $("restaurant-name");
+          if (nameEl) nameEl.textContent = "Restaurant Not Found";
+          if ($("categoryTabs")) $("categoryTabs").innerHTML = "";
+          if ($("mobileCategories")) $("mobileCategories").innerHTML = "";
+          showState(
+            "Restaurant not found",
+            `No restaurant matched "${key}". Please check the menu link.`
+          );
+          return;
+        }
 
         // Menu maintenance must be checked before plan/template routing.
         if (isMenuMaintenanceOn(rest)) {
@@ -1215,7 +1258,7 @@
 
             if (isSignature3D || isFull3D || isCustomMenu) {
               const signatureUrl = new URL("/signaturemenu.html", window.location.origin);
-              signatureUrl.searchParams.set("r", rest.slug);
+              signatureUrl.searchParams.set("r", rest.slug || rest.id);
               window.location.replace(signatureUrl.href);
               return;
             }
@@ -1228,7 +1271,7 @@
 
             if (isGrowthPhotos) {
               const growthUrl = new URL("/menugrowth.html", window.location.origin);
-              growthUrl.searchParams.set("r", rest.slug);
+              growthUrl.searchParams.set("r", rest.slug || rest.id);
               window.location.replace(growthUrl.href);
               return;
             }
