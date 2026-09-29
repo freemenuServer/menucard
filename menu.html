@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b0f17">
-<title>Urban Punjab — FreeMenu.in</title>
+<title>FreeMenu.in — Digital Restaurant Menu</title>
 <meta name="description" content="FreeMenu.in dynamic digital restaurant menu">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
@@ -337,8 +337,8 @@ main{padding-bottom:110px}
       </div>
     </div>
     <div class="eyebrow">Welcome to</div>
-    <h1>Urban <span>Punjab</span></h1>
-    <p>Authentic North Indian Flavours</p>
+    <h1 id="heroTitle">Restaurant <span>Menu</span></h1>
+    <p id="heroSubtitle">Authentic flavours, freshly served</p>
     <div class="hero-meta">
       <span class="hero-chip green">♧ Pure Veg Options</span>
       <span class="hero-chip">♨ Chef Special</span>
@@ -672,6 +672,16 @@ function renderRestaurant(rest){
   applyRestaurantTheme(rest);
   const name=rest.name||"Restaurant";
   document.title=`${name} — FreeMenu.in`;
+  const titleEl=$("heroTitle");
+  const subtitleEl=$("heroSubtitle");
+  if(titleEl){
+    const parts=String(name).trim().split(/\s+/);
+    const last=parts.pop()||"Menu";
+    titleEl.innerHTML=`${esc(parts.join(" ")||last)} ${parts.length?`<span>${esc(last)}</span>`:""}`;
+  }
+  if(subtitleEl){
+    subtitleEl.textContent=rest.tagline||rest.subtitle||rest.description||"Authentic flavours, freshly served";
+  }
 
   const logo=safeUrl(rest.logo_url||rest.logo||"");
   const banner=safeUrl(rest.banner_url||rest.cover_url||rest.cover_image||rest.banner||"");
@@ -918,16 +928,53 @@ async function loadDynamicMenu(){
     return;
   }
   try{
-    let q=supabaseClient.from("restaurants").select("*").limit(1);
-    q=q.eq("slug",restaurantSlug);
-    let {data:rests,error}=await q;
-    if(error) throw error;
+    /*
+     * Public links can arrive as:
+     *   ?r=urban-punjab
+     *   ?restaurant=urban-punjab
+     *   /menu/urban-punjab
+     * and older QR links may contain spaces/underscores or URL encoding.
+     * Normalize those forms before querying Supabase.
+     */
+    const rawSlug=String(restaurantSlug||"").trim();
+    const normalizedSlug=decodeURIComponent(rawSlug).trim().toLowerCase()
+      .replace(/\s+/g,"-").replace(/_+/g,"-").replace(/-+/g,"-")
+      .replace(/^-|-$/g,"");
+    const slugCandidates=[...new Set([rawSlug,normalizedSlug,rawSlug.replace(/_/g,"-"),rawSlug.replace(/\s+/g,"-")].filter(Boolean))];
+
+    let rests=[];
+    let lookupError=null;
+
+    for(const candidate of slugCandidates){
+      const result=await supabaseClient
+        .from("restaurants")
+        .select("*")
+        .ilike("slug",candidate)
+        .limit(1);
+      if(result.error){ lookupError=result.error; break; }
+      if(result.data?.length){ rests=result.data; break; }
+    }
+    if(lookupError) throw lookupError;
+
+    /* If a link accidentally contains the restaurant name instead of its slug,
+       support that too without changing the canonical URL. */
+    if(!rests.length && normalizedSlug){
+      const nameGuess=normalizedSlug.replace(/-/g," ");
+      const byName=await supabaseClient
+        .from("restaurants")
+        .select("*")
+        .ilike("name",nameGuess)
+        .limit(1);
+      if(byName.error) throw byName.error;
+      if(byName.data?.length) rests=byName.data;
+    }
 
     /* Accept ?restaurant=<uuid> as a compatibility route too. */
-    if((!rests||!rests.length) && urlParams.get("restaurant")){
-      const r=urlParams.get("restaurant");
+    if(!rests.length && urlParams.get("restaurant")){
+      const r=String(urlParams.get("restaurant")||"").trim();
       const byId=await supabaseClient.from("restaurants").select("*").eq("id",r).limit(1);
-      if(!byId.error) rests=byId.data;
+      if(byId.error) throw byId.error;
+      if(byId.data?.length) rests=byId.data;
     }
     if(!rests?.length){
       showState("Restaurant not found","Please check the FreeMenu.in menu link.");
