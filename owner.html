@@ -12,15 +12,15 @@
 
 <style>
 :root{
- --navy:#101827;--navy2:#172235;--primary:#b51d3b;--primary-dark:#89142b;
- --pink:#f52f72;--bg:#f6f7fb;--card:#fff;--text:#111827;--muted:#697386;
- --border:#e5e7eb;--green:#13a66b;--danger:#e5484d;--blue:#3283e8;
- --shadow:0 8px 25px rgba(15,23,42,.06);--radius:14px;
+ --navy:#17120f;--navy2:#241a15;--primary:#6f2632;--primary-dark:#541b25;
+ --pink:#b8893c;--bg:#f6f2ea;--card:#fffdf9;--text:#2a211d;--muted:#756a61;
+ --border:#e7ddd1;--green:#2f7658;--danger:#a94a4a;--blue:#526f88;
+ --shadow:0 10px 30px rgba(55,39,28,.07);--radius:14px;
 }
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif}
 button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoration:none;color:inherit}
 .hidden{display:none!important}.muted{color:var(--muted)}
-#loader{position:fixed;inset:0;background:#f6f7fb;display:grid;place-items:center;z-index:9999}
+#loader{position:fixed;inset:0;background:#f6f2ea;display:grid;place-items:center;z-index:9999}
 /* Current assigned plan - compact dashboard card */
 .planSummary{margin:14px 0 16px;padding:16px 18px}
 .planSummaryTop{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
@@ -44,20 +44,20 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .loader-card{text-align:center}.spinner{width:42px;height:42px;border:4px solid #ddd;border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:auto}@keyframes spin{to{transform:rotate(360deg)}}
 
 /* Layout */
-.app{min-height:100vh}.sidebar{position:fixed;left:0;top:0;bottom:0;width:238px;background:linear-gradient(180deg,#0d1624,#121b2b);color:#dce4f0;padding:22px 14px;z-index:100;overflow:auto}
+.app{min-height:100vh}.sidebar{position:fixed;left:0;top:0;bottom:0;width:238px;background:linear-gradient(180deg,#17120f,#241a15);color:#e9e0d5;padding:22px 14px;z-index:100;overflow:auto}
 .logoArea{text-align:center;padding:5px 8px 22px}.chefLogo{font-size:32px;color:#f5bf47}.sideBrand{font-family:"Cormorant Garamond",serif;font-size:25px;font-weight:700;color:#fff}.sideSub{font-size:10px;letter-spacing:1.5px;color:#aab5c7}
-.navItem{display:flex;align-items:center;gap:13px;padding:12px 13px;margin:4px 0;border-radius:8px;font-size:13px;font-weight:600;color:#bdc8d9}
-.navItem i{width:19px;text-align:center}.navItem:hover{background:#1c2a40;color:#fff}.navItem.active{background:linear-gradient(90deg,#8f1831,#b51d3b);color:#fff;box-shadow:0 6px 18px rgba(181,29,59,.2)}
-.sidePromo{margin:24px 0 0;padding:20px 12px;border:1px solid rgba(255,255,255,.13);border-radius:10px;background:linear-gradient(145deg,#242039,#321f3a);text-align:center}
-.sidePromo i{color:#ffd34f;font-size:24px}.sidePromo strong{display:block;margin:8px 0 5px}.sidePromo p{font-size:11px;color:#c7c9d5;line-height:1.5;margin:0 0 12px}
-.btn-pink{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:0;background:#f32f72;color:#fff;border-radius:8px;padding:10px 12px;font-weight:800;font-size:12px;width:100%}
-.content{margin-left:238px;min-height:100vh}.topbar{height:78px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 25px;position:sticky;top:0;z-index:80}
-.restIdentity{display:flex;align-items:center;gap:12px}.restLogo{width:44px;height:44px;border-radius:50%;object-fit:cover;border:1px solid #ddd;background:#eee}.restTitle{font-size:17px;font-weight:800}.restAddress{font-size:11px;color:var(--muted);margin-top:2px}.topActions{display:flex;align-items:center;gap:12px}.openToggle{display:flex;align-items:center;gap:8px;background:#dff7ea;color:#087443;border:0;border-radius:20px;padding:9px 14px;font-size:12px;font-weight:800}.profile{display:flex;align-items:center;gap:9px;padding-left:13px;border-left:1px solid var(--border)}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#d91f35;color:#fff;font-weight:800}
+.navItem{display:flex;align-items:center;gap:13px;padding:12px 13px;margin:4px 0;border-radius:8px;font-size:13px;font-weight:600;color:#cfc1b3}
+.navItem i{width:19px;text-align:center}.navItem:hover{background:#34251f;color:#fff}.navItem.active{background:linear-gradient(90deg,#5b1d27,#7a2b37);color:#fff;box-shadow:0 6px 18px rgba(111,38,50,.22)}
+.sidePromo{margin:24px 0 0;padding:20px 12px;border:1px solid rgba(255,255,255,.13);border-radius:10px;background:linear-gradient(145deg,#2b201b,#3a2820);text-align:center}
+.sidePromo i{color:#d5b56e;font-size:24px}.sidePromo strong{display:block;margin:8px 0 5px}.sidePromo p{font-size:11px;color:#cfc1b3;line-height:1.5;margin:0 0 12px}
+.btn-pink{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:0;background:#a87935;color:#fff;border-radius:8px;padding:10px 12px;font-weight:800;font-size:12px;width:100%}
+.content{margin-left:238px;min-height:100vh}.topbar{height:78px;background:#fffdf9;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 25px;position:sticky;top:0;z-index:80}
+.restIdentity{display:flex;align-items:center;gap:12px}.restLogo{width:44px;height:44px;border-radius:50%;object-fit:cover;border:1px solid #ddd;background:#eee}.restTitle{font-size:17px;font-weight:800}.restAddress{font-size:11px;color:var(--muted);margin-top:2px}.topActions{display:flex;align-items:center;gap:12px}.openToggle{display:flex;align-items:center;gap:8px;background:#dff7ea;color:#087443;border:0;border-radius:20px;padding:9px 14px;font-size:12px;font-weight:800}.profile{display:flex;align-items:center;gap:9px;padding-left:13px;border-left:1px solid var(--border)}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#6f2632;color:#fff;font-weight:800}
 .container{max-width:1200px;margin:auto;padding:22px 20px 45px}.mobileMenu{display:none}
 
 /* Cards / common */
 .card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}.cardTitle{font-size:16px;font-weight:800;margin:0 0 15px;display:flex;align-items:center;justify-content:space-between;gap:10px}.cardTitle small{font-size:11px;color:var(--muted);font-weight:500}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.stat{padding:17px;border-radius:12px;border:1px solid var(--border);background:#fff;box-shadow:var(--shadow);min-height:105px}.statTop{display:flex;justify-content:space-between;align-items:center}.statIcon{width:39px;height:39px;border-radius:10px;display:grid;place-items:center;background:#edf4ff;color:#287be0}.stat:nth-child(2) .statIcon{background:#fff0fa;color:#df2d8a}.stat:nth-child(3) .statIcon{background:#e9fbf5;color:#12a36b}.stat:nth-child(4) .statIcon{background:#f4edff;color:#8238d5}.statLabel{font-size:11px;margin-top:10px}.statValue{font-size:24px;font-weight:800;margin-top:2px}.statChange{font-size:10px;color:var(--green);font-weight:700}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.stat{padding:17px;border-radius:12px;border:1px solid var(--border);background:#fff;box-shadow:var(--shadow);min-height:105px}.statTop{display:flex;justify-content:space-between;align-items:center}.statIcon{width:39px;height:39px;border-radius:10px;display:grid;place-items:center;background:#f0eadf;color:#8b6733}.stat:nth-child(2) .statIcon{background:#f4e8e4;color:#9a4f5b}.stat:nth-child(3) .statIcon{background:#e7f2ec;color:#2f7658}.stat:nth-child(4) .statIcon{background:#eee8f0;color:#73516e}.statLabel{font-size:11px;margin-top:10px}.statValue{font-size:24px;font-weight:800;margin-top:2px}.statChange{font-size:10px;color:var(--green);font-weight:700}
 .twoCol{display:grid;grid-template-columns:1.15fr .85fr;gap:15px;margin-top:15px}.twoCol.equal{grid-template-columns:1fr 1fr}.threeCol{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 .btn{border:1px solid var(--border);background:#fff;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:800;color:#263244}.btn:hover{background:#f8fafc}.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}.btn.danger{color:var(--danger);background:#fff1f1;border-color:#ffd0d0}.btn.blue{color:#1671d8;background:#edf6ff;border-color:#cde5ff}.btn.green{color:#087443;background:#e8faef;border-color:#bdeccf}.btn.sm{padding:7px 9px;font-size:11px}.actions{display:flex;gap:7px;flex-wrap:wrap}
 .formGroup{margin-bottom:13px}.formGroup label{display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px}.input,.select,.textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 11px;background:#fff;color:#172033;outline:none;font-size:13px}.textarea{min-height:82px;resize:vertical}.input:focus,.select:focus,.textarea:focus{border-color:#b7a0a5;box-shadow:0 0 0 3px rgba(181,29,59,.06)}
@@ -228,6 +228,18 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .profileSecurityBox button:disabled{opacity:.65;cursor:not-allowed}
 </style>
 
+<style id="royal-finish-only">
+  .themeSelectWrap{background:#faf6ee;border-color:#e2d5c4}
+  .themeSelectWrap>label,.themeAdvanced summary{color:#5d5148}
+  .themeSelectIcon{background:linear-gradient(135deg,#4e1b25,#7c2d38);color:#dfc078}
+  .themeSwatch{background:#fffdf9;border-color:#e1d7ca}
+  .themeAdvanced{background:#fffdf9;border-color:#e1d7ca}
+  .colorField{background:#fffdf9;border-color:#e1d7ca}
+  .colorField:hover{border-color:#c5a76a;background:#fbf6ed}
+  .previewFrame{background:#fffdf9;border-color:#dfd3c5}
+  .previewBody{background:#f8f3ea}
+  .previewItem{background:#fffdf9;border-color:#e7ddd1}
+</style>
 </head>
 
 <body>
@@ -2151,12 +2163,12 @@ $("sidePlansBtn").onclick=()=>openOwnerPlans();
 
 /* ---------- Professional Theme System ---------- */
 const THEME_PRESETS={
-  warm:{name:"Warm Spice",description:"Premium restaurant warmth with rich spice tones and a welcoming cream background.",primary:"#7C2D12",primaryDark:"#5B1F0E",accent:"#D97706",background:"#FFF7ED",card:"#FFFFFF",text:"#2B1B16"},
-  minimal:{name:"Modern Clean",description:"Clean, neutral and contemporary — designed to keep food and content in focus.",primary:"#1F2937",primaryDark:"#111827",accent:"#2563EB",background:"#F8FAFC",card:"#FFFFFF",text:"#111827"},
-  luxury:{name:"Royal Luxury",description:"Deep, elegant tones with a refined gold accent for premium dining brands.",primary:"#1F1B2D",primaryDark:"#11101A",accent:"#C9A227",background:"#F8F5EE",card:"#FFFFFF",text:"#211F26"},
-  organic:{name:"Fresh Organic",description:"Fresh greens and natural neutrals for cafés, healthy food and modern casual dining.",primary:"#166534",primaryDark:"#14532D",accent:"#65A30D",background:"#F7FBEF",card:"#FFFFFF",text:"#17251A"},
-  ocean:{name:"Coastal Blue",description:"Trustworthy blue tones with a warm coral accent for a fresh contemporary menu.",primary:"#0F4C5C",primaryDark:"#0B3440",accent:"#E76F51",background:"#F4FAFC",card:"#FFFFFF",text:"#102A33"},
-  rose:{name:"Elegant Rose",description:"Sophisticated berry tones with a soft rose accent for cafés and modern dining.",primary:"#7F1D4E",primaryDark:"#5B1538",accent:"#DB2777",background:"#FFF7FB",card:"#FFFFFF",text:"#2D1723"}
+  warm:{name:"Warm Spice",description:"Premium restaurant warmth with rich burgundy, antique gold and welcoming ivory.",primary:"#6F2632",primaryDark:"#541B25",accent:"#B8893C",background:"#F8F3EA",card:"#FFFDF9",text:"#2A211D"},
+  minimal:{name:"Modern Clean",description:"Clean neutral surfaces with a refined gold accent and strong readability.",primary:"#30343B",primaryDark:"#20242A",accent:"#A77A32",background:"#F7F4EE",card:"#FFFDF9",text:"#26221F"},
+  luxury:{name:"Royal Luxury",description:"Deep espresso-burgundy, antique gold and ivory for an elegant premium dining identity.",primary:"#24151A",primaryDark:"#160D10",accent:"#C6A15B",background:"#F5F0E7",card:"#FFFDF9",text:"#241C19"},
+  organic:{name:"Heritage Green",description:"Deep heritage green with muted gold and warm ivory for a sophisticated fresh look.",primary:"#185544",primaryDark:"#103C31",accent:"#B49A61",background:"#F5F3E9",card:"#FFFDF9",text:"#1D2923"},
+  ocean:{name:"Royal Navy",description:"Deep navy, antique gold and soft ivory for a classic polished restaurant brand.",primary:"#1B3045",primaryDark:"#102130",accent:"#B89450",background:"#F3F5F4",card:"#FFFFFF",text:"#20272D"},
+  rose:{name:"Plum Champagne",description:"Rich plum-burgundy with champagne gold and warm ivory for refined modern dining.",primary:"#51243A",primaryDark:"#361626",accent:"#C39A62",background:"#F8F2EE",card:"#FFFDF9",text:"#2B2024"}
 };
 
 function hexNorm(v){return String(v||"").trim().toLowerCase()}
