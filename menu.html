@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0f17">
+<title>Urban Punjab — FreeMenu.in</title>
+<meta name="description" content="FreeMenu.in dynamic digital restaurant menu">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
+
+:root{
+  --bg:#080d13;
+  --bg2:#0b1119;
+  --surface:#0e1721;
+  --surface2:#111c27;
+  --line:rgba(255,255,255,.09);
+  --line2:rgba(245,158,11,.28);
+  --text:#f8fafc;
+  --muted:#a8b2bf;
+  --gold:#f59e0b;
+  --gold2:#ffbf3f;
+  --green:#10b981;
+  --red:#ef4444;
+  --indigo:#6366f1;
+  --max:1180px;
+  --radius:24px;
+  --shadow:0 24px 70px rgba(0,0,0,.38);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:
+  radial-gradient(circle at 12% 0%,rgba(245,158,11,.07),transparent 28%),
+  radial-gradient(circle at 88% 20%,rgba(99,102,241,.06),transparent 28%),
+  var(--bg);
+  color:var(--text);font-family:"DM Sans",system-ui,sans-serif;
+  min-height:100vh;
+}
+button,input{font:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+.container{width:min(var(--max),calc(100% - 32px));margin:auto}
+
+/* TOP NAV */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  background:rgba(8,13,19,.88);border-bottom:1px solid var(--line);
+}
+.nav{
+  min-height:72px;display:flex;align-items:center;gap:22px;
+}
+.brand{display:flex;align-items:center;gap:11px;min-width:max-content}
+.brand-logo{
+  width:42px;height:42px;border-radius:14px;border:1px solid rgba(245,158,11,.45);
+  display:grid;place-items:center;color:var(--gold);
+  background:linear-gradient(145deg,#17130d,#0d1117);
+}
+.brand-name{font-weight:800;font-size:20px;letter-spacing:-.7px}
+.brand-name b{color:var(--gold)}
+.brand-sub{font-size:9px;color:#aeb7c3;letter-spacing:2px;margin-top:-2px}
+.navlinks{display:flex;align-items:center;gap:7px;margin-left:auto}
+.navlinks a{
+  padding:10px 14px;border-radius:12px;color:#dbe2ea;font-size:14px
+}
+.navlinks a.active,.navlinks a:hover{background:rgba(245,158,11,.14);color:#fff}
+.nav-actions{display:flex;align-items:center;gap:8px}
+.status{
+  display:inline-flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid rgba(16,185,129,.28);
+  background:rgba(16,185,129,.08);border-radius:999px;color:#eafff7;font-size:12px;font-weight:700;
+}
+.status i{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
+.icon-btn{
+  width:42px;height:42px;border:1px solid var(--line);border-radius:13px;
+  background:rgba(255,255,255,.03);color:#fff;display:grid;place-items:center;
+}
+.icon-btn:hover{border-color:var(--line2);color:var(--gold)}
+
+/* HERO */
+.hero{
+  margin-top:16px;position:relative;overflow:hidden;border:1px solid var(--line2);
+  border-radius:28px;min-height:370px;box-shadow:var(--shadow);
+  background:
+    linear-gradient(90deg,rgba(4,7,10,.96) 0%,rgba(4,7,10,.78) 40%,rgba(4,7,10,.18) 78%),
+    url("https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=1800&q=86") center/cover;
+}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(3,7,10,.65),transparent 45%);pointer-events:none}
+.hero-content{position:relative;z-index:2;padding:54px 54px 38px;max-width:670px}
+.logo-mark{
+  width:112px;height:112px;border-radius:50%;border:2px solid var(--gold);
+  display:grid;place-items:center;text-align:center;margin-bottom:24px;
+  background:rgba(8,12,16,.78);box-shadow:0 0 0 8px rgba(245,158,11,.06),0 18px 50px rgba(0,0,0,.3);
+}
+.logo-mark .turban{font-size:31px;color:var(--gold);line-height:1}
+.logo-mark strong{display:block;font-family:"Playfair Display",serif;font-size:15px;letter-spacing:1px}
+.logo-mark small{font-size:6px;letter-spacing:1.8px;color:#d7c4a0}
+.eyebrow{color:var(--gold2);letter-spacing:3px;font-size:11px;font-weight:700;text-transform:uppercase}
+.hero h1{font-family:"Playfair Display",serif;font-size:clamp(44px,7vw,76px);line-height:.95;margin:9px 0 14px}
+.hero h1 span{color:var(--gold)}
+.hero p{font-size:18px;color:#e1e7ee;margin:0 0 18px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.hero-chip{padding:9px 12px;border-radius:999px;background:rgba(4,8,12,.62);border:1px solid var(--line);font-size:12px;color:#e7edf4}
+.hero-chip.green{color:#dffcf0;border-color:rgba(16,185,129,.3)}
+.hero-chip.red{color:#ffe5e5;border-color:rgba(239,68,68,.25)}
+.hero-chip.gold{color:#ffe8ad;border-color:rgba(245,158,11,.35)}
+
+/* SEARCH / FILTERS */
+.tools{padding:18px 0 8px}
+.search-row{display:flex;gap:10px;align-items:center}
+.search{
+  flex:1;position:relative
+}
+.search svg{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--gold)}
+.search input{
+  width:100%;height:48px;padding:0 16px 0 44px;border-radius:14px;
+  border:1px solid var(--line);background:rgba(255,255,255,.035);color:#fff;outline:none;
+}
+.search input:focus{border-color:rgba(245,158,11,.55);box-shadow:0 0 0 4px rgba(245,158,11,.08)}
+.filter{
+  display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 14px;
+  border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.035);color:#e6ebf1;
+}
+.filter.active{border-color:rgba(16,185,129,.35);background:rgba(16,185,129,.1);color:#caffea}
+.filter-dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+.category-nav{
+  display:flex;gap:8px;overflow:auto;padding:12px 2px 7px;scrollbar-width:none;
+}
+.category-nav::-webkit-scrollbar{display:none}
+.cat-tab{
+  flex:0 0 auto;border:1px solid var(--line);background:linear-gradient(180deg,#101a25,#0d151e);
+  color:#cdd5df;border-radius:14px;padding:11px 18px;display:flex;gap:9px;align-items:center;
+  font-size:13px;transition:.2s;
+}
+.cat-tab svg{color:#dca528}
+.cat-tab.active,.cat-tab:hover{border-color:var(--gold);color:#fff;background:linear-gradient(180deg,rgba(245,158,11,.18),rgba(245,158,11,.07));box-shadow:0 8px 25px rgba(245,158,11,.08)}
+
+/* MENU SECTIONS */
+main{padding-bottom:110px}
+.menu-section{scroll-margin-top:94px;padding:27px 0 4px}
+.section-title{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:14px}
+.section-heading{display:flex;align-items:center;gap:13px}
+.section-icon{
+  width:42px;height:42px;border-radius:13px;border:1px solid rgba(245,158,11,.26);
+  background:rgba(245,158,11,.07);color:var(--gold);display:grid;place-items:center;
+}
+.section-title h2{font-family:"Playfair Display",serif;font-size:30px;margin:0}
+.section-title p{margin:3px 0 0;color:var(--muted);font-size:13px}
+.count{color:#8995a4;font-size:12px}
+
+/* ONE IMAGE PER CATEGORY */
+.category-image{
+  height:255px;border-radius:22px;overflow:hidden;border:1px solid var(--line);
+  position:relative;background:#101820;box-shadow:0 15px 45px rgba(0,0,0,.24);
+}
+.category-image img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease}
+.category-image:hover img{transform:scale(1.025)}
+.category-image:after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(4,8,12,.82),rgba(4,8,12,.14) 58%,rgba(4,8,12,.62));
+}
+.category-overlay{
+  position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:space-between;
+  padding:30px 34px;
+}
+.category-copy{max-width:440px}
+.category-copy h3{font-family:"Playfair Display",serif;font-size:38px;margin:0 0 7px}
+.category-copy p{color:#d0d8e2;margin:0;font-size:14px;max-width:370px;line-height:1.55}
+.category-tag{display:inline-flex;margin-bottom:10px;padding:7px 10px;border-radius:999px;border:1px solid rgba(245,158,11,.35);color:#ffd77b;background:rgba(245,158,11,.08);font-size:10px;letter-spacing:1.5px;text-transform:uppercase}
+.category-copy .gold-line{width:48px;height:2px;background:var(--gold);margin-top:15px;border-radius:2px}
+
+/* TEXT MENU */
+.items{padding:5px 4px 0}
+.item{
+  display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;
+  padding:18px 4px;border-bottom:1px solid rgba(255,255,255,.065);
+}
+.item:last-child{border-bottom:0}
+.item-main{min-width:0}
+.item-name-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.food-dot{width:13px;height:13px;border:2px solid currentColor;display:inline-grid;place-items:center;flex:0 0 auto}
+.food-dot.veg{color:var(--green);border-radius:4px}.food-dot.nonveg{color:var(--red);border-radius:50%}
+.food-dot:after{content:"";width:4px;height:4px;background:currentColor;border-radius:50%}
+.item h4{margin:0;font-size:17px;letter-spacing:-.2px}
+.badge{font-size:9px;padding:4px 7px;border-radius:999px;font-weight:700;letter-spacing:.4px}
+.badge.gold{color:#ffe09a;border:1px solid rgba(245,158,11,.35);background:rgba(245,158,11,.08)}
+.badge.red{color:#ffc0c0;border:1px solid rgba(239,68,68,.25);background:rgba(239,68,68,.07)}
+.badge.muted{color:#aab3bf;border:1px solid var(--line)}
+.item-desc{margin:5px 0 0;color:#98a4b1;font-size:13px;line-height:1.5;max-width:760px}
+.item-meta{margin-top:7px;color:#697584;font-size:11px}
+.prices{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;max-width:330px}
+.price{
+  min-width:72px;text-align:center;padding:8px 10px;border-radius:11px;
+  border:1px solid var(--line);background:rgba(255,255,255,.025);
+}
+.price span{display:block;font-size:9px;color:#7f8b98;text-transform:uppercase;letter-spacing:.7px}
+.price b{font-size:14px;color:#f4f7fa}
+.sold .item h4,.sold .item-desc{opacity:.52}
+
+/* FOOTER */
+.footer{border-top:1px solid var(--line);padding:28px 0 105px;color:#788492;font-size:12px}
+.footer-inner{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.footer strong{color:#cdd5de}
+
+/* MOBILE BOTTOM NAV */
+.bottom-nav{
+  display:none;position:fixed;z-index:100;left:0;right:0;bottom:0;
+  padding:9px 10px calc(9px + env(safe-area-inset-bottom));
+  background:rgba(6,10,15,.94);backdrop-filter:blur(20px);border-top:1px solid var(--line);
+}
+.bottom-nav-inner{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.bottom-item{border:0;background:none;color:#85909d;padding:7px 2px;border-radius:12px;font-size:10px;display:grid;place-items:center;gap:4px}
+.bottom-item svg{width:20px;height:20px}.bottom-item.active{color:var(--gold);background:rgba(245,158,11,.08)}
+.mobile-search{display:none}
+
+/* MODAL / DETAIL SHEET */
+.sheet-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.66);z-index:120}
+.sheet{
+  position:fixed;z-index:121;left:50%;bottom:18px;transform:translateX(-50%);
+  width:min(600px,calc(100% - 24px));background:#101923;border:1px solid var(--line2);
+  border-radius:22px;padding:24px;box-shadow:var(--shadow);display:none;
+}
+.sheet.show,.sheet-backdrop.show{display:block}
+.sheet-head{display:flex;justify-content:space-between;gap:15px}
+.sheet h3{margin:0;font-family:"Playfair Display",serif;font-size:27px}
+.close{border:1px solid var(--line);background:#0b121a;color:#fff;border-radius:10px;width:38px;height:38px}
+.sheet p{color:#aeb8c4;line-height:1.6}
+.sheet-prices{display:flex;gap:8px;flex-wrap:wrap}.sheet-prices .price{background:#0b121a}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .navlinks{display:none}
+  .nav{min-height:64px}.nav-actions .status{display:none}
+  .hero{min-height:390px}.hero-content{padding:34px 25px}
+  .category-image{height:220px}
+}
+@media(max-width:767px){
+  .container{width:min(100% - 20px,680px)}
+  body{padding-bottom:74px}
+  .topbar{position:sticky}
+  .brand-name{font-size:18px}.brand-logo{width:38px;height:38px}
+  .nav-actions .icon-btn{width:38px;height:38px}
+  .hero{margin-top:10px;border-radius:22px;min-height:440px}
+  .hero-content{padding:27px 20px}
+  .logo-mark{width:92px;height:92px;margin-bottom:18px}
+  .hero h1{font-size:47px}
+  .hero p{font-size:15px}
+  .mobile-search{display:block;margin-top:12px}
+  .search-row{gap:7px}.search{min-width:0}
+  .search input{height:45px}
+  .filter{height:45px;padding:0 11px;font-size:12px}
+  .filter span:last-child{display:none}
+  .category-nav{margin-inline:-5px;padding-inline:5px}
+  .cat-tab{padding:10px 13px;font-size:11px}
+  .cat-tab span{display:none}
+  .section-title h2{font-size:25px}
+  .section-icon{width:38px;height:38px}
+  .count{font-size:10px}
+  .category-image{height:190px;border-radius:18px}
+  .category-overlay{padding:20px}
+  .category-copy h3{font-size:27px}
+  .category-copy p{font-size:11px;max-width:210px}
+  .category-tag{font-size:8px;padding:5px 7px}
+  .item{grid-template-columns:1fr;gap:10px;padding:16px 2px}
+  .prices{justify-content:flex-start}
+  .price{min-width:70px}
+  .bottom-nav{display:block}
+  .footer{padding-bottom:30px}
+}
+
+/* ===== Backend-integrated controls ===== */
+.backend-context{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:999px;background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.22);color:#f4d08a;font-size:10px;font-weight:800}
+.backend-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}
+.backend-action{border:1px solid var(--line);background:#0b121a;color:#f3f5f8;border-radius:11px;padding:9px 11px;font-size:11px;font-weight:800;display:inline-flex;align-items:center;gap:7px}
+.backend-action:hover{border-color:rgba(245,158,11,.45);color:#ffd06b}
+.backend-action.whatsapp{border-color:rgba(16,185,129,.3);color:#caffea;background:rgba(16,185,129,.07)}
+.backend-action.waiter{border-color:rgba(245,158,11,.3);color:#ffe0a0;background:rgba(245,158,11,.06)}
+.backend-action.ar{border-color:rgba(99,102,241,.3);color:#d8d9ff;background:rgba(99,102,241,.07)}
+.plan-watermark{display:none;text-align:center;color:#66717e;font-size:9px;letter-spacing:.7px;margin-top:10px}
+.fm-ad-wrap{grid-column:1/-1;min-height:90px;padding:8px 0;text-align:center}
+.fm-ad-wrap ins{display:block;min-height:70px}
+.ar-modal{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.72);padding:18px;align-items:center;justify-content:center}
+.ar-modal.show{display:flex}
+.ar-box{width:min(820px,100%);background:#0f171e;border:1px solid rgba(245,158,11,.3);border-radius:20px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.55)}
+.ar-head{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;color:#fff;border-bottom:1px solid var(--line)}
+.ar-close{width:36px;height:36px;border:1px solid var(--line);background:#0a1017;color:#fff;border-radius:10px;font-size:20px}
+#foodModel{width:100%;height:min(65vh,560px);background:#f5f5f5}
+.ar-tip{padding:10px 15px;color:#9da8b4;font-size:11px;text-align:center}
+@media(max-width:767px){
+  .backend-actions{gap:6px}.backend-action{font-size:10px;padding:8px 9px}
+  .fm-ad-wrap{min-height:60px}
+}
+
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="container nav">
+    <a class="brand" id="brand" href="#">
+      <div class="brand-logo" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <path d="M5 21V10l7-5 7 5v11" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+          <path d="M8 10c1.8 1.5 6.2 1.5 8 0M8 14h8M8 17h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-name">Free<b>Menu</b>.in</div>
+        <div class="brand-sub">DIGITAL RESTAURANT MENU</div>
+      </div>
+    </a>
+
+    <nav class="navlinks" aria-label="Primary">
+      <a href="#">Home</a><a class="active" href="#menu">Menu</a><a href="#about">About</a>
+      <a href="#gallery">Gallery</a><a href="#contact">Contact</a>
+    </nav>
+
+    <div class="nav-actions">
+      <div class="status"><i></i> Open Now <span>11:00 AM – 11:00 PM</span></div>
+      <button class="icon-btn" id="navSearch" aria-label="Search">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="2"/><path d="m16 16 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+<section class="hero" id="hero"><span id="about" style="position:absolute;top:0"></span>
+  <div class="hero-content">
+    <div class="logo-mark" id="logoMark" aria-label="Restaurant logo">
+      <div>
+        <div class="turban">♜</div>
+        <strong>URBAN PUNJAB</strong>
+        <small>TASTE THE PUNJAB</small>
+      </div>
+    </div>
+    <div class="eyebrow">Welcome to</div>
+    <h1>Urban <span>Punjab</span></h1>
+    <p>Authentic North Indian Flavours</p>
+    <div class="hero-meta">
+      <span class="hero-chip green">♧ Pure Veg Options</span>
+      <span class="hero-chip">♨ Chef Special</span>
+      <span class="hero-chip red">♥ Made with Love</span>
+      <span class="backend-context" id="tableContextBadge" style="display:none"></span>
+    </div>
+  </div>
+</section>
+
+<section class="tools" id="menu">
+  <div class="search-row">
+    <div class="search">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="2"/><path d="m16 16 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="searchInput" type="search" placeholder="Search for dishes, e.g. Butter Chicken, Pizza..." autocomplete="off">
+    </div>
+    <button class="filter" id="vegToggle"><span class="filter-dot"></span><span>Veg Only</span></button>
+  </div>
+
+  <nav class="category-nav" id="categoryNav" aria-label="Menu categories"></nav>
+</section>
+
+<main id="menuSections"></main>
+<div class="plan-watermark" id="planWatermark">Powered by FreeMenu.in</div>
+
+<footer class="footer" id="contact">
+  <div class="footer-inner container">
+    <div><strong>FreeMenu.in</strong> — Digital Restaurant Menu</div>
+    <div>Prices may be subject to change • Please ask our team for today's specials.</div>
+  </div>
+</footer>
+</div>
+
+<nav class="bottom-nav" aria-label="Mobile menu navigation">
+  <div class="bottom-nav-inner">
+    <button class="bottom-item active" id="bottomMenu">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M4 19h16M6 19V7h12v12M8 7V4h8v3M9 11h6M9 15h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Menu</span>
+    </button>
+    <button class="bottom-item" id="bottomVeg">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M19 4C11 4 5 7 5 14c0 3 2 6 5 6 6 0 9-6 9-16Z" stroke="currentColor" stroke-width="1.7"/><path d="M5 20c2-5 6-8 11-11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      <span>Veg Only</span>
+    </button>
+    <button class="bottom-item" id="bottomBest">
+      <svg viewBox="0 0 24 24" fill="none"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      <span>Bestsellers</span>
+    </button>
+    <button class="bottom-item" id="bottomContact">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M6 3h4l2 5-2.4 1.8a15 15 0 0 0 4.6 4.6L16 12l5 2v4c0 1.1-.9 2-2 2C10.7 20 4 13.3 4 5a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+      <span>Call Waiter</span>
+    </button>
+  </div>
+</nav>
+
+<div class="sheet-backdrop" id="backdrop"></div>
+<aside class="sheet" id="sheet" aria-modal="true" role="dialog">
+  <div class="sheet-head">
+    <div>
+      <div class="eyebrow">Dish details</div>
+      <h3 id="sheetTitle">Dish</h3>
+    </div>
+    <button class="close" id="sheetClose" aria-label="Close">×</button>
+  </div>
+  <p id="sheetDesc"></p>
+  <div class="sheet-prices" id="sheetPrices"></div>
+  <div class="backend-actions" id="sheetActions"></div>
+</aside>
+
+<div class="ar-modal" id="arModal" aria-hidden="true">
+  <div class="ar-box" role="dialog" aria-modal="true">
+    <div class="ar-head">
+      <strong id="arTitle">3D Food Preview</strong>
+      <button class="ar-close" id="arClose" type="button" aria-label="Close">×</button>
+    </div>
+    <model-viewer id="foodModel" camera-controls auto-rotate rotation-per-second="30deg"
+      ar ar-modes="webxr scene-viewer quick-look" shadow-intensity="1.5"
+      environment-image="neutral" alt="3D Dish Preview">
+      <button slot="ar-button" class="backend-action ar" style="position:absolute;bottom:16px;left:50%;transform:translateX(-50%)">
+        📱 Place on Table (AR)
+      </button>
+    </model-viewer>
+    <div class="ar-tip">Rotate & zoom the dish. On supported phones, use “Place on Table (AR)”.</div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   FreeMenu.in — NEW UI + LEGACY PUBLIC MENU INFRASTRUCTURE
+   Supabase / routing / plan gating / ads / realtime / AR /
+   WhatsApp / table + QR context are wired into the new UI.
+========================================================= */
+
+const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* Cloudflare infrastructure used by FreeMenu owner/media flows. */
+const R2_PUBLIC_BASE = "https://images.freemenu.in";
+const R2_UPLOAD_ENDPOINT = `${SUPABASE_URL}/functions/v1/r2-upload`;
+const R2_3D_UPLOAD_ENDPOINT = `${SUPABASE_URL}/functions/v1/signature-3d-model-upload`;
+
+/* URL routing: ?r=slug, ?restaurant=slug, /menu/:slug */
+const urlParams = new URLSearchParams(window.location.search);
+function pathnameSlug(){
+  const parts=window.location.pathname.split("/").filter(Boolean);
+  const menuIndex=parts.findIndex(x=>x.toLowerCase()==="menu");
+  if(menuIndex>=0 && parts[menuIndex+1]) return decodeURIComponent(parts[menuIndex+1]).toLowerCase();
+  const last=parts[parts.length-1]||"";
+  if(!/\.html?$/i.test(last) && last && !["index","home"].includes(last.toLowerCase())) return decodeURIComponent(last).toLowerCase();
+  return "";
+}
+const restaurantSlug = String(urlParams.get("r") || urlParams.get("restaurant") || pathnameSlug() || "").trim().toLowerCase();
+
+/* Preserve the existing owner auth entry routes when this file is opened with auth=login/signup. */
+const ownerAuthMode = urlParams.get("auth");
+if((ownerAuthMode === "login" || ownerAuthMode === "signup") && /owner\.html?$/i.test(window.location.pathname)){
+  window.addEventListener("load",()=>{
+    if(typeof window.showLoginForm === "function" && ownerAuthMode === "login") window.showLoginForm();
+    if(typeof window.showSignupForm === "function" && ownerAuthMode === "signup") window.showSignupForm();
+  });
+}
+const tableContext = String(urlParams.get("table") || urlParams.get("table_no") || "").trim();
+const qrContext = String(urlParams.get("qr") || urlParams.get("qr_code") || "").trim();
+const qrScan = qrContext === "1" || qrContext.toLowerCase() === "true" || !!qrContext;
+
+let restaurant = null;
+let allItems = [];
+let categories = [];
+let vegOnly = false;
+let queryText = "";
+let selectedItem = null;
+let fmAdConfig = null;
+let currentPlan = null;
+let realtimeChannel = null;
+let fallbackMode = false;
+
+const $ = id => document.getElementById(id);
+
+function esc(v){
+  return String(v ?? "").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+}
+function safeUrl(value){
+  if(!value) return "";
+  try{
+    const u=new URL(String(value),location.origin);
+    return ["http:","https:"].includes(u.protocol) ? u.href : "";
+  }catch{return "";}
+}
+function num(v){
+  if(v===null || v===undefined || String(v).trim()==="") return null;
+  const n=Number(String(v).replace(/,/g,"").replace(/[₹$£€]/g,"").trim());
+  return Number.isFinite(n)?n:null;
+}
+function money(v){const n=num(v);return n===null?"":`₹${n.toLocaleString("en-IN")}`;}
+function categoryKey(v){return String(v||"General").trim()||"General";}
+function itemType(item){
+  const t=String(item.item_type||"").toLowerCase();
+  if(t==="egg") return "egg";
+  if(t==="nonveg" || item.is_veg===false) return "nonveg";
+  return "veg";
+}
+function isAvailable(item){
+  return item.is_available!==false && item.available!==false && item.status!=="unavailable" && item.status!=="out_of_stock";
+}
+function isBestseller(item){return item.is_bestseller===true || item.bestseller===true || item.is_best_seller===true;}
+function imageForItem(item){
+  return safeUrl(item.image_url || item.photo_url || item.image || item.photo || item.item_image_url);
+}
+function categoryImage(category, items){
+  const fromCategory = safeUrl(category.image_url || category.image || category.banner_url || category.photo_url);
+  if(fromCategory) return fromCategory;
+  const withImage=items.find(imageForItem);
+  return withImage ? imageForItem(withImage) : "";
+}
+function formatTime(v){
+  if(!v) return "";
+  const p=String(v).split(":"); let h=Number(p[0]),m=Number(p[1]||0);
+  if(!Number.isFinite(h)) return "";
+  const ap=h>=12?"PM":"AM"; h=h%12||12;
+  return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")} ${String(m).padStart(2,"0")?ap:ap}`;
+}
+function phoneValue(){
+  return String(restaurant?.whatsapp || restaurant?.whatsapp_number || restaurant?.phone || "").replace(/[^\d+]/g,"");
+}
+function whatsappUrl(message){
+  const phone=phoneValue();
+  if(!phone) return "";
+  return `https://wa.me/${phone.replace(/^\+/,"")}?text=${encodeURIComponent(message)}`;
+}
+function tableLabel(){
+  if(tableContext) return `Table ${tableContext}`;
+  if(qrContext && qrContext!=="1" && qrContext.toLowerCase()!=="true") return `QR ${qrContext}`;
+  return "";
+}
+
+/* ---------- Theme from restaurant record ---------- */
+function applyRestaurantTheme(rest){
+  const root=document.documentElement.style;
+  root.setProperty("--restaurant-primary", rest.primary_color || rest.theme_primary || "#f59e0b");
+  root.setProperty("--restaurant-accent", rest.accent_color || rest.theme_accent || "#ffbf3f");
+  root.setProperty("--restaurant-bg", rest.background_color || rest.theme_background || "#080d13");
+  root.setProperty("--restaurant-card", rest.card_color || rest.theme_card || "#0e1721");
+  root.setProperty("--restaurant-text", rest.text_color || rest.theme_text || "#f8fafc");
+  if(rest.accent_color){
+    document.documentElement.style.setProperty("--gold",rest.accent_color);
+  }
+  const meta=document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.content=rest.primary_color || "#0b0f17";
+}
+
+/* ---------- Plan / tier resolution ---------- */
+async function loadPlan(rest){
+  currentPlan=null;
+  try{
+    if(rest?.plan_id){
+      const {data,error}=await supabaseClient.from("plans")
+        .select("id,name,slug,plan_type,monthly_price,setup_fee,features,is_active,qr_stickers_max,signature_3d_dishes_max")
+        .eq("id",rest.plan_id).maybeSingle();
+      if(!error && data) currentPlan=data;
+    }
+    if(!currentPlan && rest?.plan){
+      const legacy=String(rest.plan).trim().toLowerCase();
+      const {data}=await supabaseClient.from("plans")
+        .select("id,name,slug,plan_type,monthly_price,setup_fee,features,is_active,qr_stickers_max,signature_3d_dishes_max")
+        .or(`slug.eq.${legacy},plan_type.eq.${legacy}`)
+        .limit(1).maybeSingle();
+      if(data) currentPlan=data;
+    }
+  }catch(e){console.warn("Plan lookup skipped:",e.message||e)}
+  return currentPlan;
+}
+function planKey(){
+  return `${currentPlan?.slug||""} ${currentPlan?.name||""} ${currentPlan?.plan_type||""} ${restaurant?.plan||""}`.toLowerCase();
+}
+function hasPlan(word){
+  return planKey().includes(String(word).toLowerCase());
+}
+function canUseAR(){
+  if(restaurant?.ar_enabled===false) return false;
+  if(!currentPlan) return restaurant?.ar_enabled===true;
+  return /signature|3d|premium/.test(planKey());
+}
+function shouldShowWatermark(){
+  if(restaurant?.watermark_enabled===true) return true;
+  if(restaurant?.watermark_enabled===false) return false;
+  return !/premium|signature|growth|full-3d/.test(planKey());
+}
+
+/* ---------- AdSense: same legacy platform_settings logic ---------- */
+function settingValue(rows,key,fallback=""){
+  const row=(rows||[]).find(x=>x.key===key);
+  return row ? row.value : fallback;
+}
+function boolValue(v,fallback=false){
+  if(v===true||v===false) return v;
+  if(v==null||v==="") return fallback;
+  return String(v).toLowerCase()==="true";
+}
+async function loadFreeMenuAdConfig(rest){
+  try{
+    const {data,error}=await supabaseClient.from("platform_settings")
+      .select("key,value")
+      .in("key",["adsense_client_id","ads_default_slot","free_plan_ads","premium_plan_ads","ads_position"]);
+    if(error) return null;
+    const rows=data||[];
+    const client=String(settingValue(rows,"adsense_client_id","")).trim();
+    const slot=String(settingValue(rows,"ads_default_slot","")).trim();
+    const freeAds=boolValue(settingValue(rows,"free_plan_ads",true),true);
+    const premiumAds=boolValue(settingValue(rows,"premium_plan_ads",false),false);
+    const plan=String(rest?.plan||"free").toLowerCase();
+
+    let activePremium=false;
+    try{
+      const sub=await supabaseClient.from("subscriptions")
+        .select("plan,status,expiry_date")
+        .eq("restaurant_id",rest.id).eq("status","active");
+      if(!sub.error && Array.isArray(sub.data)){
+        activePremium=sub.data.some(s=>{
+          if(String(s.plan||"").toLowerCase()!=="premium") return false;
+          if(!s.expiry_date) return true;
+          const d=new Date(s.expiry_date);
+          return Number.isNaN(d.getTime()) || d>=new Date();
+        });
+      }
+    }catch{}
+    const show=activePremium ? premiumAds : (plan==="premium" ? premiumAds : freeAds);
+    if(!show || !/^ca-pub-\d{6,}$/.test(client) || !/^\d{4,}$/.test(slot)) return null;
+    return {client,slot,position:String(settingValue(rows,"ads_position","after_2_categories"))};
+  }catch(e){console.warn("Ad configuration error; ads hidden.",e);return null}
+}
+function ensureAdSenseScript(client){
+  if(!client || document.querySelector('script[data-freemenu-adsense="1"]')) return;
+  const s=document.createElement("script");
+  s.async=true;s.crossOrigin="anonymous";
+  s.src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client="+encodeURIComponent(client);
+  s.setAttribute("data-freemenu-adsense","1");
+  document.head.appendChild(s);
+}
+function renderMenuAd(){
+  if(!fmAdConfig) return "";
+  const id="fm-ad-"+Math.random().toString(36).slice(2,9);
+  setTimeout(()=>{
+    const wrap=$(id); if(!wrap) return;
+    const ins=wrap.querySelector("ins"); if(!ins) return;
+    ins.setAttribute("data-ad-client",fmAdConfig.client);
+    ins.setAttribute("data-ad-slot",fmAdConfig.slot);
+    ins.setAttribute("data-ad-format","auto");
+    ins.setAttribute("data-full-width-responsive","true");
+    try{(window.adsbygoogle=window.adsbygoogle||[]).push({})}catch(e){console.warn("AdSense render skipped",e)}
+  },80);
+  return `<div id="${id}" class="fm-ad-wrap" aria-label="Advertisement"><ins class="adsbygoogle"></ins></div>`;
+}
+function shouldInsertAd(index){
+  if(!fmAdConfig) return false;
+  const p=String(fmAdConfig.position||"after_2_categories").toLowerCase();
+  if(p.includes("every")) return (index+1)%2===0;
+  const n=Number((p.match(/(\d+)/)||[])[1]||2);
+  return index+1===n;
+}
+
+/* ---------- Restaurant / item rendering ---------- */
+function showLoading(){
+  $("menuSections").innerHTML=`<div class="loading-list">
+    ${[1,2,3].map(()=>`<div class="loading-row"><div style="flex:1"><div class="skeleton sk-title sk-line"></div><div class="skeleton sk-text sk-line"></div><div class="skeleton sk-price sk-line"></div></div></div>`).join("")}
+  </div>`;
+}
+function showState(title,message){
+  $("menuSections").innerHTML=`<div class="state-card"><strong>${esc(title)}</strong><span>${esc(message)}</span></div>`;
+}
+function renderRestaurant(rest){
+  restaurant=rest;
+  applyRestaurantTheme(rest);
+  const name=rest.name||"Restaurant";
+  document.title=`${name} — FreeMenu.in`;
+
+  const logo=safeUrl(rest.logo_url||rest.logo||"");
+  const banner=safeUrl(rest.banner_url||rest.cover_url||rest.cover_image||rest.banner||"");
+  if(logo){
+    $("brand").querySelector(".brand-logo").innerHTML=`<img src="${esc(logo)}" alt="${esc(name)} logo" style="width:100%;height:100%;object-fit:cover;border-radius:14px">`;
+    $("logoMark").innerHTML=`<img src="${esc(logo)}" alt="${esc(name)} logo" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  }
+  if(banner){
+    $("hero").style.backgroundImage=`linear-gradient(90deg,rgba(4,7,10,.96) 0%,rgba(4,7,10,.78) 40%,rgba(4,7,10,.18) 78%),url("${banner}")`;
+  }
+
+  $("hero").querySelector(".hero-content")?.setAttribute("data-restaurant-id",rest.id||"");
+
+  const open=rest.is_open!==false && rest.status!=="closed" && rest.is_active!==false;
+  const status=$("hero").querySelector(".status");
+  if(status){
+    status.innerHTML=`<i></i> ${open?"Open Now":"Closed"} <span>${esc(`${formatTime(rest.opening_time)||"11:00 AM"} – ${formatTime(rest.closing_time)||"11:00 PM"}`)}</span>`;
+    status.style.borderColor=open?"rgba(16,185,129,.28)":"rgba(239,68,68,.28)";
+  }
+  const context=tableLabel();
+  const badge=$("tableContextBadge");
+  if(badge){badge.style.display=context?"inline-flex":"none";badge.textContent=context?`🍽 ${context}`:""}
+
+  const watermark=$("planWatermark");
+  if(watermark) watermark.style.display=shouldShowWatermark()?"block":"none";
+}
+function sortedCategoryNames(items){
+  const names=[...new Set(items.map(x=>categoryKey(x.category)))];
+  const saved=Array.isArray(restaurant?.category_order)?restaurant.category_order.map(String):[];
+  const rank=new Map(saved.map((x,i)=>[x,i]));
+  return names.sort((a,b)=>(rank.has(a)?rank.get(a):999999)-(rank.has(b)?rank.get(b):999999)||a.localeCompare(b));
+}
+function categoryIcon(name){
+  const n=name.toLowerCase();
+  if(n.includes("starter")) return "♨";
+  if(n.includes("main")) return "♨";
+  if(n.includes("bread")) return "◉";
+  if(n.includes("rice")||n.includes("biryani")) return "♨";
+  if(n.includes("chinese")) return "◎";
+  if(n.includes("dessert")||n.includes("sweet")) return "✦";
+  if(n.includes("beverage")||n.includes("drink")) return "◌";
+  return "✦";
+}
+function visibleItems(cat){
+  const q=queryText.trim().toLowerCase();
+  return allItems.filter(item=>{
+    if(categoryKey(item.category)!==cat) return false;
+    if(vegOnly && itemType(item)!=="veg") return false;
+    if(!isAvailable(item)) return false;
+    const hay=`${item.name||""} ${item.description||""} ${item.category||""}`.toLowerCase();
+    return !q || hay.includes(q);
+  }).sort((a,b)=>Number(a.sort_order??a.position??999999)-Number(b.sort_order??b.position??999999)||String(a.name||"").localeCompare(String(b.name||"")));
+}
+function priceCells(item){
+  const q=num(item.price_quarter), h=num(item.price_half), f=num(item.price_full ?? item.price);
+  return `
+    <div class="prices">
+      ${q!==null?`<div class="price"><span>Quarter</span><b>${money(q)}</b></div>`:""}
+      ${h!==null?`<div class="price"><span>Half</span><b>${money(h)}</b></div>`:""}
+      ${f!==null?`<div class="price"><span>Full</span><b>${money(f)}</b></div>`:""}
+    </div>`;
+}
+function renderCategory(cat,index){
+  const items=visibleItems(cat);
+  if(!items.length) return "";
+  const image=categoryImage({image_url:""},items) || safeUrl(items[0]?.category_image_url || "");
+  return `
+    <section class="menu-section" id="cat-${esc(cat).toLowerCase().replace(/[^a-z0-9]+/g,"-")}" data-category="${esc(cat)}">
+      <div class="section-title">
+        <div class="section-heading">
+          <div class="section-icon">${categoryIcon(cat)}</div>
+          <div><h2>${esc(cat)}</h2><p>${esc(items[0]?.category_description||"")}</p></div>
+        </div>
+        <div class="count">${items.length} Item${items.length===1?"":"s"}</div>
+      </div>
+      ${image?`<div class="category-image"><img loading="lazy" src="${esc(image)}" alt="${esc(cat)}"><div class="category-overlay"><div class="category-copy"><div class="category-tag">${esc(items[0]?.category_tag||"Fresh • Signature")}</div><h3>${esc(cat)}</h3><p>${esc(items[0]?.category_description||"Explore the complete selection below.")}</p><div class="gold-line"></div></div></div></div>`:""}
+      <div class="items">
+        ${items.map(item=>renderItem(item)).join("")}
+      </div>
+    </section>
+    ${shouldInsertAd(index)?renderMenuAd():""}`;
+}
+function renderItem(item){
+  const type=itemType(item);
+  const arAvailable=canUseAR() && !!safeUrl(item.ar_model_url||item.model_url||item.glb_url);
+  return `
+    <article class="item ${isBestseller(item)?"featured-item":""}" tabindex="0"
+      data-item-id="${esc(item.id||"")}" data-name="${esc(item.name||"")}" data-desc="${esc(item.description||"")}">
+      <div class="item-main">
+        <div class="item-name-row">
+          <span class="food-dot ${type}"></span>
+          <h4>${esc(item.name||"Unnamed item")}</h4>
+          ${isBestseller(item)?`<span class="badge gold">★ Bestseller</span>`:""}
+          ${item.is_recommended?`<span class="badge gold">Recommended</span>`:""}
+        </div>
+        ${item.description?`<p class="item-desc">${esc(item.description)}</p>`:""}
+        <div class="item-meta">${type==="veg"?"100% Vegetarian":type==="egg"?"Contains Egg":"Non-Vegetarian"} • ${arAvailable?"3D / AR available":"Freshly prepared"}</div>
+      </div>
+      ${priceCells(item)}
+    </article>`;
+}
+function renderNav(){
+  const names=sortedCategoryNames(allItems);
+  $("categoryNav").innerHTML=names.map((c,i)=>`<button class="cat-tab ${i===0?"active":""}" data-target="${esc(c)}"><strong>${categoryIcon(c)}</strong><span>${esc(c)}</span></button>`).join("");
+  $("categoryNav").querySelectorAll(".cat-tab").forEach(btn=>btn.addEventListener("click",()=>{
+    const target=[...document.querySelectorAll(".menu-section")].find(s=>s.dataset.category===btn.dataset.target);
+    target?.scrollIntoView({behavior:"smooth",block:"start"});
+    $("categoryNav").querySelectorAll(".cat-tab").forEach(x=>x.classList.toggle("active",x===btn));
+  }));
+}
+function renderSections(){
+  const names=sortedCategoryNames(allItems);
+  const visible=names.map((cat,i)=>renderCategory(cat,i)).join("");
+  $("menuSections").innerHTML=visible || `<div class="state-card"><strong>No matching dishes</strong><span>Try another search or turn off Veg Only.</span></div>`;
+  $("menuSections").querySelectorAll(".item").forEach(el=>{
+    el.addEventListener("click",()=>openSheetById(el.dataset.itemId));
+    el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" ")openSheetById(el.dataset.itemId)});
+  });
+}
+function renderAll(){
+  renderNav();
+  renderSections();
+}
+
+/* ---------- Dish detail / WhatsApp / AR ---------- */
+function openSheetById(id){
+  const item=allItems.find(x=>String(x.id)===String(id));
+  if(!item) return;
+  selectedItem=item;
+  $("sheetTitle").textContent=item.name||"Dish";
+  $("sheetDesc").textContent=item.description||"";
+  $("sheetPrices").innerHTML=priceCells(item);
+
+  const actions=[];
+  const wa=whatsappUrl(`Hello ${restaurant?.name||"Restaurant"}, I am at ${tableLabel()||"the restaurant"}. I want to ask/order about: ${item.name}.`);
+  if(wa) actions.push(`<a class="backend-action whatsapp" href="${esc(wa)}" target="_blank" rel="noopener">💬 WhatsApp</a>`);
+  const model=safeUrl(item.ar_model_url||item.model_url||item.glb_url);
+  if(model && canUseAR()) actions.push(`<button class="backend-action ar" type="button" id="sheetAR">◈ 3D / AR</button>`);
+  actions.push(`<button class="backend-action waiter" type="button" id="sheetWaiter">♧ Call Waiter</button>`);
+  $("sheetActions").innerHTML=actions.join("");
+
+  $("sheet").classList.add("show");
+  $("backdrop").classList.add("show");
+  $("sheetAR")?.addEventListener("click",()=>openAR(item));
+  $("sheetWaiter")?.addEventListener("click",callWaiter);
+}
+function closeSheet(){
+  $("sheet").classList.remove("show");
+  $("backdrop").classList.remove("show");
+}
+function openAR(item){
+  const model=safeUrl(item?.ar_model_url||item?.model_url||item?.glb_url);
+  if(!model) return;
+  $("arTitle").textContent=`${item.name||"Dish"} — 3D / AR`;
+  const viewer=$("foodModel");
+  viewer.setAttribute("src",model);
+  const usdz=safeUrl(item.ar_usdz_url||item.usdz_url||"");
+  if(usdz) viewer.setAttribute("ios-src",usdz);
+  $("arModal").classList.add("show");
+  $("arModal").setAttribute("aria-hidden","false");
+  document.body.style.overflow="hidden";
+}
+function closeAR(){
+  $("arModal").classList.remove("show");
+  $("arModal").setAttribute("aria-hidden","true");
+  $("foodModel").removeAttribute("src");
+  $("foodModel").removeAttribute("ios-src");
+  document.body.style.overflow="";
+}
+
+/* ---------- Waiter integration ----------
+   If an existing restaurant exposes a waiter endpoint/function, use it.
+   Otherwise preserve the customer flow by opening the restaurant WhatsApp
+   with the table context. No hard-coded backend table is assumed.
+*/
+async function callWaiter(){
+  const payload={restaurant_id:restaurant?.id||null,table_number:tableContext||null,qr_code:qrContext||null,requested_at:new Date().toISOString()};
+  try{
+    if(restaurant?.waiter_endpoint){
+      const response=await fetch(String(restaurant.waiter_endpoint),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+      if(!response.ok) throw new Error(`Waiter endpoint ${response.status}`);
+      alert(tableLabel()?`Waiter request sent for ${tableLabel()}.`:"Waiter request sent.");
+      return;
+    }
+    if(restaurant?.waiter_rpc){
+      const {error}=await supabaseClient.rpc(String(restaurant.waiter_rpc),payload);
+      if(error) throw error;
+      alert(tableLabel()?`Waiter request sent for ${tableLabel()}.`:"Waiter request sent.");
+      return;
+    }
+  }catch(e){console.warn("Waiter backend request failed:",e.message||e)}
+  const wa=whatsappUrl(`Hello ${restaurant?.name||"Restaurant"}, please send a waiter to ${tableLabel()||"my table"}.`);
+  if(wa) window.open(wa,"_blank","noopener");
+  else if(restaurant?.phone) window.location.href=`tel:${String(restaurant.phone).replace(/[^\d+]/g,"")}`;
+  else alert("Waiter contact is not configured for this restaurant.");
+}
+
+/* ---------- Analytics ---------- */
+async function track(eventType,itemId=null,metadata={}){
+  if(!restaurant?.id) return;
+  try{
+    await supabaseClient.from("menu_analytics").insert({
+      restaurant_id:restaurant.id,event_type:eventType,menu_item_id:itemId||null,
+      session_id:getSessionId(),user_agent:navigator.userAgent.slice(0,500),
+      referrer:document.referrer||null,metadata:{...metadata,table:tableContext||null,qr:qrContext||null}
+    });
+  }catch(e){/* analytics must never break the menu */}
+}
+function getSessionId(){
+  const k="fm_menu_session";
+  let v=localStorage.getItem(k);
+  if(!v){v=crypto.randomUUID?crypto.randomUUID():Date.now()+"-"+Math.random().toString(36).slice(2);localStorage.setItem(k,v)}
+  return v;
+}
+
+/* ---------- Realtime ---------- */
+function startRealtime(){
+  if(!restaurant?.id || realtimeChannel) return;
+  realtimeChannel=supabaseClient.channel(`public-menu-${restaurant.id}`)
+    .on("postgres_changes",{event:"*",schema:"public",table:"menu_items",filter:`restaurant_id=eq.${restaurant.id}`},async()=>{
+      await refreshMenuData();
+    })
+    .on("postgres_changes",{event:"UPDATE",schema:"public",table:"restaurants",filter:`id=eq.${restaurant.id}`},async payload=>{
+      restaurant=payload.new||restaurant;
+      renderRestaurant(restaurant);
+      await loadPlan(restaurant);
+      fmAdConfig=await loadFreeMenuAdConfig(restaurant);
+      if(fmAdConfig) ensureAdSenseScript(fmAdConfig.client);
+      renderAll();
+    })
+    .subscribe();
+}
+async function refreshMenuData(){
+  const {data,error}=await supabaseClient.from("menu_items").select("*").eq("restaurant_id",restaurant.id);
+  if(!error){allItems=Array.isArray(data)?data:[];renderAll()}
+}
+
+/* ---------- Load restaurant + menu ---------- */
+async function loadDynamicMenu(){
+  showLoading();
+  if(!restaurantSlug){
+    fallbackMode=true;
+    renderFallback();
+    return;
+  }
+  try{
+    let q=supabaseClient.from("restaurants").select("*").limit(1);
+    q=q.eq("slug",restaurantSlug);
+    let {data:rests,error}=await q;
+    if(error) throw error;
+
+    /* Accept ?restaurant=<uuid> as a compatibility route too. */
+    if((!rests||!rests.length) && urlParams.get("restaurant")){
+      const r=urlParams.get("restaurant");
+      const byId=await supabaseClient.from("restaurants").select("*").eq("id",r).limit(1);
+      if(!byId.error) rests=byId.data;
+    }
+    if(!rests?.length){
+      showState("Restaurant not found","Please check the FreeMenu.in menu link.");
+      return;
+    }
+    restaurant=rests[0];
+    renderRestaurant(restaurant);
+
+    currentPlan=await loadPlan(restaurant);
+    fmAdConfig=await loadFreeMenuAdConfig(restaurant);
+    if(fmAdConfig) ensureAdSenseScript(fmAdConfig.client);
+
+    const {data,error:itemsError}=await supabaseClient.from("menu_items").select("*").eq("restaurant_id",restaurant.id);
+    if(itemsError) throw itemsError;
+    allItems=Array.isArray(data)?data:[];
+
+    if(!allItems.length){
+      showState("Menu is being prepared","No menu items have been added yet.");
+      return;
+    }
+    renderAll();
+    track(qrScan?"qr_scan":"menu_view");
+    startRealtime();
+  }catch(e){
+    console.error("Dynamic menu load failed:",e);
+    showState("Unable to load menu","Please refresh the page or try again shortly.");
+  }
+}
+
+/* ---------- Demo fallback keeps NEW_CODE directly previewable ---------- */
+const fallbackCategories = [
+  {id:"starters",name:"Starters",subtitle:"Delicious way to start your meal",tag:"Bold flavours to begin with",image:"https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&w=1400&q=86",items:[
+    {id:"demo-1",name:"Paneer Tikka",type:"veg",item_type:"veg",description:"Cottage cheese cubes marinated in tandoori spices and grilled to perfection.",is_bestseller:true,price_half:180,price_full:320},
+    {id:"demo-2",name:"Chicken Tikka",type:"nonveg",item_type:"nonveg",description:"Tender chicken pieces marinated in authentic spices and grilled.",price_half:220,price_full:400}
+  ]},
+  {id:"main-course",name:"Main Course",subtitle:"Hearty curries for every craving",tag:"Rich curries full of tradition",image:"https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=1400&q=86",items:[
+    {id:"demo-3",name:"Butter Chicken",type:"nonveg",item_type:"nonveg",description:"Creamy tomato gravy, smoky tandoor chicken and a touch of butter.",is_bestseller:true,price_half:280,price_full:480},
+    {id:"demo-4",name:"Paneer Butter Masala",type:"veg",item_type:"veg",description:"Soft paneer simmered in a silky tomato and cashew gravy.",price_half:240,price_full:420}
+  ]}
+];
+function renderFallback(){
+  restaurant={id:"demo",name:"Urban Punjab",phone:"",is_open:true};
+  allItems=fallbackCategories.flatMap(c=>c.items.map(i=>({...i,category:c.name,category_description:c.subtitle,category_image_url:c.image})));
+  renderRestaurant(restaurant);
+  renderAll();
+}
+function syncBottomVeg(){
+  $("vegToggle").classList.toggle("active",vegOnly);
+  $("bottomVeg").classList.toggle("active",vegOnly);
+}
+
+/* ---------- Events ---------- */
+$("searchInput").addEventListener("input",e=>{queryText=e.target.value.trim().toLowerCase();renderAll()});
+$("vegToggle").addEventListener("click",()=>{vegOnly=!vegOnly;syncBottomVeg();renderAll()});
+$("sheetClose").addEventListener("click",closeSheet);
+$("backdrop").addEventListener("click",closeSheet);
+$("navSearch").addEventListener("click",()=>$("searchInput").focus());
+$("bottomMenu").addEventListener("click",()=>window.scrollTo({top:0,behavior:"smooth"}));
+$("bottomVeg").addEventListener("click",()=>{$("vegToggle").click()});
+$("bottomBest").addEventListener("click",()=>{
+  const first=allItems.find(isBestseller);
+  if(first){track("item_click",first.id,{source:"bestseller"});openSheetById(first.id)}
+});
+$("bottomContact").addEventListener("click",callWaiter);
+$("arClose").addEventListener("click",closeAR);
+$("arModal").addEventListener("click",e=>{if(e.target===$("arModal"))closeAR()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeSheet();closeAR()}});
+
+/* Track item opens. */
+document.addEventListener("click",e=>{
+  const item=e.target.closest(".item");
+  if(item && item.dataset.itemId) track("item_click",item.dataset.itemId);
+});
+
+/* Boot */
+window.addEventListener("load",loadDynamicMenu);
+</script>
+</body>
+</html>
