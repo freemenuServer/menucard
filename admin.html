@@ -1130,9 +1130,11 @@ function aiShowMessage(message,type='success'){
   const el=$('aiMessage'); if(!el)return;
   el.textContent=message;el.className='ai-message show '+type;
 }
-function aiSetProgress(message,show=true){
+function aiSetProgress(percent,message=''){
   const el=$('aiProgress');if(!el)return;
-  el.textContent=message;el.classList.toggle('show',show);
+  el.textContent = message || (percent ? `${percent}%` : '');
+  el.dataset.percent = String(Number(percent)||0);
+  el.classList.toggle('show', !!message || Number(percent)>0);
 }
 function aiNormalizeNumber(v){
   if(v===null||v===undefined||String(v).trim()==='')return null;
@@ -1208,8 +1210,8 @@ function aiFileToBase64(file){
 }
 async function runAIMenuScan(){
   const rid = $('aiRestaurant')?.value;
-  if(!rid){ showAIMessage('Please select a restaurant first.', true); return; }
-  if(!aiMenuFile){ showAIMessage('Please upload a menu image first.', true); return; }
+  if(!rid){ aiShowMessage('Please select a restaurant first.', true); return; }
+  if(!aiMenuFile){ aiShowMessage('Please upload a menu image first.', true); return; }
 
   const btn = $('aiScanButton');
   const originalText = btn?.textContent || 'Scan Menu';
@@ -1287,7 +1289,7 @@ async function runAIMenuScan(){
             aiScannedRows = items.map(aiNormalizeRow);
             aiRenderReview();
             aiSetProgress(100, `Scan complete — ${aiScannedRows.length} item(s) found.`);
-            showAIMessage(
+            aiShowMessage(
               data?.model && data.model !== selectedModel
                 ? `Scan successful using fallback model: ${data.model}`
                 : `Scan successful — ${aiScannedRows.length} item(s) found.`
@@ -1338,8 +1340,8 @@ async function runAIMenuScan(){
     throw lastError || new Error('AI scan failed. Please try again.');
   }catch(err){
     console.error('AI menu scan failed:', err);
-    aiSetProgress(0, '');
-    showAIMessage(err?.message || 'AI scan failed. Please try again.', true);
+    aiSetProgress(0, 'Scan failed');
+    aiShowMessage(err?.message || 'AI scan failed. Please try again.', 'error');
   }finally{
     if(btn){
       btn.disabled = false;
