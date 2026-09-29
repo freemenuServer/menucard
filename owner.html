@@ -12,15 +12,15 @@
 
 <style>
 :root{
- --navy:#17120f;--navy2:#241a15;--primary:#6f2632;--primary-dark:#541b25;
- --pink:#b8893c;--bg:#f6f2ea;--card:#fffdf9;--text:#2a211d;--muted:#756a61;
- --border:#e7ddd1;--green:#2f7658;--danger:#a94a4a;--blue:#526f88;
- --shadow:0 8px 25px rgba(55,39,28,.07);--radius:14px;
+ --navy:#101827;--navy2:#172235;--primary:#b51d3b;--primary-dark:#89142b;
+ --pink:#f52f72;--bg:#f6f7fb;--card:#fff;--text:#111827;--muted:#697386;
+ --border:#e5e7eb;--green:#13a66b;--danger:#e5484d;--blue:#3283e8;
+ --shadow:0 8px 25px rgba(15,23,42,.06);--radius:14px;
 }
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif}
 button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoration:none;color:inherit}
 .hidden{display:none!important}.muted{color:var(--muted)}
-#loader{position:fixed;inset:0;background:#f6f2ea;display:grid;place-items:center;z-index:9999}
+#loader{position:fixed;inset:0;background:#f6f7fb;display:grid;place-items:center;z-index:9999}
 /* Current assigned plan - compact dashboard card */
 .planSummary{margin:14px 0 16px;padding:16px 18px}
 .planSummaryTop{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
@@ -44,20 +44,20 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .loader-card{text-align:center}.spinner{width:42px;height:42px;border:4px solid #ddd;border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite;margin:auto}@keyframes spin{to{transform:rotate(360deg)}}
 
 /* Layout */
-.app{min-height:100vh}.sidebar{position:fixed;left:0;top:0;bottom:0;width:238px;background:linear-gradient(180deg,#17120f,#241a15);color:#e8dfd3;padding:22px 14px;z-index:100;overflow:auto}
+.app{min-height:100vh}.sidebar{position:fixed;left:0;top:0;bottom:0;width:238px;background:linear-gradient(180deg,#0d1624,#121b2b);color:#dce4f0;padding:22px 14px;z-index:100;overflow:auto}
 .logoArea{text-align:center;padding:5px 8px 22px}.chefLogo{font-size:32px;color:#f5bf47}.sideBrand{font-family:"Cormorant Garamond",serif;font-size:25px;font-weight:700;color:#fff}.sideSub{font-size:10px;letter-spacing:1.5px;color:#aab5c7}
-.navItem{display:flex;align-items:center;gap:13px;padding:12px 13px;margin:4px 0;border-radius:8px;font-size:13px;font-weight:600;color:#cfc2b4}
-.navItem i{width:19px;text-align:center}.navItem:hover{background:#34241e;color:#fff}.navItem.active{background:linear-gradient(90deg,#5d1f2a,#7d2c38);color:#fff;box-shadow:0 6px 18px rgba(111,38,50,.22)}
+.navItem{display:flex;align-items:center;gap:13px;padding:12px 13px;margin:4px 0;border-radius:8px;font-size:13px;font-weight:600;color:#bdc8d9}
+.navItem i{width:19px;text-align:center}.navItem:hover{background:#1c2a40;color:#fff}.navItem.active{background:linear-gradient(90deg,#8f1831,#b51d3b);color:#fff;box-shadow:0 6px 18px rgba(181,29,59,.2)}
 .sidePromo{margin:24px 0 0;padding:20px 12px;border:1px solid rgba(255,255,255,.13);border-radius:10px;background:linear-gradient(145deg,#242039,#321f3a);text-align:center}
-.sidePromo i{color:#d6b46b;font-size:24px}.sidePromo strong{display:block;margin:8px 0 5px}.sidePromo p{font-size:11px;color:#cfc2b4;line-height:1.5;margin:0 0 12px}
-.btn-pink{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:0;background:#a87a35;color:#fff;border-radius:8px;padding:10px 12px;font-weight:800;font-size:12px;width:100%}
-.content{margin-left:238px;min-height:100vh}.topbar{height:78px;background:#fffdf9;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 25px;position:sticky;top:0;z-index:80}
-.restIdentity{display:flex;align-items:center;gap:12px}.restLogo{width:44px;height:44px;border-radius:50%;object-fit:cover;border:1px solid #ddd;background:#eee}.restTitle{font-size:17px;font-weight:800}.restAddress{font-size:11px;color:var(--muted);margin-top:2px}.topActions{display:flex;align-items:center;gap:12px}.openToggle{display:flex;align-items:center;gap:8px;background:#dff7ea;color:#087443;border:0;border-radius:20px;padding:9px 14px;font-size:12px;font-weight:800}.profile{display:flex;align-items:center;gap:9px;padding-left:13px;border-left:1px solid var(--border)}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#6f2632;color:#fff;font-weight:800}
+.sidePromo i{color:#ffd34f;font-size:24px}.sidePromo strong{display:block;margin:8px 0 5px}.sidePromo p{font-size:11px;color:#c7c9d5;line-height:1.5;margin:0 0 12px}
+.btn-pink{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:0;background:#f32f72;color:#fff;border-radius:8px;padding:10px 12px;font-weight:800;font-size:12px;width:100%}
+.content{margin-left:238px;min-height:100vh}.topbar{height:78px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 25px;position:sticky;top:0;z-index:80}
+.restIdentity{display:flex;align-items:center;gap:12px}.restLogo{width:44px;height:44px;border-radius:50%;object-fit:cover;border:1px solid #ddd;background:#eee}.restTitle{font-size:17px;font-weight:800}.restAddress{font-size:11px;color:var(--muted);margin-top:2px}.topActions{display:flex;align-items:center;gap:12px}.openToggle{display:flex;align-items:center;gap:8px;background:#dff7ea;color:#087443;border:0;border-radius:20px;padding:9px 14px;font-size:12px;font-weight:800}.profile{display:flex;align-items:center;gap:9px;padding-left:13px;border-left:1px solid var(--border)}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#d91f35;color:#fff;font-weight:800}
 .container{max-width:1200px;margin:auto;padding:22px 20px 45px}.mobileMenu{display:none}
 
 /* Cards / common */
-.card{background:#fffdf9;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}.cardTitle{font-size:16px;font-weight:800;margin:0 0 15px;display:flex;align-items:center;justify-content:space-between;gap:10px}.cardTitle small{font-size:11px;color:var(--muted);font-weight:500}
-.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.stat{padding:17px;border-radius:12px;border:1px solid var(--border);background:#fff;box-shadow:var(--shadow);min-height:105px}.statTop{display:flex;justify-content:space-between;align-items:center}.statIcon{width:39px;height:39px;border-radius:10px;display:grid;place-items:center;background:#f2eadc;color:#8c672d}.stat:nth-child(2) .statIcon{background:#f5e9df;color:#9b4d56}.stat:nth-child(3) .statIcon{background:#e7f2ec;color:#2f7658}.stat:nth-child(4) .statIcon{background:#eee8f1;color:#76536f}.statLabel{font-size:11px;margin-top:10px}.statValue{font-size:24px;font-weight:800;margin-top:2px}.statChange{font-size:10px;color:var(--green);font-weight:700}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}.cardTitle{font-size:16px;font-weight:800;margin:0 0 15px;display:flex;align-items:center;justify-content:space-between;gap:10px}.cardTitle small{font-size:11px;color:var(--muted);font-weight:500}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.stat{padding:17px;border-radius:12px;border:1px solid var(--border);background:#fff;box-shadow:var(--shadow);min-height:105px}.statTop{display:flex;justify-content:space-between;align-items:center}.statIcon{width:39px;height:39px;border-radius:10px;display:grid;place-items:center;background:#edf4ff;color:#287be0}.stat:nth-child(2) .statIcon{background:#fff0fa;color:#df2d8a}.stat:nth-child(3) .statIcon{background:#e9fbf5;color:#12a36b}.stat:nth-child(4) .statIcon{background:#f4edff;color:#8238d5}.statLabel{font-size:11px;margin-top:10px}.statValue{font-size:24px;font-weight:800;margin-top:2px}.statChange{font-size:10px;color:var(--green);font-weight:700}
 .twoCol{display:grid;grid-template-columns:1.15fr .85fr;gap:15px;margin-top:15px}.twoCol.equal{grid-template-columns:1fr 1fr}.threeCol{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 .btn{border:1px solid var(--border);background:#fff;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:800;color:#263244}.btn:hover{background:#f8fafc}.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}.btn.danger{color:var(--danger);background:#fff1f1;border-color:#ffd0d0}.btn.blue{color:#1671d8;background:#edf6ff;border-color:#cde5ff}.btn.green{color:#087443;background:#e8faef;border-color:#bdeccf}.btn.sm{padding:7px 9px;font-size:11px}.actions{display:flex;gap:7px;flex-wrap:wrap}
 .formGroup{margin-bottom:13px}.formGroup label{display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px}.input,.select,.textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 11px;background:#fff;color:#172033;outline:none;font-size:13px}.textarea{min-height:82px;resize:vertical}.input:focus,.select:focus,.textarea:focus{border-color:#b7a0a5;box-shadow:0 0 0 3px rgba(181,29,59,.06)}
@@ -110,7 +110,6 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
 
 .reorderMoveBtn{display:inline-flex;align-items:center;gap:6px;border:1px solid #d8dee8;background:#fff;border-radius:7px;padding:6px 9px;color:#475569;font-size:10px;font-weight:800;cursor:grab}.reorderMoveBtn:hover{background:#f1f5f9;border-color:#b8c2d1}.reorderMoveBtn:active{cursor:grabbing}
-.freemenu-login-logo-img{width:190px;max-width:75%;height:auto;display:block;margin:0 auto 14px;object-fit:contain}
 </style>
 
 
@@ -218,29 +217,17 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
   .menuLiveSwitch.off{background:#dc8b2c}
   .menuLiveState{font-size:10px;font-weight:850;white-space:nowrap}
   .menuLiveState.on{color:#087443}.menuLiveState.off{color:#b45309}
-</style>
-<style id="royal-palette-finish">
-.themeSelectWrap{background:#faf6ee;border-color:#e3d6c5}
-.themeSelectWrap>label,.themeAdvanced summary{color:#5e5148}
-.themeSelectIcon{background:linear-gradient(135deg,#4d1b25,#7b2d38);color:#e1c27f}
-.themeSwatch{background:#fffdf9;border-color:#e3d8ca}
-.themeAdvanced{background:#fffdf9;border-color:#e3d8ca}
-.themeAdvancedNote{color:#7a6d62}
-.colorField{background:#fffdf9;border-color:#e2d7ca}
-.colorField:hover{border-color:#c5a76a;background:#fbf6ed}
-.previewFrame{background:#fffdf9;border-color:#dfd3c5}
-.previewBody{background:#f8f3ea}
-.previewItem{background:#fffdf9;border-color:#e7ddd1}
-.previewAction{background:linear-gradient(135deg,#6f2632,#8a3442)!important}
+
+.profileSecurityBox{margin:18px 0;padding:16px;border:1px solid var(--border);border-radius:12px;background:#fafafa}
+.profileSecurityTitle{font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px;color:var(--text)}
+.profileSecurityTitle i{color:#d91f35}
+.profileSecuritySub{font-size:11px;color:var(--muted);line-height:1.5;margin:5px 0 14px}
+.profilePasswordMsg{font-size:12px;line-height:1.5;padding:10px 12px;border-radius:8px;margin:0 0 12px}
+.profilePasswordMsg.success{background:#ecfdf3;color:#087443;border:1px solid #bbf7d0}
+.profilePasswordMsg.error{background:#fff1f2;color:#b42318;border:1px solid #fecdd3}
+.profileSecurityBox button:disabled{opacity:.65;cursor:not-allowed}
 </style>
 
-
-
-  <!-- FreeMenu Brand / Favicon -->
-  <link rel="icon" type="image/png" sizes="512x512" href="favicon-512x512.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 </head>
 
 <body>
@@ -253,7 +240,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
   <div class="ownerAuthCard ownerAuthSplit" id="authChoiceCard">
     <div class="freemenu-login-brand">
       <div class="freemenu-login-brand-inner">
-        <img class="freemenu-login-logo-img" src="./freemenu-logo.png" alt="FreeMenu.in">
+        <div class="freemenu-login-logo">FM</div>
         <div class="fm-kicker">RESTAURANT PARTNER</div>
         <h1>FreeMenu</h1>
         <p class="fm-tagline">Your restaurant menu, profile, QR and daily menu management — all in one simple owner panel.</p>
@@ -646,7 +633,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
   <div class="card" style="max-width:720px;margin:auto;text-align:center">
     <div class="cardTitle">Restaurant QR Code</div>
     <p class="muted" style="font-size:12px">This QR opens the public menu URL for this restaurant.</p>
-    <div style="margin:18px auto;width:240px;height:240px;display:grid;place-items:center;background:#fffdf9;border:1px solid var(--border);border-radius:12px" id="qrBox"></div>
+    <div style="margin:18px auto;width:240px;height:240px;display:grid;place-items:center;background:#fff;border:1px solid var(--border);border-radius:12px" id="qrBox"></div>
     <input class="input" id="qrUrl" readonly style="text-align:center;margin-bottom:10px">
     <div class="actions" style="justify-content:center"><button class="btn primary" id="downloadQR"><i class="fa-solid fa-download"></i> Download QR</button><button class="btn" id="copyQR">Copy Link</button></div>
   </div>
@@ -696,9 +683,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
       <details class="themeAdvanced">
         <summary><i class="fa-solid fa-sliders"></i> Advanced colors</summary>
         <div class="themeGrid" style="margin-top:10px">
-          <label class="colorField"><input type="color" id="cPrimary" value="#7C2D12"><span>Primary</span></label>
-          <label class="colorField"><input type="color" id="cAccent" value="#D97706"><span>Accent</span></label>
-          <label class="colorField"><input type="color" id="cBg" value="#FFF7ED"><span>Background</span></label>
+          <label class="colorField"><input type="color" id="cPrimary" value="#7c2d12"><span>Primary</span></label>
+          <label class="colorField"><input type="color" id="cAccent" value="#d97706"><span>Accent</span></label>
+          <label class="colorField"><input type="color" id="cBg" value="#fffaf0"><span>Background</span></label>
         </div>
         <div class="themeAdvancedNote">Use this only when you want to fine-tune the selected preset. The saved colors are used by the live public menu.</div>
       </details>
@@ -728,6 +715,29 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
     <div class="card">
       <div class="cardTitle">Account & Security</div>
       <div class="formGroup"><label>Logged-in Email</label><input class="input" id="accountEmail" disabled></div>
+
+      <div class="profileSecurityBox">
+        <div class="profileSecurityTitle"><i class="fa-solid fa-key"></i> Change Password</div>
+        <div class="profileSecuritySub">Update your Owner account password without leaving the Profile page.</div>
+
+        <div class="formGroup">
+          <label>Current Password</label>
+          <input class="input" id="profileCurrentPassword" type="password" autocomplete="current-password" placeholder="Enter current password">
+        </div>
+        <div class="twoCol" style="gap:12px">
+          <div class="formGroup">
+            <label>New Password</label>
+            <input class="input" id="profileNewPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Minimum 6 characters">
+          </div>
+          <div class="formGroup">
+            <label>Confirm New Password</label>
+            <input class="input" id="profileConfirmPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Repeat new password">
+          </div>
+        </div>
+        <div id="profilePasswordMsg" class="profilePasswordMsg" style="display:none"></div>
+        <button class="btn primary" id="changeProfilePassword"><i class="fa-solid fa-lock"></i> Change Password</button>
+      </div>
+
       <button class="btn danger" id="logout2"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
     </div>
   </div>
@@ -1013,6 +1023,51 @@ async function updateOwnerPassword(){
   }
 }
 
+async function changeProfilePassword(){
+  const current=$("profileCurrentPassword")?.value||"";
+  const next=$("profileNewPassword")?.value||"";
+  const confirm=$("profileConfirmPassword")?.value||"";
+  const msg=$("profilePasswordMsg");
+  const btn=$("changeProfilePassword");
+  const showMsg=(text,type)=>{ if(!msg)return; msg.textContent=text; msg.className="profilePasswordMsg "+type; msg.style.display="block"; };
+
+  if(!current){ showMsg("Please enter your current password.","error"); return; }
+  if(next.length<6){ showMsg("New password must be at least 6 characters.","error"); return; }
+  if(next!==confirm){ showMsg("New passwords do not match.","error"); return; }
+  if(current===next){ showMsg("New password must be different from your current password.","error"); return; }
+
+  btn.disabled=true;
+  btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Changing Password...';
+  if(msg) msg.style.display="none";
+  try{
+    const user=supabaseClient.auth.getUser ? (await supabaseClient.auth.getUser()).data?.user : null;
+    const email=(user?.email||$("accountEmail")?.value||"").trim();
+    if(!email) throw new Error("Unable to identify the logged-in email.");
+
+    // Re-authenticate first so a stale/forgotten current password cannot be used to change it.
+    const {error:loginError}=await supabaseClient.auth.signInWithPassword({email,password:current});
+    if(loginError) throw new Error("Current password is incorrect.");
+
+    const {error}=await supabaseClient.auth.updateUser({password:next});
+    if(error) throw error;
+
+    $("profileCurrentPassword").value="";
+    $("profileNewPassword").value="";
+    $("profileConfirmPassword").value="";
+    showMsg("Password changed successfully.","success");
+    toast("Password changed successfully");
+  }catch(e){
+    console.error("Profile password change failed:",e);
+    showMsg(e?.message||"Unable to change password. Please try again.","error");
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML='<i class="fa-solid fa-lock"></i> Change Password';
+  }
+}
+
+$("changeProfilePassword")?.addEventListener("click",changeProfilePassword);
+["profileCurrentPassword","profileNewPassword","profileConfirmPassword"].forEach(id=>$(id)?.addEventListener("keydown",e=>{if(e.key==="Enter")changeProfilePassword()}));
+
 async function ownerLogin(){
   const email=$("loginEmailNew").value.trim();
   const password=$("loginPasswordNew").value;
@@ -1289,9 +1344,9 @@ function fillProfile(){
   $("fDineIn").checked=r.dine_in!==false;
   $("fTakeaway").checked=r.takeaway!==false;
   $("fDelivery").checked=r.home_delivery!==false;
-  $("cPrimary").value=r.primary_color||r.theme_primary||"#7C2D12";
-  $("cAccent").value=r.accent_color||"#D97706";
-  $("cBg").value=r.background_color||r.theme_background||"#FFF7ED";
+  $("cPrimary").value=r.primary_color||r.theme_primary||"#641219";
+  $("cAccent").value=r.accent_color||"#d8ad62";
+  $("cBg").value=r.background_color||r.theme_background||"#fff7ed";
   renderThemePresetOptions();
   updateTheme();
 
@@ -2096,12 +2151,12 @@ $("sidePlansBtn").onclick=()=>openOwnerPlans();
 
 /* ---------- Professional Theme System ---------- */
 const THEME_PRESETS={
-  warm:{name:"Warm Spice",description:"Premium restaurant warmth with rich spice tones and a welcoming cream background.",primary:"#6F2632",primaryDark:"#541B25",accent:"#B8893C",background:"#F8F3EA",card:"#FFFDF9",text:"#2A211D"},
-  minimal:{name:"Modern Clean",description:"Clean, neutral and contemporary — designed to keep food and content in focus.",primary:"#30343B",primaryDark:"#20242A",accent:"#A77A32",background:"#F7F4EE",card:"#FFFDF9",text:"#26221F"},
-  luxury:{name:"Royal Luxury",description:"Deep, elegant burgundy and antique gold with a refined ivory canvas for premium dining brands.",primary:"#24151A",primaryDark:"#160D10",accent:"#C6A15B",background:"#F5F0E7",card:"#FFFDF9",text:"#241C19"},
-  organic:{name:"Fresh Organic",description:"Deep heritage green with muted gold and warm ivory for cafés and modern casual dining.",primary:"#185544",primaryDark:"#103C31",accent:"#B49A61",background:"#F5F3E9",card:"#FFFDF9",text:"#1D2923"},
-  ocean:{name:"Coastal Blue",description:"Deep navy with antique gold and a soft ivory canvas for a polished contemporary menu.",primary:"#1B3045",primaryDark:"#102130",accent:"#B89450",background:"#F3F5F4",card:"#FFFFFF",text:"#20272D"},
-  rose:{name:"Elegant Rose",description:"Deep plum-burgundy with champagne gold and warm ivory for refined cafés and modern dining.",primary:"#51243A",primaryDark:"#361626",accent:"#C39A62",background:"#F8F2EE",card:"#FFFDF9",text:"#2B2024"}
+  warm:{name:"Warm Spice",description:"Premium restaurant warmth with rich spice tones and a welcoming cream background.",primary:"#7C2D12",primaryDark:"#5B1F0E",accent:"#D97706",background:"#FFF7ED",card:"#FFFFFF",text:"#2B1B16"},
+  minimal:{name:"Modern Clean",description:"Clean, neutral and contemporary — designed to keep food and content in focus.",primary:"#1F2937",primaryDark:"#111827",accent:"#2563EB",background:"#F8FAFC",card:"#FFFFFF",text:"#111827"},
+  luxury:{name:"Royal Luxury",description:"Deep, elegant tones with a refined gold accent for premium dining brands.",primary:"#1F1B2D",primaryDark:"#11101A",accent:"#C9A227",background:"#F8F5EE",card:"#FFFFFF",text:"#211F26"},
+  organic:{name:"Fresh Organic",description:"Fresh greens and natural neutrals for cafés, healthy food and modern casual dining.",primary:"#166534",primaryDark:"#14532D",accent:"#65A30D",background:"#F7FBEF",card:"#FFFFFF",text:"#17251A"},
+  ocean:{name:"Coastal Blue",description:"Trustworthy blue tones with a warm coral accent for a fresh contemporary menu.",primary:"#0F4C5C",primaryDark:"#0B3440",accent:"#E76F51",background:"#F4FAFC",card:"#FFFFFF",text:"#102A33"},
+  rose:{name:"Elegant Rose",description:"Sophisticated berry tones with a soft rose accent for cafés and modern dining.",primary:"#7F1D4E",primaryDark:"#5B1538",accent:"#DB2777",background:"#FFF7FB",card:"#FFFFFF",text:"#2D1723"}
 };
 
 function hexNorm(v){return String(v||"").trim().toLowerCase()}

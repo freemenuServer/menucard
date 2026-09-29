@@ -501,47 +501,10 @@ function openRestaurantModal(id){
  <div class="field"><label>Status</label><select id="rf_status"><option ${statusOf(r)==='active'?'selected':''}>active</option><option ${statusOf(r)==='pending'?'selected':''}>pending</option><option ${statusOf(r)==='blocked'?'selected':''}>blocked</option></select></div>
  </div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveRestaurant('${id||''}')">Save Restaurant</button></div>`)
 }
-function normalizeRestaurantSlug(value,fallbackName=''){
-  const base=String(value||fallbackName||'').trim().toLowerCase();
-  return base
-    .replace(/[^a-z0-9\s-]/g,'')
-    .replace(/\s+/g,'-')
-    .replace(/-+/g,'-')
-    .replace(/^-+|-+$/g,'');
-}
 async function saveRestaurant(id){
- const name=$('rf_name').value.trim();
- const rawSlug=$('rf_slug').value.trim();
- const normalizedSlug=normalizeRestaurantSlug(rawSlug,name);
- const payload={name,slug:normalizedSlug,phone:$('rf_phone').value.trim(),logo_url:$('rf_logo').value.trim(),address:$('rf_address').value.trim(),status:$('rf_status').value};
- if(!payload.name)return toast('Please enter restaurant name.');
- if(!payload.slug)return toast('Please enter a valid restaurant name or slug.');
- let r;
- if(id){
-   r=await db.from('restaurants').update(payload).eq('id',id);
- }else{
-   r=await db.from('restaurants').insert({...payload}).select('id').single();
- }
- if(r.error){toast(r.error.message);return}
- const createdId=!id?(r.data?.id||null):id;
- const qrId=pendingQRRestaurantId;
- pendingQRRestaurantId=null;
- await logAction(id?'Updated restaurant':'Created restaurant',createdId);
- closeModal();
- await loadAll();
- if(!id&&qrId&&createdId){
-   const qr=qrCodes.find(q=>q.id===qrId);
-   const count=qrCodes.filter(x=>x.restaurant_id===createdId&&x.status==='assigned').length;
-   if(qr&&count<10){
-     const ar=await db.from('qr_codes').update({restaurant_id:createdId,status:'assigned',assigned_at:new Date().toISOString(),assigned_by:session.user.id}).eq('id',qrId);
-     if(ar.error){toast('Restaurant created, but QR assignment failed: '+ar.error.message);return}
-     await logAction('Assigned QR '+(qr.code||''),createdId);
-     await loadQRs();
-     toast('Restaurant created and QR assigned');
-     return;
-   }
- }
- toast('Restaurant saved');
+ const payload={name:$('rf_name').value.trim(),slug:$('rf_slug').value.trim(),phone:$('rf_phone').value.trim(),logo_url:$('rf_logo').value.trim(),address:$('rf_address').value.trim(),status:$('rf_status').value};
+ let r=id?await db.from('restaurants').update(payload).eq('id',id):await db.from('restaurants').insert({...payload});
+ if(r.error){toast(r.error.message);return}await logAction(id?'Updated restaurant':'Created restaurant',id);closeModal();toast('Restaurant saved');await loadAll()
 }
 async function setRestaurantStatus(id,status){const r=await db.from('restaurants').update({status}).eq('id',id);if(r.error)return toast(r.error.message);await logAction(`Changed restaurant status to ${status}`,id);toast('Status updated');await loadAll()}
 async function deleteRestaurant(id){if(!confirm('Delete this restaurant?'))return;const r=await db.from('restaurants').delete().eq('id',id);if(r.error)return toast(r.error.message);await logAction('Deleted restaurant',id);toast('Restaurant deleted');await loadAll()}
@@ -1012,15 +975,9 @@ async function generateQRBatch(n=100){
   if(r.error)return toast(r.error.message);
   await logAction(`Generated ${n} QR codes`); await loadQRs(); toast(`${n} QR codes generated successfully`);
 }
-let pendingQRRestaurantId=null;
 function openAssignQR(id){
   const x=qrCodes.find(q=>q.id===id); if(!x)return;
-  pendingQRRestaurantId=null;
-  modal('Assign QR Code',`<div class="notice"><b>${esc(x.code)}</b> can be assigned to one restaurant. A restaurant can have maximum 10 active QR codes.</div><div class="field"><label>Restaurant</label><select id="qrAssignRest">${restaurants.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}</option>`).join('')}</select></div><div class="field" style="margin-top:10px"><label>Label (optional)</label><input id="qrAssignLabel" placeholder="Table 1"></div><div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="smallbtn" type="button" onclick="openNewRestaurantForQR('${x.id}')">＋ New Restaurant</button></div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="assignQR('${x.id}')">Assign QR</button></div>`);
-}
-function openNewRestaurantForQR(qrId){
-  pendingQRRestaurantId=qrId;
-  openRestaurantModal('');
+  modal('Assign QR Code',`<div class="notice"><b>${esc(x.code)}</b> can be assigned to one restaurant. A restaurant can have maximum 10 active QR codes.</div><div class="field"><label>Restaurant</label><select id="qrAssignRest">${restaurants.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}</option>`).join('')}</select></div><div class="field" style="margin-top:10px"><label>Label (optional)</label><input id="qrAssignLabel" placeholder="Table 1"></div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="assignQR('${x.id}')">Assign QR</button></div>`);
 }
 async function assignQR(id){
   const rid=$('qrAssignRest').value,label=$('qrAssignLabel').value.trim();
@@ -1071,7 +1028,7 @@ async function renderPrintQR(items,title){
     return {
       id:x.id,
       code:x.code,
-      url:r?.slug ? new URL('/menu.html?r='+encodeURIComponent(String(r.slug).trim().toLowerCase()),location.origin).href : qrTargetURL(x.code),
+      url:r?.slug ? new URL('/menu.html?r='+encodeURIComponent(r.slug),location.origin).href : qrTargetURL(x.code),
       restaurant:r?.name||'Restaurant Menu',
       label:x.label||''
     };
