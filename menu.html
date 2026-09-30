@@ -171,8 +171,8 @@ a{text-decoration:none;color:inherit}
   height:48px;padding:0 20px;border-radius:20px;border:1px solid #1c3643;background:#07161f;
   display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;cursor:pointer;
 }
-.filter.active{background:linear-gradient(180deg,#ffb71a,#ffab00);color:#12100a;border-color:#ffc83d}
-.filter.veg i{color:#00e389}.filter.nonveg i{color:#ff2334}
+.filter.active{background:linear-gradient(180deg,#ffb71a,#ffab00);color:#12100a!important;border-color:#ffc83d}.filter.active svg{color:#12100a!important}
+.filter.veg{color:#eef5f7!important}.filter.veg i{color:#00e389}.filter.nonveg{color:#eef5f7!important}.filter.nonveg i{color:#ff2334}
 .veg-toggle{display:none}
 
 /* Menu sections */
@@ -257,7 +257,7 @@ a{text-decoration:none;color:inherit}
   .search i{font-size:17px;margin-right:9px}
   .search input{font-size:13px}
   .filters{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-  .filter{height:39px;justify-content:center;padding:0 8px;border-radius:18px;font-size:11px}
+  .filter{height:39px;justify-content:center;color:#eef5f7!important;padding:0 8px;border-radius:18px;font-size:11px}}.filters .veg-svg{width:17px!important;height:17px!important;min-width:17px!important;min-height:17px!important;max-width:17px!important;max-height:17px!important}
   .menu-section{border-radius:14px;margin-bottom:8px}
   .section-head{min-height:55px;padding:8px 12px}
   .section-icon{width:45px;font-size:29px}
@@ -324,8 +324,22 @@ a{text-decoration:none;color:inherit}
 
 .restaurant-logo-img{width:142px;height:142px;border-radius:50%;object-fit:contain;display:block;background:#05090c}.restaurant-logo-img[hidden]{display:none!important}.restaurant-logo-fallback{width:142px;height:142px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#ffb511;font-size:54px;background:radial-gradient(circle,#211708,#050606 70%)}
 .footer{margin-top:30px;border-top:1px solid #19303b;background:linear-gradient(180deg,#06131b,#030b10);padding:24px 0 28px;color:#aebbc3}.footer-inner{display:flex;justify-content:space-between;gap:24px;align-items:flex-start}.footer-brand{font-weight:800;font-size:16px;color:#f4f7fa}.footer-brand span{color:#ffb511}.footer-sub{font-size:10px;letter-spacing:.7px;margin-top:4px;color:#7f909a}.footer-info{font-size:11px;line-height:1.7;text-align:right}.footer-info strong{color:#e7edf0}.footer-copy{margin-top:12px;padding-top:10px;border-top:1px solid #132731;font-size:10px;color:#71828c;display:flex;justify-content:space-between;gap:15px}.footer-copy span:last-child{text-align:right}
-.fm-original-logo{display:block;width:155px;height:auto;max-height:48px;object-fit:contain;object-position:left center}.desktop-original-logo{width:155px;max-height:50px}.mobile-header .fm-original-logo{width:145px;max-height:42px}.logo-circle .fm-original-logo{width:142px;max-height:142px;object-fit:contain;border-radius:20px}.restaurant-name-primary{color:#fff}.restaurant-name-accent{color:#ffb511}.trait .veg-svg{width:20px;height:20px;display:block;flex:0 0 20px}.trait.green{color:#f0f4f2}.gst-detail{white-space:nowrap}.service-chip{display:none}.admin-settings{display:none;position:fixed;inset:auto 18px 18px auto;width:min(420px,calc(100vw - 36px));z-index:120;background:#08151d;border:1px solid #77520d;border-radius:18px;box-shadow:0 20px 60px #000b;padding:18px}.admin-mode .admin-settings{display:block}.admin-settings h3{margin:0 0 14px;font-size:18px}.setting-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0}.setting-row label{font-size:12px;color:#d6dee2}.setting-row input,.setting-row select{width:150px;background:#061018;border:1px solid #29414c;color:#fff;border-radius:9px;padding:8px}.setting-row input[type=checkbox]{width:18px}.admin-save{width:100%;margin-top:12px;background:#ffb511;color:#15100a;border:0;border-radius:10px;padding:10px;font-weight:800;cursor:pointer}.admin-msg{font-size:11px;color:#9fe9c8;margin-top:8px;min-height:14px}
+.fm-original-logo{display:block;width:155px;height:auto;max-height:48px;object-fit:contain;object-position:left center}.desktop-original-logo{width:155px;max-height:50px}.mobile-header .fm-original-logo{width:145px;max-height:42px}.logo-circle .fm-original-logo{width:142px;max-height:142px;object-fit:contain;border-radius:20px}.restaurant-name-primary{color:#fff}.restaurant-name-accent{color:#ffb511}.veg-svg{
+  width:20px!important;height:20px!important;min-width:20px!important;min-height:20px!important;
+  max-width:20px!important;max-height:20px!important;display:inline-block!important;
+  flex:0 0 20px!important;overflow:visible!important;vertical-align:middle;
+  color:currentColor!important;fill:none!important;
+}
+.veg-svg path{fill:none!important;stroke:currentColor!important}
+.trait .veg-svg{color:#00e389}
+.filter.veg .veg-svg{color:#00e389}
+.filter.active .veg-svg{color:currentColor}.trait.green{color:#f0f4f2}.gst-detail{white-space:nowrap}.service-chip{display:none}.admin-settings{display:none;position:fixed;inset:auto 18px 18px auto;width:min(420px,calc(100vw - 36px));z-index:120;background:#08151d;border:1px solid #77520d;border-radius:18px;box-shadow:0 20px 60px #000b;padding:18px}.admin-mode .admin-settings{display:block}.admin-settings h3{margin:0 0 14px;font-size:18px}.setting-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0}.setting-row label{font-size:12px;color:#d6dee2}.setting-row input,.setting-row select{width:150px;background:#061018;border:1px solid #29414c;color:#fff;border-radius:9px;padding:8px}.setting-row input[type=checkbox]{width:18px}.admin-save{width:100%;margin-top:12px;background:#ffb511;color:#15100a;border:0;border-radius:10px;padding:10px;font-weight:800;cursor:pointer}.admin-msg{font-size:11px;color:#9fe9c8;margin-top:8px;min-height:14px}
 
+/* Mobile veg filter safety: never allow SVGs to become an oversized overlay. */
+@media(max-width:900px){
+  .filters .filter{display:flex;align-items:center;justify-content:center;gap:7px;position:relative;overflow:hidden}
+  .filters .filter .veg-svg{position:static!important;inset:auto!important;transform:none!important;pointer-events:none}
+}
 </style>
 </head>
 <body>
@@ -359,7 +373,7 @@ a{text-decoration:none;color:inherit}
         <h1><span class="restaurant-name-primary">Restaurant</span> <span class="restaurant-name-accent">Name</span></h1>
         <div class="tagline" data-editable>Pure Taste, Great Moments</div>
         <div class="traits">
-          <div class="trait green"><svg class="veg-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.6 3.4C13.1 3.5 7.3 5.8 5 10.2c-1.4 2.7-.7 5.8 1.1 7.5 1.8 1.7 4.7 2.1 7.4.7 4.4-2.3 6.7-8.1 7.1-15Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4 21c2.8-5.8 7.2-8.8 13.5-10.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Pure Veg Options</div>
+          <div class="trait green"><svg class="veg-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.4 3.6C13.1 3.9 7.7 6.1 5.2 10.3c-1.8 3-.9 6.5 1.4 8.2 2.3 1.7 5.6 1.2 8-1.2 3.2-3.1 4.9-8.2 5.8-13.7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M3.8 20.6c2.8-5.2 6.8-8.8 12.4-11.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Pure Veg Options</div>
           <div class="trait gold"><i class="fa-solid fa-chef-hat"></i>Chef Special</div>
           <div class="trait red"><i class="fa-regular fa-heart"></i>Made with Love</div>
         </div>
@@ -391,7 +405,7 @@ a{text-decoration:none;color:inherit}
     </label>
     <div class="filters">
       <button class="filter active" data-filter="all">All</button>
-      <button class="filter veg" data-filter="veg"><svg class="veg-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.6 3.4C13.1 3.5 7.3 5.8 5 10.2c-1.4 2.7-.7 5.8 1.1 7.5 1.8 1.7 4.7 2.1 7.4.7 4.4-2.3 6.7-8.1 7.1-15Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4 21c2.8-5.8 7.2-8.8 13.5-10.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Veg</button>
+      <button class="filter veg" data-filter="veg"><svg class="veg-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.4 3.6C13.1 3.9 7.7 6.1 5.2 10.3c-1.8 3-.9 6.5 1.4 8.2 2.3 1.7 5.6 1.2 8-1.2 3.2-3.1 4.9-8.2 5.8-13.7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M3.8 20.6c2.8-5.2 6.8-8.8 12.4-11.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Veg</button>
       <button class="filter nonveg" data-filter="nonveg"><i class="fa-solid fa-drumstick-bite"></i>Non-Veg</button>
     </div>
   </section>
