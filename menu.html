@@ -107,6 +107,7 @@ a{text-decoration:none;color:inherit}
   pointer-events:none;
 }
 .hero-inner{height:100%;position:relative;z-index:1;display:flex;align-items:center;gap:42px;padding:28px 26px}
+.hero-copy{flex:1;min-width:0}
 .logo-circle{
   width:196px;height:196px;border-radius:50%;flex:0 0 196px;
   border:4px solid #e2a82e;display:flex;align-items:center;justify-content:center;text-align:center;
@@ -180,7 +181,10 @@ a{text-decoration:none;color:inherit}
 .section-icon{width:64px;font-size:41px;color:#f7b400;text-align:left}
 .section-title h2{font-family:"Playfair Display",serif;font-size:28px;margin:0;line-height:1}
 .section-title p{font-size:15px;color:#d7dde1;margin:6px 0 0}
-.price-head{margin-left:auto;display:grid;grid-template-columns:82px 82px;gap:0;color:#e6ebee;font-size:14px}
+.price-head{margin-left:auto;display:grid;gap:0;color:#e6ebee;font-size:14px;justify-content:end}
+.price-head.cols-1{grid-template-columns:82px}
+.price-head.cols-2{grid-template-columns:82px 82px}
+.price-head.cols-3{grid-template-columns:82px 82px 82px}
 .price-head span{text-align:center}
 .item{
   min-height:57px;display:grid;grid-template-columns:48px 1fr 164px;align-items:center;
@@ -200,10 +204,13 @@ a{text-decoration:none;color:inherit}
 .badge.gold{color:#ffbd19;border-color:#bd8100;background:#2a1d02}
 .badge.red{color:#ff8a8e;border-color:#d63339;background:#260b0d}
 .badge.spicy{color:#ff8c8c;border-color:#cf2c33;background:#23090b}
-.prices{display:grid;grid-template-columns:82px 82px;align-items:center}
-.price{text-align:center;font-size:15px;font-weight:700}
+.prices{display:grid;align-items:center;justify-content:end}
+.prices.cols-1{grid-template-columns:82px}
+.prices.cols-2{grid-template-columns:82px 82px}
+.prices.cols-3{grid-template-columns:82px 82px 82px}
+.price{text-align:center;font-size:15px;font-weight:700;min-width:0}
 .price + .price{border-left:1px solid #28404b}
-.single-price{grid-column:2;text-align:center}
+.single-price{text-align:center}
 .prices.one{grid-template-columns:82px 82px}
 .prices.one .price{grid-column:2}
 
@@ -308,7 +315,7 @@ a{text-decoration:none;color:inherit}
 .price-head span,.price{color:#f1f5f7!important}
 .menu-section{color:#f4f7fa}
 
-.restaurant-logo-img{width:142px;height:142px;border-radius:50%;object-fit:cover;display:block;background:#05090c}.restaurant-logo-fallback{width:142px;height:142px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#ffb511;font-size:54px;background:radial-gradient(circle,#211708,#050606 70%)}
+.restaurant-logo-img{width:142px;height:142px;border-radius:50%;object-fit:contain;display:block;background:#05090c}.restaurant-logo-img[hidden]{display:none!important}.restaurant-logo-fallback{width:142px;height:142px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#ffb511;font-size:54px;background:radial-gradient(circle,#211708,#050606 70%)}
 .footer{margin-top:30px;border-top:1px solid #19303b;background:linear-gradient(180deg,#06131b,#030b10);padding:24px 0 28px;color:#aebbc3}.footer-inner{display:flex;justify-content:space-between;gap:24px;align-items:flex-start}.footer-brand{font-weight:800;font-size:16px;color:#f4f7fa}.footer-brand span{color:#ffb511}.footer-sub{font-size:10px;letter-spacing:.7px;margin-top:4px;color:#7f909a}.footer-info{font-size:11px;line-height:1.7;text-align:right}.footer-info strong{color:#e7edf0}.footer-copy{margin-top:12px;padding-top:10px;border-top:1px solid #132731;font-size:10px;color:#71828c;display:flex;justify-content:space-between;gap:15px}.footer-copy span:last-child{text-align:right}
 .fm-original-logo{display:block;width:155px;height:auto;max-height:48px;object-fit:contain;object-position:left center}.desktop-original-logo{width:155px;max-height:50px}.mobile-header .fm-original-logo{width:145px;max-height:42px}.logo-circle .fm-original-logo{width:142px;max-height:142px;object-fit:contain;border-radius:20px}.restaurant-name-primary{color:#fff}.restaurant-name-accent{color:#ffb511}.trait .veg-svg{width:20px;height:20px;display:block;flex:0 0 20px}.trait.green{color:#f0f4f2}.gst-detail{white-space:nowrap}.service-chip{display:none}.admin-settings{display:none;position:fixed;inset:auto 18px 18px auto;width:min(420px,calc(100vw - 36px));z-index:120;background:#08151d;border:1px solid #77520d;border-radius:18px;box-shadow:0 20px 60px #000b;padding:18px}.admin-mode .admin-settings{display:block}.admin-settings h3{margin:0 0 14px;font-size:18px}.setting-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0}.setting-row label{font-size:12px;color:#d6dee2}.setting-row input,.setting-row select{width:150px;background:#061018;border:1px solid #29414c;color:#fff;border-radius:9px;padding:8px}.setting-row input[type=checkbox]{width:18px}.admin-save{width:100%;margin-top:12px;background:#ffb511;color:#15100a;border:0;border-radius:10px;padding:10px;font-weight:800;cursor:pointer}.admin-msg{font-size:11px;color:#9fe9c8;margin-top:8px;min-height:14px}
 
@@ -340,7 +347,6 @@ a{text-decoration:none;color:inherit}
         <img id="restaurantLogo" class="restaurant-logo-img" src="" alt="Restaurant logo" hidden>
         <div id="restaurantLogoFallback" class="restaurant-logo-fallback" aria-hidden="true"><i class="fa-solid fa-store"></i></div>
       </div>
-</div>
       <div class="hero-copy">
         <div class="kicker">WELCOME TO</div>
         <h1><span class="restaurant-name-primary">Restaurant</span> <span class="restaurant-name-accent">Name</span></h1>
@@ -512,14 +518,13 @@ function renderPrice(item){
   const h=item.price_half==null?"":String(item.price_half).trim();
   const f=item.price_full??item.price;
   const full=f==null?"":String(f).trim();
-  const labels=[q?"q":null,h?"h":null,full?"f":null].filter(Boolean);
-  if(!labels.length)return"";
   const cells=[];
   if(q)cells.push(`<span class="price">₹${escapeHTML(q)}</span>`);
   if(h)cells.push(`<span class="price">₹${escapeHTML(h)}</span>`);
   if(full)cells.push(`<span class="price">₹${escapeHTML(full)}</span>`);
-  const one=labels.length===1;
-  return `<div class="prices ${one?"one":""}">${cells.join("")}</div>`;
+  const count=cells.length;
+  if(!count)return"";
+  return `<div class="prices cols-${count}">${cells.join("")}</div>`;
 }
 function renderTags(item){
   const t=[];
@@ -545,7 +550,7 @@ function renderMenu(){
     return `<section class="menu-section" id="${sectionId(c)}" data-category="${escapeHTML(c)}">
       <div class="section-head"><div class="section-icon"><i class="fa-solid ${categoryIcon(c)}"></i></div>
       <div class="section-title"><h2>${escapeHTML(c)}</h2><p>${list.length} item${list.length===1?"":"s"}</p></div>
-      <div class="price-head">${labels.map(x=>`<span>${x}</span>`).join("")}</div></div>
+      <div class="price-head cols-${labels.length}">${labels.map(x=>`<span>${x}</span>`).join("")}</div></div>
       ${list.map(item=>`<div class="item ${isUnavailable(item)?"":"available"}">
         <span class="food-dot ${getItemType(item)==="nonveg"?"nonveg":"veg"}"><i class="fa-solid fa-circle"></i></span>
         <div class="item-main"><div class="item-name-row"><span class="item-name">${escapeHTML(item.name||"Unnamed item")}</span>${renderTags(item)}</div>
