@@ -286,6 +286,21 @@ a{text-decoration:none;color:inherit}
   border:1px solid #9d6900;border-radius:12px;padding:10px 13px;font-size:11px
 }
 .admin-mode .admin-note{display:block}
+
+/* Readability + FreeMenu logo correction */
+.logo-circle .inner{color:#fff8e8}
+.logo-circle .logo-name{font-family:"DM Sans",Arial,sans-serif;font-size:24px;font-weight:800;letter-spacing:-.8px;color:#fff}
+.logo-circle .logo-name .fm-logo-free{color:#fff}
+.logo-circle .logo-name .fm-logo-menu{color:#ffb511}
+.logo-circle .logo-sub{color:#d8d0c3}
+.hero h1{color:#fff8ed!important;text-shadow:0 2px 12px rgba(0,0,0,.35)}
+.hero h1 .restaurant-name-accent{color:#ffb511}
+.item-name{color:#f7f9fb!important;text-shadow:0 1px 6px rgba(0,0,0,.18)}
+.item-desc{color:#c3cdd3!important}
+.section-title h2{color:#fff8ed!important}
+.section-title p{color:#c3cdd3!important}
+.price-head span,.price{color:#f1f5f7!important}
+.menu-section{color:#f4f7fa}
 </style>
 </head>
 <body>
@@ -319,13 +334,13 @@ a{text-decoration:none;color:inherit}
       <div class="logo-circle">
         <div class="inner">
           <i class="fa-solid fa-hat-chef logo-icon"></i>
-          <div class="logo-name" data-editable>ROYAL SPICE</div>
-          <div class="logo-sub">FAMILY RESTAURANT</div>
+          <div class="logo-name" aria-label="FreeMenu.in logo"><span class="fm-logo-free">Free</span><span class="fm-logo-menu">Menu.in</span></div>
+          <div class="logo-sub">DIGITAL RESTAURANT MENU</div>
         </div>
       </div>
       <div class="hero-copy">
         <div class="kicker">WELCOME TO</div>
-        <h1 data-editable>Royal <span>Spice</span></h1>
+        <h1><span class="restaurant-name-primary">Restaurant</span> <span class="restaurant-name-accent">Name</span></h1>
         <div class="tagline" data-editable>Pure Taste, Great Moments</div>
         <div class="traits">
           <div class="trait green"><i class="fa-regular fa-leaf"></i>Pure Veg Options</div>
@@ -514,7 +529,13 @@ function activateCategory(c){activeCategory=c;syncCategoryUI();renderMenu();docu
 function renderRestaurant(rest){
   restaurant=rest;applyRestaurantTheme(rest);
   const name=rest.name||"Restaurant";document.title=`${name} • Menu`;
-  const h=document.querySelector(".hero h1");if(h)h.innerHTML=escapeHTML(name);
+  const h=document.querySelector(".hero h1");
+  if(h){
+    const parts=name.trim().split(/\s+/);
+    const first=parts.shift()||"Restaurant";
+    const restName=parts.join(" ");
+    h.innerHTML=`<span class="restaurant-name-primary">${escapeHTML(first)}</span>${restName?` <span class="restaurant-name-accent">${escapeHTML(restName)}</span>`:""}`;
+  }
   const tagline=document.querySelector(".tagline");if(tagline)tagline.textContent=rest.tagline||rest.subtitle_text||"";
   const logo=safeUrl(rest.logo_url), hero=document.querySelector(".hero"),cover=safeUrl(rest.banner_url||rest.cover_url||rest.cover_image);
   if(hero&&cover)hero.style.backgroundImage=`linear-gradient(90deg,rgba(2,8,11,.86),rgba(10,7,3,.45)),url("${cover}")`;
