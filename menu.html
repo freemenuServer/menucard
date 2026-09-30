@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>FreeMenu.in — Royal Spice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#020b11;
+  --bg2:#06131b;
+  --panel:#071721;
+  --panel2:#091c26;
+  --panel3:#0b202b;
+  --gold:#ffb511;
+  --gold2:#ffcf62;
+  --gold-dark:#7f5100;
+  --cream:#f7f1e5;
+  --text:#f4f7fa;
+  --muted:#aab7c1;
+  --line:#1c3542;
+  --green:#00c777;
+  --green2:#13e48b;
+  --red:#ff2634;
+  --purple:#b86cff;
+  --shadow:0 16px 40px rgba(0,0,0,.34);
+  --radius:18px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 50% -10%,rgba(255,174,0,.06),transparent 30%),
+    linear-gradient(180deg,#020a10 0%,#031018 55%,#020a10 100%);
+  font-family:"DM Sans",Arial,sans-serif;
+}
+button,input{font:inherit}
+button{color:inherit}
+a{text-decoration:none;color:inherit}
+.container{width:min(100% - 40px,1280px);margin:auto}
+
+/* Header */
+.topbar{
+  height:68px;
+  display:flex;
+  align-items:center;
+  gap:28px;
+  border-bottom:1px solid #142b37;
+  background:rgba(2,10,16,.96);
+  position:sticky;
+  top:0;
+  z-index:50;
+  backdrop-filter:blur(18px);
+}
+.brand{display:flex;flex-direction:column;line-height:1}
+.brand-main{font-size:25px;font-weight:800;letter-spacing:-1.1px}
+.brand-main span{color:var(--gold)}
+.brand-sub{font-size:9px;letter-spacing:.8px;color:#cbd5da;margin-top:5px}
+.desktop-nav{display:flex;align-items:center;gap:8px;margin-left:20px}
+.desktop-nav a{
+  padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;color:#dbe2e6;
+}
+.desktop-nav a:hover{background:#10232d}
+.desktop-nav a.active{
+  color:var(--gold);background:linear-gradient(180deg,#251b07,#17130a);
+  border:1px solid #835600;box-shadow:inset 0 1px rgba(255,255,255,.05);
+}
+.header-actions{margin-left:auto;display:flex;align-items:center;gap:9px}
+.status-pill,.time-pill{
+  display:flex;align-items:center;gap:8px;border-radius:22px;
+  border:1px solid #193541;background:#07161f;padding:9px 14px;font-size:13px;
+}
+.status-pill{color:#f8fff9;background:linear-gradient(180deg,#064d38,#07382c);border-color:#087a54;font-weight:700}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#19ef9a;box-shadow:0 0 8px #19ef9a}
+.time-pill{border-left:0;margin-left:-10px;padding-left:18px}
+.waiter{
+  display:flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid #a66c00;
+  border-radius:14px;color:#fff;background:#0a151b;font-weight:700;font-size:13px;
+}
+.waiter i{font-size:18px;color:var(--gold)}
+
+/* Hero */
+.hero{
+  margin-top:0;
+  height:306px;
+  border:1px solid #865a0b;
+  border-top:0;
+  border-radius:0 0 18px 18px;
+  overflow:hidden;
+  position:relative;
+  box-shadow:var(--shadow);
+  background:
+    linear-gradient(90deg,rgba(2,8,11,.86) 0%,rgba(10,7,3,.60) 40%,rgba(19,7,1,.25) 100%),
+    linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.52)),
+    url("https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=1800&q=85") center/cover;
+}
+.hero:after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 75% 30%,rgba(255,177,0,.12),transparent 34%),linear-gradient(90deg,transparent 65%,rgba(0,0,0,.22));
+  pointer-events:none;
+}
+.hero-inner{height:100%;position:relative;z-index:1;display:flex;align-items:center;gap:42px;padding:28px 26px}
+.logo-circle{
+  width:196px;height:196px;border-radius:50%;flex:0 0 196px;
+  border:4px solid #e2a82e;display:flex;align-items:center;justify-content:center;text-align:center;
+  background:radial-gradient(circle,#1b1407,#050606 70%);
+  box-shadow:0 0 0 2px rgba(255,194,65,.25),0 0 35px rgba(255,170,0,.14);
+}
+.logo-circle .inner{font-family:"Playfair Display",serif;color:#f4d075}
+.logo-icon{font-size:44px;display:block;color:#f2b01a;margin-bottom:5px}
+.logo-name{font-size:24px;font-weight:800;line-height:1.05;letter-spacing:.5px}
+.logo-sub{font:600 10px "DM Sans";letter-spacing:.6px;margin-top:6px}
+.hero-copy{min-width:0}
+.kicker{color:var(--gold);font-size:15px;letter-spacing:2.6px;font-weight:800;margin-bottom:4px}
+.hero h1{font-family:"Playfair Display",serif;font-size:62px;line-height:.98;margin:0;letter-spacing:-2px}
+.hero h1 span{color:var(--gold)}
+.tagline{font-size:24px;color:#f3f4f5;margin-top:10px}
+.traits{display:flex;align-items:center;gap:28px;margin-top:18px;font-size:15px}
+.trait{display:flex;align-items:center;gap:7px}
+.trait.green{color:#f0f4f2}.trait.green i{color:#00dd88}
+.trait.gold i{color:#eec15e}.trait.red i{color:#ff3042}
+.info-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.info-chip{
+  display:flex;align-items:center;gap:9px;border:1px solid #5c6970;border-radius:18px;
+  background:rgba(3,12,17,.72);padding:10px 17px;color:#f0f3f5;font-size:13px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+}
+.info-chip i{color:#ffd064;font-size:16px}
+.info-chip.gst i{color:#f1e2b5}
+
+/* Category bar */
+.categories{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:18px 0 14px;
+}
+.cat{
+  min-height:76px;border:1px solid #19313d;border-radius:14px;background:linear-gradient(180deg,#091923,#07151d);
+  display:flex;align-items:center;justify-content:center;gap:7px;flex-direction:column;
+  color:#e8edf0;font-size:13px;font-weight:700;cursor:pointer;transition:.2s;
+}
+.cat i{font-size:23px;color:#e4b04a}
+.cat:hover{transform:translateY(-2px);border-color:#8d610d}
+.cat.active{border-color:#f2aa00;background:linear-gradient(180deg,#17170e,#0b171c);box-shadow:inset 0 0 0 1px rgba(255,184,0,.15)}
+.cat.active i,.cat.active span{color:#ffc321}
+
+/* Controls */
+.controls{display:flex;align-items:center;gap:18px;margin:0 0 20px}
+.search{
+  height:48px;flex:1;border:1px solid #1b3440;border-radius:18px;background:#07161f;
+  display:flex;align-items:center;padding:0 17px;box-shadow:inset 0 0 18px rgba(0,0,0,.16);
+}
+.search i{font-size:20px;color:#f7b000;margin-right:13px}
+.search input{width:100%;border:0;outline:0;background:transparent;color:#fff;font-size:15px}
+.search input::placeholder{color:#8e9ca5}
+.filters{display:flex;align-items:center;gap:8px}
+.filter{
+  height:48px;padding:0 20px;border-radius:20px;border:1px solid #1c3643;background:#07161f;
+  display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;cursor:pointer;
+}
+.filter.active{background:linear-gradient(180deg,#ffb71a,#ffab00);color:#12100a;border-color:#ffc83d}
+.filter.veg i{color:#00e389}.filter.nonveg i{color:#ff2334}
+.veg-toggle{display:none}
+
+/* Menu sections */
+.menu-section{
+  border:1px solid #8a5c0d;border-radius:18px;overflow:hidden;background:linear-gradient(180deg,#07131b,#06121a);
+  margin-bottom:12px;box-shadow:0 8px 25px rgba(0,0,0,.15);
+}
+.section-head{
+  min-height:77px;display:flex;align-items:center;padding:11px 24px;
+  background:linear-gradient(90deg,rgba(90,50,4,.34),rgba(7,20,27,.3));
+  border-bottom:1px solid #172d38;
+}
+.section-icon{width:64px;font-size:41px;color:#f7b400;text-align:left}
+.section-title h2{font-family:"Playfair Display",serif;font-size:28px;margin:0;line-height:1}
+.section-title p{font-size:15px;color:#d7dde1;margin:6px 0 0}
+.price-head{margin-left:auto;display:grid;grid-template-columns:82px 82px;gap:0;color:#e6ebee;font-size:14px}
+.price-head span{text-align:center}
+.item{
+  min-height:57px;display:grid;grid-template-columns:48px 1fr 164px;align-items:center;
+  gap:8px;padding:8px 24px;border-bottom:1px solid #152a35;
+}
+.item:last-child{border-bottom:0}
+.food-dot{
+  width:25px;height:25px;border-radius:4px;display:flex;align-items:center;justify-content:center;
+  border:2px solid currentColor;font-size:11px;
+}
+.food-dot.veg{color:#00df8a}.food-dot.nonveg{color:#ff2334}
+.item-main{min-width:0}
+.item-name-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.item-name{font-weight:700;font-size:15px}
+.item-desc{font-size:12px;color:#aebac1;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{font-size:10px;font-weight:800;padding:3px 8px;border-radius:12px;border:1px solid}
+.badge.gold{color:#ffbd19;border-color:#bd8100;background:#2a1d02}
+.badge.red{color:#ff8a8e;border-color:#d63339;background:#260b0d}
+.badge.spicy{color:#ff8c8c;border-color:#cf2c33;background:#23090b}
+.prices{display:grid;grid-template-columns:82px 82px;align-items:center}
+.price{text-align:center;font-size:15px;font-weight:700}
+.price + .price{border-left:1px solid #28404b}
+.single-price{grid-column:2;text-align:center}
+
+/* Mobile */
+.mobile-header,.mobile-only{display:none}
+.bottom-nav{display:none}
+
+@media(max-width:900px){
+  .container{width:min(100% - 20px,680px)}
+  .topbar{display:none}
+  .mobile-header{
+    display:flex;height:70px;align-items:center;justify-content:space-between;padding:0 16px;
+    background:#031018;border-bottom:1px solid #16303d;position:sticky;top:0;z-index:60;
+  }
+  .mobile-menu-btn{width:40px;height:40px;border:1px solid #1c3845;border-radius:10px;background:#071720;color:#fff;font-size:18px}
+  .brand-main{font-size:22px}.brand-sub{font-size:8px}
+  .hero{height:auto;margin-top:0;border-radius:0 0 16px 16px}
+  .hero-inner{padding:20px 15px 18px;display:block;text-align:center}
+  .logo-circle{width:130px;height:130px;flex-basis:130px;margin:0 auto 12px;border-width:3px}
+  .logo-icon{font-size:29px}.logo-name{font-size:17px}.logo-sub{font-size:7px}
+  .kicker{font-size:10px;letter-spacing:1.8px}
+  .hero h1{font-size:39px;letter-spacing:-1.2px}
+  .tagline{font-size:16px;margin-top:5px}
+  .traits{justify-content:center;gap:12px;font-size:10px;margin-top:11px;flex-wrap:wrap}
+  .info-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:13px}
+  .info-chip{justify-content:flex-start;padding:8px 9px;border-radius:13px;font-size:10px}
+  .info-chip i{font-size:12px}
+  .categories{
+    display:flex;overflow:auto;gap:7px;padding:1px 0 3px;margin:10px 0 11px;scrollbar-width:none;
+  }
+  .categories::-webkit-scrollbar{display:none}
+  .cat{flex:0 0 83px;min-height:65px;border-radius:12px;font-size:10px}
+  .cat i{font-size:20px}
+  .controls{display:grid;grid-template-columns:1fr;gap:9px;margin-bottom:11px}
+  .search{height:43px;border-radius:16px}
+  .search i{font-size:17px;margin-right:9px}
+  .search input{font-size:13px}
+  .filters{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+  .filter{height:39px;justify-content:center;padding:0 8px;border-radius:18px;font-size:11px}
+  .menu-section{border-radius:14px;margin-bottom:8px}
+  .section-head{min-height:55px;padding:8px 12px}
+  .section-icon{width:45px;font-size:29px}
+  .section-title h2{font-size:20px}
+  .section-title p{font-size:10px;margin-top:3px}
+  .price-head{display:none}
+  .item{grid-template-columns:29px 1fr 74px;gap:5px;min-height:53px;padding:7px 10px}
+  .food-dot{width:20px;height:20px;font-size:9px}
+  .item-name{font-size:12px}.item-desc{font-size:9px;margin-top:2px}
+  .badge{font-size:7px;padding:2px 5px}
+  .prices{grid-template-columns:1fr 1fr}
+  .price{font-size:10px}
+  .single-price{grid-column:1 / -1}
+  .bottom-nav{
+    display:grid;grid-template-columns:repeat(7,1fr);height:68px;position:fixed;bottom:0;left:0;right:0;z-index:70;
+    background:rgba(3,13,19,.98);border-top:1px solid #27404b;padding-bottom:env(safe-area-inset-bottom);
+    backdrop-filter:blur(16px);
+  }
+  .bottom-nav button{
+    border:0;background:transparent;color:#b8c3c9;display:flex;align-items:center;justify-content:center;
+    flex-direction:column;gap:4px;font-size:8px;cursor:pointer
+  }
+  .bottom-nav i{font-size:17px}
+  .bottom-nav button.active{color:#ffbe17}
+  .bottom-nav button.active i{filter:drop-shadow(0 0 5px rgba(255,183,0,.4))}
+  body{padding-bottom:70px}
+}
+
+/* very small */
+@media(max-width:380px){
+  .container{width:calc(100% - 14px)}
+  .hero h1{font-size:34px}
+  .info-chip{font-size:9px}
+  .cat{flex-basis:76px}
+  .item{grid-template-columns:25px 1fr 68px;padding-left:8px;padding-right:8px}
+  .item-desc{max-width:150px}
+}
+
+/* admin mode is hidden unless ?admin=1 */
+.admin-mode [data-editable]{outline:1px dashed #ffbf20;outline-offset:3px}
+.admin-note{
+  display:none;position:fixed;right:16px;bottom:16px;z-index:100;background:#1b1404;color:#ffd76b;
+  border:1px solid #9d6900;border-radius:12px;padding:10px 13px;font-size:11px
+}
+.admin-mode .admin-note{display:block}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-main">Free<span>Menu.in</span></div>
+    <div class="brand-sub">DIGITAL RESTAURANT MENU</div>
+  </div>
+  <nav class="desktop-nav">
+    <a href="#">Home</a><a class="active" href="#menu">Menu</a><a href="#">About</a><a href="#">Gallery</a><a href="#">Contact</a>
+  </nav>
+  <div class="header-actions">
+    <div class="status-pill"><span class="status-dot"></span>Open Now</div>
+    <div class="time-pill">11:00 AM - 11:00 PM</div>
+    <button class="waiter"><i class="fa-solid fa-bell-concierge"></i><span>Call<br>Waiter</span></button>
+  </div>
+</header>
+
+<header class="mobile-header">
+  <div class="brand">
+    <div class="brand-main">Free<span>Menu.in</span></div>
+    <div class="brand-sub">DIGITAL RESTAURANT MENU</div>
+  </div>
+  <button class="mobile-menu-btn" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="logo-circle">
+        <div class="inner">
+          <i class="fa-solid fa-hat-chef logo-icon"></i>
+          <div class="logo-name" data-editable>ROYAL SPICE</div>
+          <div class="logo-sub">FAMILY RESTAURANT</div>
+        </div>
+      </div>
+      <div class="hero-copy">
+        <div class="kicker">WELCOME TO</div>
+        <h1 data-editable>Royal <span>Spice</span></h1>
+        <div class="tagline" data-editable>Pure Taste, Great Moments</div>
+        <div class="traits">
+          <div class="trait green"><i class="fa-regular fa-leaf"></i>Pure Veg Options</div>
+          <div class="trait gold"><i class="fa-solid fa-chef-hat"></i>Chef Special</div>
+          <div class="trait red"><i class="fa-regular fa-heart"></i>Made with Love</div>
+        </div>
+        <div class="info-row">
+          <div class="info-chip"><i class="fa-solid fa-location-dot"></i><span data-editable>MG Road, Bengaluru</span></div>
+          <div class="info-chip"><i class="fa-solid fa-phone"></i><span data-editable>+91 98765 43210</span></div>
+          <div class="info-chip"><i class="fa-regular fa-clock"></i><span data-editable>11:00 AM - 11:00 PM</span></div>
+          <div class="info-chip gst"><i class="fa-solid fa-file-invoice"></i><span data-editable>GST: 29ABCDE1234F1Z5</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="categories" aria-label="Categories" id="categoryBar">
+    <button class="cat active" data-cat="Starters"><i class="fa-solid fa-bowl-food"></i><span>Starters</span></button>
+    <button class="cat" data-cat="Main Course"><i class="fa-solid fa-pot-food"></i><span>Main Course</span></button>
+    <button class="cat" data-cat="Breads"><i class="fa-solid fa-pizza-slice"></i><span>Breads</span></button>
+    <button class="cat" data-cat="Rice & Biryani"><i class="fa-solid fa-bowl-rice"></i><span>Rice & Biryani</span></button>
+    <button class="cat" data-cat="Chinese"><i class="fa-solid fa-utensils"></i><span>Chinese</span></button>
+    <button class="cat" data-cat="Desserts"><i class="fa-solid fa-bowl-food"></i><span>Desserts</span></button>
+    <button class="cat" data-cat="Beverages"><i class="fa-solid fa-glass-water"></i><span>Beverages</span></button>
+  </nav>
+
+  <section class="controls">
+    <label class="search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input id="search" type="search" placeholder="Search for dishes, e.g. Paneer Tikka, Biryani...">
+    </label>
+    <div class="filters">
+      <button class="filter active" data-filter="all">All</button>
+      <button class="filter veg" data-filter="veg"><i class="fa-regular fa-leaf"></i>Veg</button>
+      <button class="filter nonveg" data-filter="nonveg"><i class="fa-solid fa-drumstick-bite"></i>Non-Veg</button>
+    </div>
+  </section>
+
+  <div id="menu"></div>
+</main>
+
+<nav class="bottom-nav" id="bottomNav" aria-label="Mobile categories">
+  <button class="active" data-cat="Starters"><i class="fa-solid fa-bowl-food"></i><span>Starters</span></button>
+  <button data-cat="Main Course"><i class="fa-solid fa-pot-food"></i><span>Main</span></button>
+  <button data-cat="Breads"><i class="fa-solid fa-pizza-slice"></i><span>Breads</span></button>
+  <button data-cat="Rice & Biryani"><i class="fa-solid fa-bowl-rice"></i><span>Biryani</span></button>
+  <button data-cat="Chinese"><i class="fa-solid fa-utensils"></i><span>Chinese</span></button>
+  <button data-cat="Desserts"><i class="fa-solid fa-ice-cream"></i><span>Desserts</span></button>
+  <button data-cat="Beverages"><i class="fa-solid fa-glass-water"></i><span>Drinks</span></button>
+</nav>
+
+<div class="admin-note">Admin edit mode: highlighted text is editable. Changes are saved in this browser.</div>
+
+<script>
+
+/* =========================================================
+   FreeMenu PUBLIC MENU — PRESERVED PLATFORM SETTINGS
+   ========================================================= */
+const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* Cloudflare/R2 compatibility settings retained for the platform. */
+const R2_PUBLIC_BASE = "https://images.freemenu.in";
+const R2_UPLOAD_ENDPOINT = `${SUPABASE_URL}/functions/v1/r2-upload`;
+const R2_3D_UPLOAD_ENDPOINT = `${SUPABASE_URL}/functions/v1/signature-3d-model-upload`;
+
+const urlParams = new URLSearchParams(window.location.search);
+const tableContext = String(urlParams.get("table") || urlParams.get("table_no") || "").trim();
+const qrContext = String(urlParams.get("qr") || urlParams.get("qr_code") || "").trim();
+const qrScan = qrContext === "1" || qrContext.toLowerCase() === "true" || !!qrContext;
+
+function pathnameRestaurantKey(){
+  const parts=window.location.pathname.split("/").filter(Boolean);
+  const menuIndex=parts.findIndex(x=>x.toLowerCase()==="menu");
+  if(menuIndex>=0&&parts[menuIndex+1])return decodeURIComponent(parts[menuIndex+1]).trim();
+  const last=parts[parts.length-1]||"";
+  if(!/\.html?$/i.test(last)&&last&&!["index","home"].includes(last.toLowerCase()))return decodeURIComponent(last).trim();
+  return "";
+}
+const restaurantKey=String(urlParams.get("r")||urlParams.get("restaurant")||urlParams.get("slug")||
+  urlParams.get("restaurant_id")||urlParams.get("id")||pathnameRestaurantKey()||"").trim();
+
+const PUBLIC_MENU_SETTINGS=Object.freeze({
+  restaurant:["name","slug","welcome_text","tagline","subtitle_text","feature_1","feature_2","feature_3","slogan_1","slogan_2",
+    "logo_url","banner_url","cover_url","cover_image","phone","call_button_text","address","is_open","status","is_active",
+    "opening_time","closing_time","dine_in","takeaway","home_delivery","category_order","primary_color","primary_dark",
+    "background_color","card_color","text_color","accent_color","card_radius","theme_primary","theme_primary_dark",
+    "theme_background","theme_card","theme_text","theme_accent","theme_radius","menu_update_mode","plan","plan_id",
+    "custom_plan_enabled","waiter_endpoint","waiter_rpc","whatsapp","whatsapp_number","gst","gst_number"],
+  menuItem:["name","description","category","item_type","is_veg","is_available","available","unavailable","status","price",
+    "price_quarter","price_half","price_full","is_bestseller","bestseller","is_recommended","recommended","is_spicy","spicy",
+    "sort_order","position"],
+  platform:["adsense_client_id","ads_default_slot","free_plan_ads","premium_plan_ads","ads_position"],
+  subscription:["plan","status","expiry_date"]
+});
+
+let restaurant=null, allItems=[], activeCategory="all", activeFilter="all", query="", fmAdConfig=null, fmMaintenanceTimer=null, categoryObserver=null;
+const $=id=>document.getElementById(id);
+function escapeHTML(v=""){return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");}
+function safeUrl(v){if(!v)return"";try{const u=new URL(v,location.origin);return["http:","https:"].includes(u.protocol)?u.href:""}catch(_){return""}}
+function cssColor(v,f){if(!v)return f;const t=document.createElement("span");t.style.color=v;return t.style.color?v:f}
+function applyRestaurantTheme(rest){
+  const r=document.documentElement.style;
+  r.setProperty("--accent",cssColor(rest.accent_color||rest.theme_accent,"#ffb511"));
+  r.setProperty("--bg",cssColor(rest.background_color||rest.theme_background,"#020b11"));
+  r.setProperty("--surface",cssColor(rest.card_color||rest.theme_card,"#071721"));
+  r.setProperty("--text",cssColor(rest.text_color||rest.theme_text,"#f4f7fa"));
+  const radius=Number(rest.card_radius||rest.theme_radius);if(Number.isFinite(radius)&&radius>=0&&radius<=40)r.setProperty("--radius",`${radius}px`);
+}
+function getItemType(item){const t=String(item.item_type||"").toLowerCase();if(t==="egg")return"egg";if(t==="nonveg"||item.is_veg===false)return"nonveg";return"veg"}
+function isUnavailable(item){return item.is_available===false||item.available===false||item.unavailable===true||item.status==="unavailable"||item.status==="out_of_stock"}
+function getCategories(items){
+  const names=[...new Set(items.map(x=>String(x.category||"General").trim()||"General"))];
+  const saved=Array.isArray(restaurant?.category_order)?restaurant.category_order.map(String):[];
+  const rank=new Map(saved.map((x,i)=>[x,i]));
+  return names.sort((a,b)=>(rank.has(a)?rank.get(a):999999)-(rank.has(b)?rank.get(b):999999)||a.localeCompare(b));
+}
+function categoryIcon(c){
+  c=String(c||"").toLowerCase();
+  if(c.includes("starter")||c.includes("tandoori")||c.includes("kebab"))return"fa-bowl-food";
+  if(c.includes("main")||c.includes("curry"))return"fa-pot-food";
+  if(c.includes("bread")||c.includes("roti")||c.includes("naan"))return"fa-pizza-slice";
+  if(c.includes("rice")||c.includes("biryani"))return"fa-bowl-rice";
+  if(c.includes("chinese")||c.includes("noodle"))return"fa-utensils";
+  if(c.includes("dessert")||c.includes("sweet")||c.includes("ice cream"))return"fa-ice-cream";
+  if(c.includes("beverage")||c.includes("drink")||c.includes("tea")||c.includes("coffee"))return"fa-glass-water";
+  return"fa-sparkles";
+}
+function sectionId(n){return"section-"+String(n).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
+function renderCategoryNav(){
+  const cats=getCategories(allItems);
+  $("categoryBar").innerHTML=cats.map(c=>`<button class="cat ${activeCategory===c?"active":""}" data-cat="${escapeHTML(c)}"><i class="fa-solid ${categoryIcon(c)}"></i><span>${escapeHTML(c)}</span></button>`).join("");
+  $("bottomNav").innerHTML=cats.map(c=>`<button class="${activeCategory===c?"active":""}" data-cat="${escapeHTML(c)}"><i class="fa-solid ${categoryIcon(c)}"></i><span>${escapeHTML(c)}</span></button>`).join("");
+}
+function renderPrice(item){
+  const vals=[item.price_quarter,item.price_half,item.price_full??item.price].map(v=>v==null?"":String(v).trim());
+  const out=vals.filter(Boolean);
+  return out.length?`<div class="prices ${out.length===1?"one":""}">${out.map(v=>`<span class="price">₹${escapeHTML(v)}</span>`).join("")}</div>`:"";
+}
+function renderTags(item){
+  const t=[];
+  if(item.is_bestseller===true||item.bestseller===true)t.push(`<span class="badge gold">Bestseller</span>`);
+  if(item.is_recommended===true||item.recommended===true)t.push(`<span class="badge gold">Recommended</span>`);
+  if(item.is_spicy===true||item.spicy===true)t.push(`<span class="badge spicy">Spicy</span>`);
+  if(isUnavailable(item))t.push(`<span class="badge red">Unavailable</span>`);
+  return t.join("");
+}
+function renderMenu(){
+  const q=query.trim().toLowerCase();
+  const filtered=allItems.filter(item=>{
+    const cat=String(item.category||"General").trim()||"General";
+    return (activeCategory==="all"||cat===activeCategory)&&(activeFilter==="all"||getItemType(item)===activeFilter)&&
+      (!q||`${item.name||""} ${item.description||""} ${cat}`.toLowerCase().includes(q));
+  });
+  const groups={};filtered.forEach(x=>{const c=String(x.category||"General").trim()||"General";(groups[c]??=[]).push(x)});
+  if(!filtered.length){$("menu").innerHTML=`<section class="menu-section"><div class="section-head"><div class="section-title"><h2>No items found</h2><p>Try another search, category or filter.</p></div></div></section>`;return}
+  $("menu").innerHTML=getCategories(filtered).filter(c=>groups[c]).map(c=>{
+    const list=groups[c].sort((a,b)=>Number(a.sort_order??a.position??999999)-Number(b.sort_order??b.position??999999)||String(a.name||"").localeCompare(String(b.name||"")));
+    const hasQ=list.some(x=>String(x.price_quarter??"").trim()),hasH=list.some(x=>String(x.price_half??"").trim()),hasF=list.some(x=>String(x.price_full??x.price??"").trim());
+    const labels=[hasQ?"Qtr":null,hasH?"Half":null,hasF?"Full":null].filter(Boolean);
+    return `<section class="menu-section" id="${sectionId(c)}" data-category="${escapeHTML(c)}">
+      <div class="section-head"><div class="section-icon"><i class="fa-solid ${categoryIcon(c)}"></i></div>
+      <div class="section-title"><h2>${escapeHTML(c)}</h2><p>${list.length} item${list.length===1?"":"s"}</p></div>
+      <div class="price-head">${labels.map(x=>`<span>${x}</span>`).join("")}</div></div>
+      ${list.map(item=>`<div class="item ${isUnavailable(item)?"":"available"}">
+        <span class="food-dot ${getItemType(item)==="nonveg"?"nonveg":"veg"}"><i class="fa-solid fa-circle"></i></span>
+        <div class="item-main"><div class="item-name-row"><span class="item-name">${escapeHTML(item.name||"Unnamed item")}</span>${renderTags(item)}</div>
+        ${item.description?`<div class="item-desc">${escapeHTML(item.description)}</div>`:""}</div>${renderPrice(item)}</div>`).join("")}
+    </section>`;
+  }).join("");
+  setupCategoryObserver();
+}
+function setupCategoryObserver(){
+  if(categoryObserver)categoryObserver.disconnect();
+  const sections=[...document.querySelectorAll("#menu .menu-section")];if(!sections.length)return;
+  categoryObserver=new IntersectionObserver(entries=>{
+    const v=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+    if(!v||query.trim())return;const c=v.target.dataset.category;if(c&&c!==activeCategory){activeCategory=c;syncCategoryUI()}
+  },{rootMargin:"-18% 0px -65% 0px",threshold:[.05,.2,.5]});
+  sections.forEach(s=>categoryObserver.observe(s));
+}
+function syncCategoryUI(){document.querySelectorAll("[data-cat]").forEach(b=>b.classList.toggle("active",b.dataset.cat===activeCategory))}
+function activateCategory(c){activeCategory=c;syncCategoryUI();renderMenu();document.getElementById(sectionId(c))?.scrollIntoView({behavior:"smooth",block:"start"})}
+
+function renderRestaurant(rest){
+  restaurant=rest;applyRestaurantTheme(rest);
+  const name=rest.name||"Restaurant";document.title=`${name} • Menu`;
+  const h=document.querySelector(".hero h1");if(h)h.innerHTML=escapeHTML(name);
+  const tagline=document.querySelector(".tagline");if(tagline)tagline.textContent=rest.tagline||rest.subtitle_text||"";
+  const logo=safeUrl(rest.logo_url), hero=document.querySelector(".hero"),cover=safeUrl(rest.banner_url||rest.cover_url||rest.cover_image);
+  if(hero&&cover)hero.style.backgroundImage=`linear-gradient(90deg,rgba(2,8,11,.86),rgba(10,7,3,.45)),url("${cover}")`;
+  const chips=document.querySelectorAll(".info-chip span");
+  if(chips[0])chips[0].textContent=rest.address||"";
+  if(chips[1])chips[1].textContent=rest.phone||"";
+  const fmt=v=>{if(!v)return"";const p=String(v).split(":");let h=Number(p[0]),m=Number(p[1]||0);const s=h>=12?"PM":"AM";h=h%12||12;return`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")} ${s}`};
+  if(chips[2])chips[2].textContent=fmt(rest.opening_time)&&fmt(rest.closing_time)?`${fmt(rest.opening_time)} - ${fmt(rest.closing_time)}`:"";
+  if(chips[3]){const gst=rest.gst_number||rest.gst||"";chips[3].textContent=gst?`GST: ${gst}`:"";chips[3].parentElement.style.display=gst?"flex":"none"}
+  const waiter=document.querySelector(".waiter");if(waiter)waiter.onclick=callWaiter;
+  window.fmRestaurant=rest;
+}
+async function callWaiter(){
+  const r=restaurant||{},payload={restaurant_id:r.id||null,table_number:tableContext||null,qr_code:qrContext||null,requested_at:new Date().toISOString()};
+  if(r.waiter_endpoint)try{const x=await fetch(r.waiter_endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});if(x.ok)return}catch(_){}
+  if(r.waiter_rpc)try{await supabaseClient.rpc(r.waiter_rpc,payload);return}catch(_){}
+  const phone=String(r.whatsapp||r.whatsapp_number||r.phone||"").replace(/[^0-9]/g,"");
+  if(phone)window.open(`https://wa.me/${phone}?text=${encodeURIComponent(`Hello ${r.name||"Restaurant"}, please send a waiter to table ${tableContext||"my table"}.`)}`,"_blank");
+}
+function fmSettingValue(rows,key,f=""){const x=(rows||[]).find(r=>r.key===key);return x?x.value:f}
+function fmBool(v,f=false){if(v===true||v===false)return v;if(v==null||v==="")return f;return String(v).toLowerCase()==="true"}
+async function loadFreeMenuAdConfig(r){
+  try{
+    const x=await supabaseClient.from("platform_settings").select("key,value").in("key",["adsense_client_id","ads_default_slot","free_plan_ads","premium_plan_ads","ads_position"]);
+    if(x.error)return null;const client=String(fmSettingValue(x.data,"adsense_client_id","")).trim(),slot=String(fmSettingValue(x.data,"ads_default_slot","")).trim();
+    const free=fmBool(fmSettingValue(x.data,"free_plan_ads",true),true),premium=fmBool(fmSettingValue(x.data,"premium_plan_ads",false),false);
+    const sub=await supabaseClient.from("subscriptions").select("plan,status,expiry_date").eq("restaurant_id",r.id).eq("status","active");
+    let active=false;if(!sub.error&&Array.isArray(sub.data))active=sub.data.some(s=>String(s.plan||"").toLowerCase()==="premium"&&(!s.expiry_date||new Date(s.expiry_date)>=new Date()));
+    const plan=String(r.plan||"free").toLowerCase(),show=active?premium:(plan==="premium"?premium:free);
+    if(!show||!/^ca-pub-\d{6,}$/.test(client)||!/^\d{4,}$/.test(slot))return null;return{client,slot};
+  }catch(_){return null}
+}
+function ensureAdSenseScript(client){if(!client||document.querySelector('script[data-freemenu-adsense="1"]'))return;const s=document.createElement("script");s.async=true;s.crossOrigin="anonymous";s.src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client="+encodeURIComponent(client);s.dataset.freemenuAdsense="1";document.head.appendChild(s)}
+function showMenuMaintenance(){$("menu").innerHTML=`<section class="menu-section"><div class="section-head"><div class="section-title"><h2>Price Now Updating</h2><p>Menu will be available soon. Please check again in a little while.</p></div></div></section>`}
+async function checkMenuMaintenance(){if(!restaurant?.id)return;try{const x=await supabaseClient.from("restaurants").select("menu_update_mode").eq("id",restaurant.id).maybeSingle();if(x.error)return;if(x.data?.menu_update_mode===true)showMenuMaintenance();else if(restaurant.menu_update_mode===true)location.reload();restaurant.menu_update_mode=x.data?.menu_update_mode===true}catch(_){}}
+
+async function loadPublicMenu(){
+  if(!restaurantKey){showMenuMaintenance();return}
+  try{
+    let rest=null;const byId=await supabaseClient.from("restaurants").select("*").eq("id",restaurantKey).maybeSingle();
+    if(!byId.error&&byId.data)rest=byId.data;
+    if(!rest){const x=await supabaseClient.from("restaurants").select("*").eq("slug",restaurantKey.toLowerCase()).limit(1);if(x.error)throw x.error;rest=Array.isArray(x.data)?x.data[0]:null}
+    if(!rest){$("menu").innerHTML=`<section class="menu-section"><div class="section-head"><div class="section-title"><h2>Restaurant Not Found</h2><p>No restaurant matched this menu link.</p></div></div></section>`;return}
+    if(rest.menu_update_mode===true){restaurant=rest;showMenuMaintenance();fmMaintenanceTimer=setInterval(checkMenuMaintenance,10000);return}
+
+    /* ROOT / PLAN REDIRECTS */
+    if(rest.plan_id){
+      const p=await supabaseClient.from("plans").select("id,name,slug,is_active").eq("id",rest.plan_id).maybeSingle();
+      if(p.data&&p.data.is_active!==false){
+        const k=`${p.data.slug||""} ${p.data.name||""}`.toLowerCase().trim();
+        const signature=k.includes("signature 3d")||k.includes("signature-3d")||k.includes("signature_3d")||(k.includes("signature")&&k.includes("3d"));
+        const full=k.includes("full 3d")||k.includes("full-3d")||k.includes("full_3d")||(k.includes("full")&&k.includes("3d"));
+        if(signature||full||rest.custom_plan_enabled===true){const u=new URL("/signaturemenu.html",location.origin);u.searchParams.set("r",rest.slug||rest.id);location.replace(u.href);return}
+        const growth=k.includes("growth")||k.includes("growth-photos")||k.includes("growth photos")||k.includes("photo_menu_v1");
+        if(growth){const u=new URL("/menugrowth.html",location.origin);u.searchParams.set("r",rest.slug||rest.id);location.replace(u.href);return}
+      }
+    }
+
+    renderRestaurant(rest);fmAdConfig=await loadFreeMenuAdConfig(rest);if(fmAdConfig)ensureAdSenseScript(fmAdConfig.client);
+    const x=await supabaseClient.from("menu_items").select("*").eq("restaurant_id",rest.id);if(x.error)throw x.error;
+    allItems=Array.isArray(x.data)?x.data:[];renderCategoryNav();renderMenu();syncCategoryUI();
+
+    supabaseClient.channel(`public-menu-${rest.id}`)
+      .on("postgres_changes",{event:"*",schema:"public",table:"menu_items",filter:`restaurant_id=eq.${rest.id}`},refreshMenuData)
+      .on("postgres_changes",{event:"UPDATE",schema:"public",table:"restaurants",filter:`id=eq.${rest.id}`},async e=>{restaurant={...restaurant,...e.new};renderRestaurant(restaurant);if(restaurant.menu_update_mode)showMenuMaintenance()})
+      .subscribe();
+  }catch(e){console.error(e);$("menu").innerHTML=`<section class="menu-section"><div class="section-head"><div class="section-title"><h2>Menu Unavailable</h2><p>Please refresh the page or check your connection.</p></div></div></section>`}
+}
+async function refreshMenuData(){if(!restaurant?.id)return;const x=await supabaseClient.from("menu_items").select("*").eq("restaurant_id",restaurant.id);if(!x.error){allItems=Array.isArray(x.data)?x.data:[];renderCategoryNav();renderMenu();syncCategoryUI()}}
+document.addEventListener("click",e=>{
+  const c=e.target.closest("[data-cat]");if(c){e.preventDefault();activateCategory(c.dataset.cat);return}
+  const f=e.target.closest("[data-filter]");if(f){activeFilter=f.dataset.filter;document.querySelectorAll("[data-filter]").forEach(x=>x.classList.toggle("active",x.dataset.filter===activeFilter));renderMenu()}
+});
+$("search").addEventListener("input",e=>{query=e.target.value||"";renderMenu()});
+document.addEventListener("DOMContentLoaded",loadPublicMenu);
+
+/* Admin edit mode: append ?admin=1 to the URL. */
+if(new URLSearchParams(location.search).get("admin")==="1"){
+  document.body.classList.add("admin-mode");
+  document.querySelectorAll("[data-editable]").forEach((el,i)=>{
+    const key="fm-edit-"+i;
+    const saved=localStorage.getItem(key);
+    if(saved!==null)el.textContent=saved;
+    el.contentEditable="true";
+    el.addEventListener("input",()=>localStorage.setItem(key,el.textContent));
+  });
+}
+render();
+</script>
+</body>
+</html>
