@@ -2153,6 +2153,16 @@ body::before{
 }
 </style>
 
+
+<style id="freemenu-hide-item-counts">
+/* Hide overall item total and per-category item counts everywhere. */
+#summary-line,
+.summary-line,
+.item-count{
+  display:none!important;
+}
+</style>
+
 </head>
 <body>
   <div class="app-shell">
@@ -2516,11 +2526,30 @@ function getSavedCategoryOrder(rest, items) {
         if (type === "veg") counts.veg++;
         if (type === "nonveg") counts.nonveg++;
       });
-      $("food-filters").innerHTML = [
-        `<button class="food-filter ${currentFoodType === "all" ? "active" : ""}" data-food-type="all" type="button">All <span>${counts.all}</span></button>`,
-        `<button class="food-filter veg-filter ${currentFoodType === "veg" ? "active" : ""}" data-food-type="veg" type="button"><span class="filter-dot veg"></span> Veg <span>${counts.veg}</span></button>`,
-        `<button class="food-filter nonveg-filter ${currentFoodType === "nonveg" ? "active" : ""}" data-food-type="nonveg" type="button"><span class="filter-dot nonveg"></span> Non-Veg <span>${counts.nonveg}</span></button>`
-      ].join("");
+
+      // Only show a food-type filter when that type actually exists
+      // in this restaurant's menu. If a selected type disappears,
+      // safely return to All.
+      if (currentFoodType === "veg" && counts.veg === 0) currentFoodType = "all";
+      if (currentFoodType === "nonveg" && counts.nonveg === 0) currentFoodType = "all";
+
+      const buttons = [
+        `<button class="food-filter ${currentFoodType === "all" ? "active" : ""}" data-food-type="all" type="button">All</button>`
+      ];
+
+      if (counts.veg > 0) {
+        buttons.push(
+          `<button class="food-filter veg-filter ${currentFoodType === "veg" ? "active" : ""}" data-food-type="veg" type="button"><span class="filter-dot veg"></span> Veg</button>`
+        );
+      }
+
+      if (counts.nonveg > 0) {
+        buttons.push(
+          `<button class="food-filter nonveg-filter ${currentFoodType === "nonveg" ? "active" : ""}" data-food-type="nonveg" type="button"><span class="filter-dot nonveg"></span> Non-Veg</button>`
+        );
+      }
+
+      $("food-filters").innerHTML = buttons.join("");
     }
 
     function renderMenu() {
