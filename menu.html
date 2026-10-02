@@ -1710,7 +1710,17 @@ function getSavedCategoryOrder(rest, items) {
             ? decodeURIComponent(pathParts[1])
             : "";
 
-        const slug = (pathSlug || params.get("r") || params.get("slug") || "").trim();
+        // Resolve the restaurant from the current URL first.
+        // Some hosting rewrites can serve menu.html on refresh and drop the
+        // pretty-route/query context, so keep the last valid restaurant slug
+        // for this browser tab as a refresh-safe fallback.
+        const urlSlug = (pathSlug || params.get("r") || params.get("slug") || "").trim();
+        let slug = urlSlug;
+        if (slug) {
+          try { sessionStorage.setItem("fm_current_menu_slug", slug); } catch (_) {}
+        } else {
+          try { slug = (sessionStorage.getItem("fm_current_menu_slug") || "").trim(); } catch (_) {}
+        }
 
         if (!slug) {
           $("rest-name").textContent = "Restaurant Not Found";
@@ -1768,6 +1778,9 @@ function getSavedCategoryOrder(rest, items) {
         }
 
         const rest = restaurants[0];
+        try {
+          if (rest.slug) sessionStorage.setItem("fm_current_menu_slug", String(rest.slug).trim());
+        } catch (_) {}
 
         // Keep this exact current menu page as the route target.
         // No legacy/alternate menu file is loaded.
