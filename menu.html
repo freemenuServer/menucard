@@ -1207,6 +1207,71 @@ body::before{
 }
 </style>
 
+
+<style id="freemenu-amount-alignment-fix">
+/* ===== Amount / price column alignment ===== */
+.item-main-row{
+  display:flex!important;
+  align-items:center!important;
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+.item-info{
+  flex:1 1 auto!important;
+  min-width:0!important;
+  max-width:none!important;
+}
+.item-price-area{
+  flex:0 0 auto!important;
+  width:var(--price-area-width, 150px)!important;
+  margin-left:auto!important;
+  display:grid!important;
+  grid-template-columns:repeat(var(--price-cols), 1fr)!important;
+  gap:0!important;
+  align-items:center!important;
+  justify-content:stretch!important;
+  text-align:center!important;
+}
+.item-price-area .price-cell{
+  width:auto!important;
+  min-width:0!important;
+  text-align:center!important;
+}
+.items-price-header{
+  margin-left:auto!important;
+  width:var(--price-area-width, 150px)!important;
+  display:grid!important;
+  grid-template-columns:repeat(var(--price-cols), 1fr)!important;
+  gap:0!important;
+  padding-left:0!important;
+  padding-right:0!important;
+  text-align:center!important;
+  box-sizing:border-box!important;
+}
+@media(min-width:641px){
+  .item-main-row{padding-right:22px!important}
+  .items-price-header{padding-right:22px!important; width:calc(var(--price-area-width, 150px) + 22px)!important}
+}
+@media(max-width:640px){
+  .item-main-row{padding-right:6px!important}
+  .item-price-area{
+    --price-area-width:140px;
+    width:var(--price-area-width)!important;
+  }
+  .items-price-header{
+    --price-area-width:140px;
+    width:var(--price-area-width)!important;
+  }
+  .price-amount{font-size:12px!important}
+}
+@media(max-width:380px){
+  .item-price-area,.items-price-header{
+    --price-area-width:128px;
+    width:var(--price-area-width)!important;
+  }
+}
+</style>
+
 </head>
 <body>
   <div class="app-shell">
