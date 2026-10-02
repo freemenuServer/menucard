@@ -1710,7 +1710,7 @@ function getSavedCategoryOrder(rest, items) {
             ? decodeURIComponent(pathParts[1])
             : "";
 
-        const slug = (pathSlug || params.get("r") || params.get("slug") || "").trim().toLowerCase();
+        const slug = (pathSlug || params.get("r") || params.get("slug") || "").trim();
 
         if (!slug) {
           $("rest-name").textContent = "Restaurant Not Found";
@@ -1726,6 +1726,18 @@ function getSavedCategoryOrder(rest, items) {
         let restQuery = supabaseClient.from("restaurants").select("*").eq("slug", slug).limit(1);
         let { data: restaurants, error: restError } = await restQuery;
         if (restError) throw restError;
+
+        // Slugs are identifiers, but older records may contain different casing.
+        // Resolve case-insensitively before trying UUID/name fallbacks.
+        if (!restaurants || !restaurants.length) {
+          const bySlugInsensitive = await supabaseClient
+            .from("restaurants")
+            .select("*")
+            .ilike("slug", slug)
+            .limit(1);
+          if (bySlugInsensitive.error) throw bySlugInsensitive.error;
+          restaurants = bySlugInsensitive.data || [];
+        }
 
         if (!restaurants || !restaurants.length) {
           const byId = await supabaseClient.from("restaurants").select("*").eq("id", slug).limit(1);
