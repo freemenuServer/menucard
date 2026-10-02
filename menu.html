@@ -998,6 +998,141 @@ body::before{
 }
 </style>
 
+
+<style id="freemenu-final-layout-fix">
+/* ===== Final logo / mobile / filter / price alignment fix ===== */
+.hero-content{align-items:center!important}
+.logo-wrap{
+  width:128px!important;height:128px!important;
+  flex:0 0 128px!important;border-radius:28px!important;
+}
+.hero-info{
+  align-self:center!important;min-width:0!important;padding-bottom:0!important;
+}
+.restaurant-name{text-align:left!important}
+
+/* Food type filters: search -> Veg/Non-Veg -> categories */
+.food-filter-scroll{
+  display:flex;align-items:center;gap:8px;overflow-x:auto;
+  padding:9px 1px 3px;scrollbar-width:none;
+}
+.food-filter-scroll::-webkit-scrollbar{display:none}
+.food-filter{
+  border:1px solid rgba(255,255,255,.12);
+  background:#171d2a;color:#cbd5e1;
+  min-height:34px;padding:7px 12px;border-radius:999px;
+  white-space:nowrap;font-size:12px;font-weight:800;
+  display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+}
+.food-filter span:last-child{opacity:.7;font-size:10px}
+.food-filter.active{
+  background:linear-gradient(135deg,#ff2a6b,#7c5cff);
+  border-color:transparent;color:#fff;
+  box-shadow:0 6px 16px rgba(255,42,107,.2)
+}
+.food-filter.veg-filter.active{background:#12964e}
+.food-filter.nonveg-filter.active{background:#b4232e}
+.filter-dot{
+  width:11px;height:11px;border-radius:3px;display:inline-block;
+  border:1.5px solid currentColor;position:relative
+}
+.filter-dot::after{
+  content:"";position:absolute;width:5px;height:5px;left:1.5px;top:1.5px;
+  border-radius:50%;background:currentColor
+}
+.filter-dot.nonveg::after{
+  border-radius:1px;transform:rotate(45deg);width:4.5px;height:4.5px;left:2px;top:2px
+}
+
+/* Quarter/Half/Full are NOT in the category heading anymore. */
+.categoryHeadWithPrices .categoryPriceSwitch{display:none!important}
+.items-price-header{
+  display:grid;
+  grid-template-columns:repeat(var(--price-cols),minmax(54px,70px));
+  justify-content:end;gap:7px;padding:9px 15px 5px;
+  color:#8994a8;font-size:9px;font-weight:800;text-align:center;
+  text-transform:uppercase;letter-spacing:.35px;
+  background:#101622;border-bottom:1px solid rgba(255,255,255,.07)
+}
+.item-price-area{
+  display:grid!important;
+  grid-template-columns:repeat(var(--price-cols),minmax(54px,70px))!important;
+  gap:7px!important;width:auto!important;flex:0 0 auto!important;
+  align-self:center!important;margin-left:auto!important
+}
+.price-cell{text-align:center;min-width:0}
+.price-label{display:none}
+.price-amount{
+  display:block;white-space:nowrap;font-size:13.5px;font-weight:850;color:#ffcf68
+}
+.price-cell.empty .price-amount{color:#657084}
+.item-main-row{align-items:center!important}
+.item-info{min-width:0!important}
+.item-name{overflow-wrap:anywhere}
+.items-list{overflow:hidden}
+
+@media(min-width:641px){
+  .hero-content{display:flex!important;flex-direction:row!important}
+  .hero-info{flex:1}
+}
+@media(max-width:640px){
+  body{padding-top:64px!important}
+  .site-nav{height:62px!important}
+  .site-brand-mark{width:142px!important;height:44px!important}
+
+  /* Mobile: restaurant logo ABOVE restaurant name */
+  .hero{min-height:0!important}
+  .hero-content{
+    min-height:0!important;padding:22px 18px 20px!important;
+    display:flex!important;flex-direction:column!important;
+    align-items:center!important;justify-content:flex-start!important;
+    text-align:center!important;gap:12px!important
+  }
+  .logo-wrap{
+    width:104px!important;height:104px!important;
+    flex:0 0 104px!important;border-radius:26px!important;
+    margin:0 auto!important
+  }
+  .hero-info{width:100%!important;text-align:center!important}
+  .restaurant-name{
+    text-align:center!important;font-size:clamp(28px,9vw,44px)!important
+  }
+  .hero-welcome,.hero-subtitle{text-align:center!important}
+  .hero-features{justify-content:center!important}
+  .hero-slogans{text-align:center!important}
+  .hero-slogans div:last-child{padding-left:0!important}
+  .restaurant-meta{justify-content:center!important}
+  .hero-action{position:absolute!important;right:16px!important;bottom:18px!important}
+
+  /* Mobile order: search -> food filter -> categories */
+  .sticky-panel{
+    display:flex!important;flex-direction:column!important;
+    padding:10px 10px 8px!important;gap:0!important
+  }
+  .search-wrap{order:1!important}
+  .food-filter-scroll{order:2!important;padding-top:10px!important}
+  .category-scroll{order:3!important;padding-top:9px!important;margin-bottom:0!important}
+  .menu-wrap{padding:16px 10px 30px!important}
+
+  .category-heading{padding:11px 12px 9px!important}
+  .category-title{font-size:17px!important}
+  .items-price-header{
+    grid-template-columns:repeat(var(--price-cols),minmax(50px,1fr));
+    padding:8px 10px 5px
+  }
+  .item-price-area{
+    grid-template-columns:repeat(var(--price-cols),minmax(50px,1fr))!important;
+    gap:5px!important
+  }
+  .price-amount{font-size:12.5px}
+  .menu-item{padding:13px 10px!important}
+  .item-main-row{gap:8px!important}
+  .item-info{flex:1 1 auto!important}
+  .item-name{font-size:14px!important;line-height:1.25!important}
+  .item-desc{font-size:11.5px!important}
+}
+</style>
+
 </head>
 <body>
   <div class="app-shell">
@@ -1080,6 +1215,11 @@ body::before{
         </div>
         <input id="menu-search" type="search" placeholder="Search food or category..." autocomplete="off" />
       </div>
+      <div class="food-filter-scroll" id="food-filters" aria-label="Food type filters">
+        <button class="food-filter active" data-food-type="all" type="button">All</button>
+        <button class="food-filter veg-filter" data-food-type="veg" type="button"><span class="filter-dot veg"></span> Veg</button>
+        <button class="food-filter nonveg-filter" data-food-type="nonveg" type="button"><span class="filter-dot nonveg"></span> Non-Veg</button>
+      </div>
       <div class="category-scroll" id="category-chips"></div>
     </section>
 
@@ -1103,6 +1243,7 @@ body::before{
     let restaurant = null;
     let allItems = [];
     let currentCategory = "all";
+    let currentFoodType = "all";
     let searchText = "";
 
     const $ = (id) => document.getElementById(id);
@@ -1205,15 +1346,32 @@ body::before{
       return item.is_available === false || item.available === false || item.status === "unavailable" || item.status === "out_of_stock";
     }
 
-    function renderPrice(item, category) {
-      const q = item.price_quarter;
-      const h = item.price_half;
-      const f = item.price_full || item.price;
-      return `<div class="three-price-area">
-        <div class="three-price-cell">${q !== null && q !== undefined && q !== "" ? "₹"+escapeHTML(q) : "—"}</div>
-        <div class="three-price-cell">${h !== null && h !== undefined && h !== "" ? "₹"+escapeHTML(h) : "—"}</div>
-        <div class="three-price-cell">${f !== null && f !== undefined && f !== "" ? "₹"+escapeHTML(f) : "—"}</div>
-      </div>`;
+    function priceValue(item, key) {
+      const value = item?.[key];
+      return value !== null && value !== undefined && value !== "" ? value : null;
+    }
+
+    function getPriceFlags(items) {
+      const flags = [];
+      if (items.some(item => priceValue(item, "price_quarter") !== null)) flags.push("quarter");
+      if (items.some(item => priceValue(item, "price_half") !== null)) flags.push("half");
+      if (items.some(item => priceValue(item, "price_full") !== null || priceValue(item, "price") !== null)) flags.push("full");
+      return flags;
+    }
+
+    function renderPrice(item, priceFlags) {
+      if (!priceFlags.length) return "";
+      const cells = priceFlags.map(flag => {
+        const key = flag === "quarter" ? "price_quarter" : flag === "half" ? "price_half" : "price_full";
+        const fallback = flag === "full" ? "price" : null;
+        const value = priceValue(item, key);
+        const display = value === null && fallback ? priceValue(item, fallback) : value;
+        return `<div class="price-cell ${display === null ? "empty" : ""}">
+          <span class="price-label">${flag === "quarter" ? "Quarter" : flag === "half" ? "Half" : "Full"}</span>
+          <span class="price-amount">${display === null ? "—" : `₹${escapeHTML(display)}`}</span>
+        </div>`;
+      }).join("");
+      return `<div class="item-price-area price-cols-${priceFlags.length}" style="--price-cols:${priceFlags.length}">${cells}</div>`;
     }
 
     function renderTags(item) {
@@ -1225,7 +1383,7 @@ body::before{
       return tags.length ? `<div class="item-tags">${tags.join("")}</div>` : "";
     }
 
-    function renderItem(item) {
+    function renderItem(item, priceFlags) {
       const type = getItemType(item);
       const unavailable = isUnavailable(item);
 
@@ -1241,9 +1399,7 @@ body::before{
                 ${renderTags(item)}
                 ${item.description ? `<p class="item-desc">${escapeHTML(item.description)}</p>` : ""}
               </div>
-              <div class="item-price-area">
-                ${renderPrice(item, categoryKey(item.category))}
-              </div>
+              ${renderPrice(item, priceFlags)}
             </div>
           </div>
         </article>
@@ -1299,11 +1455,27 @@ function getSavedCategoryOrder(rest, items) {
       const q = searchText.trim().toLowerCase();
       return allItems.filter(item => {
         const category = categoryKey(item.category);
+        const type = getItemType(item);
         const categoryMatch = currentCategory === "all" || category === currentCategory;
+        const foodMatch = currentFoodType === "all" || type === currentFoodType;
         const haystack = `${item.name || ""} ${item.description || ""} ${category}`.toLowerCase();
         const searchMatch = !q || haystack.includes(q);
-        return categoryMatch && searchMatch;
+        return categoryMatch && foodMatch && searchMatch;
       });
+    }
+
+    function renderFoodFilters() {
+      const counts = { all: allItems.length, veg: 0, nonveg: 0 };
+      allItems.forEach(item => {
+        const type = getItemType(item);
+        if (type === "veg") counts.veg++;
+        if (type === "nonveg") counts.nonveg++;
+      });
+      $("food-filters").innerHTML = [
+        `<button class="food-filter ${currentFoodType === "all" ? "active" : ""}" data-food-type="all" type="button">All <span>${counts.all}</span></button>`,
+        `<button class="food-filter veg-filter ${currentFoodType === "veg" ? "active" : ""}" data-food-type="veg" type="button"><span class="filter-dot veg"></span> Veg <span>${counts.veg}</span></button>`,
+        `<button class="food-filter nonveg-filter ${currentFoodType === "nonveg" ? "active" : ""}" data-food-type="nonveg" type="button"><span class="filter-dot nonveg"></span> Non-Veg <span>${counts.nonveg}</span></button>`
+      ].join("");
     }
 
     function renderMenu() {
@@ -1338,19 +1510,23 @@ function getSavedCategoryOrder(rest, items) {
 
       $("menu-sections").innerHTML = orderedCategories.filter(category => grouped[category]).map(category => {
         const items = grouped[category];
+        const priceFlags = getPriceFlags(items);
+        const priceHeader = priceFlags.length
+          ? `<div class="items-price-header price-cols-${priceFlags.length}" style="--price-cols:${priceFlags.length}">
+              ${priceFlags.map(flag => `<span>${flag === "quarter" ? "Quarter" : flag === "half" ? "Half" : "Full"}</span>`).join("")}
+             </div>`
+          : "";
         return `
         <section class="category-section" id="${sectionId(category)}" data-category="${escapeHTML(category)}">
-          <div class="category-heading categoryHeadWithPrices">
+          <div class="category-heading">
             <div style="display:flex;align-items:center;gap:9px;min-width:0">
               <h2 class="category-title">${escapeHTML(category)}</h2>
               <span class="item-count">${items.length} item${items.length === 1 ? "" : "s"}</span>
             </div>
-            <div class="categoryPriceSwitch" aria-label="Prices">
-      <span>Quarter</span><span>Half</span><span>Full</span>
-    </div>
           </div>
           <div class="items-list">
-            ${items.map(renderItem).join("")}
+            ${priceHeader}
+            ${items.map(item => renderItem(item, priceFlags)).join("")}
           </div>
         </section>
       `}).join("");
@@ -1499,6 +1675,7 @@ function getSavedCategoryOrder(rest, items) {
         if (itemsError) throw itemsError;
 
         allItems = Array.isArray(items) ? items : [];
+        renderFoodFilters();
 
         // Optional sorting if you later add sort_order fields.
         allItems.sort((a, b) => {
@@ -1527,6 +1704,15 @@ function getSavedCategoryOrder(rest, items) {
 
     $("menu-search").addEventListener("input", (event) => {
       searchText = event.target.value || "";
+      renderMenu();
+    });
+
+    $("food-filters").addEventListener("click", (event) => {
+      const btn = event.target.closest(".food-filter");
+      if (!btn) return;
+
+      currentFoodType = btn.dataset.foodType || "all";
+      renderFoodFilters();
       renderMenu();
     });
 
