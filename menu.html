@@ -1272,6 +1272,113 @@ body::before{
 }
 </style>
 
+
+<style id="freemenu-price-columns-final">
+/* ===== FINAL: one fixed price grid for every menu row ===== */
+.item-main-row{
+  display:flex!important;
+  width:100%!important;
+  min-width:0!important;
+  align-items:center!important;
+}
+.item-info{
+  flex:1 1 auto!important;
+  min-width:0!important;
+}
+.item-price-area{
+  flex:0 0 210px!important;
+  width:210px!important;
+  height:auto!important;
+  margin-left:auto!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,70px)!important;
+  gap:0!important;
+  align-items:center!important;
+  justify-content:stretch!important;
+}
+.item-price-area .price-cell{
+  width:70px!important;
+  min-width:70px!important;
+  text-align:center!important;
+}
+.price-slot-empty{
+  visibility:hidden!important;
+}
+.price-amount{
+  white-space:nowrap!important;
+  display:block!important;
+  text-align:center!important;
+  font-size:14px!important;
+  font-weight:900!important;
+  color:#ffcf68!important;
+}
+.items-price-header{
+  box-sizing:border-box!important;
+  width:210px!important;
+  margin-left:auto!important;
+  padding:9px 0 5px!important;
+  display:grid!important;
+  grid-template-columns:repeat(3,70px)!important;
+  gap:0!important;
+  text-align:center!important;
+}
+.items-price-header > span{
+  width:70px!important;
+  min-width:70px!important;
+  text-align:center!important;
+}
+.items-price-header .header-empty{
+  visibility:hidden!important;
+}
+@media(min-width:641px){
+  .item-main-row{padding-right:22px!important}
+  .items-price-header{
+    width:232px!important;
+    padding-right:22px!important;
+  }
+}
+@media(max-width:640px){
+  .item-main-row{padding-right:4px!important}
+  .item-price-area{
+    flex-basis:156px!important;
+    width:156px!important;
+    grid-template-columns:repeat(3,52px)!important;
+  }
+  .item-price-area .price-cell{
+    width:52px!important;
+    min-width:52px!important;
+  }
+  .items-price-header{
+    width:156px!important;
+    grid-template-columns:repeat(3,52px)!important;
+  }
+  .items-price-header > span{
+    width:52px!important;
+    min-width:52px!important;
+  }
+  .price-amount{font-size:12.5px!important}
+}
+@media(max-width:380px){
+  .item-price-area{
+    flex-basis:144px!important;
+    width:144px!important;
+    grid-template-columns:repeat(3,48px)!important;
+  }
+  .item-price-area .price-cell{
+    width:48px!important;
+    min-width:48px!important;
+  }
+  .items-price-header{
+    width:144px!important;
+    grid-template-columns:repeat(3,48px)!important;
+  }
+  .items-price-header > span{
+    width:48px!important;
+    min-width:48px!important;
+  }
+}
+</style>
+
 </head>
 <body>
   <div class="app-shell">
@@ -1500,7 +1607,11 @@ body::before{
 
     function renderPrice(item, priceFlags) {
       if (!priceFlags.length) return "";
-      const cells = priceFlags.map(flag => {
+      const slotFlags = ["quarter", "half", "full"];
+      const cells = slotFlags.map(flag => {
+        if (!priceFlags.includes(flag)) {
+          return `<div class="price-cell price-slot-empty" aria-hidden="true"></div>`;
+        }
         const key = flag === "quarter" ? "price_quarter" : flag === "half" ? "price_half" : "price_full";
         const fallback = flag === "full" ? "price" : null;
         const value = priceValue(item, key);
@@ -1510,7 +1621,7 @@ body::before{
           <span class="price-amount">${display === null ? "—" : `₹${escapeHTML(display)}`}</span>
         </div>`;
       }).join("");
-      return `<div class="item-price-area price-cols-${priceFlags.length}" style="--price-cols:${priceFlags.length}">${cells}</div>`;
+      return `<div class="item-price-area" style="--price-cols:3">${cells}</div>`;
     }
 
     function renderTags(item) {
@@ -1651,8 +1762,10 @@ function getSavedCategoryOrder(rest, items) {
         const items = grouped[category];
         const priceFlags = getPriceFlags(items);
         const priceHeader = priceFlags.length
-          ? `<div class="items-price-header price-cols-${priceFlags.length}" style="--price-cols:${priceFlags.length}">
-              ${priceFlags.map(flag => `<span>${flag === "quarter" ? "Quarter" : flag === "half" ? "Half" : "Full"}</span>`).join("")}
+          ? `<div class="items-price-header" style="--price-cols:3">
+              <span class="${priceFlags.includes("quarter") ? "" : "header-empty"}">${priceFlags.includes("quarter") ? "Quarter" : ""}</span>
+              <span class="${priceFlags.includes("half") ? "" : "header-empty"}">${priceFlags.includes("half") ? "Half" : ""}</span>
+              <span class="${priceFlags.includes("full") ? "" : "header-empty"}">${priceFlags.includes("full") ? "Full" : ""}</span>
              </div>`
           : "";
         return `
