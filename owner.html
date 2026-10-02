@@ -232,6 +232,18 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+<style id="freemenu-signup-full-form-fix">
+/* Signup: let the whole page scroll instead of trapping the long form inside a nested card. */
+@media (max-width:760px){
+  #ownerAuth{align-items:flex-start!important;overflow:visible!important;min-height:100vh!important;height:auto!important;padding:0 0 28px!important}
+  #authChoiceCard.ownerAuthSplit{max-height:none!important;height:auto!important;overflow:visible!important;align-self:flex-start!important;margin:0 auto!important}
+  #authChoiceCard.ownerAuthSplit .authRightPanel{min-height:auto!important;height:auto!important;overflow:visible!important;justify-content:flex-start!important}
+  #authChoiceCard.ownerAuthSplit .authCombinedForm{height:auto!important;overflow:visible!important}
+  #authChoiceCard .ownerAuthCard{max-height:none!important;overflow:visible!important}
+}
+</style>
+
 </head>
 
 <body>
