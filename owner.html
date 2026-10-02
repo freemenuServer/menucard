@@ -1083,7 +1083,16 @@ async function ownerSignup(){
 
   const {data,error}=await supabaseClient.auth.signUp({
     email,password,
-    options:{data:{full_name:name,phone,role:"owner"}}
+    options:{
+      data:{
+        full_name:name,
+        phone:phone.replace(/\D/g,""),
+        role:"owner",
+        restaurant_name:restaurant,
+        restaurant_address:address,
+        restaurant_slug:slug
+      }
+    }
   });
   if(error){
     setAuthMsg("signupErrorNew",error.message);
@@ -1141,8 +1150,8 @@ async function ownerSignup(){
       await init();
     },500);
   }else{
-    setAuthMsg("signupSuccessNew","Account created. Please verify your email, then login to open your Owner Dashboard.",true);
-    setTimeout(showLoginForm,900);
+    setAuthMsg("signupSuccessNew","Account created. Please verify your email, then login. Your restaurant details are saved and will be connected automatically after verification.",true);
+    setTimeout(showLoginForm,1400);
   }
 
   $("signupSubmitNew").disabled=false;
@@ -1219,8 +1228,38 @@ async function init(afterLogin=false){
       }
     }
 
+    if(!data?.length && !superAdminMode){
+      // First-login recovery for accounts created while email confirmation was enabled.
+      // Signup data is kept in Auth user metadata so the restaurant can be created
+      // safely after the owner confirms the email and logs in.
+      const meta=session.user.user_metadata||{};
+      const pendingName=String(meta.restaurant_name||"").trim();
+      const pendingAddress=String(meta.restaurant_address||"").trim();
+      const pendingSlug=String(meta.restaurant_slug||"").trim().toLowerCase();
+      const pendingPhone=String(meta.phone||"").replace(/\D/g,"");
+      if(pendingName && pendingSlug){
+        const existingBySlug=await supabaseClient.from("restaurants").select("id").eq("slug",pendingSlug).maybeSingle();
+        if(existingBySlug.error) return fail("Could not check restaurant slug: "+existingBySlug.error.message);
+        if(existingBySlug.data){
+          return fail("This Menu Slug is already in use. Please contact support or choose another slug before creating the account.");
+        }
+        const createRes=await supabaseClient.from("restaurants").insert({
+          owner_id:session.user.id,
+          name:pendingName,
+          slug:pendingSlug,
+          phone:pendingPhone,
+          address:pendingAddress,
+          status:"pending",
+          plan:"free",
+          subscription_status:"inactive"
+        }).select("*").single();
+        if(createRes.error) return fail("Your account is verified, but the restaurant could not be created: "+createRes.error.message+". Make sure the restaurants INSERT policy allows owner_id = auth.uid().");
+        data=[createRes.data];
+      }
+    }
+
     if(!data?.length){
-      return fail("No restaurant is linked to this login account. Please login with the correct restaurant owner account or link this Auth user to the restaurant.");
+      return fail("No restaurant is linked to this login account. Please complete signup or login with the correct restaurant owner account.");
     }
 
     currentRestaurant=data[0];
