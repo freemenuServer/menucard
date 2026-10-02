@@ -135,8 +135,18 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .signup-route .authCombinedForm #loginCard{display:none!important}
 .signup-route .authCombinedForm #signupCard{display:block!important}
 .signup-route .authCombinedForm #resetPasswordCard{display:none!important}
-.signup-route #authLoginTab{display:none!important}
+./* Signup route keeps BOTH tabs visible so user can return to Login. */
+.signup-route #authLoginTab{display:block!important;flex:1}
 .signup-route #authSignupTab{display:block!important;flex:1}
+/* On the signup route the whole right panel must be scrollable; never clip the long form. */
+.signup-route .ownerAuthSplit{overflow:auto!important;align-items:start!important}
+.signup-route .ownerAuthSplit .authRightPanel{justify-content:flex-start!important;min-height:0!important}
+.signup-route .ownerAuthSplit .authCombinedForm{overflow:visible!important}
+.signup-route .ownerAuthSplit #signupCard{padding-bottom:32px!important}
+@media(max-width:760px){
+  .signup-route .ownerAuthSplit{height:calc(100vh - 20px)!important;max-height:calc(100vh - 20px)!important;overflow-y:auto!important;overflow-x:hidden!important}
+  .signup-route .ownerAuthSplit .authRightPanel{padding-bottom:40px!important}
+}
 
 .authFormCard .authBrand{margin-left:auto;margin-right:auto}
 .authFormCard h1,.authFormCard .authSub{text-align:center}
@@ -242,6 +252,14 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
   #authChoiceCard.ownerAuthSplit .authCombinedForm{height:auto!important;overflow:visible!important}
   #authChoiceCard .ownerAuthCard{max-height:none!important;overflow:visible!important}
 }
+</style>
+
+<style id="signup-full-form-final-fix">
+html.signup-route #authLoginTab,html.signup-route #authSignupTab{display:block!important;flex:1!important}
+html.signup-route #authChoiceCard{align-items:start!important;overflow:auto!important}
+html.signup-route #authChoiceCard .authRightPanel{justify-content:flex-start!important;min-height:0!important}
+html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
+@media(max-width:760px){html.signup-route #authChoiceCard{height:calc(100vh - 20px)!important;max-height:calc(100vh - 20px)!important;overflow-y:auto!important}}
 </style>
 
 </head>
@@ -944,6 +962,9 @@ function showSignupForm(){
   if($("resetPasswordCard")) $("resetPasswordCard").style.display="none";
   $("authLoginTab")?.classList.remove("active");
   $("authSignupTab")?.classList.add("active");
+  // Keep the Login tab available on the signup route.
+  if($('authLoginTab')) $('authLoginTab').style.display='block';
+  if($('authSignupTab')) $('authSignupTab').style.display='block';
 }
 function showResetPasswordForm(){
   $("ownerAuth").classList.add("show");
