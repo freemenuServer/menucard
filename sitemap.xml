@@ -1,35 +1,74 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/css" href="https://www.xml-sitemaps.com/css/sitemap.css"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-
-  <url>
-       <loc>https://freemenu.in/</loc>
-       <lastmod>2026-10-02T07:33:51+00:00</lastmod>
-       <priority>1.0000</priority>
-  </url>
-  <url>
-       <loc>https://freemenu.in/about</loc>
-       <lastmod>2026-10-02T07:33:51+00:00</lastmod>
-       <priority>0.6400</priority>
-  </url>
-  <url>
-       <loc>https://freemenu.in/contact-us</loc>
-       <lastmod>2026-10-02T07:33:51+00:00</lastmod>
-       <priority>0.6400</priority>
-  </url>
-  <url>
-       <loc>https://freemenu.in/privacy-policy</loc>
-       <lastmod>2026-10-02T07:33:51+00:00</lastmod>
-       <priority>0.6400</priority>
-  </url>
-  <url>
-       <loc>https://freemenu.in/terms-and-conditions</loc>
-       <lastmod>2026-10-02T07:33:51+00:00</lastmod>
-       <priority>0.6400</priority>
-  </url>
-  <url>
-       <loc>https://freemenu.in/disclaimer</loc>
-       <lastmod>2026-10-02T07:33:51+00:00</lastmod>
-       <priority>0.6400</priority>
-  </url>
+﻿<?xml version="1.0" encoding="UTF-8"?>
+		<!--	created with www.mysitemapgenerator.com	-->
+		<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+	<loc>https://freemenu.in/</loc>
+	<lastmod>2026-10-02T09:46:35+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://freemenu.in/%60menu.html?r=%24%7BencodeURIComponent%28id</loc>
+	<lastmod>2026-10-02T09:46:35+01:00</lastmod>
+	<priority>0.9</priority>
+</url>
+<url>
+	<loc>https://freemenu.in/about</loc>
+	<lastmod>2026-10-02T09:46:35+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://freemenu.in/privacy-policy</loc>
+	<lastmod>2026-10-02T09:46:36+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://freemenu.in/owner?auth=login</loc>
+	<lastmod>2026-10-02T09:46:37+01:00</lastmod>
+	<priority>0.9</priority>
+</url>
+<url>
+	<loc>https://freemenu.in/contact-us</loc>
+	<lastmod>2026-10-02T09:46:37+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://freemenu.in/location.pathname+</loc>
+	<lastmod>2026-10-02T09:46:37+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://freemenu.in/owner?auth=</loc>
+	<lastmod>2026-10-02T09:46:38+01:00</lastmod>
+	<priority>0.9</priority>
+</url>
+<url>
+	<loc>https://freemenu.in/terms-and-conditions</loc>
+	<lastmod>2026-10-02T09:46:38+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://freemenu.in/owner?auth=signup</loc>
+	<lastmod>2026-10-02T09:46:39+01:00</lastmod>
+	<priority>0.9</priority>
+</url>
+<url>
+	<loc>https://freemenu.in/disclaimer</loc>
+	<lastmod>2026-10-02T09:46:39+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://freemenu.in/%60menu.html?r=%24%7BencodeURIComponent%28id</loc>
+	<lastmod>2026-10-02T09:46:40+01:00</lastmod>
+	<priority>0.9</priority>
+</url>
+<url>
+	<loc>https://freemenu.in/plans?owner_plans=</loc>
+	<lastmod>2026-10-02T09:46:41+01:00</lastmod>
+	<priority>0.9</priority>
+</url>
+<url>
+	<loc>https://freemenu.in/owner</loc>
+	<lastmod>2026-10-02T09:46:44+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
 </urlset>
