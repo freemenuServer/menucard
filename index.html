@@ -93,17 +93,15 @@ function renderRestaurants(list){document.getElementById("resultCount").textCont
 function fmIsUuid(value){return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value||""))}
 function fmSlugify(value){return String(value||"restaurant").toLowerCase().trim().replace(/&/g," and ").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").replace(/-+/g,"-")||"restaurant"}
 function openRestaurant(restaurantId){
-  const id = decodeURIComponent(String(restaurantId || "").trim());
-  if (!id) return;
-  const r = restaurants.find(x => String(x.id) === id);
-  if (!r) return;
-  const storedSlug = String(r.slug || "").trim().toLowerCase();
-  const slug = storedSlug && !fmIsUuid(storedSlug) ? storedSlug : fmSlugify(r.name || id);
-  if (!slug) return;
-  // Works on root domains and nested deployments; preserves the public /menu/:slug route.
-  const target = new URL("menu/" + encodeURIComponent(slug), window.location.href);
-  window.location.href = target.href;
-}function toggleFav(e,id,btn){e.stopPropagation();if(favorites.has(id)){favorites.delete(id);btn.textContent="♡"}else{favorites.add(id);btn.textContent="♥"}localStorage.setItem("freemenu_favorites",JSON.stringify([...favorites]))}
+  const id=decodeURIComponent(String(restaurantId||"").trim());
+  const r=restaurants.find(x=>String(x.id)===id);
+  if(!r)return;
+  const raw=String(r.slug||"").trim();
+  const slug=raw && !fmIsUuid(raw) ? raw : fmSlugify(r.name||id);
+  if(!slug)return;
+  window.location.assign("/menu/"+encodeURIComponent(slug));
+}
+function toggleFav(e,id,btn){e.stopPropagation();if(favorites.has(id)){favorites.delete(id);btn.textContent="♡"}else{favorites.add(id);btn.textContent="♥"}localStorage.setItem("freemenu_favorites",JSON.stringify([...favorites]))}
 document.getElementById("mainSearch").addEventListener("input",()=>{selectedCuisine="";applyFilters()});document.getElementById("searchBtn").addEventListener("click",applyFilters);document.getElementById("sortSelect").addEventListener("change",applyFilters);document.getElementById("onlyVeg").addEventListener("change",applyFilters);document.getElementById("openNow").addEventListener("change",applyFilters);document.getElementById("hasOffers").addEventListener("change",applyFilters);document.querySelectorAll('input[name="price"]').forEach(x=>x.addEventListener("change",applyFilters));document.getElementById("clearFilters").addEventListener("click",()=>{document.getElementById("mainSearch").value="";document.getElementById("onlyVeg").checked=false;document.getElementById("openNow").checked=false;document.getElementById("hasOffers").checked=false;document.querySelectorAll('input[name="price"]').forEach(x=>x.checked=false);selectedCuisine="";applyFilters()});document.getElementById("mobileFilterBtn").addEventListener("click",()=>document.getElementById("filtersBox").classList.toggle("show"));loadData();
 </script>
 
