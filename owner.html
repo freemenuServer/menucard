@@ -893,6 +893,9 @@ function showOwnerLogin(){
   $("loader").classList.add("hidden");
   $("ownerAuth").classList.add("show");
   $("authChoiceCard").style.display="grid";
+  const mode=new URLSearchParams(location.search).get("auth");
+  if(mode==="signup") return showSignupForm();
+  if(mode==="reset") return showResetPasswordForm();
   showLoginForm();
 }
 function hideOwnerLogin(){
@@ -934,7 +937,12 @@ function showResetPasswordForm(){
   $("authLoginTab")?.classList.remove("active");
   $("authSignupTab")?.classList.remove("active");
 }
-function showAuthChoice(){ showLoginForm(); }
+function showAuthChoice(){
+  const mode=new URLSearchParams(location.search).get("auth");
+  if(mode==="signup") return showSignupForm();
+  if(mode==="reset") return showResetPasswordForm();
+  showLoginForm();
+}
 $("authLoginTab")?.addEventListener("click",showLoginForm);
 $("authSignupTab")?.addEventListener("click",showSignupForm);
 function setAuthMsg(id,msg,ok=false){
