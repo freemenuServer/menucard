@@ -2075,6 +2075,70 @@ body::before{
 }
 </style>
 
+
+<style id="freemenu-mobile-bottom-round-svg">
+/* ===== Mobile bottom category buttons: round + SVG icons ===== */
+@media(max-width:640px){
+  .sticky-panel .category-scroll{
+    align-items:center!important;
+    gap:9px!important;
+    padding:4px 2px 5px!important;
+  }
+  .sticky-panel .category-scroll .cat-chip{
+    height:46px!important;
+    min-height:46px!important;
+    padding:7px 14px 7px 9px!important;
+    border-radius:999px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:7px!important;
+    white-space:nowrap!important;
+    flex:0 0 auto!important;
+    width:max-content!important;
+    border:1px solid rgba(255,255,255,.14)!important;
+    background:rgba(22,28,42,.98)!important;
+    color:#dbe3f0!important;
+    box-shadow:0 3px 12px rgba(0,0,0,.18)!important;
+  }
+  .sticky-panel .category-scroll .cat-chip.active{
+    background:linear-gradient(135deg,#ff2d73,#8058ff)!important;
+    border-color:transparent!important;
+    color:#fff!important;
+    box-shadow:0 5px 16px rgba(255,45,115,.25)!important;
+  }
+  .category-chip-icon{
+    width:30px!important;
+    height:30px!important;
+    flex:0 0 30px!important;
+    border-radius:50%!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    background:rgba(255,255,255,.09)!important;
+    border:1px solid rgba(255,255,255,.12)!important;
+  }
+  .cat-chip.active .category-chip-icon{
+    background:rgba(255,255,255,.18)!important;
+    border-color:rgba(255,255,255,.2)!important;
+  }
+  .category-chip-icon svg{
+    width:17px!important;
+    height:17px!important;
+    fill:none!important;
+    stroke:currentColor!important;
+    stroke-width:1.8!important;
+    stroke-linecap:round!important;
+    stroke-linejoin:round!important;
+  }
+  .category-chip-text{
+    font-size:11px!important;
+    line-height:1!important;
+    font-weight:800!important;
+  }
+}
+</style>
+
 </head>
 <body>
   <div class="app-shell">
@@ -2352,6 +2416,23 @@ body::before{
       `;
     }
 
+    function categoryIconSVG(category) {
+      const c = String(category || "").toLowerCase();
+      if (/dessert|ice|sweet|cake|kulfi|cream/.test(c)) {
+        return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10l-1 5H8L7 4Z"/><path d="M9 9v7a3 3 0 0 0 6 0V9"/><path d="M8 20h8"/></svg>';
+      }
+      if (/chinese|noodle|starter|momo/.test(c)) {
+        return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14"/><path d="M7 8v5a5 5 0 0 0 10 0V8"/><path d="M9 4c1 2 2 2 3 0M13 4c1 2 2 2 3 0"/><path d="M8 20h8"/></svg>';
+      }
+      if (/dosa|south|idli|uttapam|roast|fusion/.test(c)) {
+        return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15c2-6 14-6 16 0-2 3-14 3-16 0Z"/><path d="M6 15c2 1 10 1 12 0"/><path d="M12 6v3M9 7l1 2M15 7l-1 2"/></svg>';
+      }
+      if (/pizza|burger|sandwich|fast/.test(c)) {
+        return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16"/><path d="M6 11c1-5 11-5 12 0"/><path d="M5 15h14"/><path d="M7 18h10"/></svg>';
+      }
+      return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14v11H5z"/><path d="M8 7V5h8v2M9 11h6M9 14h4"/></svg>';
+    }
+
     function categoryKey(category) {
       return String(category || "General").trim() || "General";
     }
@@ -2388,10 +2469,14 @@ function getSavedCategoryOrder(rest, items) {
     function renderCategoryChips() {
       const categories = getSavedCategoryOrder(restaurant, allItems);
       $("category-chips").innerHTML = [
-        `<button class="cat-chip ${currentCategory === "all" ? "active" : ""}" data-category="all">All Menu</button>`,
+        `<button class="cat-chip ${currentCategory === "all" ? "active" : ""}" data-category="all">
+          <span class="category-chip-icon">${categoryIconSVG("all")}</span>
+          <span class="category-chip-text">All Menu</span>
+        </button>`,
         ...categories.map(category => `
           <button class="cat-chip ${currentCategory === category ? "active" : ""}" data-category="${escapeHTML(category)}">
-            ${escapeHTML(category)}
+            <span class="category-chip-icon">${categoryIconSVG(category)}</span>
+            <span class="category-chip-text">${escapeHTML(category)}</span>
           </button>
         `)
       ].join("");
