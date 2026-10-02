@@ -1710,7 +1710,7 @@ function getSavedCategoryOrder(rest, items) {
             ? decodeURIComponent(pathParts[1])
             : "";
 
-        const slug = (pathSlug || params.get("r") || "").trim().toLowerCase();
+        const slug = (pathSlug || params.get("r") || params.get("slug") || "").trim().toLowerCase();
 
         if (!slug) {
           $("rest-name").textContent = "Restaurant Not Found";
