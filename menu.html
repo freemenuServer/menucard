@@ -2139,6 +2139,20 @@ body::before{
 }
 </style>
 
+
+<style id="freemenu-pc-no-category-svg">
+/* Desktop: category buttons remain text-only. SVG icons are mobile-only. */
+@media(min-width:641px){
+  .category-chip-icon,
+  .category-chip-icon svg{
+    display:none!important;
+  }
+  .category-chip-text{
+    display:inline!important;
+  }
+}
+</style>
+
 </head>
 <body>
   <div class="app-shell">
