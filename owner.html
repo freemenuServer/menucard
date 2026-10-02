@@ -129,6 +129,15 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .authChoiceBtn b{display:block;font-size:16px;color:#172033}
 .authChoiceBtn small{display:block;color:#7a8495;font-size:10px;margin-top:5px;line-height:1.4}
 .authFormCard{text-align:left}
+/* Auth route visibility: exactly one form is shown at a time. */
+.authCombinedForm .authFormCard{display:none!important;padding:0;box-shadow:none;border:0;background:transparent;max-width:none;margin:0}
+.authCombinedForm .authFormCard.active{display:block!important}
+.signup-route .authCombinedForm #loginCard{display:none!important}
+.signup-route .authCombinedForm #signupCard{display:block!important}
+.signup-route .authCombinedForm #resetPasswordCard{display:none!important}
+.signup-route #authLoginTab{display:none!important}
+.signup-route #authSignupTab{display:block!important;flex:1}
+
 .authFormCard .authBrand{margin-left:auto;margin-right:auto}
 .authFormCard h1,.authFormCard .authSub{text-align:center}
 .authBack,.authSwitch{border:0;background:none;color:#5b6474;font-weight:700;cursor:pointer;padding:0}
@@ -183,16 +192,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .authTabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#f3f4f6;border-radius:12px;padding:4px;margin:0 0 22px}
 .authTab{border:0;background:transparent;border-radius:9px;padding:11px 10px;font-weight:800;color:#687386;cursor:pointer;font-size:13px}
 .authTab.active{background:#fff;color:#8f1831;box-shadow:0 3px 10px rgba(15,23,42,.08)}
-.authCombinedForm .authFormCard{display:none!important;padding:0;box-shadow:none;border:0;background:transparent;max-width:none;margin:0}
+
 .authCombinedForm .authBack{display:none}
 .authCombinedForm .authBrand,.authCombinedForm .authKicker{display:none}
 .authCombinedForm .authFormCard h1{font-size:30px;margin-bottom:4px}
 .authCombinedForm .authFormCard .authSub{margin-bottom:18px}
-.authCombinedForm .signupCard{display:none!important}
-.authCombinedForm .signupCard.active{display:block!important}
-.authCombinedForm .loginCard.active{display:block!important}
-.authCombinedForm #resetPasswordCard.active{display:block!important}
-.authCombinedForm #loginCard{display:block!important}.authCombinedForm #signupCard{display:none!important}.authCombinedForm #resetPasswordCard{display:none!important}.authCombinedForm #signupCard.active{display:block!important}.authCombinedForm #loginCard.active{display:block!important}.authCombinedForm #resetPasswordCard.active{display:block!important}
+
+
 @media(max-width:760px){.ownerAuthSplit{grid-template-columns:1fr!important}.freemenu-login-brand{display:block!important;min-height:250px}.freemenu-login-brand-inner{padding:28px}.freemenu-login-brand h1{font-size:36px}.authRightPanel{min-height:auto!important;padding:28px 22px!important}}
 </style>
 
@@ -229,7 +235,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 </head>
 
 <body>
-
+<script>(function(){if(new URLSearchParams(location.search).get("auth")==="signup")document.documentElement.classList.add("signup-route");})();</script>
 
 <div id="ownerAuth">
   <div class="ownerAuthBackdrop"></div>
@@ -257,7 +263,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
       </div>
       <div class="authCombinedForm">
 <!-- LOGIN FORM -->
-  <div class="ownerAuthCard authFormCard" id="loginCard" style="display:block">
+  <div class="ownerAuthCard authFormCard" id="loginCard" style="display:none">
     <button type="button" class="authBack" id="backLoginBtn">← Back</button>
     <div class="authBrand">🔐</div><div class="authKicker">FreeMenu Owner Portal</div>
     <h1>Owner Login</h1>
@@ -902,6 +908,7 @@ function hideOwnerLogin(){
   $("ownerAuth").classList.remove("show");
 }
 function showLoginForm(){
+  document.documentElement.classList.remove("signup-route");
   $("ownerAuth").classList.add("show");
   $("authChoiceCard").style.display="grid";
   $("loginCard").classList.add("active");
@@ -914,6 +921,7 @@ function showLoginForm(){
   $("authSignupTab")?.classList.remove("active");
 }
 function showSignupForm(){
+  document.documentElement.classList.add("signup-route");
   $("ownerAuth").classList.add("show");
   $("authChoiceCard").style.display="grid";
   $("loginCard").classList.remove("active");
