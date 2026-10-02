@@ -96,8 +96,11 @@ function openRestaurant(restaurantId){
   const id=decodeURIComponent(String(restaurantId||"").trim());
   const r=restaurants.find(x=>String(x.id)===id);
   if(!r)return;
+  // Always use the restaurant's actual database slug when available.
+  // If an older restaurant has no slug, use its UUID so the menu page can
+  // resolve it by id instead of accidentally opening another restaurant.
   const raw=String(r.slug||"").trim();
-  const slug=raw && !fmIsUuid(raw) ? raw : fmSlugify(r.name||id);
+  const slug=raw || id;
   if(!slug)return;
   window.location.assign("/menu/"+encodeURIComponent(slug));
 }
