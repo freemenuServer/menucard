@@ -1,1 +1,11 @@
-/menu/:slug    /engine.html?r=:slug    200
+/menu/:slug
+     ↓
+router/engine
+     ↓
+restaurants.plan_id
+     ↓
+plans
+     ↓
+Growth → menugrowth.html
+Signature/Full → signaturemenu.html
+Free → menu.html
