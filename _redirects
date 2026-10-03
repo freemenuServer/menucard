@@ -1,12 +1,1 @@
-# FreeMenu clean restaurant menu URLs
-
 /menu/:slug    /engine.html?r=:slug    200
-
-# Direct menu engine
-/menu.html     /menu.html              200
-
-# Root application pages
-/owner         /owner.html             200
-/admin         /admin.html             200
-/plans         /plans.html             200
-/qr            /qr.html                200
