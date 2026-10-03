@@ -1,19 +1,17 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="robots" content="noindex,nofollow" />
-  <title>FreeMenu • Opening Menu</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>FreeMenu</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
-    html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f7f7f5;color:#222}
+    html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:#f7f7f5;color:#222}
     body{display:grid;place-items:center;padding:24px;box-sizing:border-box}
-    .box{width:min(460px,100%);background:#fff;border:1px solid #e8e8e5;border-radius:18px;padding:28px;box-shadow:0 12px 35px rgba(0,0,0,.07);text-align:center}
+    .box{width:min(520px,100%);background:#fff;border:1px solid #e8e8e5;border-radius:18px;padding:28px;box-shadow:0 12px 35px rgba(0,0,0,.07);text-align:center}
     .spinner{width:28px;height:28px;border:3px solid #e7e7e3;border-top-color:#7b1e16;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
-    h1{font-size:18px;margin:0 0 7px}.msg{font-size:13px;color:#777;line-height:1.5}.error{color:#b42318}
-    .debug{display:none;margin-top:16px;padding:10px;border-radius:10px;background:#f5f5f2;text-align:left;font:11px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;word-break:break-word}
-    .link{display:inline-block;margin-top:16px;color:#7b1e16;font-weight:700;text-decoration:none}
+    h1{font-size:18px;margin:0 0 8px}.msg{font-size:13px;color:#777;line-height:1.55;word-break:break-word}.error{color:#b42318}
+    .debug{margin-top:16px;padding:12px;border-radius:12px;background:#f6f6f3;text-align:left;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;display:none}
     @keyframes spin{to{transform:rotate(360deg)}}
   </style>
 </head>
@@ -22,7 +20,7 @@
     <div class="spinner" id="spinner"></div>
     <h1 id="title">Opening menu…</h1>
     <div class="msg" id="message">Checking the restaurant's assigned plan.</div>
-    <div class="debug" id="debug"></div>
+    <pre class="debug" id="debug"></pre>
   </main>
 
 <script>
@@ -30,59 +28,53 @@
   const SUPABASE_URL = "https://pfsrpowopbrevocwsuii.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const debugMode = new URLSearchParams(location.search).get("debug") === "1";
 
   const $ = id => document.getElementById(id);
-
-  function setState(title, message, error = false) {
+  function state(title, message, error=false) {
     $("title").textContent = title;
     $("message").textContent = message;
     $("message").className = "msg" + (error ? " error" : "");
     if (error) $("spinner").style.display = "none";
   }
-
-  function debug(info) {
-    // Hidden by default. Add ?debug=1 to the engine URL while testing.
-    if (new URLSearchParams(location.search).get("debug") === "1") {
-      $("debug").style.display = "block";
-      $("debug").textContent = typeof info === "string" ? info : JSON.stringify(info, null, 2);
-    }
+  function debug(data) {
+    if (!debugMode) return;
+    const el = $("debug");
+    el.style.display = "block";
+    el.textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2);
   }
-
-  function go(template, restaurantKey) {
+  function go(template, slug) {
     const target = new URL("/" + template, location.origin);
-    target.searchParams.set("r", restaurantKey);
+    target.searchParams.set("r", slug);
     location.replace(target.href);
   }
 
   async function findRestaurant(key) {
-    // IMPORTANT: do NOT use .or(slug.eq...,id.eq...) here.
-    // restaurants.id is UUID while slug is text; an invalid UUID in an OR
-    // expression can make the whole Supabase query fail.
+    // Clean public URLs always contain a slug. This is deliberately NOT an
+    // OR query with id=key because Supabase/Postgres can reject a non-UUID
+    // value when id is a uuid column.
+    const slug = String(key || "").trim().toLowerCase();
+    if (!slug) return { data:null, error:new Error("Missing restaurant slug") };
+
     let result = await supabaseClient
       .from("restaurants")
       .select("id,name,slug,plan_id,plan,custom_plan_enabled")
-      .eq("slug", key)
+      .eq("slug", slug)
       .maybeSingle();
 
-    if (result.error) throw result.error;
-    if (result.data) return result.data;
-
-    // UUID fallback for direct engine links using ?r=<restaurant-id>.
-    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(key)) {
+    // Optional UUID fallback for direct /engine.html?r=<uuid> links.
+    if (!result.data && !result.error && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(slug)) {
       result = await supabaseClient
         .from("restaurants")
         .select("id,name,slug,plan_id,plan,custom_plan_enabled")
-        .eq("id", key)
+        .eq("id", slug)
         .maybeSingle();
-      if (result.error) throw result.error;
-      if (result.data) return result.data;
     }
-
-    return null;
+    return result;
   }
 
-  async function findAssignedPlan(rest) {
-    // OLD WORKING LOGIC: restaurants.plan_id -> plans.id -> plans.slug/name.
+  async function getAssignedPlan(rest) {
+    // Primary source: restaurants.plan_id -> plans.id.
     if (rest.plan_id) {
       const { data, error } = await supabaseClient
         .from("plans")
@@ -90,14 +82,12 @@
         .eq("id", rest.plan_id)
         .maybeSingle();
 
-      if (error) throw error;
-      if (data) return data;
+      if (!error && data && data.is_active !== false) return data;
     }
 
-    // Backward-compatible fallback only when there is no usable plan_id.
-    // This does not override a valid plan_id.
+    // Backward compatibility only. New assignments should use plan_id.
     const legacy = String(rest.plan || "").trim().toLowerCase();
-    const legacySlugMap = {
+    const legacySlug = {
       free: "free-starter",
       starter: "free-starter",
       "free-starter": "free-starter",
@@ -110,93 +100,85 @@
       "full-3d": "full-3d-experience",
       "full_3d": "full-3d-experience",
       "full-3d-experience": "full-3d-experience"
-    };
+    }[legacy];
 
-    const legacySlug = legacySlugMap[legacy];
-    if (!legacySlug) return null;
-
-    const { data, error } = await supabaseClient
-      .from("plans")
-      .select("id,name,slug,is_active")
-      .eq("slug", legacySlug)
-      .maybeSingle();
-
-    if (error) throw error;
-    return data || null;
+    if (legacySlug) {
+      const { data, error } = await supabaseClient
+        .from("plans")
+        .select("id,name,slug,is_active")
+        .eq("slug", legacySlug)
+        .maybeSingle();
+      if (!error && data && data.is_active !== false) return data;
+    }
+    return null;
   }
 
-  function chooseTemplate(rest, plan) {
-    // This block intentionally mirrors the old working page's routing logic.
-    // Source: assigned plan slug/name + custom_plan_enabled.
-    if (plan && plan.is_active !== false) {
-      const planKey = `${plan.slug || ""} ${plan.name || ""}`.toLowerCase().trim();
+  function resolveTemplate(rest, plan) {
+    // Exact routing behavior from the old working page.
+    if (!plan) return "menu.html";
 
-      const isSignature3D =
-        planKey.includes("signature 3d") ||
-        planKey.includes("signature-3d") ||
-        planKey.includes("signature_3d") ||
-        (planKey.includes("signature") && planKey.includes("3d"));
+    const planKey = `${plan.slug || ""} ${plan.name || ""}`.toLowerCase().trim();
 
-      const isFull3D =
-        planKey.includes("full 3d") ||
-        planKey.includes("full-3d") ||
-        planKey.includes("full_3d") ||
-        (planKey.includes("full") && planKey.includes("3d"));
+    const isSignature3D =
+      planKey.includes("signature 3d") ||
+      planKey.includes("signature-3d") ||
+      planKey.includes("signature_3d") ||
+      (planKey.includes("signature") && planKey.includes("3d"));
 
-      const isCustomMenu = rest.custom_plan_enabled === true;
+    const isFull3D =
+      planKey.includes("full 3d") ||
+      planKey.includes("full-3d") ||
+      planKey.includes("full_3d") ||
+      (planKey.includes("full") && planKey.includes("3d"));
 
-      if (isSignature3D || isFull3D || isCustomMenu) {
-        return "signaturemenu.html";
-      }
+    const isCustomMenu = rest.custom_plan_enabled === true;
 
-      const isGrowthPhotos =
-        planKey.includes("growth") ||
-        planKey.includes("growth-photos") ||
-        planKey.includes("growth photos") ||
-        planKey.includes("photo_menu_v1");
+    if (isSignature3D || isFull3D || isCustomMenu) return "signaturemenu.html";
 
-      if (isGrowthPhotos) {
-        return "menugrowth.html";
-      }
-    }
+    const isGrowthPhotos =
+      planKey.includes("growth") ||
+      planKey.includes("growth-photos") ||
+      planKey.includes("growth photos") ||
+      planKey.includes("photo_menu_v1");
+
+    if (isGrowthPhotos) return "menugrowth.html";
 
     return "menu.html";
   }
 
   async function route() {
     const params = new URLSearchParams(location.search);
-    const key = (params.get("r") || params.get("slug") || "").trim().toLowerCase();
-
+    const key = (params.get("r") || params.get("slug") || "").trim();
     if (!key) {
-      setState("Restaurant link missing", "No restaurant slug was supplied.", true);
+      state("Restaurant link missing", "No restaurant slug was supplied.", true);
       return;
     }
 
     try {
-      const rest = await findRestaurant(key);
+      const { data: rest, error: restError } = await findRestaurant(key);
+      if (restError) throw restError;
       if (!rest) {
-        debug({key, error:"restaurant not found"});
-        setState("Restaurant not found", "Please check the menu link and try again.", true);
+        state("Restaurant not found", "No restaurant matched this menu URL.", true);
+        debug({ restaurantKey:key, error:"No restaurant found" });
         return;
       }
 
-      const plan = await findAssignedPlan(rest);
-      const template = chooseTemplate(rest, plan);
-      const publicKey = rest.slug || rest.id;
+      const plan = await getAssignedPlan(rest);
+      const template = resolveTemplate(rest, plan);
+      const publicSlug = rest.slug || key;
 
       debug({
-        requestedKey:key,
-        restaurant:{id:rest.id,name:rest.name,slug:rest.slug,plan_id:rest.plan_id,plan:rest.plan,custom_plan_enabled:rest.custom_plan_enabled},
+        restaurant:{id:rest.id,name:rest.name,slug:rest.slug,plan_id:rest.plan_id,legacy_plan:rest.plan,custom_plan_enabled:rest.custom_plan_enabled},
         assignedPlan:plan,
-        selectedTemplate:template,
-        target:`/${template}?r=${publicKey}`
+        resolvedTemplate:template,
+        target:`/${template}?r=${publicSlug}`
       });
 
-      go(template, publicKey);
-    } catch (error) {
-      console.error("FreeMenu engine routing error:", error);
-      debug({message:error?.message || String(error), details:error});
-      setState("Unable to open menu", "The restaurant or its assigned plan could not be checked.", true);
+      go(template, publicSlug);
+    } catch (err) {
+      console.error("FreeMenu engine routing error", err);
+      state("Unable to open menu", "Could not read the restaurant's assigned plan.", true);
+      debug({ error: String(err && (err.message || err)), hint:"Check Supabase RLS for public SELECT on restaurants and active plans." });
     }
   }
 
