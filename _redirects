@@ -1,14 +1,12 @@
-# FreeMenu Netlify Routing
+# FreeMenu clean restaurant menu URLs
 
-/menu/:slug    /engine?r=:slug    200
+/menu/:slug    /engine.html?r=:slug    200
 
-/engine        /engine.html       200
+# Direct menu engine
+/menu.html     /menu.html              200
 
-/menu.html     /menu.html         200
-/menugrowth.html    /menugrowth.html    200
-/signaturemenu.html /signaturemenu.html 200
-
-/owner         /owner.html        200
-/admin         /admin.html        200
-/plans         /plans.html        200
-/qr            /qr.html           200
+# Root application pages
+/owner         /owner.html             200
+/admin         /admin.html             200
+/plans         /plans.html             200
+/qr            /qr.html                200
