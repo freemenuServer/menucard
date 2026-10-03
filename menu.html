@@ -1506,6 +1506,41 @@
   }
 </style>
 
+
+<style id="freemenu-mobile-category-bottom-fixed">
+@media (max-width: 700px){
+  .sticky-panel{
+    padding-bottom: 0 !important;
+  }
+  .sticky-panel .category-scroll{
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
+    z-index: 9999 !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom)) !important;
+    box-sizing: border-box !important;
+    background: rgba(13,14,16,.97) !important;
+    border-top: 1px solid rgba(255,255,255,.10) !important;
+    box-shadow: 0 -8px 24px rgba(0,0,0,.22) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+  }
+  .sticky-panel .category-scroll .cat-chip{
+    flex: 0 0 auto !important;
+  }
+  .menu-wrap{
+    padding-bottom: 88px !important;
+  }
+}
+</style>
+
 </head>
 <body>
   <div class="app-shell">
