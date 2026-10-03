@@ -924,18 +924,327 @@
   }
 </style>
 
+
+<style id="freemenu-dark-theme">
+  :root{
+    --primary:#d6a85b!important;
+    --primary-dark:#a97832!important;
+    --primary-soft:#2b241b!important;
+    --accent:#e0b86a!important;
+    --bg:#0d0e10!important;
+    --surface:#17191c!important;
+    --surface-2:#202328!important;
+    --text:#f3f0e8!important;
+    --muted:#aaa79f!important;
+    --border:#30343a!important;
+    --shadow:0 12px 30px rgba(0,0,0,.28)!important;
+  }
+
+  html,body{
+    background:#0d0e10!important;
+    color:#f3f0e8!important;
+  }
+
+  body{
+    background:
+      radial-gradient(circle at 10% 0%,rgba(214,168,91,.08),transparent 28%),
+      linear-gradient(180deg,#0d0e10 0%,#111317 100%)!important;
+  }
+
+  .app-shell{
+    background:#0d0e10!important;
+  }
+
+  /* FreeMenu header */
+  .freemenu-nav{
+    background:#0d0e10!important;
+    border-bottom-color:#292c31!important;
+  }
+  .freemenu-name{color:#f5f1e8!important}
+  .freemenu-label{color:#8f918f!important}
+
+  /* Restaurant hero */
+  .hero{
+    background:#17191c!important;
+    box-shadow:0 18px 50px rgba(0,0,0,.38)!important;
+  }
+  .hero-cover{opacity:.28!important}
+  .hero-overlay{
+    background:
+      linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.72))!important;
+  }
+  .hero-info,
+  .restaurant-name,
+  .hero-tagline,
+  .hero-subtitle,
+  .hero-slogans{
+    color:#f7f3eb!important;
+  }
+  .hero-welcome{color:#e0b86a!important}
+  .hero-feature{
+    color:#eee9df!important;
+    background:rgba(255,255,255,.07)!important;
+    border-color:rgba(255,255,255,.14)!important;
+  }
+
+  /* Service strip */
+  .service-strip{
+    background:#17191c!important;
+    color:#eeeae2!important;
+    border-color:#30343a!important;
+    box-shadow:0 10px 28px rgba(0,0,0,.28)!important;
+  }
+  .service{background:#22252a!important;color:#c9c7c0!important}
+  .service-time{color:#ddd9d0!important}
+
+  /* Search / sticky controls */
+  .sticky-panel{
+    background:rgba(13,14,16,.94)!important;
+    border-color:#30343a!important;
+  }
+  .search-wrap{
+    background:#191b1f!important;
+    border-color:#34383f!important;
+  }
+  .search-icon{color:#d6a85b!important}
+  #menu-search{
+    color:#f2efe8!important;
+    background:transparent!important;
+  }
+  #menu-search::placeholder{color:#777a80!important}
+
+  .cat-chip{
+    background:#181a1e!important;
+    color:#b9b7b0!important;
+    border-color:#34383f!important;
+    box-shadow:0 3px 10px rgba(0,0,0,.18)!important;
+  }
+  .cat-chip:hover{
+    background:#22252a!important;
+    color:#eeeae2!important;
+  }
+  .cat-chip.active{
+    background:#d6a85b!important;
+    border-color:#d6a85b!important;
+    color:#17120c!important;
+  }
+
+  /* Menu area */
+  .menu-wrap{background:transparent!important}
+  .summary-line{color:#96989a!important}
+
+  .category-title{
+    color:#f1ede5!important;
+  }
+  .item-count{color:#85898e!important}
+
+  .items-list{
+    background:#17191c!important;
+    border-color:#30343a!important;
+    box-shadow:0 10px 26px rgba(0,0,0,.26)!important;
+  }
+  .menu-item,
+  .menu-item + .menu-item{
+    background:#17191c!important;
+    border-bottom-color:#2b2f35!important;
+  }
+  .menu-item:hover{
+    background:#1d2024!important;
+  }
+  .menu-item:active{
+    background:#22252a!important;
+  }
+  .item-name{color:#f0ede6!important}
+  .item-desc{color:#9d9d99!important}
+  .food-symbol{background:transparent!important}
+
+  /* Prices */
+  .price-header{color:#a9a69f!important}
+  .portion-price,
+  .single-price{
+    color:#e0b86a!important;
+  }
+  .portion-price.empty{color:#55595f!important}
+
+  .categoryPriceSwitch{
+    background:#202328!important;
+    border-color:#353941!important;
+  }
+  .categoryPriceSwitch button{
+    color:#92959a!important;
+  }
+  .categoryPriceSwitch button:hover{
+    background:#292d32!important;
+    color:#eeeae2!important;
+  }
+  .categoryPriceSwitch button.active{
+    background:#d6a85b!important;
+    color:#17120c!important;
+  }
+
+  /* Tags */
+  .tag{
+    background:#2a251d!important;
+    color:#e0b86a!important;
+  }
+  .tag.hot{
+    background:#30251a!important;
+    color:#e6a75d!important;
+  }
+  .tag.out{
+    background:#351d20!important;
+    color:#f08b8b!important;
+  }
+
+  /* State/loading */
+  .state-card,
+  .loading-list{
+    background:#17191c!important;
+    border-color:#30343a!important;
+    color:#aaa79f!important;
+  }
+  .state-card strong{color:#f0ede6!important}
+  .loading-row{border-bottom-color:#30343a!important}
+  .skeleton{background:#25282d!important}
+  .skeleton::after{
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent)!important;
+  }
+
+  /* Footer */
+  .freemenu-footer{
+    background:#0d0e10!important;
+    border-top-color:#292c31!important;
+  }
+  .footer-freemenu{color:#d6a85b!important}
+  .footer-restaurant{color:#d2cec5!important}
+  .freemenu-footer .footer-note,
+  .footer-note{color:#74777c!important}
+
+  /* Call / WhatsApp actions */
+  .hero-action{
+    background:rgba(0,0,0,.34)!important;
+    border-color:rgba(255,255,255,.20)!important;
+    color:#fff!important;
+  }
+
+  @media(max-width:640px){
+    body{background:#0d0e10!important}
+    .hero{background:#17191c!important}
+    .service-strip,.sticky-panel{background:#17191c!important}
+  }
+</style>
+
+
+<style id="freemenu-category-layout">
+  /* Item quantities are intentionally hidden. */
+  .summary-line,
+  .item-count{
+    display:none!important;
+  }
+
+  /* Laptop / desktop: category slider stays at the top under search. */
+  .sticky-panel{
+    position:sticky;
+    top:0;
+    z-index:80;
+  }
+  .category-scroll{
+    display:flex;
+    flex-wrap:nowrap;
+    overflow-x:auto;
+    overflow-y:hidden;
+    -webkit-overflow-scrolling:touch;
+    scroll-snap-type:x proximity;
+    scrollbar-width:none;
+  }
+  .category-scroll::-webkit-scrollbar{display:none}
+  .cat-chip{
+    flex:0 0 auto;
+    scroll-snap-align:start;
+  }
+
+  @media (max-width: 700px){
+    /* Keep search at the top; move only the category slider to the bottom. */
+    .sticky-panel{
+      position:sticky;
+      top:0;
+      bottom:auto;
+      padding-bottom:8px;
+      border-bottom:0!important;
+      background:rgba(13,14,16,.94)!important;
+    }
+
+    .category-scroll{
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      z-index:120;
+      width:100%;
+      margin:0!important;
+      padding:10px 12px calc(10px + env(safe-area-inset-bottom))!important;
+      gap:8px;
+      background:rgba(13,14,16,.97)!important;
+      border-top:1px solid #30343a;
+      box-shadow:0 -10px 28px rgba(0,0,0,.35);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      overflow-x:auto;
+      overflow-y:hidden;
+      scroll-snap-type:x mandatory;
+    }
+
+    .cat-chip{
+      flex:0 0 auto;
+      min-height:42px;
+      padding:10px 15px!important;
+      scroll-snap-align:start;
+    }
+
+    .menu-wrap{
+      padding-bottom:92px!important;
+    }
+
+    .freemenu-footer{
+      margin-bottom:10px;
+    }
+  }
+</style>
+
+
+<style id="freemenu-logo-image-style">
+  .freemenu-brand{
+    display:flex;
+    align-items:center;
+    min-width:0;
+  }
+  .freemenu-logo-image{
+    display:block;
+    width:auto;
+    height:42px;
+    max-width:190px;
+    object-fit:contain;
+    object-position:left center;
+  }
+  @media(max-width:640px){
+    .freemenu-logo-image{
+      height:36px;
+      max-width:165px;
+    }
+  }
+</style>
+
 </head>
 <body>
   <div class="app-shell">
     <nav class="site-nav freemenu-nav" aria-label="FreeMenu navigation">
       <div class="freemenu-brand">
-        <span class="freemenu-logo" aria-hidden="true">
-          <svg viewBox="0 0 48 48" role="img">
-            <rect x="2" y="2" width="44" height="44" rx="13" fill="currentColor"/>
-            <path d="M14 12h21v5H19v5h14v5H19v9h-5V12Z" fill="#fff"/>
-          </svg>
-        </span>
-        <span class="freemenu-name">FreeMenu</span>
+        <img
+          class="freemenu-logo-image"
+          src="freemenu-logo-full.png"
+          alt="FreeMenu"
+          onerror="this.onerror=null;this.src='freemenu-logo.png';"
+        />
       </div>
       <span class="freemenu-label">Digital Menu</span>
     </nav>
@@ -1320,11 +1629,8 @@ function getSavedCategoryOrder(rest, items) {
         }
       });
 
-      $("summary-line").style.display = "flex";
-      $("summary-line").innerHTML = `
-        <span>${filtered.length} item${filtered.length === 1 ? "" : "s"}</span>
-        ${searchText ? `<span>Search: “${escapeHTML(searchText)}”</span>` : ""}
-      `;
+      $("summary-line").style.display = "none";
+      $("summary-line").innerHTML = "";
 
       if (!filtered.length) {
         showState("Nothing found", "Try another search or category.");
@@ -1338,7 +1644,7 @@ function getSavedCategoryOrder(rest, items) {
           <div class="category-heading categoryHeadWithPrices">
             <div class="categoryTitleWrap">
               <h2 class="category-title">${escapeHTML(category)}</h2>
-              <span class="item-count">${items.length} item${items.length === 1 ? "" : "s"}</span>
+
             </div>
             <div class="categoryPriceSwitch" aria-label="Price size">
               <button type="button" class="${((window.fmCategoryPriceMode||{})[category]||"full")==="quarter"?"active":""}" onclick='fmSetCategoryPriceMode(${JSON.stringify(category)},"quarter")'>Quarter</button>
