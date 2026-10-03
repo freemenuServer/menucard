@@ -152,7 +152,7 @@ function render(settings){
   document.getElementById("openTemplate")?.addEventListener("click",()=>{
     const url=new URL(path,location.origin);
     url.searchParams.set("r",settings.restaurantSlug||"");
-    location.href=url.toString();
+    location.replace(url.toString());
   });
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -166,7 +166,14 @@ function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':
     if(!restaurant) throw new Error("Restaurant not found.");
     const plan=await loadPlan(restaurant);
     if(!plan) throw new Error("Assigned plan could not be resolved.");
-    render(buildSettings(plan,restaurant));
+    const settings=buildSettings(plan,restaurant);
+    render(settings);
+
+    // ENGINE ROUTING: once the plan is resolved, immediately open the real
+    // public template. The engine itself is never the final customer page.
+    const target=new URL(settings.templatePath,location.origin);
+    target.searchParams.set("r",slug);
+    window.setTimeout(()=>window.location.replace(target.toString()),80);
   }catch(error){
     console.error(error);
     document.getElementById("status").innerHTML='<span class="pill error">ENGINE ERROR</span>';
