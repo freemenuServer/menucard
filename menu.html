@@ -2148,7 +2148,17 @@ function renderRestaurant(rest) {
 
       try {
         const params = new URLSearchParams(window.location.search);
-        const slug = (params.get("r") || "").trim().toLowerCase();
+        let slug = (params.get("r") || "").trim().toLowerCase();
+
+        // Clean-URL compatibility: also accept /menu/{slug} when the host
+        // does not pass the rewrite query through to menu.html.
+        if (!slug) {
+          const pathParts = window.location.pathname.split("/").filter(Boolean);
+          const menuIndex = pathParts.findIndex(part => part.toLowerCase() === "menu");
+          if (menuIndex >= 0 && pathParts[menuIndex + 1]) {
+            slug = decodeURIComponent(pathParts[menuIndex + 1]).trim().toLowerCase();
+          }
+        }
 
         let query = supabaseClient.from("restaurants").select("*");
         if (slug) query = query.eq("slug", slug);
@@ -2184,59 +2194,6 @@ function renderRestaurant(rest) {
           }
         }
 
-
-        /* =========================================================
-           PUBLIC MENU TEMPLATE ROUTING
-           Keep the existing menu UI/data logic intact.
-           The restaurant's assigned plan decides which public
-           template should be shown.
-        ========================================================== */
-        if (window.fmPublicPlan) {
-          const planKey = `${window.fmPublicPlan.slug || ""} ${window.fmPublicPlan.name || ""}`
-            .toLowerCase()
-            .trim();
-
-          const isSignature3D =
-            planKey.includes("signature 3d") ||
-            planKey.includes("signature-3d") ||
-            planKey.includes("signature_3d") ||
-            (planKey.includes("signature") && planKey.includes("3d"));
-
-          const isFull3D =
-            planKey.includes("full 3d") ||
-            planKey.includes("full-3d") ||
-            planKey.includes("full_3d") ||
-            (planKey.includes("full") && planKey.includes("3d"));
-
-          const isGrowthPhotos =
-            planKey.includes("growth") ||
-            planKey.includes("growth-photos") ||
-            planKey.includes("growth photos") ||
-            planKey.includes("photo_menu_v1");
-
-          const isCustomMenu = rest.custom_plan_enabled === true;
-
-          const currentFile = window.location.pathname
-            .split("/")
-            .pop()
-            .toLowerCase();
-
-          let targetFile = "menu.html";
-
-          if (isSignature3D || isFull3D || isCustomMenu) {
-            targetFile = "signaturemenu.html";
-          } else if (isGrowthPhotos) {
-            targetFile = "menugrowth.html";
-          }
-
-          if (currentFile !== targetFile) {
-            const targetUrl = new URL(`/${targetFile}`, window.location.origin);
-            targetUrl.searchParams.set("r", rest.slug || rest.id);
-            window.location.replace(targetUrl.href);
-            return;
-          }
-        }
-
         if (!window.fmPublicPlan) {
           const legacy = String(rest.plan || "").trim().toLowerCase();
           const legacyPlanMap = {
@@ -2265,6 +2222,52 @@ function renderRestaurant(rest) {
               rest.public_plan = legacyPlan;
             }
           }
+        }
+
+        /* =========================================================
+           PUBLIC MENU TEMPLATE ROUTING
+           Resolve the plan first (including legacy fallback), then
+           route only when the assigned plan needs another template.
+           Free Starter intentionally stays on menu.html.
+        ========================================================== */
+        const resolvedPlan = window.fmPublicPlan;
+        const resolvedPlanKey = `${resolvedPlan?.slug || ""} ${resolvedPlan?.name || ""}`
+          .toLowerCase()
+          .trim();
+
+        const isSignature3D =
+          resolvedPlanKey.includes("signature 3d") ||
+          resolvedPlanKey.includes("signature-3d") ||
+          resolvedPlanKey.includes("signature_3d") ||
+          (resolvedPlanKey.includes("signature") && resolvedPlanKey.includes("3d"));
+
+        const isFull3D =
+          resolvedPlanKey.includes("full 3d") ||
+          resolvedPlanKey.includes("full-3d") ||
+          resolvedPlanKey.includes("full_3d") ||
+          (resolvedPlanKey.includes("full") && resolvedPlanKey.includes("3d"));
+
+        const isGrowthPhotos =
+          resolvedPlanKey.includes("growth") ||
+          resolvedPlanKey.includes("growth-photos") ||
+          resolvedPlanKey.includes("growth photos") ||
+          resolvedPlanKey.includes("photo_menu_v1");
+
+        const isCustomMenu = rest.custom_plan_enabled === true;
+
+        let targetFile = "menu.html";
+        if (isSignature3D || isFull3D || isCustomMenu) {
+          targetFile = "signaturemenu.html";
+        } else if (isGrowthPhotos) {
+          targetFile = "menugrowth.html";
+        }
+
+        const currentFile = window.location.pathname.split("/").pop().toLowerCase();
+        if (currentFile !== targetFile) {
+          const targetUrl = new URL(`/${targetFile}`, window.location.origin);
+          targetUrl.searchParams.set("r", rest.slug || rest.id);
+          window.location.replace(targetUrl.href);
+          return;
         }
 
         // Three public template targets: Free, Growth, and one shared 3D template.
