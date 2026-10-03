@@ -2263,7 +2263,13 @@ function renderRestaurant(rest) {
         }
 
         const currentFile = window.location.pathname.split("/").pop().toLowerCase();
-        if (currentFile !== targetFile) {
+
+        // IMPORTANT:
+        // Free Starter is the default menu. When /menu/:slug is rewritten
+        // internally to menu.html, the browser can still report the clean
+        // /menu/:slug pathname. Never redirect Free Starter; otherwise the
+        // clean rewrite + client routing can create a reload loop.
+        if (targetFile !== "menu.html" && currentFile !== targetFile) {
           const targetUrl = new URL(`/${targetFile}`, window.location.origin);
           targetUrl.searchParams.set("r", rest.slug || rest.id);
           window.location.replace(targetUrl.href);
