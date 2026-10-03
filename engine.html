@@ -1,371 +1,606 @@
-<script>
-const SUPABASE_URL =
-  "https://pfsrpowopbrevocwsuii.supabase.co";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
 
-const SUPABASE_ANON_KEY =
-  "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
+  <title>FreeMenu</title>
 
-
-/* =========================================================
-   PLAN → TEMPLATE MAPPING
-   ========================================================= */
-
-const PLAN_TEMPLATES = {
-  "free-starter": "menu.html",
-  "growth-photos": "menugrowth.html",
-  "signature-3d": "signaturemenu.html",
-  "full-3d-experience": "signaturemenu.html"
-};
-
-
-/* =========================================================
-   OLD PLAN NAME COMPATIBILITY
-   ========================================================= */
-
-const LEGACY_PLAN_MAP = {
-  "free": "free-starter",
-  "starter": "free-starter",
-
-  "growth": "growth-photos",
-  "premium": "growth-photos",
-
-  "signature": "signature-3d",
-  "signature_3d": "signature-3d",
-
-  "full-3d": "full-3d-experience",
-  "full_3d": "full-3d-experience"
-};
-
-
-function canonicalPlanSlug(value) {
-  const slug = String(value || "")
-    .trim()
-    .toLowerCase();
-
-  return LEGACY_PLAN_MAP[slug] || slug;
-}
-
-
-/* =========================================================
-   GET RESTAURANT
-   ========================================================= */
-
-async function getRestaurant(slug) {
-
-  const { data, error } =
-    await supabaseClient
-      .from("restaurants")
-      .select(`
-        id,
-        name,
-        slug,
-        plan_id,
-        plan
-      `)
-      .eq("slug", slug)
-      .maybeSingle();
-
-  if (error) {
-    throw new Error(
-      "Restaurant lookup failed: " + error.message
-    );
-  }
-
-  if (!data) {
-    throw new Error("Restaurant not found.");
-  }
-
-  return data;
-}
-
-
-/* =========================================================
-   GET ASSIGNED PLAN
-   ========================================================= */
-
-async function getAssignedPlan(restaurant) {
-
-  /*
-   * PRIMARY SOURCE
-   * restaurants.plan_id
-   */
-
-  if (restaurant.plan_id) {
-
-    const { data, error } =
-      await supabaseClient
-        .from("plans")
-        .select(`
-          id,
-          name,
-          slug,
-          template_file,
-          qr_stickers_max,
-          signature_3d_dishes_max,
-          features,
-          is_active
-        `)
-        .eq("id", restaurant.plan_id)
-        .maybeSingle();
-
-    if (error) {
-      throw new Error(
-        "Plan lookup failed: " + error.message
-      );
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      background: #f6f7fb;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    if (data) {
-      return data;
-    }
-  }
-
-
-  /*
-   * LEGACY FALLBACK
-   *
-   * Only used if plan_id is missing or invalid.
-   */
-
-  const legacySlug =
-    canonicalPlanSlug(restaurant.plan);
-
-  if (legacySlug) {
-
-    const { data, error } =
-      await supabaseClient
-        .from("plans")
-        .select(`
-          id,
-          name,
-          slug,
-          template_file,
-          qr_stickers_max,
-          signature_3d_dishes_max,
-          features,
-          is_active
-        `)
-        .eq("slug", legacySlug)
-        .maybeSingle();
-
-    if (error) {
-      throw new Error(
-        "Legacy plan lookup failed: " +
-        error.message
-      );
+    .engine-loader {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      box-sizing: border-box;
     }
 
-    if (data) {
-      return data;
+    .engine-card {
+      width: min(420px, 100%);
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 20px;
+      padding: 24px;
+      box-sizing: border-box;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,.08);
     }
-  }
 
+    .engine-spinner {
+      width: 34px;
+      height: 34px;
+      margin: 0 auto 14px;
+      border: 3px solid #e5e7eb;
+      border-top-color: #111827;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
 
-  throw new Error(
-    "No plan is assigned to this restaurant."
-  );
-}
+    .engine-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+      color: #111827;
+    }
 
+    .engine-text {
+      margin: 7px 0 0;
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.5;
+    }
 
-/* =========================================================
-   RESOLVE TEMPLATE
-   ========================================================= */
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
 
-function resolveTemplate(plan) {
+<body>
 
-  const planSlug =
-    canonicalPlanSlug(plan?.slug);
+  <div class="engine-loader">
+    <div class="engine-card">
+      <div class="engine-spinner"></div>
 
-  /*
-   * First preference:
-   * template_file stored on plans table
-   */
+      <h1 class="engine-title">
+        Loading menu…
+      </h1>
 
-  if (
-    plan?.template_file &&
-    String(plan.template_file).trim()
-  ) {
-    return String(plan.template_file).trim();
-  }
-
-  /*
-   * Safe automatic fallback
-   */
-
-  const template =
-    PLAN_TEMPLATES[planSlug];
-
-  if (!template) {
-    throw new Error(
-      "No template configured for plan: " +
-      planSlug
-    );
-  }
-
-  return template;
-}
-
-
-/* =========================================================
-   REDIRECT
-   ========================================================= */
-
-async function routeRestaurant() {
-
-  const params =
-    new URLSearchParams(location.search);
-
-  const restaurantSlug =
-    String(
-      params.get("r") ||
-      params.get("slug") ||
-      ""
-    )
-      .trim()
-      .toLowerCase();
-
-
-  if (!restaurantSlug) {
-    throw new Error(
-      "Restaurant slug missing."
-    );
-  }
-
-
-  /* Restaurant */
-
-  const restaurant =
-    await getRestaurant(
-      restaurantSlug
-    );
-
-
-  /* Assigned plan */
-
-  const plan =
-    await getAssignedPlan(
-      restaurant
-    );
-
-
-  /* Template */
-
-  const template =
-    resolveTemplate(plan);
-
-
-  /*
-   * Expose settings for debugging
-   */
-
-  window.fmMenuSettings = {
-    restaurantId: restaurant.id,
-    restaurantSlug: restaurant.slug,
-
-    planId: plan.id,
-    planSlug: plan.slug,
-    planName: plan.name,
-
-    templateFile: template,
-
-    qrLimit:
-      Number(plan.qr_stickers_max) || 0,
-
-    arLimit:
-      Number(plan.signature_3d_dishes_max) || 0,
-
-    features:
-      Array.isArray(plan.features)
-        ? plan.features
-        : []
-  };
-
-
-  console.log(
-    "FreeMenu Plan Routing:",
-    window.fmMenuSettings
-  );
-
-
-  /*
-   * Final destination
-   */
-
-  const target =
-    new URL(
-      "/" + template,
-      location.origin
-    );
-
-  target.searchParams.set(
-    "r",
-    restaurant.slug
-  );
-
-
-  /*
-   * Replace current URL.
-   * No extra history entry.
-   */
-
-  window.location.replace(
-    target.toString()
-  );
-}
-
-
-/* =========================================================
-   START
-   ========================================================= */
-
-routeRestaurant().catch(error => {
-
-  console.error(
-    "FreeMenu Plan Engine Error:",
-    error
-  );
-
-  document.body.innerHTML = `
-    <div style="
-      min-height:100vh;
-      display:grid;
-      place-items:center;
-      padding:24px;
-      font-family:system-ui,sans-serif;
-      background:#f6f7fb;
-    ">
-      <div style="
-        width:min(520px,100%);
-        background:#fff;
-        border:1px solid #e5e7eb;
-        border-radius:20px;
-        padding:24px;
-        box-shadow:0 20px 60px #0001;
-      ">
-        <h2 style="margin:0 0 8px">
-          Menu Routing Error
-        </h2>
-
-        <p style="
-          color:#6b7280;
-          line-height:1.6;
-        ">
-          ${String(error.message || "Unknown error")
-            .replace(/[&<>"']/g, c => ({
-              "&":"&amp;",
-              "<":"&lt;",
-              ">":"&gt;",
-              '"':"&quot;",
-              "'":"&#39;"
-            }[c]))}
-        </p>
-      </div>
+      <p class="engine-text">
+        Please wait.
+      </p>
     </div>
-  `;
-});
-</script>
+  </div>
+
+
+  <!-- Supabase MUST load before engine script -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+  <script>
+    const SUPABASE_URL =
+      "https://pfsrpowopbrevocwsuii.supabase.co";
+
+    const SUPABASE_ANON_KEY =
+      "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+
+
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+      );
+
+
+    /* =========================================================
+       PLAN → TEMPLATE
+       THIS IS THE SOURCE OF TRUTH
+       ========================================================= */
+
+    const PLAN_TEMPLATES = {
+      "free-starter": "menu.html",
+
+      "growth-photos": "menugrowth.html",
+
+      "signature-3d": "signaturemenu.html",
+
+      "full-3d-experience": "signaturemenu.html"
+    };
+
+
+    /* =========================================================
+       OLD PLAN NAME COMPATIBILITY
+       ========================================================= */
+
+    const LEGACY_PLAN_MAP = {
+
+      "free":
+        "free-starter",
+
+      "starter":
+        "free-starter",
+
+      "growth":
+        "growth-photos",
+
+      "premium":
+        "growth-photos",
+
+      "growth-photos":
+        "growth-photos",
+
+      "signature":
+        "signature-3d",
+
+      "signature_3d":
+        "signature-3d",
+
+      "signature-3d":
+        "signature-3d",
+
+      "full-3d":
+        "full-3d-experience",
+
+      "full_3d":
+        "full-3d-experience",
+
+      "full-3d-experience":
+        "full-3d-experience"
+    };
+
+
+    function canonicalPlanSlug(value) {
+
+      const slug =
+        String(value || "")
+          .trim()
+          .toLowerCase();
+
+      return (
+        LEGACY_PLAN_MAP[slug] ||
+        slug
+      );
+    }
+
+
+    /* =========================================================
+       GET RESTAURANT
+       ========================================================= */
+
+    async function getRestaurant(slug) {
+
+      const { data, error } =
+        await supabaseClient
+          .from("restaurants")
+          .select(`
+            id,
+            name,
+            slug,
+            plan_id,
+            plan
+          `)
+          .eq("slug", slug)
+          .maybeSingle();
+
+
+      if (error) {
+
+        throw new Error(
+          "Restaurant lookup failed: " +
+          error.message
+        );
+      }
+
+
+      if (!data) {
+
+        throw new Error(
+          "Restaurant not found."
+        );
+      }
+
+
+      return data;
+    }
+
+
+    /* =========================================================
+       GET ASSIGNED PLAN
+       ========================================================= */
+
+    async function getAssignedPlan(restaurant) {
+
+      /*
+       * PRIMARY:
+       * restaurants.plan_id
+       */
+
+      if (restaurant.plan_id) {
+
+        const { data, error } =
+          await supabaseClient
+            .from("plans")
+            .select(`
+              id,
+              name,
+              slug,
+              qr_stickers_max,
+              signature_3d_dishes_max,
+              features,
+              is_active
+            `)
+            .eq("id", restaurant.plan_id)
+            .maybeSingle();
+
+
+        if (error) {
+
+          throw new Error(
+            "Plan lookup failed: " +
+            error.message
+          );
+        }
+
+
+        if (data) {
+
+          return data;
+        }
+      }
+
+
+      /*
+       * LEGACY FALLBACK
+       */
+
+      const legacySlug =
+        canonicalPlanSlug(
+          restaurant.plan
+        );
+
+
+      if (legacySlug) {
+
+        const { data, error } =
+          await supabaseClient
+            .from("plans")
+            .select(`
+              id,
+              name,
+              slug,
+              qr_stickers_max,
+              signature_3d_dishes_max,
+              features,
+              is_active
+            `)
+            .eq("slug", legacySlug)
+            .maybeSingle();
+
+
+        if (error) {
+
+          throw new Error(
+            "Legacy plan lookup failed: " +
+            error.message
+          );
+        }
+
+
+        if (data) {
+
+          return data;
+        }
+      }
+
+
+      throw new Error(
+        "No plan is assigned to this restaurant."
+      );
+    }
+
+
+    /* =========================================================
+       RESOLVE TEMPLATE
+       ========================================================= */
+
+    function resolveTemplate(plan) {
+
+      const planSlug =
+        canonicalPlanSlug(
+          plan?.slug
+        );
+
+
+      /*
+       * IMPORTANT:
+       *
+       * Do NOT use plans.template_file as the
+       * primary source.
+       *
+       * Template is automatically selected from
+       * the assigned plan.
+       */
+
+      const template =
+        PLAN_TEMPLATES[planSlug];
+
+
+      if (!template) {
+
+        throw new Error(
+          "No template configured for plan: " +
+          planSlug
+        );
+      }
+
+
+      return template;
+    }
+
+
+    /* =========================================================
+       ROUTE RESTAURANT
+       ========================================================= */
+
+    async function routeRestaurant() {
+
+      const params =
+        new URLSearchParams(
+          window.location.search
+        );
+
+
+      const restaurantSlug =
+        String(
+          params.get("r") ||
+          params.get("slug") ||
+          ""
+        )
+          .trim()
+          .toLowerCase();
+
+
+      if (!restaurantSlug) {
+
+        throw new Error(
+          "Restaurant slug missing."
+        );
+      }
+
+
+      /* -----------------------------------------
+         RESTAURANT
+         ----------------------------------------- */
+
+      const restaurant =
+        await getRestaurant(
+          restaurantSlug
+        );
+
+
+      /* -----------------------------------------
+         ASSIGNED PLAN
+         ----------------------------------------- */
+
+      const plan =
+        await getAssignedPlan(
+          restaurant
+        );
+
+
+      /* -----------------------------------------
+         TEMPLATE
+         ----------------------------------------- */
+
+      const template =
+        resolveTemplate(
+          plan
+        );
+
+
+      /* -----------------------------------------
+         DEBUG SETTINGS
+         ----------------------------------------- */
+
+      window.fmMenuSettings = {
+
+        restaurantId:
+          restaurant.id,
+
+        restaurantSlug:
+          restaurant.slug,
+
+        planId:
+          plan.id,
+
+        planSlug:
+          plan.slug,
+
+        planName:
+          plan.name,
+
+        templateFile:
+          template,
+
+        qrLimit:
+          Number(
+            plan.qr_stickers_max
+          ) || 0,
+
+        arLimit:
+          Number(
+            plan.signature_3d_dishes_max
+          ) || 0,
+
+        features:
+          Array.isArray(plan.features)
+            ? plan.features
+            : []
+      };
+
+
+      console.log(
+        "================================"
+      );
+
+      console.log(
+        "FreeMenu Plan Engine"
+      );
+
+      console.log(
+        "Restaurant:",
+        restaurant.name
+      );
+
+      console.log(
+        "Slug:",
+        restaurant.slug
+      );
+
+      console.log(
+        "Plan:",
+        plan.name
+      );
+
+      console.log(
+        "Plan Slug:",
+        plan.slug
+      );
+
+      console.log(
+        "Template:",
+        template
+      );
+
+      console.log(
+        "================================"
+      );
+
+
+      /* -----------------------------------------
+         FINAL URL
+         ----------------------------------------- */
+
+      const target =
+        new URL(
+          "/" + template,
+          window.location.origin
+        );
+
+
+      target.searchParams.set(
+        "r",
+        restaurant.slug
+      );
+
+
+      /*
+       * Example:
+       *
+       * Growth
+       * /menu/restaurant
+       *      ↓
+       * /engine.html?r=restaurant
+       *      ↓
+       * /menugrowth.html?r=restaurant
+       */
+
+
+      window.location.replace(
+        target.toString()
+      );
+    }
+
+
+    /* =========================================================
+       START ENGINE
+       ========================================================= */
+
+    routeRestaurant()
+      .catch(error => {
+
+        console.error(
+          "FreeMenu Plan Engine Error:",
+          error
+        );
+
+
+        const safeMessage =
+          String(
+            error?.message ||
+            "Unknown error"
+          )
+          .replace(
+            /[&<>"']/g,
+            c => ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;"
+            }[c])
+          );
+
+
+        document.body.innerHTML = `
+
+          <div style="
+            min-height:100vh;
+            display:grid;
+            place-items:center;
+            padding:24px;
+            box-sizing:border-box;
+            font-family:system-ui,-apple-system,
+              BlinkMacSystemFont,'Segoe UI',sans-serif;
+            background:#f6f7fb;
+          ">
+
+            <div style="
+              width:min(520px,100%);
+              background:#fff;
+              border:1px solid #e5e7eb;
+              border-radius:20px;
+              padding:24px;
+              box-sizing:border-box;
+              box-shadow:0 20px 60px rgba(0,0,0,.08);
+            ">
+
+              <h2 style="
+                margin:0 0 8px;
+                color:#111827;
+              ">
+                Menu Routing Error
+              </h2>
+
+              <p style="
+                margin:0;
+                color:#6b7280;
+                line-height:1.6;
+              ">
+                ${safeMessage}
+              </p>
+
+            </div>
+
+          </div>
+        `;
+      });
+  </script>
+
+</body>
+</html>
