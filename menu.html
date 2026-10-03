@@ -283,8 +283,6 @@
 
 
     /* Plan-gated public menu enhancements: additive only. */
-    .item-media{margin-top:10px;border-radius:14px;overflow:hidden;background:var(--surface-2,#f5f5f5)}
-    .item-media img{display:block;width:100%;height:190px;object-fit:cover}
     .item-ar{margin-top:10px;border-radius:14px;overflow:hidden;background:#f7f7f7}
     .item-ar model-viewer{width:100%;height:220px;background:transparent}
     .ar-actions{display:flex;gap:8px;padding:9px;flex-wrap:wrap}
@@ -751,22 +749,197 @@
 @media(max-width:650px){.hero-content{padding:16px!important;gap:12px!important}.hero-slogans,.hero-features{display:none!important}}
 </style>
 
+
+<style id="freemenu-clean-ui">
+  /* FreeMenu top branding */
+  .freemenu-nav{
+    height:68px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:0 4px;
+    margin:0 0 12px;
+    border-bottom:1px solid rgba(0,0,0,.07);
+  }
+  .freemenu-brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:0;
+  }
+  .freemenu-logo{
+    width:40px;
+    height:40px;
+    flex:0 0 40px;
+    color:var(--primary);
+    display:grid;
+    place-items:center;
+  }
+  .freemenu-logo svg{width:40px;height:40px;display:block}
+  .freemenu-name{
+    font-size:18px;
+    line-height:1;
+    font-weight:900;
+    letter-spacing:-.45px;
+    color:#171717;
+  }
+  .freemenu-label{
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.45px;
+    color:#8a8a84;
+    text-transform:uppercase;
+  }
+
+  /* Restaurant identity: left aligned, vertically centered */
+  .hero-content{
+    align-items:center;
+  }
+  .hero-info{
+    align-self:center;
+    text-align:left;
+  }
+  .hero-info .restaurant-name,
+  .hero-info .hero-welcome,
+  .hero-info .hero-tagline,
+  .hero-info .hero-subtitle,
+  .hero-info .hero-slogans{
+    text-align:left;
+  }
+  .hero-features,
+  .restaurant-meta{
+    justify-content:flex-start;
+  }
+
+  /* Portion selector: clear and compact */
+  .categoryHeadWithPrices{
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:12px;
+  }
+  .categoryTitleWrap{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    min-width:0;
+  }
+  .categoryPriceSwitch{
+    display:flex;
+    align-items:center;
+    gap:3px;
+    padding:3px;
+    flex:0 0 auto;
+    background:#f3f1ed;
+    border:1px solid #e2ddd5;
+    border-radius:999px;
+    box-shadow:inset 0 1px 2px rgba(0,0,0,.04);
+  }
+  .categoryPriceSwitch button{
+    min-width:52px;
+    border:0;
+    border-radius:999px;
+    padding:7px 9px;
+    background:transparent;
+    color:#77736c;
+    font-size:10px;
+    line-height:1;
+    font-weight:850;
+    cursor:pointer;
+    transition:background .18s ease,color .18s ease,box-shadow .18s ease;
+  }
+  .categoryPriceSwitch button:hover{
+    background:#fff;
+    color:var(--text);
+  }
+  .categoryPriceSwitch button.active{
+    background:var(--primary);
+    color:#fff;
+    box-shadow:0 3px 9px color-mix(in srgb,var(--primary) 22%,transparent);
+  }
+
+  /* Keep price columns visually aligned */
+  .single-price-area{display:flex;justify-content:flex-end}
+  .single-price{
+    font-size:14px!important;
+    font-weight:900!important;
+    text-align:center;
+  }
+
+  /* FreeMenu footer */
+  .freemenu-footer{
+    text-align:center;
+    padding:18px 16px 30px;
+    border-top:1px solid rgba(0,0,0,.06);
+    margin-top:4px;
+  }
+  .footer-freemenu{
+    color:var(--primary);
+    font-size:15px;
+    line-height:1;
+    font-weight:950;
+    letter-spacing:-.25px;
+  }
+  .footer-restaurant{
+    margin-top:6px;
+    color:#4a4a46;
+    font-size:13px;
+    line-height:1.2;
+    font-weight:800;
+  }
+  .freemenu-footer .footer-note{
+    padding:7px 0 0;
+  }
+
+  @media(max-width:640px){
+    .freemenu-nav{
+      height:60px;
+      padding:0 14px;
+      margin-bottom:8px;
+    }
+    .freemenu-logo,
+    .freemenu-logo svg{
+      width:36px;
+      height:36px;
+    }
+    .freemenu-name{font-size:16px}
+    .freemenu-label{font-size:9px}
+    .hero-content{align-items:center}
+    .hero-info{align-self:center}
+    .categoryHeadWithPrices{
+      align-items:center!important;
+    }
+    .categoryTitleWrap{
+      flex:1 1 auto;
+      min-width:0;
+    }
+    .categoryPriceSwitch{
+      gap:2px;
+    }
+    .categoryPriceSwitch button{
+      min-width:45px;
+      padding:6px 7px;
+      font-size:9px;
+    }
+  }
+</style>
+
 </head>
 <body>
   <div class="app-shell">
-
-
-    <nav class="site-nav" aria-label="Restaurant navigation">
-      <div class="site-brand">
-        <div class="site-brand-mark" id="site-brand-mark"></div>
-        <div class="site-brand-name" id="site-brand-name">Restaurant</div>
+    <nav class="site-nav freemenu-nav" aria-label="FreeMenu navigation">
+      <div class="freemenu-brand">
+        <span class="freemenu-logo" aria-hidden="true">
+          <svg viewBox="0 0 48 48" role="img">
+            <rect x="2" y="2" width="44" height="44" rx="13" fill="currentColor"/>
+            <path d="M14 12h21v5H19v5h14v5H19v9h-5V12Z" fill="#fff"/>
+          </svg>
+        </span>
+        <span class="freemenu-name">FreeMenu</span>
       </div>
-      <div class="site-nav-links">
-        <button class="site-nav-link" type="button" onclick="document.getElementById('menu-sections').scrollIntoView({behavior:'smooth'})">Menu</button>
-        <button class="site-nav-link" type="button" onclick="document.getElementById('service-strip').scrollIntoView({behavior:'smooth'})">About</button>
-        <a class="site-nav-link" id="site-contact-link" href="#">Contact</a>
-      </div>
+      <span class="freemenu-label">Digital Menu</span>
     </nav>
+
 
     <header class="hero" id="hero">
       <img id="rest-cover" class="hero-cover" alt="" style="display:none;" />
@@ -843,7 +1016,11 @@
     <main class="menu-wrap">
       <div id="summary-line" class="summary-line" style="display:none;"></div>
       <div id="menu-sections"></div>
-      <div class="footer-note">Digital menu • Prices may be subject to change</div>
+      <footer class="freemenu-footer">
+        <div class="footer-freemenu">FreeMenu</div>
+        <div class="footer-restaurant" id="footer-restaurant-name">Restaurant</div>
+        <div class="footer-note">Digital menu • Prices may be subject to change</div>
+      </footer>
     </main>
   </div>
 
@@ -952,6 +1129,59 @@
     }
 
 
+    function publicPlanSlug(){
+      return String(window.fmPublicPlan?.slug || window.fmPublicPlan?.name || "free-starter").trim().toLowerCase();
+    }
+    function publicPlanFeatures(){
+      const raw=window.fmPublicPlan?.features;
+      return Array.isArray(raw) ? raw.filter(x=>x && x.enabled !== false).map(x=>String(x.text||"").toLowerCase()) : [];
+    }
+    function publicPlanHasFeature(fragment){
+      const needle=String(fragment||"").toLowerCase();
+      return publicPlanFeatures().some(text=>text.includes(needle));
+    }
+    function publicPlanTier(){
+      const slug=publicPlanSlug();
+      if(slug.includes("full-3d")) return "full-3d-experience";
+      if(slug.includes("signature-3d") || slug.includes("signature")) return "signature-3d";
+      if(slug.includes("growth") || slug.includes("premium")) return "growth-photos";
+      return "free-starter";
+    }
+    function publicPlanAllowsPhotos(){
+      return publicPlanTier() !== "free-starter";
+    }
+    function publicPlanAllowsTags(){
+      return publicPlanHasFeature("bestseller") || publicPlanHasFeature("chef special") || publicPlanHasFeature("veg / non-veg / egg");
+    }
+    function publicPlanAllowsWhatsApp(){
+      return publicPlanHasFeature("whatsapp menu sharing");
+    }
+    function publicPlanArLimit(){
+      const p=window.fmPublicPlan;
+      if(!p) return 0;
+      const configured=Number(p.signature_3d_dishes_max);
+      if(Number.isFinite(configured) && configured>0) return configured;
+      return publicPlanTier()==="full-3d-experience" ? 15 : publicPlanTier()==="signature-3d" ? 5 : 0;
+    }
+    function publicPlanAllowsAR(item){
+      if(publicPlanArLimit()<=0) return false;
+      if(window.fmPublicArIds instanceof Set && item?.id != null) return window.fmPublicArIds.has(String(item.id));
+      return !!(item && (item.ar_model_url || item.ar_usdz_url) && item.ar_enabled !== false);
+    }
+
+    function renderItemAR(item){
+      if(!publicPlanAllowsAR(item)) return "";
+      const glb=item.ar_model_url || "";
+      const usdz=item.ar_usdz_url || "";
+      if(!glb && !usdz) return "";
+      return `<div class="item-ar">
+        <model-viewer src="${escapeHTML(glb)}" ${usdz?`ios-src="${escapeHTML(usdz)}"`:""} alt="${escapeHTML(item.name || "3D menu item")}" camera-controls auto-rotate ar ar-modes="webxr scene-viewer quick-look" loading="lazy" reveal="interaction"></model-viewer>
+        <div class="ar-actions">
+          <button type="button" data-ar-launch="${escapeHTML(item.id || "")}">View 3D / AR</button>
+        </div>
+      </div>`;
+    }
+
     function getItemType(item) {
       if (String(item.item_type || "").toLowerCase() === "egg") return "egg";
       if (String(item.item_type || "").toLowerCase() === "nonveg" || item.is_veg === false) return "nonveg";
@@ -980,6 +1210,11 @@
 
     function renderTags(item) {
       const tags = [];
+      if (publicPlanAllowsTags()) {
+        if (item.is_bestseller === true || item.bestseller === true) tags.push(`<span class="tag hot">★ Bestseller</span>`);
+        if (item.is_recommended === true || item.recommended === true) tags.push(`<span class="tag">Recommended</span>`);
+        if (item.is_spicy === true || item.spicy === true) tags.push(`<span class="tag hot">🌶 Spicy</span>`);
+      }
       if (isUnavailable(item)) tags.push(`<span class="tag out">Unavailable</span>`);
       return tags.length ? `<div class="item-tags">${tags.join("")}</div>` : "";
     }
@@ -999,7 +1234,6 @@
                 </div>
                 ${renderTags(item)}
                 ${item.description ? `<p class="item-desc">${escapeHTML(item.description)}</p>` : ""}
-                ${renderItemPhoto(item)}
                 ${renderItemAR(item)}
               </div>
               <div class="item-price-area">
@@ -1102,7 +1336,7 @@ function getSavedCategoryOrder(rest, items) {
         return `
         <section class="category-section" id="${sectionId(category)}" data-category="${escapeHTML(category)}">
           <div class="category-heading categoryHeadWithPrices">
-            <div style="display:flex;align-items:center;gap:9px;min-width:0">
+            <div class="categoryTitleWrap">
               <h2 class="category-title">${escapeHTML(category)}</h2>
               <span class="item-count">${items.length} item${items.length === 1 ? "" : "s"}</span>
             </div>
@@ -1138,6 +1372,8 @@ function getSavedCategoryOrder(rest, items) {
       $("rest-slogan1").textContent = rest.slogan_1 || "Good Food";
       $("rest-slogan2").textContent = rest.slogan_2 || "Good Mood";
       document.title = `${restaurantName} • Menu`;
+      const footerRestaurant = document.getElementById("footer-restaurant-name");
+      if (footerRestaurant) footerRestaurant.textContent = restaurantName;
       const brandName = document.getElementById("site-brand-name");
       if (brandName) brandName.textContent = rest.name || "Restaurant";
 
@@ -1182,8 +1418,15 @@ function getSavedCategoryOrder(rest, items) {
 
       const whatsappBtn=$("rest-whatsapp-btn");
       if(whatsappBtn){
-        whatsappBtn.style.display="none";
-        whatsappBtn.removeAttribute("href");
+        if(publicPlanAllowsWhatsApp()){
+          const shareUrl=window.location.href;
+          const message=`${restaurantName} — Digital Menu\n${shareUrl}`;
+          whatsappBtn.href=`https://wa.me/?text=${encodeURIComponent(message)}`;
+          whatsappBtn.style.display="grid";
+        }else{
+          whatsappBtn.style.display="none";
+          whatsappBtn.removeAttribute("href");
+        }
       }
 
       const address = rest.address || rest.location || rest.city;
@@ -1238,6 +1481,77 @@ function getSavedCategoryOrder(rest, items) {
 
         const rest = restaurants[0];
 
+        // Read the currently assigned plan, but NEVER redirect the public menu
+        // to a template that may not exist. The core menu engine must remain
+        // usable for every active restaurant/plan.
+        // Resolve the assigned plan. plan_id is the source of truth; the legacy
+        // restaurants.plan value is supported only as a backward-compatible fallback.
+        window.fmPublicPlan = null;
+        if (rest.plan_id) {
+          const { data: assignedPlan } = await supabaseClient
+            .from("plans")
+            .select("id,name,slug,plan_type,qr_stickers_max,signature_3d_dishes_max,features,is_active")
+            .eq("id", rest.plan_id)
+            .maybeSingle();
+          if (assignedPlan && assignedPlan.is_active !== false) {
+            window.fmPublicPlan = assignedPlan;
+            rest.public_plan = assignedPlan;
+          }
+        }
+
+        if (!window.fmPublicPlan) {
+          const legacy = String(rest.plan || "").trim().toLowerCase();
+          const legacyPlanMap = {
+            free: "free-starter",
+            starter: "free-starter",
+            "free-starter": "free-starter",
+            growth: "growth-photos",
+            premium: "growth-photos",
+            "growth-photos": "growth-photos",
+            signature: "signature-3d",
+            "signature-3d": "signature-3d",
+            signature_3d: "signature-3d",
+            "full-3d": "full-3d-experience",
+            "full_3d": "full-3d-experience",
+            "full-3d-experience": "full-3d-experience"
+          };
+          const legacySlug = legacyPlanMap[legacy];
+          if (legacySlug) {
+            const { data: legacyPlan } = await supabaseClient
+              .from("plans")
+              .select("id,name,slug,plan_type,qr_stickers_max,signature_3d_dishes_max,features,is_active")
+              .eq("slug", legacySlug)
+              .maybeSingle();
+            if (legacyPlan && legacyPlan.is_active !== false) {
+              window.fmPublicPlan = legacyPlan;
+              rest.public_plan = legacyPlan;
+            }
+          }
+        }
+
+        // Three public template targets: Free, Growth, and one shared 3D template.
+        // Signature 3D and Full 3D NEVER use separate public templates.
+        const planSlug = publicPlanSlug();
+        const template = publicPlanTier() === "free-starter"
+          ? "free"
+          : publicPlanTier() === "growth-photos"
+            ? "growth"
+            : "3d";
+        window.fmMenuSettings = {
+          template,
+          templateKey: template,
+          planSlug,
+          planName: window.fmPublicPlan?.name || "Free Starter",
+          qrLimit: Number(window.fmPublicPlan?.qr_stickers_max || 0),
+          foodTags: publicPlanAllowsTags(),
+          whatsapp: publicPlanAllowsWhatsApp(),
+          arLimit: publicPlanArLimit(),
+          shared3dTemplate: template === "3d",
+          plan: window.fmPublicPlan || null
+        };
+        document.documentElement.dataset.menuTemplate = template;
+        document.documentElement.dataset.menuPlan = planSlug;
+
         renderRestaurant(rest);
 
         const { data: items, error: itemsError } = await supabaseClient
@@ -1255,6 +1569,14 @@ function getSavedCategoryOrder(rest, items) {
           const bOrder = Number(b.sort_order ?? b.position ?? 999999);
           return aOrder - bOrder;
         });
+
+        // Enforce the assigned plan's public AR allowance without changing menu data.
+        const arLimit=publicPlanArLimit();
+        window.fmPublicArIds=new Set(
+          arLimit>0
+            ? allItems.filter(item=>item && (item.ar_model_url || item.ar_usdz_url) && item.ar_enabled !== false).slice(0,arLimit).map(item=>String(item.id))
+            : []
+        );
 
         if (!allItems.length) {
           $("category-chips").innerHTML = "";
