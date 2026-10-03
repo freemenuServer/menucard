@@ -2184,6 +2184,59 @@ function renderRestaurant(rest) {
           }
         }
 
+
+        /* =========================================================
+           PUBLIC MENU TEMPLATE ROUTING
+           Keep the existing menu UI/data logic intact.
+           The restaurant's assigned plan decides which public
+           template should be shown.
+        ========================================================== */
+        if (window.fmPublicPlan) {
+          const planKey = `${window.fmPublicPlan.slug || ""} ${window.fmPublicPlan.name || ""}`
+            .toLowerCase()
+            .trim();
+
+          const isSignature3D =
+            planKey.includes("signature 3d") ||
+            planKey.includes("signature-3d") ||
+            planKey.includes("signature_3d") ||
+            (planKey.includes("signature") && planKey.includes("3d"));
+
+          const isFull3D =
+            planKey.includes("full 3d") ||
+            planKey.includes("full-3d") ||
+            planKey.includes("full_3d") ||
+            (planKey.includes("full") && planKey.includes("3d"));
+
+          const isGrowthPhotos =
+            planKey.includes("growth") ||
+            planKey.includes("growth-photos") ||
+            planKey.includes("growth photos") ||
+            planKey.includes("photo_menu_v1");
+
+          const isCustomMenu = rest.custom_plan_enabled === true;
+
+          const currentFile = window.location.pathname
+            .split("/")
+            .pop()
+            .toLowerCase();
+
+          let targetFile = "menu.html";
+
+          if (isSignature3D || isFull3D || isCustomMenu) {
+            targetFile = "signaturemenu.html";
+          } else if (isGrowthPhotos) {
+            targetFile = "menugrowth.html";
+          }
+
+          if (currentFile !== targetFile) {
+            const targetUrl = new URL(`/${targetFile}`, window.location.origin);
+            targetUrl.searchParams.set("r", rest.slug || rest.id);
+            window.location.replace(targetUrl.href);
+            return;
+          }
+        }
+
         if (!window.fmPublicPlan) {
           const legacy = String(rest.plan || "").trim().toLowerCase();
           const legacyPlanMap = {
