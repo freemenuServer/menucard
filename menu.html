@@ -1319,6 +1319,8 @@ body::before{
     let currentCategory = "all";
     let currentFoodType = "all";
     let searchText = "";
+    let menuPlan = null;
+    let menuEntitlements = { foodTags:false, badges:false, photos:false, gallery:false, ar:false, signature3dMax:0, planName:"Free Starter", planType:"free" };
 
     const $ = (id) => document.getElementById(id);
 
@@ -1410,6 +1412,36 @@ body::before{
     }
 
 
+    function normalizePlanFeatures(features) {
+      if (!Array.isArray(features)) return [];
+      return features.map(x => typeof x === "string" ? x : (x?.text || ""))
+        .map(x => String(x).trim().toLowerCase()).filter(Boolean);
+    }
+
+    function featureHas(features, words) {
+      return features.some(f => words.some(w => f.includes(w)));
+    }
+
+    function buildMenuEntitlements(rest, plan) {
+      const custom = rest?.custom_plan_enabled === true;
+      const features = normalizePlanFeatures(custom ? rest.custom_features : plan?.features);
+      const signature3dMax = custom
+        ? Number(rest?.custom_signature_3d_dishes_max || 0)
+        : Number(plan?.signature_3d_dishes_max || 0);
+      const paid = custom || String(plan?.plan_type || "free").toLowerCase() === "paid";
+      menuEntitlements = {
+        foodTags: featureHas(features, ["veg / non-veg", "veg/non-veg", "veg / non veg", "food tag", "veg tags", "non-veg tags", "non veg tags"]),
+        badges: featureHas(features, ["bestseller", "chef special", "badges", "recommended"]),
+        photos: custom ? rest?.custom_photo_enabled === true : featureHas(features, ["photo", "photos", "hd image", "food image"]),
+        gallery: custom ? rest?.custom_gallery_enabled === true : featureHas(features, ["gallery"]),
+        ar: custom ? rest?.custom_ar_enabled === true : (signature3dMax > 0 || featureHas(features, ["3d", "ar"])),
+        signature3dMax: Number.isFinite(signature3dMax) ? signature3dMax : 0,
+        planName: custom ? (rest?.custom_plan_name || "Custom Menu") : (plan?.name || "Free Starter"),
+        planType: custom ? "custom" : String(plan?.plan_type || "free").toLowerCase(),
+        paid
+      };
+    }
+
     function getItemType(item) {
       if (String(item.item_type || "").toLowerCase() === "egg") return "egg";
       if (String(item.item_type || "").toLowerCase() === "nonveg" || item.is_veg === false) return "nonveg";
@@ -1450,9 +1482,11 @@ body::before{
 
     function renderTags(item) {
       const tags = [];
-      if (item.is_bestseller === true || item.bestseller === true) tags.push(`<span class="tag hot">★ Bestseller</span>`);
-      if (item.is_recommended === true || item.recommended === true) tags.push(`<span class="tag">Recommended</span>`);
-      if (item.is_spicy === true || item.spicy === true) tags.push(`<span class="tag hot">🌶 Spicy</span>`);
+      if (menuEntitlements.badges) {
+        if (item.is_bestseller === true || item.bestseller === true) tags.push(`<span class="tag hot">★ Bestseller</span>`);
+        if (item.is_recommended === true || item.recommended === true) tags.push(`<span class="tag">Recommended</span>`);
+        if (item.is_spicy === true || item.spicy === true) tags.push(`<span class="tag hot">🌶 Spicy</span>`);
+      }
       if (isUnavailable(item)) tags.push(`<span class="tag out">Unavailable</span>`);
       return tags.length ? `<div class="item-tags">${tags.join("")}</div>` : "";
     }
@@ -1467,7 +1501,7 @@ body::before{
             <div class="item-main-row">
               <div class="item-info">
                 <div class="item-topline">
-                  <span class="food-symbol ${type}" aria-label="${type}"></span>
+                  ${menuEntitlements.foodTags ? `<span class="food-symbol ${type}" aria-label="${type}"></span>` : ""}
                   <h3 class="item-name">${escapeHTML(item.name || "Unnamed item")}</h3>
                 </div>
                 ${renderTags(item)}
@@ -1545,11 +1579,16 @@ function getSavedCategoryOrder(rest, items) {
         if (type === "veg") counts.veg++;
         if (type === "nonveg") counts.nonveg++;
       });
-      $("food-filters").innerHTML = [
-        `<button class="food-filter ${currentFoodType === "all" ? "active" : ""}" data-food-type="all" type="button">All <span>${counts.all}</span></button>`,
-        `<button class="food-filter veg-filter ${currentFoodType === "veg" ? "active" : ""}" data-food-type="veg" type="button"><span class="filter-dot veg"></span> Veg <span>${counts.veg}</span></button>`,
-        `<button class="food-filter nonveg-filter ${currentFoodType === "nonveg" ? "active" : ""}" data-food-type="nonveg" type="button"><span class="filter-dot nonveg"></span> Non-Veg <span>${counts.nonveg}</span></button>`
-      ].join("");
+      const buttons = [
+        `<button class="food-filter ${currentFoodType === "all" ? "active" : ""}" data-food-type="all" type="button">All</button>`
+      ];
+      if (menuEntitlements.foodTags) {
+        if (counts.veg) buttons.push(`<button class="food-filter veg-filter ${currentFoodType === "veg" ? "active" : ""}" data-food-type="veg" type="button"><span class="filter-dot veg"></span> Veg</button>`);
+        if (counts.nonveg) buttons.push(`<button class="food-filter nonveg-filter ${currentFoodType === "nonveg" ? "active" : ""}" data-food-type="nonveg" type="button"><span class="filter-dot nonveg"></span> Non-Veg</button>`);
+      } else if (currentFoodType !== "all") {
+        currentFoodType = "all";
+      }
+      $("food-filters").innerHTML = buttons.join("");
     }
 
     function renderMenu() {
@@ -1778,6 +1817,36 @@ function getSavedCategoryOrder(rest, items) {
         }
 
         const rest = restaurants[0];
+
+        // Public menu must use the restaurant's currently assigned plan.
+        // Custom Menu takes priority; otherwise resolve restaurants.plan_id.
+        if (rest.custom_plan_enabled === true) {
+          menuPlan = {
+            name: rest.custom_plan_name || "Custom Menu",
+            plan_type: "custom",
+            features: Array.isArray(rest.custom_features) ? rest.custom_features : [],
+            signature_3d_dishes_max: Number(rest.custom_signature_3d_dishes_max || 0)
+          };
+        } else {
+          let planResult = rest.plan_id
+            ? await supabaseClient.from("plans").select("*").eq("id", rest.plan_id).maybeSingle()
+            : { data: null, error: null };
+          if (planResult.error) throw planResult.error;
+          if (!planResult.data) {
+            const freeResult = await supabaseClient.from("plans").select("*").eq("plan_type", "free").eq("is_active", true).order("sort_order", { ascending:true }).limit(1).maybeSingle();
+            if (freeResult.error) throw freeResult.error;
+            planResult = freeResult;
+          }
+          menuPlan = planResult.data || { name:"Free Starter", plan_type:"free", features:[], signature_3d_dishes_max:0 };
+        }
+
+        // Expired assignments are treated as Free Starter on the public side too.
+        if (rest.plan_expires_at && new Date(rest.plan_expires_at).getTime() < Date.now()) {
+          const freeResult = await supabaseClient.from("plans").select("*").eq("plan_type", "free").eq("is_active", true).order("sort_order", { ascending:true }).limit(1).maybeSingle();
+          if (!freeResult.error && freeResult.data) menuPlan = freeResult.data;
+        }
+        buildMenuEntitlements(rest, menuPlan);
+
         try {
           if (rest.slug) sessionStorage.setItem("fm_current_menu_slug", String(rest.slug).trim());
         } catch (_) {}
