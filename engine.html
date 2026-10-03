@@ -4,182 +4,1060 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FreeMenu — Plan Engine</title>
+
 <style>
-:root{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:#111827;background:#f6f7fb}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px}
-.card{width:min(920px,100%);background:#fff;border:1px solid #e5e7eb;border-radius:22px;padding:28px;box-shadow:0 18px 60px #11182712}
-h1{margin:0 0 6px;font-size:28px}.muted{color:#6b7280}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}.box{border:1px solid #e5e7eb;border-radius:16px;padding:16px}.k{font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:.06em}.v{font-size:20px;font-weight:750;margin-top:5px}.pill{display:inline-block;border:1px solid #dbe3ef;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700;margin:4px 4px 0 0}.ok{background:#ecfdf3;color:#067647;border-color:#abefc6}.warn{background:#fffaeb;color:#b54708;border-color:#fedf89}.error{background:#fef3f2;color:#b42318;border-color:#fecdca}pre{background:#0b1020;color:#d7e1ff;border-radius:14px;padding:16px;overflow:auto;font-size:12px;line-height:1.55}button{border:0;border-radius:12px;padding:11px 16px;background:#111827;color:#fff;font-weight:700;cursor:pointer}button.secondary{background:#eef2f7;color:#111827}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}@media(max-width:700px){.grid{grid-template-columns:1fr}}
+:root{
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  color:#111827;
+  background:#f6f7fb;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:24px;
+}
+
+.card{
+  width:min(920px,100%);
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:22px;
+  padding:28px;
+  box-shadow:0 18px 60px #11182712;
+}
+
+h1{
+  margin:0 0 6px;
+  font-size:28px;
+}
+
+.muted{
+  color:#6b7280;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin:22px 0;
+}
+
+.box{
+  border:1px solid #e5e7eb;
+  border-radius:16px;
+  padding:16px;
+}
+
+.k{
+  font-size:12px;
+  color:#6b7280;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+}
+
+.v{
+  font-size:20px;
+  font-weight:750;
+  margin-top:5px;
+}
+
+.pill{
+  display:inline-block;
+  border:1px solid #dbe3ef;
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:12px;
+  font-weight:700;
+  margin:4px 4px 0 0;
+}
+
+.ok{
+  background:#ecfdf3;
+  color:#067647;
+  border-color:#abefc6;
+}
+
+.warn{
+  background:#fffaeb;
+  color:#b54708;
+  border-color:#fedf89;
+}
+
+.error{
+  background:#fef3f2;
+  color:#b42318;
+  border-color:#fecdca;
+}
+
+pre{
+  background:#0b1020;
+  color:#d7e1ff;
+  border-radius:14px;
+  padding:16px;
+  overflow:auto;
+  font-size:12px;
+  line-height:1.55;
+}
+
+button{
+  border:0;
+  border-radius:12px;
+  padding:11px 16px;
+  background:#111827;
+  color:#fff;
+  font-weight:700;
+  cursor:pointer;
+}
+
+button.secondary{
+  background:#eef2f7;
+  color:#111827;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+@media(max-width:700px){
+  .grid{
+    grid-template-columns:1fr;
+  }
+}
 </style>
 </head>
+
 <body>
+
 <main class="card">
+
   <h1>FreeMenu Plan Engine</h1>
-  <div id="status" class="muted">Resolving restaurant plan…</div>
+
+  <div id="status" class="muted">
+    Resolving restaurant plan…
+  </div>
+
   <div id="content"></div>
+
 </main>
+
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
+
 /* =========================================================
-   FREEMENU — STANDALONE PLAN / TEMPLATE ENGINE
-   File: menu-plan-engine.html
-   Usage: /menu-plan-engine.html?r=restaurant-slug
+   FREEMENU PLAN ENGINE
+   =========================================================
+
+   URL:
+
+   /menu-plan-engine.html?r=restaurant-slug
+
+
+   PLAN ROUTING:
+
+   free-starter
+      → menu.html
+
+   growth-photos
+      → menugrowth.html
+
+   signature-3d
+      → signaturemenu.html
+
+   full-3d-experience
+      → signaturemenu.html
+
 
    IMPORTANT:
-   - menu.html is NOT modified by this file.
-   - Signature 3D + Full 3D use the SAME shared 3D template key.
-   - Put the real template filenames in TEMPLATE_PATHS when ready.
-   ========================================================= */
 
-const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
-const SUPABASE_ANON_KEY = "YOUR-SUPABASE-ANON-KEY";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+   Signature 3D + Full 3D use the SAME
+   signaturemenu.html template.
 
-/* Replace ONLY these values if/when your real template filenames are known. */
+   Their difference comes from:
+
+   signature_3d_dishes_max
+
+   Signature 3D = 5
+   Full 3D = 15
+========================================================= */
+
+
+/* =========================================================
+   SUPABASE CONFIG
+========================================================= */
+
+const SUPABASE_URL =
+  "https://pfsrpowopbrevocwsuii.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+/* =========================================================
+   PLAN → TEMPLATE ROUTING
+========================================================= */
+
 const TEMPLATE_PATHS = {
-  free: "",       // e.g. /free-template.html
-  growth: "",     // e.g. /growth-template.html
-  threeD: ""      // shared Signature + Full 3D template, e.g. /3d-template.html
+
+  "free-starter":
+    "menu.html",
+
+  "growth-photos":
+    "menugrowth.html",
+
+  "signature-3d":
+    "signaturemenu.html",
+
+  "full-3d-experience":
+    "signaturemenu.html"
+
 };
+
+
+/* =========================================================
+   LEGACY PLAN MAP
+========================================================= */
 
 const LEGACY_PLAN_MAP = {
-  free:"free-starter", starter:"free-starter", "free-starter":"free-starter",
-  growth:"growth-photos", premium:"growth-photos", "growth-photos":"growth-photos",
-  signature:"signature-3d", "signature-3d":"signature-3d", signature_3d:"signature-3d",
-  "full-3d":"full-3d-experience", "full_3d":"full-3d-experience", "full-3d-experience":"full-3d-experience"
+
+  free:
+    "free-starter",
+
+  starter:
+    "free-starter",
+
+  "free-starter":
+    "free-starter",
+
+  growth:
+    "growth-photos",
+
+  premium:
+    "growth-photos",
+
+  "growth-photos":
+    "growth-photos",
+
+  signature:
+    "signature-3d",
+
+  "signature-3d":
+    "signature-3d",
+
+  signature_3d:
+    "signature-3d",
+
+  "full-3d":
+    "full-3d-experience",
+
+  "full_3d":
+    "full-3d-experience",
+
+  "full-3d-experience":
+    "full-3d-experience"
+
 };
 
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
 function canonicalSlug(value){
-  const s=String(value||"").trim().toLowerCase();
-  return LEGACY_PLAN_MAP[s] || s || "free-starter";
+
+  const s =
+    String(value || "")
+      .trim()
+      .toLowerCase();
+
+  return (
+    LEGACY_PLAN_MAP[s] ||
+    s ||
+    "free-starter"
+  );
 }
-function templateKey(slug){
-  const s=canonicalSlug(slug);
-  if(s==="free-starter") return "free";
-  if(s==="growth-photos") return "growth";
-  if(s==="signature-3d" || s==="full-3d-experience") return "3d";
-  return "free";
+
+
+function numberOr(value, fallback = 0){
+
+  const n = Number(value);
+
+  return Number.isFinite(n)
+    ? n
+    : fallback;
 }
-function numberOr(value,fallback=0){const n=Number(value);return Number.isFinite(n)?n:fallback}
+
+
 function featureTexts(plan){
+
   return Array.isArray(plan?.features)
-    ? plan.features.filter(x=>x && x.enabled!==false).map(x=>String(x.text||""))
+
+    ? plan.features
+        .filter(x => x && x.enabled !== false)
+        .map(x => String(x.text || ""))
+
     : [];
 }
-function hasFeature(plan,needle){
-  const n=String(needle||"").toLowerCase();
-  return featureTexts(plan).some(x=>x.toLowerCase().includes(n));
+
+
+function hasFeature(plan, needle){
+
+  const n =
+    String(needle || "")
+      .toLowerCase();
+
+  return featureTexts(plan)
+    .some(text =>
+      text.toLowerCase().includes(n)
+    );
 }
-function buildSettings(plan,restaurant){
-  const slug=canonicalSlug(plan?.slug || restaurant?.plan);
-  const key=templateKey(slug);
-  const arLimit=numberOr(plan?.signature_3d_dishes_max,0);
+
+
+/* =========================================================
+   BUILD PUBLIC MENU SETTINGS
+========================================================= */
+
+function buildSettings(plan, restaurant){
+
+  const slug =
+    canonicalSlug(
+      plan?.slug ||
+      restaurant?.plan
+    );
+
+
+  const templatePath =
+    TEMPLATE_PATHS[slug] ||
+    TEMPLATE_PATHS["free-starter"];
+
+
+  const arLimit =
+    numberOr(
+      plan?.signature_3d_dishes_max,
+      0
+    );
+
+
   return {
-    restaurantId: restaurant?.id || null,
-    restaurantSlug: restaurant?.slug || null,
-    planId: plan?.id || null,
-    planSlug: slug,
-    planName: plan?.name || "Free Starter",
-    template:key,
-    templateKey:key,
-    templatePath:TEMPLATE_PATHS[key==="3d"?"threeD":key] || "",
-    shared3dTemplate:key==="3d",
-    qrLimit:numberOr(plan?.qr_stickers_max,0),
-    arLimit:arLimit,
-    photos:slug!=="free-starter",
-    foodTags:hasFeature(plan,"bestseller") || hasFeature(plan,"chef special") || hasFeature(plan,"veg / non-veg / egg"),
-    whatsapp:hasFeature(plan,"whatsapp menu sharing"),
-    features:featureTexts(plan),
-    plan:plan || null
+
+    restaurantId:
+      restaurant?.id || null,
+
+    restaurantSlug:
+      restaurant?.slug || null,
+
+    planId:
+      plan?.id || null,
+
+    planSlug:
+      slug,
+
+    planName:
+      plan?.name || "Free Starter",
+
+    templatePath:
+      templatePath,
+
+    templateKey:
+      templatePath,
+
+    qrLimit:
+      numberOr(
+        plan?.qr_stickers_max,
+        0
+      ),
+
+    arLimit:
+      arLimit,
+
+    photos:
+      slug !== "free-starter",
+
+    foodTags:
+      hasFeature(
+        plan,
+        "bestseller"
+      ) ||
+      hasFeature(
+        plan,
+        "chef special"
+      ) ||
+      hasFeature(
+        plan,
+        "veg / non-veg / egg"
+      ),
+
+    whatsapp:
+      hasFeature(
+        plan,
+        "whatsapp menu sharing"
+      ),
+
+    shared3dTemplate:
+      slug === "signature-3d" ||
+      slug === "full-3d-experience",
+
+    features:
+      featureTexts(plan),
+
+    plan:
+      plan || null
+
   };
+
 }
+
+
+/* =========================================================
+   LOAD RESTAURANT
+========================================================= */
 
 async function loadRestaurant(slug){
-  const {data,error}=await supabaseClient.from("restaurants").select("*").eq("slug",slug).limit(1);
-  if(error) throw error;
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("restaurants")
+      .select("*")
+      .eq("slug", slug)
+      .limit(1);
+
+
+  if(error){
+    throw error;
+  }
+
+
   return data?.[0] || null;
+
 }
+
+
+/* =========================================================
+   LOAD PLAN
+
+   PRIORITY:
+
+   1. restaurants.plan_id
+   2. restaurants.plan legacy fallback
+========================================================= */
+
 async function loadPlan(restaurant){
+
+  /* -----------------------------------------
+     1. PLAN ID — SOURCE OF TRUTH
+  ----------------------------------------- */
+
   if(restaurant?.plan_id){
-    const {data,error}=await supabaseClient.from("plans")
-      .select("id,name,slug,plan_type,qr_stickers_max,signature_3d_dishes_max,features,is_active")
-      .eq("id",restaurant.plan_id).maybeSingle();
-    if(error) console.warn("Assigned plan lookup:",error.message);
-    if(data && data.is_active!==false) return data;
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from("plans")
+        .select(`
+          id,
+          name,
+          slug,
+          plan_type,
+          template_file,
+          qr_stickers_max,
+          signature_3d_dishes_max,
+          features,
+          is_active
+        `)
+        .eq(
+          "id",
+          restaurant.plan_id
+        )
+        .maybeSingle();
+
+
+    if(error){
+
+      console.warn(
+        "Assigned plan lookup:",
+        error.message
+      );
+
+    }
+
+
+    if(
+      data &&
+      data.is_active !== false
+    ){
+
+      return data;
+
+    }
+
   }
-  const legacy=canonicalSlug(restaurant?.plan);
+
+
+  /* -----------------------------------------
+     2. LEGACY PLAN FALLBACK
+  ----------------------------------------- */
+
+  const legacy =
+    canonicalSlug(
+      restaurant?.plan
+    );
+
+
   if(legacy){
-    const {data,error}=await supabaseClient.from("plans")
-      .select("id,name,slug,plan_type,qr_stickers_max,signature_3d_dishes_max,features,is_active")
-      .eq("slug",legacy).maybeSingle();
-    if(error) console.warn("Legacy plan lookup:",error.message);
-    if(data && data.is_active!==false) return data;
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from("plans")
+        .select(`
+          id,
+          name,
+          slug,
+          plan_type,
+          template_file,
+          qr_stickers_max,
+          signature_3d_dishes_max,
+          features,
+          is_active
+        `)
+        .eq(
+          "slug",
+          legacy
+        )
+        .maybeSingle();
+
+
+    if(error){
+
+      console.warn(
+        "Legacy plan lookup:",
+        error.message
+      );
+
+    }
+
+
+    if(
+      data &&
+      data.is_active !== false
+    ){
+
+      return data;
+
+    }
+
   }
+
+
   return null;
+
 }
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeHtml(value){
+
+  return String(value)
+    .replace(
+      /[&<>"']/g,
+      character => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#39;"
+      }[character])
+    );
+
+}
+
+
+/* =========================================================
+   RENDER ENGINE STATUS
+========================================================= */
 
 function render(settings){
-  window.fmMenuSettings=settings;
-  document.documentElement.dataset.menuTemplate=settings.templateKey;
-  document.documentElement.dataset.menuPlan=settings.planSlug;
 
-  const path=settings.templatePath;
-  document.getElementById("status").innerHTML=`<span class="pill ok">PLAN RESOLVED</span> <span class="pill">${settings.planName}</span>`;
-  document.getElementById("content").innerHTML=`
+  window.fmMenuSettings =
+    settings;
+
+
+  document.documentElement
+    .dataset.menuPlan =
+      settings.planSlug;
+
+
+  document.documentElement
+    .dataset.menuTemplate =
+      settings.templatePath;
+
+
+  document.getElementById(
+    "status"
+  ).innerHTML = `
+
+    <span class="pill ok">
+      PLAN RESOLVED
+    </span>
+
+    <span class="pill">
+      ${escapeHtml(settings.planName)}
+    </span>
+
+  `;
+
+
+  document.getElementById(
+    "content"
+  ).innerHTML = `
+
     <div class="grid">
-      <div class="box"><div class="k">Template</div><div class="v">${settings.templateKey}</div></div>
-      <div class="box"><div class="k">QR limit</div><div class="v">${settings.qrLimit}</div></div>
-      <div class="box"><div class="k">3D / AR dishes</div><div class="v">${settings.arLimit || "—"}</div></div>
-    </div>
-    <div class="box">
-      <div class="k">Feature settings</div>
-      <div>
-        <span class="pill ${settings.photos?'ok':'warn'}">Photos: ${settings.photos?'ON':'OFF'}</span>
-        <span class="pill ${settings.foodTags?'ok':'warn'}">Food Tags: ${settings.foodTags?'ON':'OFF'}</span>
-        <span class="pill ${settings.whatsapp?'ok':'warn'}">WhatsApp: ${settings.whatsapp?'ON':'OFF'}</span>
-        <span class="pill ${settings.shared3dTemplate?'ok':'warn'}">Shared 3D: ${settings.shared3dTemplate?'YES':'NO'}</span>
-      </div>
-    </div>
-    <div style="margin-top:18px"><div class="k">Resolved settings</div><pre>${escapeHtml(JSON.stringify(settings,null,2))}</pre></div>
-    <div class="actions">
-      ${path ? `<button id="openTemplate">Open resolved template</button>` : `<span class="pill warn">Template path not configured — engine will not guess or redirect.</span>`}
-      <button class="secondary" id="copySettings">Copy settings JSON</button>
-    </div>`;
 
-  document.getElementById("copySettings")?.addEventListener("click",async()=>{
-    await navigator.clipboard.writeText(JSON.stringify(settings,null,2));
-    document.getElementById("copySettings").textContent="Copied";
-  });
-  document.getElementById("openTemplate")?.addEventListener("click",()=>{
-    const url=new URL(path,location.origin);
-    url.searchParams.set("r",settings.restaurantSlug||"");
-    location.replace(url.toString());
-  });
+      <div class="box">
+
+        <div class="k">
+          Template
+        </div>
+
+        <div class="v">
+          ${escapeHtml(
+            settings.templatePath
+          )}
+        </div>
+
+      </div>
+
+
+      <div class="box">
+
+        <div class="k">
+          QR Limit
+        </div>
+
+        <div class="v">
+          ${settings.qrLimit}
+        </div>
+
+      </div>
+
+
+      <div class="box">
+
+        <div class="k">
+          3D / AR Dishes
+        </div>
+
+        <div class="v">
+          ${
+            settings.arLimit ||
+            "—"
+          }
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="box">
+
+      <div class="k">
+        Feature Settings
+      </div>
+
+      <div>
+
+        <span class="pill ${
+          settings.photos
+            ? "ok"
+            : "warn"
+        }">
+          Photos:
+          ${
+            settings.photos
+              ? "ON"
+              : "OFF"
+          }
+        </span>
+
+
+        <span class="pill ${
+          settings.foodTags
+            ? "ok"
+            : "warn"
+        }">
+          Food Tags:
+          ${
+            settings.foodTags
+              ? "ON"
+              : "OFF"
+          }
+        </span>
+
+
+        <span class="pill ${
+          settings.whatsapp
+            ? "ok"
+            : "warn"
+        }">
+          WhatsApp:
+          ${
+            settings.whatsapp
+              ? "ON"
+              : "OFF"
+          }
+        </span>
+
+
+        <span class="pill ${
+          settings.shared3dTemplate
+            ? "ok"
+            : "warn"
+        }">
+          Shared 3D:
+          ${
+            settings.shared3dTemplate
+              ? "YES"
+              : "NO"
+          }
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div style="margin-top:18px">
+
+      <div class="k">
+        Resolved Settings
+      </div>
+
+      <pre>${escapeHtml(
+        JSON.stringify(
+          settings,
+          null,
+          2
+        )
+      )}</pre>
+
+    </div>
+
+
+    <div class="actions">
+
+      <button
+        id="openTemplate"
+      >
+        Open resolved template
+      </button>
+
+
+      <button
+        class="secondary"
+        id="copySettings"
+      >
+        Copy settings JSON
+      </button>
+
+    </div>
+
+  `;
+
+
+  /* =========================================
+     COPY SETTINGS
+  ========================================= */
+
+  document
+    .getElementById(
+      "copySettings"
+    )
+    ?.addEventListener(
+      "click",
+      async () => {
+
+        await navigator.clipboard
+          .writeText(
+            JSON.stringify(
+              settings,
+              null,
+              2
+            )
+          );
+
+
+        document.getElementById(
+          "copySettings"
+        ).textContent =
+          "Copied";
+
+      }
+    );
+
+
+  /* =========================================
+     MANUAL OPEN
+  ========================================= */
+
+  document
+    .getElementById(
+      "openTemplate"
+    )
+    ?.addEventListener(
+      "click",
+      () => {
+
+        const url =
+          new URL(
+            settings.templatePath,
+            location.origin
+          );
+
+
+        url.searchParams.set(
+          "r",
+          settings.restaurantSlug || ""
+        );
+
+
+        location.replace(
+          url.toString()
+        );
+
+      }
+    );
+
 }
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+
+/* =========================================================
+   ENGINE INIT
+========================================================= */
 
 (async function init(){
+
   try{
-    const params=new URLSearchParams(location.search);
-    const slug=String(params.get("r")||params.get("slug")||"").trim().toLowerCase();
-    if(!slug) throw new Error("Restaurant slug missing. Open this page as /menu-plan-engine.html?r=restaurant-slug");
-    const restaurant=await loadRestaurant(slug);
-    if(!restaurant) throw new Error("Restaurant not found.");
-    const plan=await loadPlan(restaurant);
-    if(!plan) throw new Error("Assigned plan could not be resolved.");
-    const settings=buildSettings(plan,restaurant);
+
+    /* -----------------------------------------
+       GET RESTAURANT SLUG
+    ----------------------------------------- */
+
+    const params =
+      new URLSearchParams(
+        location.search
+      );
+
+
+    const slug =
+      String(
+        params.get("r") ||
+        params.get("slug") ||
+        ""
+      )
+      .trim()
+      .toLowerCase();
+
+
+    if(!slug){
+
+      throw new Error(
+        "Restaurant slug missing."
+      );
+
+    }
+
+
+    /* -----------------------------------------
+       RESTAURANT
+    ----------------------------------------- */
+
+    const restaurant =
+      await loadRestaurant(
+        slug
+      );
+
+
+    if(!restaurant){
+
+      throw new Error(
+        "Restaurant not found."
+      );
+
+    }
+
+
+    /* -----------------------------------------
+       PLAN
+    ----------------------------------------- */
+
+    const plan =
+      await loadPlan(
+        restaurant
+      );
+
+
+    if(!plan){
+
+      throw new Error(
+        "Assigned plan could not be resolved."
+      );
+
+    }
+
+
+    /* -----------------------------------------
+       BUILD SETTINGS
+    ----------------------------------------- */
+
+    const settings =
+      buildSettings(
+        plan,
+        restaurant
+      );
+
+
+    /* -----------------------------------------
+       SAFETY CHECK
+    ----------------------------------------- */
+
+    if(
+      !settings.templatePath
+    ){
+
+      throw new Error(
+        "No template is configured for this plan."
+      );
+
+    }
+
+
+    /* -----------------------------------------
+       SAVE SETTINGS
+    ----------------------------------------- */
+
+    window.fmMenuSettings =
+      settings;
+
+
+    /* -----------------------------------------
+       REDIRECT TO REAL MENU
+    ----------------------------------------- */
+
+    const target =
+      new URL(
+        settings.templatePath,
+        location.origin
+      );
+
+
+    target.searchParams.set(
+      "r",
+      slug
+    );
+
+
+    /*
+      Small delay so the engine can
+      resolve cleanly before redirect.
+    */
+
+    window.setTimeout(
+      () => {
+
+        window.location.replace(
+          target.toString()
+        );
+
+      },
+      100
+    );
+
+
+    /* -----------------------------------------
+       ALSO RENDER STATUS
+    ----------------------------------------- */
+
     render(settings);
 
-    // ENGINE ROUTING: once the plan is resolved, immediately open the real
-    // public template. The engine itself is never the final customer page.
-    const target=new URL(settings.templatePath,location.origin);
-    target.searchParams.set("r",slug);
-    window.setTimeout(()=>window.location.replace(target.toString()),80);
+
   }catch(error){
-    console.error(error);
-    document.getElementById("status").innerHTML='<span class="pill error">ENGINE ERROR</span>';
-    document.getElementById("content").innerHTML=`<div class="box"><b>${escapeHtml(error.message||"Unknown error")}</b><p class="muted">Check the restaurant slug, Supabase configuration, and plans SELECT/RLS policy.</p></div>`;
+
+    console.error(
+      "FreeMenu Plan Engine Error:",
+      error
+    );
+
+
+    document.getElementById(
+      "status"
+    ).innerHTML = `
+
+      <span class="pill error">
+        ENGINE ERROR
+      </span>
+
+    `;
+
+
+    document.getElementById(
+      "content"
+    ).innerHTML = `
+
+      <div class="box">
+
+        <b>
+          ${escapeHtml(
+            error.message ||
+            "Unknown error"
+          )}
+        </b>
+
+
+        <p class="muted">
+
+          Check the restaurant slug,
+          Supabase configuration,
+          restaurants.plan_id,
+          plans table,
+          and RLS policies.
+
+        </p>
+
+      </div>
+
+    `;
+
   }
+
 })();
+
 </script>
+
 </body>
 </html>
