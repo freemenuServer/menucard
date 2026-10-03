@@ -1234,6 +1234,204 @@
   }
 </style>
 
+
+<style id="freemenu-mobile-category-icons">
+  .cat-chip-icon{display:none}
+  @media(max-width:700px){
+    .category-scroll{
+      gap:10px!important;
+      padding:9px 10px calc(9px + env(safe-area-inset-bottom))!important;
+    }
+    .cat-chip{
+      min-width:68px;
+      min-height:58px;
+      padding:7px 10px!important;
+      border-radius:14px!important;
+      display:flex!important;
+      flex-direction:column!important;
+      align-items:center!important;
+      justify-content:center!important;
+      gap:4px!important;
+      text-align:center;
+    }
+    .cat-chip-icon{
+      display:flex;
+      width:21px;
+      height:21px;
+      align-items:center;
+      justify-content:center;
+      opacity:.9;
+    }
+    .cat-chip-icon svg{
+      width:20px;
+      height:20px;
+      fill:none;
+      stroke:currentColor;
+      stroke-width:1.7;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+    .cat-chip-label{
+      white-space:nowrap;
+      font-size:11px;
+      line-height:1.05;
+      max-width:92px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+  }
+</style>
+
+
+<style id="freemenu-price-row-layout">
+  /* Portion selector stays in one horizontal row. */
+  .categoryPriceSwitch{
+    display:inline-flex!important;
+    flex-wrap:nowrap!important;
+    white-space:nowrap!important;
+    flex:0 0 auto!important;
+  }
+  .categoryPriceSwitch button{
+    flex:0 0 auto!important;
+  }
+
+  /* Item price sits directly below the item-name row, not beside it. */
+  .item-main-row{
+    display:block!important;
+  }
+  .item-info{
+    width:100%;
+    min-width:0;
+  }
+  .item-price-area{
+    width:100%;
+    margin-top:4px;
+    display:flex!important;
+    justify-content:flex-start!important;
+    align-items:center;
+  }
+  .single-price-area{
+    display:flex!important;
+    justify-content:flex-start!important;
+  }
+  .single-price{
+    width:auto!important;
+    min-width:0!important;
+    text-align:left!important;
+    padding:0!important;
+  }
+
+  @media(max-width:700px){
+    .categoryHeadWithPrices{
+      flex-wrap:nowrap!important;
+      align-items:center!important;
+    }
+    .categoryTitleWrap{
+      min-width:0;
+      flex:1 1 auto;
+    }
+    .categoryPriceSwitch{
+      flex:0 0 auto!important;
+      overflow:visible!important;
+    }
+    .item-price-area{
+      margin-top:4px;
+    }
+  }
+</style>
+
+
+<style id="freemenu-fixed-price-columns">
+  .categoryHeadWithPrices{
+    align-items:flex-end!important;
+    justify-content:space-between!important;
+    gap:14px;
+  }
+
+  .categoryPriceSwitch.fixed-price-columns{
+    display:grid!important;
+    grid-template-columns:repeat(var(--price-cols, 1), minmax(48px, 1fr));
+    align-items:center;
+    gap:0!important;
+    min-width:0;
+    padding:0!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    border-radius:0!important;
+  }
+
+  .categoryPriceSwitch.fixed-price-columns .price-size-label{
+    display:block;
+    min-width:52px;
+    padding:6px 8px;
+    text-align:center;
+    color:#9b9da1!important;
+    font-size:10px;
+    line-height:1;
+    font-weight:850;
+    white-space:nowrap;
+  }
+
+  .item-price-area{
+    width:100%!important;
+    margin-top:4px!important;
+  }
+
+  .single-price-area.fixed-price-columns{
+    display:grid!important;
+    grid-template-columns:repeat(var(--price-cols, 1), minmax(48px, 1fr));
+    width:max-content!important;
+    min-width:156px;
+    max-width:100%;
+    justify-content:start!important;
+    align-items:center;
+    gap:0!important;
+  }
+
+  .single-price.fixed-price-columns,
+  .single-price-area.fixed-price-columns .single-price{
+    display:block!important;
+    width:auto!important;
+    min-width:52px!important;
+    padding:2px 8px!important;
+    text-align:center!important;
+    font-size:13px!important;
+    line-height:1.25;
+    font-weight:900!important;
+    color:#e0b86a!important;
+    white-space:nowrap;
+  }
+
+  .single-price.price-empty{
+    color:#4f5359!important;
+  }
+
+  @media(max-width:700px){
+    .categoryHeadWithPrices{
+      align-items:flex-end!important;
+      gap:8px;
+    }
+
+    .categoryPriceSwitch.fixed-price-columns .price-size-label{
+      min-width:44px;
+      padding:5px 5px;
+      font-size:9px;
+    }
+
+    .single-price-area.fixed-price-columns{
+      min-width:132px;
+    }
+
+    .single-price-area.fixed-price-columns .single-price{
+      min-width:44px!important;
+      padding-left:5px!important;
+      padding-right:5px!important;
+      font-size:12px!important;
+    }
+  }
+</style>
+
 </head>
 <body>
   <div class="app-shell">
@@ -1501,20 +1699,60 @@
       return item.is_available === false || item.available === false || item.status === "unavailable" || item.status === "out_of_stock";
     }
 
-    function renderPrice(item, category) {
-      const mode = (window.fmCategoryPriceMode && window.fmCategoryPriceMode[category]) || "full";
-      const values = {
-        quarter: item.price_quarter,
-        half: item.price_half,
-        full: item.price_full || item.price
-      };
-      let value = values[mode];
-      if (value === null || value === undefined || value === "") {
-        value = values.full ?? values.half ?? values.quarter;
-      }
-      return value !== null && value !== undefined && value !== ""
-        ? `<div class="single-price-area"><div class="single-price">₹${escapeHTML(value)}</div></div>`
-        : "";
+    function getAvailablePriceModes(items) {
+      const hasQuarter = items.some(item =>
+        item.price_quarter !== null && item.price_quarter !== undefined && item.price_quarter !== ""
+      );
+      const hasHalf = items.some(item =>
+        item.price_half !== null && item.price_half !== undefined && item.price_half !== ""
+      );
+      const hasFull = items.some(item =>
+        (item.price_full !== null && item.price_full !== undefined && item.price_full !== "") ||
+        (item.price !== null && item.price !== undefined && item.price !== "")
+      );
+
+      return [
+        ...(hasQuarter ? [["quarter", "Quarter"]] : []),
+        ...(hasHalf ? [["half", "Half"]] : []),
+        ...(hasFull ? [["full", "Full"]] : [])
+      ];
+    }
+
+    function getPriceValue(item, mode) {
+      if (mode === "quarter") return item.price_quarter;
+      if (mode === "half") return item.price_half;
+      return item.price_full ?? item.price;
+    }
+
+    function renderCategoryPriceLabels(items) {
+      const modes = getAvailablePriceModes(items);
+      if (!modes.length) return "";
+
+      return `
+        <div class="categoryPriceSwitch fixed-price-columns" aria-label="Available price sizes">
+          ${modes.map(([mode, label]) => `
+            <span class="price-size-label" data-price-mode="${mode}">${label}</span>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderPrice(item, category, categoryItems) {
+      const modes = getAvailablePriceModes(categoryItems || [item]);
+      if (!modes.length) return "";
+
+      return `
+        <div class="single-price-area fixed-price-columns">
+          ${modes.map(([mode]) => {
+            const value = getPriceValue(item, mode);
+            return `
+              <span class="single-price ${value === null || value === undefined || value === "" ? "price-empty" : ""}">
+                ${value !== null && value !== undefined && value !== "" ? `₹${escapeHTML(value)}` : "—"}
+              </span>
+            `;
+          }).join("")}
+        </div>
+      `;
     }
 
     function renderTags(item) {
@@ -1541,12 +1779,12 @@
                   <span class="food-symbol ${type}" aria-label="${type}"></span>
                   <h3 class="item-name">${escapeHTML(item.name || "Unnamed item")}</h3>
                 </div>
+                <div class="item-price-area">
+                  ${renderPrice(item, categoryKey(item.category), items)}
+                </div>
                 ${renderTags(item)}
                 ${item.description ? `<p class="item-desc">${escapeHTML(item.description)}</p>` : ""}
                 ${renderItemAR(item)}
-              </div>
-              <div class="item-price-area">
-                ${renderPrice(item, categoryKey(item.category))}
               </div>
             </div>
           </div>
@@ -1590,10 +1828,14 @@ function getSavedCategoryOrder(rest, items) {
     function renderCategoryChips() {
       const categories = getSavedCategoryOrder(restaurant, allItems);
       $("category-chips").innerHTML = [
-        `<button class="cat-chip ${currentCategory === "all" ? "active" : ""}" data-category="all">All Menu</button>`,
+        `<button class="cat-chip ${currentCategory === "all" ? "active" : ""}" data-category="all">
+          <span class="cat-chip-icon">${categoryIconSVG("all")}</span>
+          <span class="cat-chip-label">All Menu</span>
+        </button>`,
         ...categories.map(category => `
           <button class="cat-chip ${currentCategory === category ? "active" : ""}" data-category="${escapeHTML(category)}">
-            ${escapeHTML(category)}
+            <span class="cat-chip-icon">${categoryIconSVG(category)}</span>
+            <span class="cat-chip-label">${escapeHTML(category)}</span>
           </button>
         `)
       ].join("");
@@ -1646,11 +1888,7 @@ function getSavedCategoryOrder(rest, items) {
               <h2 class="category-title">${escapeHTML(category)}</h2>
 
             </div>
-            <div class="categoryPriceSwitch" aria-label="Price size">
-              <button type="button" class="${((window.fmCategoryPriceMode||{})[category]||"full")==="quarter"?"active":""}" onclick='fmSetCategoryPriceMode(${JSON.stringify(category)},"quarter")'>Quarter</button>
-              <button type="button" class="${((window.fmCategoryPriceMode||{})[category]||"full")==="half"?"active":""}" onclick='fmSetCategoryPriceMode(${JSON.stringify(category)},"half")'>Half</button>
-              <button type="button" class="${((window.fmCategoryPriceMode||{})[category]||"full")==="full"?"active":""}" onclick='fmSetCategoryPriceMode(${JSON.stringify(category)},"full")'>Full</button>
-            </div>
+            ${renderCategoryPriceLabels(items)}
           </div>
           <div class="items-list">
             ${items.map(renderItem).join("")}
@@ -1659,7 +1897,36 @@ function getSavedCategoryOrder(rest, items) {
       `}).join("");
     }
 
-    function renderRestaurant(rest) {
+    
+function categoryIconSVG(category) {
+  const key = String(category || "").toLowerCase();
+
+  let path = '<path d="M4 6h16M7 4v4M17 4v4M5 10h14v10H5zM8 14h8M8 17h5"/>';
+
+  if (key === "all" || key.includes("menu")) {
+    path = '<path d="M4 5h6v6H4zM14 5h6v6h-6zM4 15h6v6H4zM14 15h6v6h-6z"/>';
+  } else if (key.includes("tandoor") || key.includes("kebab") || key.includes("grill")) {
+    path = '<path d="M8 4v16M16 4v16M5 8h14M5 16h14"/>';
+  } else if (key.includes("fry") || key.includes("snack") || key.includes("starter")) {
+    path = '<path d="M5 5h14l-2 15H7L5 5Z"/><path d="M8 9h8M9 13h6M10 17h4"/>';
+  } else if (key.includes("bread") || key.includes("roti") || key.includes("naan")) {
+    path = '<path d="M5 14c0-4 3-7 7-7s7 3 7 7c0 3-2 5-7 5s-7-2-7-5Z"/><path d="M8 13c1-2 2-3 4-3s3 1 4 3"/>';
+  } else if (key.includes("rice") || key.includes("biryani")) {
+    path = '<path d="M4 12h16c0 5-3.6 8-8 8s-8-3-8-8Z"/><path d="M8 9c1-3 2-5 4-6M14 9c0-3-1-4-2-6"/>';
+  } else if (key.includes("curry") || key.includes("main") || key.includes("gravy")) {
+    path = '<path d="M4 11h16c0 5-3.6 8-8 8s-8-3-8-8Z"/><path d="M7 8h10M9 5h6"/>';
+  } else if (key.includes("drink") || key.includes("beverage") || key.includes("shake") || key.includes("juice")) {
+    path = '<path d="M7 4h10l-1 16H8L7 4Z"/><path d="M9 8h6M10 2h4"/>';
+  } else if (key.includes("dessert") || key.includes("sweet")) {
+    path = '<path d="M5 10h14l-1 9H6l-1-9Z"/><path d="M7 10c0-3 2-5 5-5s5 2 5 5M8 14h8"/>';
+  } else if (key.includes("salad") || key.includes("healthy")) {
+    path = '<path d="M4 11h16c0 5-3.5 8-8 8s-8-3-8-8Z"/><path d="M7 9c1-3 3-4 5-4s4 1 5 4M12 5V3"/>';
+  }
+
+  return `<svg viewBox="0 0 24 24" aria-hidden="true">${path}</svg>`;
+}
+
+function renderRestaurant(rest) {
       restaurant = rest;
       applyRestaurantTheme(rest);
 
@@ -1930,5 +2197,25 @@ window.fmSetCategoryPriceMode = function(category, mode){
   renderMenu();
 };
 </script>
+
+<script id="freemenu-price-column-count">
+(function(){
+  function syncPriceColumns(){
+    document.querySelectorAll(".category-section").forEach(function(section){
+      const labels = section.querySelector(".categoryPriceSwitch.fixed-price-columns");
+      if (!labels) return;
+      const count = labels.querySelectorAll(".price-size-label").length || 1;
+      labels.style.setProperty("--price-cols", count);
+      section.querySelectorAll(".single-price-area.fixed-price-columns").forEach(function(row){
+        row.style.setProperty("--price-cols", count);
+      });
+    });
+  }
+  document.addEventListener("DOMContentLoaded", syncPriceColumns);
+  const observer = new MutationObserver(syncPriceColumns);
+  observer.observe(document.documentElement, {childList:true, subtree:true});
+})();
+</script>
+
 </body>
 </html>
