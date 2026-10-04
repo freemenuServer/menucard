@@ -383,14 +383,58 @@ function printQR(){
     alert('QR is not ready yet.');
     return;
   }
-  /*
-    New print mode:
-    - A4 portrait
-    - 1 QR = 1 page
-    - print UI hidden
-    - exact A4 dimensions
-  */
-  window.print();
+
+  // Do NOT print the management page itself. Build a dedicated
+  // one-sheet print document so browser pagination cannot include
+  // the hidden controls / other state panels.
+  const source=poster.cloneNode(true);
+  source.style.display='block';
+  source.removeAttribute('id');
+
+  const printWin=window.open('', '_blank', 'width=900,height=1200');
+  if(!printWin){
+    alert('Please allow pop-ups for FreeMenu to print the QR.');
+    return;
+  }
+
+  const styles=`
+    @page{size:A4 portrait;margin:0;}
+    *{box-sizing:border-box;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+    html,body{margin:0!important;padding:0!important;width:210mm!important;height:297mm!important;overflow:hidden!important;background:#fff!important;}
+    body{font-family:Inter,Arial,Helvetica,sans-serif;}
+    .sheet{width:210mm;height:297mm;overflow:hidden;position:relative;}
+    .poster{position:relative;width:210mm!important;height:297mm!important;min-height:297mm!important;max-height:297mm!important;max-width:210mm!important;margin:0!important;padding:28mm 16mm 16mm!important;border-radius:0!important;box-shadow:none!important;overflow:hidden!important;}
+    .content{position:relative;z-index:2;text-align:center;}
+    .qrBox{width:120mm!important;max-width:120mm!important;padding:6mm!important;margin:0 auto!important;}
+    #qrcode{width:100%;display:flex;justify-content:center;align-items:center;}
+    #qrcode canvas,#qrcode svg{display:block;width:88mm!important;height:88mm!important;max-width:88mm!important;max-height:88mm!important;}
+    .smallTitle{font-size:30pt!important;line-height:1!important;}
+    .bigTitle{font-size:58pt!important;line-height:.9!important;}
+    .restaurant{font-size:16pt!important;}
+    .note{font-size:10pt!important;}
+    .scan{font-size:9pt!important;margin-top:3mm!important;}
+    .brandArea{margin-top:7mm!important;}
+    .fm-qr-logo{width:42mm!important;height:auto!important;}
+    .tag{font-size:7pt!important;}
+    .features{margin-top:7mm!important;padding-top:5mm!important;}
+    .fi{font-size:13pt!important;}
+    .ft{font-size:8.5pt!important;}
+    .fs{font-size:6.5pt!important;}
+    .footer{margin-top:6mm!important;font-size:6.5pt!important;}
+    .footer2{font-size:7.5pt!important;}
+  `;
+
+  printWin.document.open();
+  printWin.document.write('<!doctype html><html><head><meta charset=\"utf-8\"><title>FreeMenu QR - '+String(restaurantName.textContent||'Restaurant Menu').replace(/[<>]/g,'')+'</title><style>'+styles+'</style></head><body><div class=\"sheet\">'+source.outerHTML+'</div></body></html>');
+  printWin.document.close();
+
+  printWin.onload=()=>{
+    setTimeout(()=>{
+      printWin.focus();
+      printWin.print();
+      setTimeout(()=>printWin.close(),700);
+    },350);
+  };
 }
 
 function downloadQR(){
