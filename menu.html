@@ -2187,7 +2187,7 @@ function renderRestaurant(rest) {
 
       try {
         const params = new URLSearchParams(window.location.search);
-        let slug = (params.get("r") || "").trim().toLowerCase();
+        let slug = (window.__FM_ROUTE_SLUG || params.get("r") || "").trim().toLowerCase();
 
         // Clean-URL compatibility: also accept /menu/{slug} when the host
         // does not pass the rewrite query through to menu.html.
@@ -2308,7 +2308,7 @@ function renderRestaurant(rest) {
         // internally to menu.html, the browser can still report the clean
         // /menu/:slug pathname. Never redirect Free Starter; otherwise the
         // clean rewrite + client routing can create a reload loop.
-        if (targetFile !== "menu.html" && currentFile !== targetFile) {
+        if (targetFile !== "menu.html" && currentFile !== targetFile && !window.__FM_ROUTED_TEMPLATE) {
           const targetUrl = new URL(`/${targetFile}`, window.location.origin);
           targetUrl.searchParams.set("r", rest.slug || rest.id);
           window.location.replace(targetUrl.href);

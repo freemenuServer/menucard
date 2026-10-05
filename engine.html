@@ -43,10 +43,29 @@
     el.style.display = "block";
     el.textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2);
   }
-  function go(template, slug) {
-    const target = new URL("/" + template, location.origin);
-    target.searchParams.set("r", slug);
-    location.replace(target.href);
+  async function go(template, slug) {
+    // The browser must remain on /{slug}. Fetch the plan-specific template
+    // internally, inject the slug, and render it into the current document.
+    // This preserves the existing plan/template behavior without exposing
+    // ?r=... or template filenames in the customer-facing URL.
+    try {
+      const response = await fetch("/" + template, { cache: "no-store" });
+      if (!response.ok) throw new Error("Template HTTP " + response.status);
+      let html = await response.text();
+      const bootstrap = `<script>window.__FM_ROUTE_SLUG=${JSON.stringify(String(slug || "").trim().toLowerCase())};window.__FM_ROUTED_TEMPLATE=${JSON.stringify(String(template))};</script>`;
+      if (/<head\b[^>]*>/i.test(html)) {
+        html = html.replace(/<head\b[^>]*>/i, m => m + '<base href="/">' + bootstrap);
+      } else {
+        html = bootstrap + html;
+      }
+      document.open();
+      document.write(html);
+      document.close();
+    } catch (err) {
+      console.error("FreeMenu template load error", err);
+      state("Unable to open menu", "Could not load the assigned menu template.", true);
+      debug({ error: String(err && (err.message || err)), template, slug });
+    }
   }
 
   async function findRestaurant(key) {
