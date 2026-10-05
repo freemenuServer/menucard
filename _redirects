@@ -1,6 +1,11 @@
 # FreeMenu public menu routing
-# Keep the real menu.html file accessible; do not redirect /menu to it.
+# Old /menu links are sent to the real menu.html file.
+# Query strings such as /menu?r=dosafactory are preserved.
+/menu/    /menu.html    302
+/menu     /menu.html    302
+
 # Legacy /menu/<slug> support.
 /menu/:slug    /menu.html?r=:slug    200
+
 # Clean public restaurant URLs: https://freemenu.in/<slug>
 /:slug         /menu.html?r=:slug    200
