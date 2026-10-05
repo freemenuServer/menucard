@@ -320,7 +320,7 @@ const qrContainer=document.getElementById('qrcode');
 let currentCode='',qrInstance=null,currentDesign=1;
 
 function getMenuUrl(slug){
-  return new URL('/'+encodeURIComponent(slug),window.location.origin).href;
+  return new URL('/menu.html?r='+encodeURIComponent(slug),window.location.origin).href;
 }
 
 function showUnassigned(code){

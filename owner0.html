@@ -110,7 +110,6 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 
 
 .reorderMoveBtn{display:inline-flex;align-items:center;gap:6px;border:1px solid #d8dee8;background:#fff;border-radius:7px;padding:6px 9px;color:#475569;font-size:10px;font-weight:800;cursor:grab}.reorderMoveBtn:hover{background:#f1f5f9;border-color:#b8c2d1}.reorderMoveBtn:active{cursor:grabbing}
-.freemenu-login-logo-img{width:190px;max-width:75%;height:auto;display:block;margin:0 auto 14px;object-fit:contain}
 </style>
 
 
@@ -129,25 +128,6 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .authChoiceBtn b{display:block;font-size:16px;color:#172033}
 .authChoiceBtn small{display:block;color:#7a8495;font-size:10px;margin-top:5px;line-height:1.4}
 .authFormCard{text-align:left}
-/* Auth route visibility: exactly one form is shown at a time. */
-.authCombinedForm .authFormCard{display:none!important;padding:0;box-shadow:none;border:0;background:transparent;max-width:none;margin:0}
-.authCombinedForm .authFormCard.active{display:block!important}
-.signup-route .authCombinedForm #loginCard{display:none!important}
-.signup-route .authCombinedForm #signupCard{display:block!important}
-.signup-route .authCombinedForm #resetPasswordCard{display:none!important}
-./* Signup route keeps BOTH tabs visible so user can return to Login. */
-.signup-route #authLoginTab{display:block!important;flex:1}
-.signup-route #authSignupTab{display:block!important;flex:1}
-/* On the signup route the whole right panel must be scrollable; never clip the long form. */
-.signup-route .ownerAuthSplit{overflow:auto!important;align-items:start!important}
-.signup-route .ownerAuthSplit .authRightPanel{justify-content:flex-start!important;min-height:0!important}
-.signup-route .ownerAuthSplit .authCombinedForm{overflow:visible!important}
-.signup-route .ownerAuthSplit #signupCard{padding-bottom:32px!important}
-@media(max-width:760px){
-  .signup-route .ownerAuthSplit{height:calc(100vh - 20px)!important;max-height:calc(100vh - 20px)!important;overflow-y:auto!important;overflow-x:hidden!important}
-  .signup-route .ownerAuthSplit .authRightPanel{padding-bottom:40px!important}
-}
-
 .authFormCard .authBrand{margin-left:auto;margin-right:auto}
 .authFormCard h1,.authFormCard .authSub{text-align:center}
 .authBack,.authSwitch{border:0;background:none;color:#5b6474;font-weight:700;cursor:pointer;padding:0}
@@ -202,13 +182,16 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
 .authTabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#f3f4f6;border-radius:12px;padding:4px;margin:0 0 22px}
 .authTab{border:0;background:transparent;border-radius:9px;padding:11px 10px;font-weight:800;color:#687386;cursor:pointer;font-size:13px}
 .authTab.active{background:#fff;color:#8f1831;box-shadow:0 3px 10px rgba(15,23,42,.08)}
-
+.authCombinedForm .authFormCard{display:none!important;padding:0;box-shadow:none;border:0;background:transparent;max-width:none;margin:0}
 .authCombinedForm .authBack{display:none}
 .authCombinedForm .authBrand,.authCombinedForm .authKicker{display:none}
 .authCombinedForm .authFormCard h1{font-size:30px;margin-bottom:4px}
 .authCombinedForm .authFormCard .authSub{margin-bottom:18px}
-
-
+.authCombinedForm .signupCard{display:none!important}
+.authCombinedForm .signupCard.active{display:block!important}
+.authCombinedForm .loginCard.active{display:block!important}
+.authCombinedForm #resetPasswordCard.active{display:block!important}
+.authCombinedForm #loginCard{display:block!important}.authCombinedForm #signupCard{display:none!important}.authCombinedForm #resetPasswordCard{display:none!important}.authCombinedForm #signupCard.active{display:block!important}.authCombinedForm #loginCard.active{display:block!important}.authCombinedForm #resetPasswordCard.active{display:block!important}
 @media(max-width:760px){.ownerAuthSplit{grid-template-columns:1fr!important}.freemenu-login-brand{display:block!important;min-height:250px}.freemenu-login-brand-inner{padding:28px}.freemenu-login-brand h1{font-size:36px}.authRightPanel{min-height:auto!important;padding:28px 22px!important}}
 </style>
 
@@ -234,38 +217,21 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoratio
   .menuLiveSwitch.off{background:#dc8b2c}
   .menuLiveState{font-size:10px;font-weight:850;white-space:nowrap}
   .menuLiveState.on{color:#087443}.menuLiveState.off{color:#b45309}
-</style>
 
-
-  <!-- FreeMenu Brand / Favicon -->
-  <link rel="icon" type="image/png" sizes="512x512" href="favicon-512x512.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-
-<style id="freemenu-signup-full-form-fix">
-/* Signup: let the whole page scroll instead of trapping the long form inside a nested card. */
-@media (max-width:760px){
-  #ownerAuth{align-items:flex-start!important;overflow:visible!important;min-height:100vh!important;height:auto!important;padding:0 0 28px!important}
-  #authChoiceCard.ownerAuthSplit{max-height:none!important;height:auto!important;overflow:visible!important;align-self:flex-start!important;margin:0 auto!important}
-  #authChoiceCard.ownerAuthSplit .authRightPanel{min-height:auto!important;height:auto!important;overflow:visible!important;justify-content:flex-start!important}
-  #authChoiceCard.ownerAuthSplit .authCombinedForm{height:auto!important;overflow:visible!important}
-  #authChoiceCard .ownerAuthCard{max-height:none!important;overflow:visible!important}
-}
-</style>
-
-<style id="signup-full-form-final-fix">
-html.signup-route #authLoginTab,html.signup-route #authSignupTab{display:block!important;flex:1!important}
-html.signup-route #authChoiceCard{align-items:start!important;overflow:auto!important}
-html.signup-route #authChoiceCard .authRightPanel{justify-content:flex-start!important;min-height:0!important}
-html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
-@media(max-width:760px){html.signup-route #authChoiceCard{height:calc(100vh - 20px)!important;max-height:calc(100vh - 20px)!important;overflow-y:auto!important}}
+.profileSecurityBox{margin:18px 0;padding:16px;border:1px solid var(--border);border-radius:12px;background:#fafafa}
+.profileSecurityTitle{font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px;color:var(--text)}
+.profileSecurityTitle i{color:#d91f35}
+.profileSecuritySub{font-size:11px;color:var(--muted);line-height:1.5;margin:5px 0 14px}
+.profilePasswordMsg{font-size:12px;line-height:1.5;padding:10px 12px;border-radius:8px;margin:0 0 12px}
+.profilePasswordMsg.success{background:#ecfdf3;color:#087443;border:1px solid #bbf7d0}
+.profilePasswordMsg.error{background:#fff1f2;color:#b42318;border:1px solid #fecdd3}
+.profileSecurityBox button:disabled{opacity:.65;cursor:not-allowed}
 </style>
 
 </head>
 
 <body>
-<script>(function(){if(new URLSearchParams(location.search).get("auth")==="signup")document.documentElement.classList.add("signup-route");})();</script>
+
 
 <div id="ownerAuth">
   <div class="ownerAuthBackdrop"></div>
@@ -274,7 +240,7 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
   <div class="ownerAuthCard ownerAuthSplit" id="authChoiceCard">
     <div class="freemenu-login-brand">
       <div class="freemenu-login-brand-inner">
-        <img class="freemenu-login-logo-img" src="./freemenu-logo.png" alt="FreeMenu.in">
+        <div class="freemenu-login-logo">FM</div>
         <div class="fm-kicker">RESTAURANT PARTNER</div>
         <h1>FreeMenu</h1>
         <p class="fm-tagline">Your restaurant menu, profile, QR and daily menu management — all in one simple owner panel.</p>
@@ -293,7 +259,7 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
       </div>
       <div class="authCombinedForm">
 <!-- LOGIN FORM -->
-  <div class="ownerAuthCard authFormCard" id="loginCard" style="display:none">
+  <div class="ownerAuthCard authFormCard" id="loginCard" style="display:block">
     <button type="button" class="authBack" id="backLoginBtn">← Back</button>
     <div class="authBrand">🔐</div><div class="authKicker">FreeMenu Owner Portal</div>
     <h1>Owner Login</h1>
@@ -572,19 +538,6 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
     </div>
     <div class="formGroup"><label>Logo Image URL</label><div class="uploadRow"><input class="input" id="fLogo" placeholder="https://..."><input type="file" id="logoFile" accept="image/*" hidden><button class="fileBtn" id="chooseLogo">Choose</button><button class="btn blue" id="uploadLogo">Upload</button></div></div>
     <div class="formGroup"><label>Address</label><textarea class="textarea" id="fAddress" placeholder="Your restaurant address"></textarea></div>
-    <div class="card" style="margin-top:15px;background:linear-gradient(180deg,#fff,#fffaf7);border:1px solid var(--border)">
-      <div class="cardTitle"><span><i class="fa-solid fa-receipt"></i> GST Settings</span><small>Configure GST display and billing details for your restaurant</small></div>
-      <div class="threeCol">
-        <div class="formGroup"><label>GST Applicable</label><select class="select" id="fGstEnabled"><option value="false">No — Not Applicable</option><option value="true">Yes — GST Applicable</option></select></div>
-        <div class="formGroup"><label>GST Rate (%)</label><input class="input" id="fGstRate" type="number" min="0" max="100" step="0.01" placeholder="e.g. 5"></div>
-        <div class="formGroup"><label>GSTIN</label><input class="input" id="fGstNumber" maxlength="15" placeholder="e.g. 07ABCDE1234F1Z5" style="text-transform:uppercase"></div>
-      </div>
-      <div class="twoCol equal">
-        <div class="formGroup"><label>GST Price Mode</label><select class="select" id="fGstInclusive"><option value="false">Exclusive — Add GST separately</option><option value="true">Inclusive — Price already includes GST</option></select></div>
-        <div class="formGroup"><label>Customer Display</label><div id="gstSettingPreview" style="padding:11px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:13px;color:var(--text)">GST: Not Applicable</div></div>
-      </div>
-      <div class="muted" style="font-size:11px;margin-top:4px">These settings are stored with the restaurant and can be used by the public menu/billing flow.</div>
-    </div>
     <button class="btn primary" id="saveProfile"><i class="fa-solid fa-floppy-disk"></i> Save Restaurant Details</button>
     <div class="card" style="margin-top:15px;background:linear-gradient(180deg,#fff,#fffaf7)">
       <div class="cardTitle">Public Menu Hero Information <small>Customize the restaurant information shown on the public menu</small></div>
@@ -730,9 +683,9 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
       <details class="themeAdvanced">
         <summary><i class="fa-solid fa-sliders"></i> Advanced colors</summary>
         <div class="themeGrid" style="margin-top:10px">
-          <label class="colorField"><input type="color" id="cPrimary" value="#7C2D12"><span>Primary</span></label>
-          <label class="colorField"><input type="color" id="cAccent" value="#D97706"><span>Accent</span></label>
-          <label class="colorField"><input type="color" id="cBg" value="#FFF7ED"><span>Background</span></label>
+          <label class="colorField"><input type="color" id="cPrimary" value="#7c2d12"><span>Primary</span></label>
+          <label class="colorField"><input type="color" id="cAccent" value="#d97706"><span>Accent</span></label>
+          <label class="colorField"><input type="color" id="cBg" value="#fffaf0"><span>Background</span></label>
         </div>
         <div class="themeAdvancedNote">Use this only when you want to fine-tune the selected preset. The saved colors are used by the live public menu.</div>
       </details>
@@ -762,6 +715,29 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
     <div class="card">
       <div class="cardTitle">Account & Security</div>
       <div class="formGroup"><label>Logged-in Email</label><input class="input" id="accountEmail" disabled></div>
+
+      <div class="profileSecurityBox">
+        <div class="profileSecurityTitle"><i class="fa-solid fa-key"></i> Change Password</div>
+        <div class="profileSecuritySub">Update your Owner account password without leaving the Profile page.</div>
+
+        <div class="formGroup">
+          <label>Current Password</label>
+          <input class="input" id="profileCurrentPassword" type="password" autocomplete="current-password" placeholder="Enter current password">
+        </div>
+        <div class="twoCol" style="gap:12px">
+          <div class="formGroup">
+            <label>New Password</label>
+            <input class="input" id="profileNewPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Minimum 6 characters">
+          </div>
+          <div class="formGroup">
+            <label>Confirm New Password</label>
+            <input class="input" id="profileConfirmPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Repeat new password">
+          </div>
+        </div>
+        <div id="profilePasswordMsg" class="profilePasswordMsg" style="display:none"></div>
+        <button class="btn primary" id="changeProfilePassword"><i class="fa-solid fa-lock"></i> Change Password</button>
+      </div>
+
       <button class="btn danger" id="logout2"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
     </div>
   </div>
@@ -929,16 +905,12 @@ function showOwnerLogin(){
   $("loader").classList.add("hidden");
   $("ownerAuth").classList.add("show");
   $("authChoiceCard").style.display="grid";
-  const mode=new URLSearchParams(location.search).get("auth");
-  if(mode==="signup") return showSignupForm();
-  if(mode==="reset") return showResetPasswordForm();
   showLoginForm();
 }
 function hideOwnerLogin(){
   $("ownerAuth").classList.remove("show");
 }
 function showLoginForm(){
-  document.documentElement.classList.remove("signup-route");
   $("ownerAuth").classList.add("show");
   $("authChoiceCard").style.display="grid";
   $("loginCard").classList.add("active");
@@ -951,7 +923,6 @@ function showLoginForm(){
   $("authSignupTab")?.classList.remove("active");
 }
 function showSignupForm(){
-  document.documentElement.classList.add("signup-route");
   $("ownerAuth").classList.add("show");
   $("authChoiceCard").style.display="grid";
   $("loginCard").classList.remove("active");
@@ -962,9 +933,6 @@ function showSignupForm(){
   if($("resetPasswordCard")) $("resetPasswordCard").style.display="none";
   $("authLoginTab")?.classList.remove("active");
   $("authSignupTab")?.classList.add("active");
-  // Keep the Login tab available on the signup route.
-  if($('authLoginTab')) $('authLoginTab').style.display='block';
-  if($('authSignupTab')) $('authSignupTab').style.display='block';
 }
 function showResetPasswordForm(){
   $("ownerAuth").classList.add("show");
@@ -978,12 +946,7 @@ function showResetPasswordForm(){
   $("authLoginTab")?.classList.remove("active");
   $("authSignupTab")?.classList.remove("active");
 }
-function showAuthChoice(){
-  const mode=new URLSearchParams(location.search).get("auth");
-  if(mode==="signup") return showSignupForm();
-  if(mode==="reset") return showResetPasswordForm();
-  showLoginForm();
-}
+function showAuthChoice(){ showLoginForm(); }
 $("authLoginTab")?.addEventListener("click",showLoginForm);
 $("authSignupTab")?.addEventListener("click",showSignupForm);
 function setAuthMsg(id,msg,ok=false){
@@ -1060,6 +1023,51 @@ async function updateOwnerPassword(){
   }
 }
 
+async function changeProfilePassword(){
+  const current=$("profileCurrentPassword")?.value||"";
+  const next=$("profileNewPassword")?.value||"";
+  const confirm=$("profileConfirmPassword")?.value||"";
+  const msg=$("profilePasswordMsg");
+  const btn=$("changeProfilePassword");
+  const showMsg=(text,type)=>{ if(!msg)return; msg.textContent=text; msg.className="profilePasswordMsg "+type; msg.style.display="block"; };
+
+  if(!current){ showMsg("Please enter your current password.","error"); return; }
+  if(next.length<6){ showMsg("New password must be at least 6 characters.","error"); return; }
+  if(next!==confirm){ showMsg("New passwords do not match.","error"); return; }
+  if(current===next){ showMsg("New password must be different from your current password.","error"); return; }
+
+  btn.disabled=true;
+  btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Changing Password...';
+  if(msg) msg.style.display="none";
+  try{
+    const user=supabaseClient.auth.getUser ? (await supabaseClient.auth.getUser()).data?.user : null;
+    const email=(user?.email||$("accountEmail")?.value||"").trim();
+    if(!email) throw new Error("Unable to identify the logged-in email.");
+
+    // Re-authenticate first so a stale/forgotten current password cannot be used to change it.
+    const {error:loginError}=await supabaseClient.auth.signInWithPassword({email,password:current});
+    if(loginError) throw new Error("Current password is incorrect.");
+
+    const {error}=await supabaseClient.auth.updateUser({password:next});
+    if(error) throw error;
+
+    $("profileCurrentPassword").value="";
+    $("profileNewPassword").value="";
+    $("profileConfirmPassword").value="";
+    showMsg("Password changed successfully.","success");
+    toast("Password changed successfully");
+  }catch(e){
+    console.error("Profile password change failed:",e);
+    showMsg(e?.message||"Unable to change password. Please try again.","error");
+  }finally{
+    btn.disabled=false;
+    btn.innerHTML='<i class="fa-solid fa-lock"></i> Change Password';
+  }
+}
+
+$("changeProfilePassword")?.addEventListener("click",changeProfilePassword);
+["profileCurrentPassword","profileNewPassword","profileConfirmPassword"].forEach(id=>$(id)?.addEventListener("keydown",e=>{if(e.key==="Enter")changeProfilePassword()}));
+
 async function ownerLogin(){
   const email=$("loginEmailNew").value.trim();
   const password=$("loginPasswordNew").value;
@@ -1132,16 +1140,7 @@ async function ownerSignup(){
 
   const {data,error}=await supabaseClient.auth.signUp({
     email,password,
-    options:{
-      data:{
-        full_name:name,
-        phone:phone.replace(/\D/g,""),
-        role:"owner",
-        restaurant_name:restaurant,
-        restaurant_address:address,
-        restaurant_slug:slug
-      }
-    }
+    options:{data:{full_name:name,phone,role:"owner"}}
   });
   if(error){
     setAuthMsg("signupErrorNew",error.message);
@@ -1199,8 +1198,8 @@ async function ownerSignup(){
       await init();
     },500);
   }else{
-    setAuthMsg("signupSuccessNew","Account created. Please verify your email, then login. Your restaurant details are saved and will be connected automatically after verification.",true);
-    setTimeout(showLoginForm,1400);
+    setAuthMsg("signupSuccessNew","Account created. Please verify your email, then login to open your Owner Dashboard.",true);
+    setTimeout(showLoginForm,900);
   }
 
   $("signupSubmitNew").disabled=false;
@@ -1277,38 +1276,8 @@ async function init(afterLogin=false){
       }
     }
 
-    if(!data?.length && !superAdminMode){
-      // First-login recovery for accounts created while email confirmation was enabled.
-      // Signup data is kept in Auth user metadata so the restaurant can be created
-      // safely after the owner confirms the email and logs in.
-      const meta=session.user.user_metadata||{};
-      const pendingName=String(meta.restaurant_name||"").trim();
-      const pendingAddress=String(meta.restaurant_address||"").trim();
-      const pendingSlug=String(meta.restaurant_slug||"").trim().toLowerCase();
-      const pendingPhone=String(meta.phone||"").replace(/\D/g,"");
-      if(pendingName && pendingSlug){
-        const existingBySlug=await supabaseClient.from("restaurants").select("id").eq("slug",pendingSlug).maybeSingle();
-        if(existingBySlug.error) return fail("Could not check restaurant slug: "+existingBySlug.error.message);
-        if(existingBySlug.data){
-          return fail("This Menu Slug is already in use. Please contact support or choose another slug before creating the account.");
-        }
-        const createRes=await supabaseClient.from("restaurants").insert({
-          owner_id:session.user.id,
-          name:pendingName,
-          slug:pendingSlug,
-          phone:pendingPhone,
-          address:pendingAddress,
-          status:"pending",
-          plan:"free",
-          subscription_status:"inactive"
-        }).select("*").single();
-        if(createRes.error) return fail("Your account is verified, but the restaurant could not be created: "+createRes.error.message+". Make sure the restaurants INSERT policy allows owner_id = auth.uid().");
-        data=[createRes.data];
-      }
-    }
-
     if(!data?.length){
-      return fail("No restaurant is linked to this login account. Please complete signup or login with the correct restaurant owner account.");
+      return fail("No restaurant is linked to this login account. Please login with the correct restaurant owner account or link this Auth user to the restaurant.");
     }
 
     currentRestaurant=data[0];
@@ -1350,30 +1319,6 @@ function fail(msg){
   </div>`;
 }
 
-function updateGstPreview(){
-  const enabled=$("fGstEnabled")?.value === "true";
-  const rate=parseFloat($("fGstRate")?.value||"");
-  const number=String($("fGstNumber")?.value||"").trim().toUpperCase();
-  const inclusive=$("fGstInclusive")?.value === "true";
-  const el=$("gstSettingPreview");
-  if(!el)return;
-  if(!enabled){el.textContent="GST: Not Applicable";return}
-  const rateText=Number.isFinite(rate)&&rate>=0 ? `GST: ${rate}% ${inclusive?"Inclusive":"Exclusive"}` : "GST: Rate not set";
-  el.textContent=number ? `${rateText} • GSTIN: ${number}` : rateText;
-}
-
-function fillGstSettings(r){
-  const enabled=!!(r?.gst_enabled ?? r?.gst_applicable);
-  const rate=r?.gst_rate ?? r?.gst_percentage ?? r?.gst_percent ?? "";
-  const number=r?.gst_number ?? r?.gstin ?? r?.gstin_number ?? "";
-  const inclusive=!!(r?.gst_inclusive ?? r?.gst_price_inclusive);
-  if($("fGstEnabled")) $("fGstEnabled").value=enabled?"true":"false";
-  if($("fGstRate")) $("fGstRate").value=rate==null?"":rate;
-  if($("fGstNumber")) $("fGstNumber").value=String(number||"").toUpperCase();
-  if($("fGstInclusive")) $("fGstInclusive").value=inclusive?"true":"false";
-  updateGstPreview();
-}
-
 function fillProfile(){
   renderThemePresetOptions();
   const r=currentRestaurant;
@@ -1383,7 +1328,6 @@ function fillProfile(){
   $("profilePhone").textContent=r.phone||"—";$("profileAddress").textContent=r.address||"—";$("profileSlug").textContent=r.slug||"—";
   updateMenuMaintenanceUI();
   $("fName").value=r.name||"";$("fPhone").value=r.phone||"";$("fSlug").value=r.slug||"";$("fLogo").value=r.logo_url||"";$("fAddress").value=r.address||"";
-  fillGstSettings(r);
   if($("fLogoMedia")) $("fLogoMedia").value=r.logo_url||"";
   if($("fBannerMedia")) $("fBannerMedia").value=r.banner_url||r.cover_url||"";
   $("fWelcome").value=r.welcome_text??"Welcome to";
@@ -1400,9 +1344,9 @@ function fillProfile(){
   $("fDineIn").checked=r.dine_in!==false;
   $("fTakeaway").checked=r.takeaway!==false;
   $("fDelivery").checked=r.home_delivery!==false;
-  $("cPrimary").value=r.primary_color||r.theme_primary||"#7C2D12";
-  $("cAccent").value=r.accent_color||"#D97706";
-  $("cBg").value=r.background_color||r.theme_background||"#FFF7ED";
+  $("cPrimary").value=r.primary_color||r.theme_primary||"#641219";
+  $("cAccent").value=r.accent_color||"#d8ad62";
+  $("cBg").value=r.background_color||r.theme_background||"#fff7ed";
   renderThemePresetOptions();
   updateTheme();
 
@@ -2020,37 +1964,12 @@ $("menuSearch").oninput=renderDashboardTable;$("menuCategoryFilter").onchange=re
 $("fullSearch").oninput=renderFullTable;$("fullCatFilter").onchange=renderFullTable;$("fullTypeFilter").onchange=renderFullTable;
 
 /* ---------- Profile ---------- */
-["fGstEnabled","fGstRate","fGstNumber","fGstInclusive"].forEach(id=>{
-  const el=$(id);
-  if(el) el.addEventListener("input",updateGstPreview);
-  if(el) el.addEventListener("change",updateGstPreview);
-});
-
 $("saveProfile").onclick=async()=>{
  const name=$("fName").value.trim(),phone=$("fPhone").value.trim(),logo_url=$("fLogo").value.trim(),address=$("fAddress").value.trim();
  if(!name)return toast("Restaurant name is required");
- const profilePayload={name,phone,logo_url,address};
- const {data,error}=await supabaseClient.from("restaurants").update(profilePayload).eq("id",currentRestaurantId).select().single();
+ const {data,error}=await supabaseClient.from("restaurants").update({name,phone,logo_url,address}).eq("id",currentRestaurantId).select().single();
  if(error){toast("Profile save failed: "+error.message);return}
-
- const gstEnabled=$("fGstEnabled").value === "true";
- const gstRateRaw=$("fGstRate").value.trim();
- const gstRate=gstRateRaw === "" ? null : Number(gstRateRaw);
- const gstNumber=$("fGstNumber").value.trim().toUpperCase();
- const gstInclusive=$("fGstInclusive").value === "true";
- if(gstRate!==null && (!Number.isFinite(gstRate) || gstRate<0 || gstRate>100)){
-   toast("GST rate must be between 0 and 100");
-   return;
- }
- const gstPayload={gst_enabled:gstEnabled,gst_rate:gstRate,gst_number:gstNumber||null,gst_inclusive:gstInclusive};
- const {data:gstData,error:gstError}=await supabaseClient.from("restaurants").update(gstPayload).eq("id",currentRestaurantId).select().single();
- if(gstError){
-   currentRestaurant=data;
-   fillProfile();
-   toast("Restaurant saved, but GST could not be saved. Run the GST migration SQL once: "+gstError.message);
-   return;
- }
- currentRestaurant=gstData||data;fillProfile();toast("Restaurant details & GST settings saved");
+ currentRestaurant=data;fillProfile();toast("Restaurant details saved");
 };
 $("chooseLogo").onclick=()=>$("logoMediaFile").click();
 $("logoFile").onchange=()=>{$("chooseLogo").textContent=$("logoFile").files[0]?.name?.slice(0,18)||"Choose"};
