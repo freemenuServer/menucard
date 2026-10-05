@@ -109,7 +109,7 @@ function readIndexCache(){
 function paintIndex(){buildCuisines();applyFilters()}
 
 async function fetchIndexData(){
-  const restaurantFields="id,name,slug,address,phone,cover_url,banner_url,cover_image,logo_url,status,is_active,offer_text,offer,discount_text,plan";
+  const restaurantFields="id,name,slug,address,phone,cover_url,banner_url,logo_url,status,is_active,offer_text,offer,discount_text,plan";
   const menuFields="id,restaurant_id,name,description,category,price,price_quarter,price_half,price_full,is_veg,item_type";
   const [r1,r2]=await Promise.all([
     sb.from("restaurants").select(restaurantFields),
