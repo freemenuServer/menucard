@@ -262,6 +262,35 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
 @media(max-width:760px){html.signup-route #authChoiceCard{height:calc(100vh - 20px)!important;max-height:calc(100vh - 20px)!important;overflow-y:auto!important}}
 </style>
 
+<style id="signup-no-scroll-compact">
+/* Compact signup view: same details, smaller overall panel, no internal scrollbar. */
+@media (min-width:761px){
+  html.signup-route #authChoiceCard{
+    zoom:.84!important;
+    max-height:calc(100vh - 24px)!important;
+    overflow:hidden!important;
+  }
+  html.signup-route #authChoiceCard .authRightPanel{
+    padding:24px 30px 22px!important;
+    min-height:0!important;
+  }
+  html.signup-route #authChoiceCard .authTabs{margin-bottom:14px!important}
+  html.signup-route #authChoiceCard .authCombinedForm .authFormCard h1{font-size:27px!important}
+  html.signup-route #authChoiceCard .authCombinedForm .authFormCard .authSub{margin-bottom:12px!important}
+  html.signup-route #authChoiceCard .authFormCard .formGroup{margin-bottom:9px!important}
+  html.signup-route #authChoiceCard .authFormCard label{margin-bottom:4px!important}
+  html.signup-route #authChoiceCard .authFormCard .input{padding:10px 12px!important}
+  html.signup-route #authChoiceCard .loginSubmit{padding:11px 14px!important}
+  html.signup-route #authChoiceCard .authSwitch{margin-top:9px!important}
+}
+@media (max-width:760px){
+  html.signup-route #authChoiceCard{
+    overflow:hidden!important;
+    height:auto!important;
+    max-height:calc(100vh - 16px)!important;
+  }
+}
+</style>
 </head>
 
 <body>
