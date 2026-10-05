@@ -167,7 +167,12 @@
 
   async function route() {
     const params = new URLSearchParams(location.search);
-    const key = (params.get("r") || params.get("slug") || "").trim();
+    // Clean public route: /{restaurant-slug}. Netlify/hosting may rewrite it
+    // to engine.html without preserving the query string, so fall back to the
+    // original pathname before using legacy query-string routes.
+    const pathSlug = location.pathname.replace(/^\/+|\/+$/g, "").split("/")[0] || "";
+    const legacyKey = (params.get("r") || params.get("slug") || "").trim();
+    const key = (legacyKey || (pathSlug && pathSlug !== "engine.html" && pathSlug !== "menu" ? pathSlug : "")).trim();
     if (!key) {
       state("Restaurant link missing", "No restaurant slug was supplied.", true);
       return;
