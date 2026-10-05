@@ -866,29 +866,64 @@
     text-align:center;
   }
 
-  /* FreeMenu footer */
+  /* FreeMenu footer — layout only; rest of menu remains unchanged */
   .freemenu-footer{
-    text-align:center;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    text-align:initial;
     padding:18px 16px 30px;
     border-top:1px solid rgba(0,0,0,.06);
     margin-top:4px;
   }
   .footer-freemenu{
+    display:inline-flex;
+    align-items:center;
+    flex:0 0 auto;
     color:var(--primary);
     font-size:15px;
     line-height:1;
     font-weight:950;
     letter-spacing:-.25px;
+    text-decoration:none;
+  }
+  .footer-freemenu img{
+    display:block;
+    width:104px;
+    height:auto;
+    max-height:34px;
+    object-fit:contain;
+  }
+  .footer-right{
+    margin-left:auto;
+    text-align:right;
+    min-width:0;
   }
   .footer-restaurant{
-    margin-top:6px;
+    margin-top:0;
     color:#4a4a46;
     font-size:13px;
     line-height:1.2;
     font-weight:800;
   }
   .freemenu-footer .footer-note{
-    padding:7px 0 0;
+    padding:5px 0 0;
+    color:#74777c;
+    font-size:10px;
+    line-height:1.4;
+  }
+  @media(max-width:640px){
+    .freemenu-footer{
+      padding:16px 12px 26px;
+      gap:12px;
+    }
+    .footer-freemenu img{
+      width:90px;
+      max-height:30px;
+    }
+    .footer-restaurant{font-size:11px}
+    .freemenu-footer .footer-note{font-size:9px}
   }
 
   @media(max-width:640px){
@@ -1639,9 +1674,13 @@
       <div id="summary-line" class="summary-line" style="display:none;"></div>
       <div id="menu-sections"></div>
       <footer class="freemenu-footer">
-        <div class="footer-freemenu">FreeMenu</div>
-        <div class="footer-restaurant" id="footer-restaurant-name">Restaurant</div>
-        <div class="footer-note">Digital menu • Prices may be subject to change</div>
+        <a class="footer-freemenu" href="/" aria-label="FreeMenu home">
+          <img src="/freemenu-logo.png" alt="FreeMenu" onerror="this.style.display='none'">
+        </a>
+        <div class="footer-right">
+          <div class="footer-restaurant" id="footer-restaurant-name">Restaurant</div>
+          <div class="footer-note">Digital menu • Prices may be subject to change</div>
+        </div>
       </footer>
     </main>
   </div>
