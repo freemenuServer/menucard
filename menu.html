@@ -2187,7 +2187,7 @@ function renderRestaurant(rest) {
 
       try {
         const params = new URLSearchParams(window.location.search);
-        let slug = (window.__FM_ROUTE_SLUG || params.get("r") || "").trim().toLowerCase();
+        let slug = (params.get("r") || "").trim().toLowerCase();
 
         // Clean-URL compatibility: also accept /menu/{slug} when the host
         // does not pass the rewrite query through to menu.html.
@@ -2301,25 +2301,17 @@ function renderRestaurant(rest) {
           targetFile = "menugrowth.html";
         }
 
-        // The public URL is always /{slug}. Do NOT navigate the browser to
-        // engine.html or to a plan template filename. menu.html is the only
-        // public router/entry point; for Growth/3D plans it loads the existing
-        // template document in-place so the clean URL never changes.
-        if (targetFile !== "menu.html") {
+        const currentFile = window.location.pathname.split("/").pop().toLowerCase();
+
+        // IMPORTANT:
+        // Free Starter is the default menu. When /menu/:slug is rewritten
+        // internally to menu.html, the browser can still report the clean
+        // /menu/:slug pathname. Never redirect Free Starter; otherwise the
+        // clean rewrite + client routing can create a reload loop.
+        if (targetFile !== "menu.html" && currentFile !== targetFile) {
           const targetUrl = new URL(`/${targetFile}`, window.location.origin);
-          const response = await fetch(targetUrl.href, { cache: "no-store" });
-          if (!response.ok) throw new Error(`Template load failed (${response.status})`);
-          let templateHtml = await response.text();
-          const routeSlug = String(rest.slug || rest.id || slug).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-          const routeBootstrap = `<script>window.__FM_ROUTE_SLUG='${routeSlug}';</script>`;
-          if (/<head\b[^>]*>/i.test(templateHtml)) {
-            templateHtml = templateHtml.replace(/<head\b[^>]*>/i, match => `${match}${routeBootstrap}`);
-          } else {
-            templateHtml = routeBootstrap + templateHtml;
-          }
-          document.open();
-          document.write(templateHtml);
-          document.close();
+          targetUrl.searchParams.set("r", rest.slug || rest.id);
+          window.location.replace(targetUrl.href);
           return;
         }
 

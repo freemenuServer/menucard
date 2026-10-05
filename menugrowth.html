@@ -173,7 +173,7 @@
   function shareWhatsApp(){window.open('https://wa.me/?text='+encodeURIComponent(`${restaurant?.name||'Restaurant'} Menu: ${location.href}`),'_blank');}
   async function loadGrowthMenu(){
     try{
-      const slug=(window.__FM_ROUTE_SLUG || new URLSearchParams(location.search).get('r') || '').trim().toLowerCase();
+      const slug=(new URLSearchParams(location.search).get('r')||'').trim().toLowerCase();
       if(!slug){$('restaurantName').textContent='Restaurant Not Found';return;}
       const {data:rest,error:re}=await supabaseClient.from('restaurants').select('*').eq('slug',slug).limit(1).maybeSingle();if(re)throw re;if(!rest){$('restaurantName').textContent='Restaurant Not Found';return;}restaurant=rest;
       const {data:items,error:ie}=await supabaseClient.from('menu_items').select('*').eq('restaurant_id',rest.id);if(ie)throw ie;menuData=Array.isArray(items)?items:[];
