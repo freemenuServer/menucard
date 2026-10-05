@@ -82,47 +82,11 @@
 }
 </style>
 
-
-<style id="footer-logo-fixed">
-.footer-logo-fixed{
-  display:inline-flex!important;
-  align-items:center;
-  gap:9px;
-  text-decoration:none!important;
-  line-height:1;
-}
-.footer-logo-mark{
-  width:38px;
-  height:38px;
-  display:grid;
-  place-items:center;
-  border-radius:9px;
-  background:#fff;
-  color:#b3132b;
-  font-size:13px;
-  font-weight:950;
-  letter-spacing:-.6px;
-}
-.footer-logo-word{
-  color:#fff;
-  font-size:24px;
-  font-weight:850;
-  letter-spacing:-.9px;
-}
-.footer-logo-word span{color:#ef3340}
-.footer-logo-word small{
-  color:#ef3340;
-  font-size:11px;
-  font-weight:800;
-  margin-left:1px;
-  letter-spacing:0;
-}
-@media(max-width:700px){
-  .footer-logo-word{font-size:21px}
-  .footer-logo-mark{width:34px;height:34px}
-}
+<style id="footer-original-logo">
+.footer-logo-fixed{display:inline-flex!important;align-items:center;text-decoration:none!important;line-height:0}
+.footer-logo-fixed img{display:block;width:180px;height:auto;max-height:52px;object-fit:contain}
+@media(max-width:700px){.footer-logo-fixed img{width:155px;max-height:46px}}
 </style>
-
 </head>
 <body>
 <header class="topbar"><div class="container nav"><a class="brand" href="#" aria-label="FreeMenu home"><img class="fm-index-logo" src="./freemenu-logo.png" fetchpriority="high" decoding="async" alt="FreeMenu" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="fm-index-logo-fallback"><span class="mark">FM</span><span class="word">Free<span>Menu</span></span></span></a><nav class="navlinks"><a class="active" href="#">Home</a><a href="#restaurants">Restaurants</a><a href="#cuisines">Cuisines</a><a href="#restaurants">Offers</a><a href="#footer">About</a></nav><div class="navright"><div class="loc-mini">📍 Delhi NCR</div><button class="navbtn" onclick="location.href='owner.html?auth=login'">Login</button><button class="navbtn primary" onclick="location.href='owner.html?auth=signup'">Sign Up</button></div></div></header>
@@ -134,8 +98,7 @@
     <div class="footer-main">
       <div class="footer-brand">
         <a class="footer-logo footer-logo-fixed" href="/" aria-label="FreeMenu home">
-  <span class="footer-logo-mark">FM</span>
-  <span class="footer-logo-word">Free<span>Menu</span><small>.in</small></span>
+  <img src="./freemenu-logo-full.png" alt="FreeMenu" width="180" height="52">
 </a>
         <p>Explore • Scan • Dine</p>
         <small>Digital menus for restaurants and their customers.</small>
