@@ -262,6 +262,35 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
 @media(max-width:760px){html.signup-route #authChoiceCard{height:calc(100vh - 20px)!important;max-height:calc(100vh - 20px)!important;overflow-y:auto!important}}
 </style>
 
+<style id="signup-no-scroll-compact">
+/* Compact signup view: same details, smaller overall panel, no internal scrollbar. */
+@media (min-width:761px){
+  html.signup-route #authChoiceCard{
+    zoom:.84!important;
+    max-height:calc(100vh - 24px)!important;
+    overflow:hidden!important;
+  }
+  html.signup-route #authChoiceCard .authRightPanel{
+    padding:24px 30px 22px!important;
+    min-height:0!important;
+  }
+  html.signup-route #authChoiceCard .authTabs{margin-bottom:14px!important}
+  html.signup-route #authChoiceCard .authCombinedForm .authFormCard h1{font-size:27px!important}
+  html.signup-route #authChoiceCard .authCombinedForm .authFormCard .authSub{margin-bottom:12px!important}
+  html.signup-route #authChoiceCard .authFormCard .formGroup{margin-bottom:9px!important}
+  html.signup-route #authChoiceCard .authFormCard label{margin-bottom:4px!important}
+  html.signup-route #authChoiceCard .authFormCard .input{padding:10px 12px!important}
+  html.signup-route #authChoiceCard .loginSubmit{padding:11px 14px!important}
+  html.signup-route #authChoiceCard .authSwitch{margin-top:9px!important}
+}
+@media (max-width:760px){
+  html.signup-route #authChoiceCard{
+    overflow:hidden!important;
+    height:auto!important;
+    max-height:calc(100vh - 16px)!important;
+  }
+}
+</style>
 </head>
 
 <body>
@@ -301,8 +330,9 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
     <div id="loginErrorNew" class="authError" style="display:none"></div>
 
     <div class="formGroup">
-      <label>Email Address</label>
-      <input class="input" id="loginEmailNew" type="email" autocomplete="email" placeholder="owner@example.com">
+      <label>Email or Mobile Number</label>
+      <input class="input" id="loginIdentifierNew" type="text" inputmode="email" autocomplete="username" placeholder="Email or 10 digit mobile number">
+      <div class="slugHint">Use your existing email or mobile number.</div>
     </div>
     <div class="formGroup">
       <label>Password</label>
@@ -342,17 +372,32 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
     <div id="signupSuccessNew" class="authSuccess" style="display:none"></div>
 
     <div class="formGroup">
-      <label>Full Name</label>
-      <input class="input" id="signupName" type="text" placeholder="Your full name">
+      <label>Sign Up With</label>
+      <div style="display:flex;gap:8px;margin-bottom:4px">
+        <button type="button" class="authSwitch signupMethodBtn active" id="signupUseEmail" style="flex:1;border:1px solid #d9dce3;border-radius:10px;padding:11px;background:#fff">📧 Email</button>
+        <button type="button" class="authSwitch signupMethodBtn" id="signupUsePhone" style="flex:1;border:1px solid #d9dce3;border-radius:10px;padding:11px;background:#fff">📱 Mobile</button>
+      </div>
     </div>
-    <div class="formGroup">
-      <label>Mobile Number</label>
-      <input class="input" id="signupPhone" type="tel" placeholder="10 digit mobile number">
-    </div>
-    <div class="formGroup">
+
+    <div class="formGroup" id="signupEmailGroup">
       <label>Email Address</label>
       <input class="input" id="signupEmail" type="email" autocomplete="email" placeholder="owner@example.com">
     </div>
+
+    <div class="formGroup" id="signupPhoneGroup" style="display:none">
+      <label>Mobile Number</label>
+      <div style="display:flex;gap:8px">
+        <div style="display:flex;align-items:center;justify-content:center;padding:0 14px;background:#f3f4f6;border:1px solid #d9dce3;border-radius:10px;font-weight:700;white-space:nowrap">🇮🇳 +91</div>
+        <input class="input" id="signupPhone" type="tel" inputmode="numeric" autocomplete="tel" maxlength="10" placeholder="10 digit mobile number">
+      </div>
+      <div class="slugHint">No OTP. Your mobile number will be used with your password.</div>
+    </div>
+
+    <div class="formGroup">
+      <label>Full Name</label>
+      <input class="input" id="signupName" type="text" placeholder="Your full name">
+    </div>
+
     <div class="twoCol">
       <div class="formGroup">
         <label>Password</label>
@@ -363,6 +408,7 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
         <input class="input" id="signupConfirm" type="password" autocomplete="new-password" placeholder="Repeat password">
       </div>
     </div>
+
     <div class="formGroup">
       <label>Restaurant Name</label>
       <input class="input" id="signupRestaurant" type="text" placeholder="Your restaurant name">
@@ -1061,18 +1107,30 @@ async function updateOwnerPassword(){
 }
 
 async function ownerLogin(){
-  const email=$("loginEmailNew").value.trim();
+  const identifier=$("loginIdentifierNew").value.trim();
   const password=$("loginPasswordNew").value;
   setAuthMsg("loginErrorNew","");
-  if(!email || !password){
-    setAuthMsg("loginErrorNew","Please enter email and password.");
+  if(!identifier || !password){
+    setAuthMsg("loginErrorNew","Please enter your email/mobile number and password.");
     return;
   }
   const btn=$("loginSubmitNew");
   btn.disabled=true;
   btn.textContent="Signing in...";
   try{
-    const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+    const isEmail=identifier.includes("@");
+    let payload;
+    if(isEmail){
+      payload={email:identifier,password};
+    }else{
+      const digits=identifier.replace(/\D/g,"");
+      if(!/^\d{10}$/.test(digits)){
+        setAuthMsg("loginErrorNew","Please enter a valid email or 10 digit mobile number.");
+        return;
+      }
+      payload={phone:"+91"+digits,password};
+    }
+    const {data,error}=await supabaseClient.auth.signInWithPassword(payload);
     if(error){
       setAuthMsg("loginErrorNew",error.message);
       return;
@@ -1084,13 +1142,10 @@ async function ownerLogin(){
     hideOwnerLogin();
     $("loader").classList.remove("hidden");
     await init(true);
-    // Owner login must stay on the Owner Dashboard.
-    // Public/customer menus are opened separately from the dashboard.
-    return;
   }catch(e){
     console.error("Owner login failed:",e);
     showLoginForm();
-    setAuthMsg("loginErrorNew",e?.message||"Unable to login. Please check your connection and try again.");
+    setAuthMsg("loginErrorNew",e?.message||"Unable to login. Please check your credentials and try again.");
   }finally{
     btn.disabled=false;
     btn.textContent="🔐 Login to Owner Panel";
@@ -1101,16 +1156,16 @@ async function ownerSignup(){
   setAuthMsg("signupErrorNew","");
   setAuthMsg("signupSuccessNew","");
   const name=$("signupName").value.trim();
-  const phone=$("signupPhone").value.trim();
   const email=$("signupEmail").value.trim();
+  const phoneDigits=$("signupPhone").value.trim().replace(/\D/g,"");
   const password=$("signupPassword").value;
   const confirm=$("signupConfirm").value;
   const restaurant=$("signupRestaurant").value.trim();
   const address=$("signupAddress").value.trim();
-  const slug=$("signupSlug").value.trim().toLowerCase()
-    .replace(/[^a-z0-9-]+/g,"-").replace(/^-+|-+$/g,"");
+  const slug=$("signupSlug").value.trim().toLowerCase().replace(/[^a-z0-9-]+/g,"-").replace(/^-+|-+$/g,"");
+  const method=window.ownerSignupMethod||"email";
 
-  if(!name||!phone||!email||!password||!restaurant||!address||!slug){
+  if(!name||!password||!restaurant||!address||!slug){
     setAuthMsg("signupErrorNew","Please complete all required fields.");
     return;
   }
@@ -1122,71 +1177,67 @@ async function ownerSignup(){
     setAuthMsg("signupErrorNew","Passwords do not match.");
     return;
   }
-  if(!/^\d{10}$/.test(phone.replace(/\D/g,""))){
+  if(method==="email" && !email){
+    setAuthMsg("signupErrorNew","Please enter your email address.");
+    return;
+  }
+  if(method==="phone" && !/^\d{10}$/.test(phoneDigits)){
     setAuthMsg("signupErrorNew","Please enter a valid 10 digit mobile number.");
     return;
   }
 
-  $("signupSubmitNew").disabled=true;
-  $("signupSubmitNew").textContent="Creating account...";
+  const btn=$("signupSubmitNew");
+  btn.disabled=true;
+  btn.textContent="Creating account...";
 
-  const {data,error}=await supabaseClient.auth.signUp({
-    email,password,
-    options:{
-      data:{
-        full_name:name,
-        phone:phone.replace(/\D/g,""),
-        role:"owner",
-        restaurant_name:restaurant,
-        restaurant_address:address,
-        restaurant_slug:slug
-      }
+  try{
+    const phone=method==="phone"?"+91"+phoneDigits:null;
+    const authPayload=method==="email"
+      ? {email,password,options:{data:{full_name:name,phone:phoneDigits||null,role:"owner",restaurant_name:restaurant,restaurant_address:address,restaurant_slug:slug}}}
+      : {phone,password,options:{data:{full_name:name,email:email||null,role:"owner",restaurant_name:restaurant,restaurant_address:address,restaurant_slug:slug}}};
+
+    const {data,error}=await supabaseClient.auth.signUp(authPayload);
+    if(error){
+      setAuthMsg("signupErrorNew",error.message);
+      return;
     }
-  });
-  if(error){
-    setAuthMsg("signupErrorNew",error.message);
-    $("signupSubmitNew").disabled=false;
-    $("signupSubmitNew").textContent="📝 Create Restaurant Account";
-    return;
-  }
+    if(!data?.user){
+      setAuthMsg("signupErrorNew","Account could not be created. Please try again.");
+      return;
+    }
+    if(!data.session){
+      const msg=method==="email"
+        ? "Account created, but email confirmation is enabled in Supabase. Turn OFF Confirm email for direct login."
+        : "Account created, but phone confirmation is enabled in Supabase. Turn OFF Confirm phone for direct login.";
+      setAuthMsg("signupSuccessNew",msg,true);
+      setTimeout(showLoginForm,1800);
+      return;
+    }
 
-  // Supabase may require email confirmation. If a session exists, create the
-  // restaurant immediately; otherwise instruct the owner to confirm and login.
-  if(data.user && data.session){
-    const {data:existing,error:checkError}=await supabaseClient
-      .from("restaurants").select("id").eq("slug",slug).maybeSingle();
-
+    const {data:existing,error:checkError}=await supabaseClient.from("restaurants").select("id").eq("slug",slug).maybeSingle();
     if(checkError){
       setAuthMsg("signupErrorNew",checkError.message);
-      $("signupSubmitNew").disabled=false;
-      $("signupSubmitNew").textContent="📝 Create Restaurant Account";
       return;
     }
     if(existing){
       setAuthMsg("signupErrorNew","This Menu Slug is already in use. Please choose another.");
-      $("signupSubmitNew").disabled=false;
-      $("signupSubmitNew").textContent="📝 Create Restaurant Account";
       return;
     }
 
-    const {data:restaurantRow,error:restaurantError}=await supabaseClient
-      .from("restaurants")
-      .insert({
-        owner_id:data.user.id,
-        name:restaurant,
-        slug,
-        phone:phone.replace(/\D/g,""),
-        address,
-        status:"pending",
-        plan:"free",
-        subscription_status:"inactive"
-      })
-      .select("*").single();
+    const {data:restaurantRow,error:restaurantError}=await supabaseClient.from("restaurants").insert({
+      owner_id:data.user.id,
+      name:restaurant,
+      slug,
+      phone:phoneDigits,
+      email:email||null,
+      address,
+      status:"pending",
+      plan:"free",
+      subscription_status:"inactive"
+    }).select("*").single();
 
     if(restaurantError){
       setAuthMsg("signupErrorNew","Account created but restaurant setup failed: "+restaurantError.message);
-      $("signupSubmitNew").disabled=false;
-      $("signupSubmitNew").textContent="📝 Create Restaurant Account";
       return;
     }
 
@@ -1198,14 +1249,26 @@ async function ownerSignup(){
       $("loader").classList.remove("hidden");
       await init();
     },500);
-  }else{
-    setAuthMsg("signupSuccessNew","Account created. Please verify your email, then login. Your restaurant details are saved and will be connected automatically after verification.",true);
-    setTimeout(showLoginForm,1400);
+  }catch(e){
+    console.error("Owner signup failed:",e);
+    setAuthMsg("signupErrorNew",e?.message||"Unable to create account. Please try again.");
+  }finally{
+    btn.disabled=false;
+    btn.textContent="📝 Create Restaurant Account";
   }
-
-  $("signupSubmitNew").disabled=false;
-  $("signupSubmitNew").textContent="📝 Create Restaurant Account";
 }
+
+window.ownerSignupMethod="email";
+$("signupUseEmail").onclick=()=>{
+  window.ownerSignupMethod="email";
+  $("signupEmailGroup").style.display="block";
+  $("signupPhoneGroup").style.display="none";
+};
+$("signupUsePhone").onclick=()=>{
+  window.ownerSignupMethod="phone";
+  $("signupEmailGroup").style.display="none";
+  $("signupPhoneGroup").style.display="block";
+};
 
 $("goSignupFromLogin").onclick=showSignupForm;
 $("goLoginFromSignup").onclick=showLoginForm;
