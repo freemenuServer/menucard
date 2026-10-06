@@ -202,7 +202,7 @@ function openRestaurant(restaurantId){
   const raw=String(r.slug||"").trim();
   const slug=raw || id;
   if(!slug)return;
-  window.location.assign("/"+encodeURIComponent(String(slug).trim().toLowerCase()));
+  window.location.assign("/menu.html?r="+encodeURIComponent(String(slug).trim().toLowerCase()));
 }
 function toggleFav(e,id,btn){e.stopPropagation();if(favorites.has(id)){favorites.delete(id);btn.textContent="♡"}else{favorites.add(id);btn.textContent="♥"}localStorage.setItem("freemenu_favorites",JSON.stringify([...favorites]))}
 document.getElementById("mainSearch").addEventListener("input",()=>{selectedCuisine="";applyFilters()});document.getElementById("searchBtn").addEventListener("click",applyFilters);document.getElementById("sortSelect").addEventListener("change",applyFilters);document.getElementById("onlyVeg").addEventListener("change",applyFilters);document.getElementById("openNow").addEventListener("change",applyFilters);document.getElementById("hasOffers").addEventListener("change",applyFilters);document.querySelectorAll('input[name="price"]').forEach(x=>x.addEventListener("change",applyFilters));document.getElementById("clearFilters").addEventListener("click",()=>{document.getElementById("mainSearch").value="";document.getElementById("onlyVeg").checked=false;document.getElementById("openNow").checked=false;document.getElementById("hasOffers").checked=false;document.querySelectorAll('input[name="price"]').forEach(x=>x.checked=false);selectedCuisine="";applyFilters()});document.getElementById("mobileFilterBtn").addEventListener("click",()=>document.getElementById("filtersBox").classList.toggle("show"));loadData();

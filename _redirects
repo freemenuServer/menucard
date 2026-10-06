@@ -1,8 +1,3 @@
-# Keep existing internal/template pages reachable without entering the clean-slug router
-/menu.html    /__fm/menu.html    200
-/menugrowth.html    /__fm/menugrowth.html    200
-/signaturemenu.html    /__fm/signaturemenu.html    200
-/engine.html    /__fm/engine.html    200
-
-# Clean public restaurant menu URLs
-/:slug    /__fm/engine.html?r=:slug    200
+# Clean public restaurant menu URL
+# Example: https://freemenu.in/dosafactory
+/:slug    /menu.html?r=:slug    200
