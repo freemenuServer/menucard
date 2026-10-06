@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="About FreeMenu.in - Built by restaurateurs for restaurateurs. Upgrade your dining space with real-time digital menus, zero reprint costs, and next-gen 3D WebAR." />
+  <title>About Us • Built for Visionary Restaurateurs • FreeMenu</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;0,800;1,400;1,700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <style>
+    :root {
+      --bg: #07090e;
+      --panel: #0f141d;
+      --panel-card: #151b26;
+      --border: #1f293d;
+      --border-accent: rgba(245, 158, 11, 0.4);
+      --accent: #f59e0b;
+      --accent-glow: rgba(245, 158, 11, 0.25);
+      --accent-hover: #d97706;
+      --green: #10b981;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --heading: #ffffff;
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+      line-height: 1.7;
+      padding: 0 16px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 40px auto 90px;
+    }
+
+    /* 1. HERO SECTION */
+    .hero {
+      position: relative;
+      background: radial-gradient(circle at 85% 15%, rgba(245, 158, 11, 0.16), transparent 50%),
+                  radial-gradient(circle at 15% 85%, rgba(16, 185, 129, 0.08), transparent 45%),
+                  linear-gradient(180deg, #151c27 0%, var(--panel) 100%);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 64px 38px;
+      text-align: center;
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.7);
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 480px;
+      height: 240px;
+      background: var(--accent-glow);
+      filter: blur(100px);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid var(--border-accent);
+      color: var(--accent);
+      padding: 7px 18px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(34px, 6.5vw, 56px);
+      font-weight: 850;
+      color: var(--heading);
+      line-height: 1.15;
+      letter-spacing: -0.8px;
+      margin-bottom: 20px;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b, #fde047);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 17.5px;
+      color: var(--muted);
+      max-width: 740px;
+      margin: 0 auto 30px;
+      font-weight: 400;
+    }
+
+    /* QUICK STATS RIBBON */
+    .stats-ribbon {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin: 32px 0 44px;
+    }
+    .stat-box {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 18px;
+      text-align: center;
+      transition: all 0.25s ease;
+    }
+    .stat-box:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+    }
+    .stat-val {
+      font-size: 34px;
+      font-weight: 850;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .stat-desc {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+
+    /* 2. THE RESTAURATEUR's DILEMMA SECTION */
+    .section-wrap {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 44px 36px;
+      margin-bottom: 32px;
+    }
+    .section-head {
+      margin-bottom: 24px;
+    }
+    .section-head h2 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-head h2 i {
+      color: var(--accent);
+      font-size: 24px;
+    }
+    .section-sub {
+      color: var(--muted);
+      font-size: 14.5px;
+      margin-top: 4px;
+    }
+
+    /* COMPARISON TABLE: OLD WAY VS FREEMENU */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 24px;
+    }
+    .compare-col {
+      border-radius: 16px;
+      padding: 24px;
+    }
+    .compare-bad {
+      background: rgba(239, 68, 68, 0.05);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+    }
+    .compare-good {
+      background: rgba(16, 185, 129, 0.05);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .compare-title {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .compare-bad .compare-title { color: #f87171; }
+    .compare-good .compare-title { color: #34d399; }
+    .compare-list {
+      list-style: none;
+      font-size: 14px;
+    }
+    .compare-list li {
+      margin-bottom: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    /* 3. INTERACTIVE OWNER SAVINGS CALCULATOR */
+    .calc-box {
+      background: linear-gradient(145deg, #161e2b 0%, #0d121a 100%);
+      border: 1px solid var(--border-accent);
+      border-radius: 22px;
+      padding: 34px 30px;
+      margin: 32px 0;
+    }
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 28px;
+      align-items: center;
+    }
+    .slider-group {
+      margin-bottom: 18px;
+    }
+    .slider-label {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .slider-label span {
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .calc-result {
+      background: var(--panel);
+      border: 1px dashed var(--accent);
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+    }
+    .calc-saving-amount {
+      font-size: 40px;
+      font-weight: 850;
+      color: var(--green);
+      font-family: 'JetBrains Mono', monospace;
+      margin: 4px 0;
+    }
+
+    /* 4. PILLARS OF EXCELLENCE */
+    .pillar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .pillar-card {
+      background: var(--panel-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px 24px;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+    .pillar-card:hover {
+      border-color: var(--border-accent);
+      transform: translateY(-4px);
+      box-shadow: 0 14px 40px rgba(0, 0, 0, 0.5);
+    }
+    .pillar-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid var(--border-accent);
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      font-size: 22px;
+      margin-bottom: 18px;
+    }
+    .pillar-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .pillar-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* 5. HOW IT WORKS (3 SIMPLE STEPS) */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-top: 20px;
+    }
+    .step-card {
+      background: var(--panel-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 20px;
+      position: relative;
+    }
+    .step-number {
+      font-size: 32px;
+      font-weight: 850;
+      color: rgba(245, 158, 11, 0.25);
+      font-family: 'JetBrains Mono', monospace;
+      position: absolute;
+      top: 14px;
+      right: 18px;
+    }
+    .step-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .step-desc {
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* 6. FOUNDER QUOTE & ETHOS */
+    .quote-card {
+      background: radial-gradient(circle at 10% 20%, rgba(245, 158, 11, 0.1), transparent 45%),
+                  var(--panel);
+      border: 1px solid var(--border-accent);
+      border-radius: 24px;
+      padding: 38px 32px;
+      margin-bottom: 32px;
+      display: flex;
+      gap: 22px;
+      align-items: center;
+    }
+    .quote-badge-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: #1e293b;
+      border: 2px solid var(--accent);
+      display: grid;
+      place-items: center;
+      font-size: 30px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    .quote-content p {
+      font-size: 16px;
+      color: #fff;
+      font-style: italic;
+      line-height: 1.7;
+      margin-bottom: 8px;
+    }
+    .quote-content .author {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* 7. RESTAURANT OWNER VIP DESK / CTA */
+    .vip-cta {
+      background: linear-gradient(180deg, #151d29 0%, #0c1017 100%);
+      border: 1px solid var(--border-accent);
+      border-radius: 26px;
+      padding: 44px 32px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+    .vip-cta h3 {
+      font-size: clamp(24px, 4vw, 32px);
+      font-weight: 850;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+    .vip-cta p {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 24px;
+    }
+    .contact-actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .cta-btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      transition: all 0.2s ease;
+    }
+    .cta-primary {
+      background: var(--accent);
+      color: #111;
+    }
+    .cta-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-2px);
+    }
+    .cta-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: #fff;
+    }
+    .cta-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      margin-top: 48px;
+      font-size: 13px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      padding-top: 28px;
+    }
+
+    @media (max-width: 768px) {
+      .hero { padding: 42px 20px; }
+      .compare-grid { grid-template-columns: 1fr; }
+      .calc-grid { grid-template-columns: 1fr; }
+      .quote-card { flex-direction: column; text-align: center; }
+      .section-wrap { padding: 30px 20px; }
+    }
+  </style>
+
+  <!-- FreeMenu Brand / Favicon -->
+  <link rel="icon" type="image/png" sizes="512x512" href="favicon-512x512.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+</head>
+<body>
+
+  <main class="container">
+
+    <!-- 1. HERO SECTION -->
+    <header class="hero">
+      <div class="badge">
+        <i class="fa-solid fa-crown"></i> The Hospitality Technology Partner
+      </div>
+      <h1>Designed by Food Lovers, Built for <span>Proud Restaurant Owners</span></h1>
+      <p>
+        Running a kitchen is an art. Managing paper menus should never be a struggle. FreeMenu is on a mission to eliminate reprint headaches, enhance guest dining, and put full control back into the restaurant owner's hands.
+      </p>
+      <div class="contact-actions">
+        <a href="#calculator" class="cta-btn cta-primary">
+          <i class="fa-solid fa-calculator"></i> Calculate Your Savings
+        </a>
+        <a href="tel:+917091924949" class="cta-btn cta-secondary">
+          <i class="fa-solid fa-phone"></i> Talk to Founder Desk
+        </a>
+      </div>
+    </header>
+
+    <!-- METRICS -->
+    <section class="stats-ribbon">
+      <div class="stat-box">
+        <div class="stat-val">₹0</div>
+        <div class="stat-desc">Paper Menu Printing Cost</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val">10 Sec</div>
+        <div class="stat-desc">Instant Price Update Time</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val">+28%</div>
+        <div class="stat-desc">Higher High-Margin Dish Orders</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val">100%</div>
+        <div class="stat-desc">Zero App Download Needed</div>
+      </div>
+    </section>
+
+    <!-- 2. OLD WAY VS FREEMENU (CONNECTS WITH THE OWNER's REALITY) -->
+    <section class="section-wrap">
+      <div class="section-head">
+        <h2><i class="fa-solid fa-scale-balanced"></i> Why Traditional Menus Are Hurting Your Brand</h2>
+        <div class="section-sub">A side-by-side look at how traditional dining stacks up against the FreeMenu standard.</div>
+      </div>
+
+      <div class="compare-grid">
+        <div class="compare-col compare-bad">
+          <div class="compare-title">
+            <i class="fa-solid fa-circle-xmark"></i> Traditional Paper / Acrylic Menus
+          </div>
+          <ul class="compare-list">
+            <li><i class="fa-solid fa-xmark" style="color:#ef4444;"></i> <strong>Expensive to Reprint:</strong> Changing just 2 dish prices costs thousands of rupees in fresh booklet printing.</li>
+            <li><i class="fa-solid fa-xmark" style="color:#ef4444;"></i> <strong>Dirty & Unhygienic:</strong> Oily fingers, food sauce drops, and torn plastic leave a cheap first impression on guests.</li>
+            <li><i class="fa-solid fa-xmark" style="color:#ef4444;"></i> <strong>Zero Dish Visualization:</strong> Guests have to guess portion sizes and appearance from plain black text.</li>
+            <li><i class="fa-solid fa-xmark" style="color:#ef4444;"></i> <strong>Out-of-Stock Embarrassment:</strong> Waiters have to verbally apologize when a dish is finished during rush hours.</li>
+          </ul>
+        </div>
+
+        <div class="compare-col compare-good">
+          <div class="compare-title">
+            <i class="fa-solid fa-circle-check"></i> The FreeMenu Smart QR Standard
+          </div>
+          <ul class="compare-list">
+            <li><i class="fa-solid fa-check" style="color:#10b981;"></i> <strong>Instant Edits Anytime:</strong> Update prices, mark dishes out of stock, or launch specials in 5 seconds from your phone.</li>
+            <li><i class="fa-solid fa-check" style="color:#10b981;"></i> <strong>Premium Table Presence:</strong> Guests scan a sleek acrylic/wooden QR stand with their smartphone camera.</li>
+            <li><i class="fa-solid fa-check" style="color:#10b981;"></i> <strong>Sensational Visuals & 3D AR:</strong> Showcase crisp food photos, chef notes, and AR models right on the dining table.</li>
+            <li><i class="fa-solid fa-check" style="color:#10b981;"></i> <strong>Multi-Portion Clarity:</strong> Clear pricing columns for Full, Half, and Quarter portions without clutter.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. INTERACTIVE ANNUAL SAVINGS CALCULATOR -->
+    <section class="calc-box" id="calculator">
+      <div class="section-head">
+        <h2><i class="fa-solid fa-coins"></i> Your Restaurant Savings Calculator</h2>
+        <div class="section-sub">Slide to see how much FreeMenu saves your establishment every single year on printing alone.</div>
+      </div>
+
+      <div class="calc-grid">
+        <div class="calc-inputs">
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Number of Tables:</span>
+              <span id="tablesVal">20 Tables</span>
+            </div>
+            <input type="range" id="tablesSlider" min="5" max="100" value="20" step="5" oninput="calculateSavings()">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Menu Booklet Reprints / Year:</span>
+              <span id="reprintsVal">4 Times</span>
+            </div>
+            <input type="range" id="reprintsSlider" min="1" max="12" value="4" step="1" oninput="calculateSavings()">
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-label">
+              <span>Average Cost per Booklet:</span>
+              <span id="costVal">₹250</span>
+            </div>
+            <input type="range" id="costSlider" min="100" max="600" value="250" step="50" oninput="calculateSavings()">
+          </div>
+        </div>
+
+        <div class="calc-result">
+          <div style="font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase;">Estimated Annual Savings</div>
+          <div class="calc-saving-amount" id="savingsTotal">₹20,000</div>
+          <div style="font-size: 13px; color: var(--muted);">Direct printing costs saved + zero staff time wasted</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. FOUR PILLARS BUILT FOR RESTAURANT SUCCESS -->
+    <section class="section-wrap">
+      <div class="section-head">
+        <h2><i class="fa-solid fa-layer-group"></i> Four Pillars Built for Restaurant Success</h2>
+        <div class="section-sub">Enterprise technology tailored specifically to solve real kitchen and table challenges.</div>
+      </div>
+
+      <div class="pillar-grid">
+        <div class="pillar-card">
+          <div class="pillar-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+          <h3 class="pillar-title">Owner-First Dashboard</h3>
+          <p class="pillar-desc">
+            You don't need to be a software engineer. Our interface is as simple as sending a WhatsApp message. Upload a photo, type a price, and click Save. Done.
+          </p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon"><i class="fa-solid fa-cube"></i></div>
+          <h3 class="pillar-title">WebAR Video & 3D Dining</h3>
+          <p class="pillar-desc">
+            Give diners an unforgettable visual treat. Show sizzling signature platters or video teasers floating directly in front of them without any app download.
+          </p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon"><i class="fa-solid fa-cloud-bolt"></i></div>
+          <h3 class="pillar-title">Cloudflare High-Speed Edge</h3>
+          <p class="pillar-desc">
+            When 50 guests scan your menu at 8:30 PM on a Saturday night, your menu opens in under 100 milliseconds without buffering or lag.
+          </p>
+        </div>
+
+        <div class="pillar-card">
+          <div class="pillar-icon"><i class="fa-solid fa-shield-halved"></i></div>
+          <h3 class="pillar-title">Safe & Independent</h3>
+          <p class="pillar-desc">
+            Your restaurant data is your intellectual property. Powered by Supabase security, your menu details, specials, and analytics stay completely private.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. 3 EASY STEPS TO GO LIVE -->
+    <section class="section-wrap">
+      <div class="section-head">
+        <h2><i class="fa-solid fa-wand-magic-sparkles"></i> Live in Under 15 Minutes</h2>
+        <div class="section-sub">No complex POS integrations or weeks of waiting. Three straightforward steps.</div>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <h3 class="step-title">Upload Dishes</h3>
+          <p class="step-desc">Add your categories (Starters, Main Course, Beverages), portions (Quarter/Half/Full), and prices in your dashboard.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <h3 class="step-title">Generate High-Res QR</h3>
+          <p class="step-desc">Download your customized QR code file formatted for table tents, acrylic stands, or wall stands.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <h3 class="step-title">Delight Your Diners</h3>
+          <p class="step-desc">Guests scan with their native smartphone cameras. Enjoy zero print overhead and instant menu modifications forever.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. FOUNDER ETHOS & COMMITMENT -->
+    <div class="quote-card">
+      <div class="quote-badge-avatar">
+        <i class="fa-solid fa-utensils"></i>
+      </div>
+      <div class="quote-content">
+        <p>
+          "We understand what it feels like to run a restaurant: from balancing kitchen inventory to ensuring every guest leaves with a smile. FreeMenu is not just another piece of software; it's our dedication to making every restaurant owner feel proud of their digital presence."
+        </p>
+        <div class="author">Founder & Engineering Desk • FreeMenu.in</div>
+      </div>
+    </div>
+
+    <!-- 7. VIP OWNER CTA -->
+    <section class="vip-cta">
+      <h3>Ready to Give Your Restaurant the Upgrade It Deserves?</h3>
+      <p>
+        Join our growing family of proud dining establishments. Our support desk assists you personally with initial menu setup and QR branding.
+      </p>
+
+      <div class="contact-actions">
+        <a href="tel:+917091924949" class="cta-btn cta-primary">
+          <i class="fa-solid fa-phone"></i> Direct Call: +91 7091924949
+        </a>
+        <a href="mailto:athravsharma2828@gmail.com" class="cta-btn cta-secondary">
+          <i class="fa-solid fa-envelope"></i> athravsharma2828@gmail.com
+        </a>
+        <span class="cta-btn cta-secondary" style="cursor: default;">
+          <i class="fa-solid fa-location-dot" style="color:var(--accent);"></i> Headquartered in Delhi, India
+        </span>
+      </div>
+    </section>
+
+    <footer class="footer">
+      © 2026 FreeMenu.in • Crafted with pride for the hospitality industry.
+    </footer>
+
+  </main>
+
+  <!-- SAVINGS CALCULATOR LOGIC -->
+  <script>
+    function calculateSavings() {
+      const tables = parseInt(document.getElementById('tablesSlider').value);
+      const reprints = parseInt(document.getElementById('reprintsSlider').value);
+      const cost = parseInt(document.getElementById('costSlider').value);
+
+      document.getElementById('tablesVal').textContent = tables + " Tables";
+      document.getElementById('reprintsVal').textContent = reprints + " Times";
+      document.getElementById('costVal').textContent = "₹" + cost;
+
+      // Calculation: Tables * Reprints per year * Cost per book
+      const total = tables * reprints * cost;
+      document.getElementById('savingsTotal').textContent = "₹" + total.toLocaleString('en-IN');
+    }
+
+    // Init on page load
+    window.addEventListener('load', calculateSavings);
+  </script>
+
+</body>
+</html>

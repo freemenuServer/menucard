@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Contact FreeMenu.in - Get dedicated support for digital restaurant menus, custom WebAR setups, and enterprise partnerships." />
+  <title>Contact Us • FreeMenu</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;0,800;1,400&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <style>
+    :root {
+      --bg: #090c10;
+      --panel: #11161d;
+      --panel-card: #151c26;
+      --border: #1f2937;
+      --border-accent: rgba(245, 158, 11, 0.35);
+      --accent: #f59e0b;
+      --accent-hover: #d97706;
+      --green: #10b981;
+      --green-hover: #059669;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --heading: #ffffff;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+      line-height: 1.7;
+      padding: 0 16px;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 40px auto 80px;
+    }
+
+    /* HEADER */
+    .hero {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid var(--border-accent);
+      color: var(--accent);
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .hero h1 {
+      font-size: clamp(30px, 5.5vw, 48px);
+      font-weight: 850;
+      color: var(--heading);
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, #f59e0b, #fde047);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 620px;
+      margin: 0 auto;
+    }
+
+    /* 2-COLUMN LAYOUT */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    /* LEFT INFO PANEL */
+    .info-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px 26px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    }
+    .info-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .info-sub {
+      font-size: 13.5px;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .channel-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--panel-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 14px;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.2s ease;
+    }
+    .channel-card:hover {
+      border-color: var(--accent);
+      transform: translateX(4px);
+    }
+    .channel-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid var(--border-accent);
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+      font-size: 19px;
+      flex-shrink: 0;
+    }
+    .channel-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .channel-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 2px;
+      word-break: break-all;
+    }
+
+    .wa-btn {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+      padding: 14px 20px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      text-decoration: none;
+      margin-top: 20px;
+      transition: 0.2s;
+    }
+    .wa-btn:hover {
+      background: var(--green);
+      color: #111;
+    }
+
+    /* RIGHT FORM PANEL */
+    .form-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 34px 30px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    }
+    .form-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .form-sub {
+      font-size: 13.5px;
+      color: var(--muted);
+      margin-bottom: 22px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .form-control {
+      width: 100%;
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: #fff;
+      padding: 12px 14px;
+      font-size: 13.5px;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .form-control:focus {
+      border-color: var(--accent);
+    }
+    textarea.form-control {
+      resize: vertical;
+      min-height: 110px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--green);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 14.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.25);
+    }
+    .btn-submit:hover {
+      background: var(--green-hover);
+      transform: translateY(-2px);
+    }
+
+    /* FAQ ACCORDION */
+    .faq-section {
+      margin-top: 50px;
+    }
+    .faq-head {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .faq-head h2 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .faq-item {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .faq-q {
+      padding: 16px 20px;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .faq-q:hover {
+      color: var(--accent);
+    }
+    .faq-a {
+      padding: 0 20px 18px;
+      font-size: 13.5px;
+      color: var(--muted);
+      line-height: 1.6;
+      display: none;
+    }
+    .faq-item.active .faq-a {
+      display: block;
+    }
+    .faq-item.active .faq-q i {
+      transform: rotate(180deg);
+      color: var(--accent);
+    }
+
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      margin-top: 50px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 768px) {
+      .contact-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .form-panel, .info-panel { padding: 26px 18px; }
+    }
+  </style>
+
+  <!-- FreeMenu Brand / Favicon -->
+  <link rel="icon" type="image/png" sizes="512x512" href="favicon-512x512.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+</head>
+<body>
+
+  <main class="container">
+
+    <!-- HERO HEADER -->
+    <header class="hero">
+      <div class="badge">
+        <i class="fa-solid fa-headset"></i> We're Here to Help
+      </div>
+      <h1>Get in Touch with <span>FreeMenu Desk</span></h1>
+      <p>
+        Have questions about setting up your restaurant's digital menu, custom WebAR dining experiences, or bulk importing? Our team is always one message away.
+      </p>
+    </header>
+
+    <!-- CONTACT GRID -->
+    <div class="contact-grid">
+
+      <!-- LEFT: DIRECT CHANNELS -->
+      <aside class="info-panel">
+        <h2 class="info-title">Direct Contacts</h2>
+        <p class="info-sub">Feel free to connect directly via call, email, or chat.</p>
+
+        <!-- Phone -->
+        <a href="tel:+917091924949" class="channel-card">
+          <div class="channel-icon"><i class="fa-solid fa-phone"></i></div>
+          <div>
+            <div class="channel-label">Support Helpline</div>
+            <div class="channel-value">+91 7091924949</div>
+          </div>
+        </a>
+
+        <!-- Email -->
+        <a href="mailto:athravsharma2828@gmail.com" class="channel-card">
+          <div class="channel-icon"><i class="fa-solid fa-envelope"></i></div>
+          <div>
+            <div class="channel-label">Official Email</div>
+            <div class="channel-value">athravsharma2828@gmail.com</div>
+          </div>
+        </a>
+
+        <!-- Location -->
+        <div class="channel-card" style="cursor: default;">
+          <div class="channel-icon"><i class="fa-solid fa-location-dot"></i></div>
+          <div>
+            <div class="channel-label">Headquarters</div>
+            <div class="channel-value">Delhi, India</div>
+          </div>
+        </div>
+
+        <!-- WhatsApp Quick Chat -->
+        <a href="https://wa.me/917091924949?text=Hi%20FreeMenu%20Team,%20I%20want%20to%20know%20more%20about%20your%20digital%20menu%20services." target="_blank" class="wa-btn">
+          <i class="fa-brands fa-whatsapp" style="font-size: 19px;"></i> Chat on WhatsApp
+        </a>
+      </aside>
+
+      <!-- RIGHT: SEND MESSAGE FORM (WHATSAPP AUTOMATED) -->
+      <section class="form-panel">
+        <h2 class="form-title">Send Us an Instant Inquiry</h2>
+        <p class="form-sub">Fill out the details below. Clicking send will directly open your message on WhatsApp for instant support.</p>
+
+        <form id="contactForm" onsubmit="handleWhatsAppSubmit(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Your Name *</label>
+              <input type="text" id="senderName" class="form-control" placeholder="Rohan Mehra" required>
+            </div>
+            <div class="form-group">
+              <label>Restaurant / Brand Name</label>
+              <input type="text" id="restaurantName" class="form-control" placeholder="Urban Bistro">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Phone Number *</label>
+              <input type="tel" id="senderPhone" class="form-control" placeholder="+91 98765 43210" required>
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" id="senderEmail" class="form-control" placeholder="rohan@example.com">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Inquiry Subject</label>
+            <select id="inquirySubject" class="form-control">
+              <option value="New Restaurant Menu Setup">New Restaurant Menu Setup</option>
+              <option value="3D / WebAR Showcase Inquiry">3D / WebAR Showcase Inquiry</option>
+              <option value="CSV Menu Bulk Import Assistance">CSV Menu Bulk Import Assistance</option>
+              <option value="AdSense & Plan Options">AdSense & Plan Options</option>
+              <option value="Technical Support">Technical Support / Help</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Message / Details *</label>
+            <textarea id="senderMessage" class="form-control" placeholder="Describe your requirement or menu questions..." required></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit" id="submitBtn">
+            <i class="fa-brands fa-whatsapp" style="font-size: 18px;"></i> Send Inquiry via WhatsApp
+          </button>
+        </form>
+      </section>
+
+    </div>
+
+    <!-- QUICK FAQ SECTION -->
+    <section class="faq-section">
+      <div class="faq-head">
+        <h2>Frequently Asked Questions</h2>
+        <p style="font-size:13.5px; color:var(--muted); margin-top:4px;">Quick answers to common questions about FreeMenu</p>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How long does it take to get our restaurant menu live?
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="faq-a">
+          Less than 15 minutes! Once you register, you can immediately input your dishes or upload your menu using our CSV bulk importer, download your unique tabletop QR code, and start serving.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Do guests need to download any application to view the menu or AR models?
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="faq-a">
+          Zero app downloads are required. Diners simply point their default smartphone camera at the QR stand, and the menu opens instantly in their browser with high-speed Cloudflare edge caching.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Can we update dish prices during active operating hours?
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
+        <div class="faq-a">
+          Yes, changes reflect in real-time. If you adjust a price, toggle an item out-of-stock, or add a daily special, guests will see the updated menu the moment they refresh.
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      © 2026 FreeMenu.in. All rights reserved. • Delhi, India
+    </footer>
+
+  </main>
+
+  <script>
+    function toggleFaq(el) {
+      const parent = el.parentElement;
+      parent.classList.toggle('active');
+    }
+
+    // FORM DETAILS TO WHATSAPP DISPATCH LOGIC
+    function handleWhatsAppSubmit(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('senderName').value.trim();
+      const rest = document.getElementById('restaurantName').value.trim() || 'N/A';
+      const phone = document.getElementById('senderPhone').value.trim();
+      const email = document.getElementById('senderEmail').value.trim() || 'N/A';
+      const subject = document.getElementById('inquirySubject').value;
+      const msg = document.getElementById('senderMessage').value.trim();
+
+      // Formatted WhatsApp message template
+      const fullText = 
+`*New FreeMenu Inquiry Received* 🍽️
+-----------------------------------
+👤 *Name:* ${name}
+🏨 *Restaurant:* ${rest}
+📞 *Phone:* ${phone}
+✉️ *Email:* ${email}
+📌 *Subject:* ${subject}
+-----------------------------------
+💬 *Message:*
+${msg}`;
+
+      const targetNumber = "917091924949";
+      const waUrl = `https://wa.me/${targetNumber}?text=${encodeURIComponent(fullText)}`;
+
+      // Open WhatsApp Web or App
+      window.open(waUrl, '_blank');
+
+      // Clear input fields
+      document.getElementById('contactForm').reset();
+    }
+  </script>
+
+</body>
+</html>
