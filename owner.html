@@ -420,7 +420,7 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
     <div class="formGroup">
       <label>Menu Slug</label>
       <input class="input" id="signupSlug" type="text" placeholder="my-restaurant-menu">
-      <div class="slugHint">Your public menu: menu.html?r=your-slug</div>
+      <div class="slugHint">Your public menu: freemenu.in/your-slug</div>
     </div>
 
     <button type="button" class="loginSubmit" id="signupSubmitNew">📝 Create Restaurant Account</button>
@@ -947,7 +947,7 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const cleanNum=v=>v!==""&&v!==null&&v!==undefined&&!Number.isNaN(Number(v))?Number(v):null;
 function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),2300)}
 function initials(name){return (name||"Owner").split(/\s+/).slice(0,2).map(x=>x[0]).join("").toUpperCase()}
-function publicUrl(){return new URL("menu.html?r="+encodeURIComponent(currentRestaurant?.slug||""),location.href).href}
+function publicUrl(){return new URL("/"+encodeURIComponent(String(currentRestaurant?.slug||"").trim().toLowerCase()),location.origin).href}
 
 /* ---------- Navigation ---------- */
 const sections=["dashboard","restaurant","menu","categories","gallery","qr","preview","analytics","settings","orders","support"];

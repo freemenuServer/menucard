@@ -1,1 +1,1 @@
-/menu/:slug    /engine.html?r=:slug    200
+/:slug    /menu.html?r=:slug    200

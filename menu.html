@@ -2196,6 +2196,14 @@ function renderRestaurant(rest) {
           const menuIndex = pathParts.findIndex(part => part.toLowerCase() === "menu");
           if (menuIndex >= 0 && pathParts[menuIndex + 1]) {
             slug = decodeURIComponent(pathParts[menuIndex + 1]).trim().toLowerCase();
+          } else if (pathParts.length === 1) {
+            const reserved = new Set([
+              "about","admin","contact-us","disclaimer","drive","engine","index",
+              "menu","menugrowth","owner","plans","privacy-policy","qr",
+              "signaturemenu","terms-and-conditions","favicon.ico"
+            ]);
+            const candidate = decodeURIComponent(pathParts[0]).trim().toLowerCase();
+            if (!reserved.has(candidate) && !candidate.includes(".")) slug = candidate;
           }
         }
 
@@ -2301,19 +2309,8 @@ function renderRestaurant(rest) {
           targetFile = "menugrowth.html";
         }
 
-        const currentFile = window.location.pathname.split("/").pop().toLowerCase();
-
-        // IMPORTANT:
-        // Free Starter is the default menu. When /menu/:slug is rewritten
-        // internally to menu.html, the browser can still report the clean
-        // /menu/:slug pathname. Never redirect Free Starter; otherwise the
-        // clean rewrite + client routing can create a reload loop.
-        if (targetFile !== "menu.html" && currentFile !== targetFile) {
-          const targetUrl = new URL(`/${targetFile}`, window.location.origin);
-          targetUrl.searchParams.set("r", rest.slug || rest.id);
-          window.location.replace(targetUrl.href);
-          return;
-        }
+        // Public menus stay on the clean /<restaurant-slug> URL.
+        // menu.html is the public menu engine for every assigned plan/template.
 
         // Three public template targets: Free, Growth, and one shared 3D template.
         // Signature 3D and Full 3D NEVER use separate public templates.
