@@ -1590,9 +1590,9 @@
       <div class="freemenu-brand">
         <img
           class="freemenu-logo-image"
-          src="/assets/brand/02_logo_horizontal.png"
+          src="assets/brand/02_logo_horizontal.png"
           alt="FreeMenu"
-          onerror="this.onerror=null;this.src='/assets/brand/01_main_logo_full.png';"
+          onerror="this.onerror=null;this.src='assets/brand/01_main_logo_full.png';"
         />
       </div>
       <span class="freemenu-label">Digital Menu</span>
@@ -2323,7 +2323,7 @@ function renderRestaurant(rest) {
         // /menu/:slug pathname. Never redirect Free Starter; otherwise the
         // clean rewrite + client routing can create a reload loop.
         if (targetFile !== "menu.html" && currentFile !== targetFile) {
-          const targetUrl = new URL(`/__fm/${targetFile}`, window.location.origin);
+          const targetUrl = new URL(`/${targetFile}`, window.location.origin);
           targetUrl.searchParams.set("r", rest.slug || rest.id);
           window.location.replace(targetUrl.href);
           return;

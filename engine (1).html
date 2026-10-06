@@ -45,7 +45,7 @@
   }
   // Internal router: the destination page immediately normalizes the visible URL to /<slug>.
   function go(template, slug) {
-    const target = new URL("/__fm/" + template, location.origin);
+    const target = new URL("/" + template, location.origin);
     target.searchParams.set("r", slug);
     location.replace(target.href);
   }
