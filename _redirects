@@ -1,7 +1,1 @@
-# FreeMenu clean public restaurant URLs
-# Legacy /menu/:slug links
-/menu/:slug    /menu.html?r=:slug    200
-# Legacy /menu links (must be before /:slug to prevent redirect loops)
-/menu          /menu.html           200
-# Clean public restaurant URL
-/:slug         /menu.html?r=:slug   200
+/menu/:slug    /engine.html?r=:slug    200
