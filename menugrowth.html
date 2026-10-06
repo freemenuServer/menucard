@@ -173,7 +173,11 @@
   function shareWhatsApp(){window.open('https://wa.me/?text='+encodeURIComponent(`${restaurant?.name||'Restaurant'} Menu: ${location.href}`),'_blank');}
   async function loadGrowthMenu(){
     try{
-      const slug=(new URLSearchParams(location.search).get('r')||'').trim().toLowerCase();
+      const pathParts=location.pathname.split('/').filter(Boolean);
+      const reserved=new Set(['about','admin','contact-us','disclaimer','drive','engine','index','menu','menugrowth','owner','plans','privacy-policy','qr','signaturemenu','terms-and-conditions','favicon.ico']);
+      let slug=(new URLSearchParams(location.search).get('r')||'').trim().toLowerCase();
+      if(!slug && pathParts.length===1){const candidate=decodeURIComponent(pathParts[0]).trim().toLowerCase();if(!reserved.has(candidate)&&!candidate.includes('.'))slug=candidate;}
+      if(slug && location.pathname!=='/'+encodeURIComponent(slug)) history.replaceState({},document.title,'/'+encodeURIComponent(slug));
       if(!slug){$('restaurantName').textContent='Restaurant Not Found';return;}
       const {data:rest,error:re}=await supabaseClient.from('restaurants').select('*').eq('slug',slug).limit(1).maybeSingle();if(re)throw re;if(!rest){$('restaurantName').textContent='Restaurant Not Found';return;}restaurant=rest;
       const {data:items,error:ie}=await supabaseClient.from('menu_items').select('*').eq('restaurant_id',rest.id);if(ie)throw ie;menuData=Array.isArray(items)?items:[];

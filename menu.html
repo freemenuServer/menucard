@@ -2207,6 +2207,12 @@ function renderRestaurant(rest) {
           }
         }
 
+        // Keep the public URL clean in the browser while this document is
+        // internally reached through the routing engine.
+        if (slug && window.location.pathname !== "/" + encodeURIComponent(slug)) {
+          window.history.replaceState({}, document.title, "/" + encodeURIComponent(slug));
+        }
+
         let query = supabaseClient.from("restaurants").select("*");
         if (slug) query = query.eq("slug", slug);
 
@@ -2309,8 +2315,19 @@ function renderRestaurant(rest) {
           targetFile = "menugrowth.html";
         }
 
-        // Public menus stay on the clean /<restaurant-slug> URL.
-        // menu.html is the public menu engine for every assigned plan/template.
+        const currentFile = window.location.pathname.split("/").pop().toLowerCase();
+
+        // IMPORTANT:
+        // Free Starter is the default menu. When /menu/:slug is rewritten
+        // internally to menu.html, the browser can still report the clean
+        // /menu/:slug pathname. Never redirect Free Starter; otherwise the
+        // clean rewrite + client routing can create a reload loop.
+        if (targetFile !== "menu.html" && currentFile !== targetFile) {
+          const targetUrl = new URL(`/${targetFile}`, window.location.origin);
+          targetUrl.searchParams.set("r", rest.slug || rest.id);
+          window.location.replace(targetUrl.href);
+          return;
+        }
 
         // Three public template targets: Free, Growth, and one shared 3D template.
         // Signature 3D and Full 3D NEVER use separate public templates.

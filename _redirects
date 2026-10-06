@@ -1,1 +1,2 @@
-/:slug    /menu.html?r=:slug    200
+# Clean public restaurant menu URLs
+/:slug    /engine.html?r=:slug    200
