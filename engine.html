@@ -43,7 +43,6 @@
     el.style.display = "block";
     el.textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2);
   }
-  // Internal router: the destination page immediately normalizes the visible URL to /<slug>.
   function go(template, slug) {
     const target = new URL("/" + template, location.origin);
     target.searchParams.set("r", slug);

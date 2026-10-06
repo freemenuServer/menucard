@@ -1,3 +1,7 @@
-# Clean public restaurant menu URL
-# Example: https://freemenu.in/dosafactory
-/:slug    /menu.html?r=:slug    200
+# FreeMenu clean public restaurant URLs
+# Legacy /menu/:slug links
+/menu/:slug    /menu.html?r=:slug    200
+# Legacy /menu links (must be before /:slug to prevent redirect loops)
+/menu          /menu.html           200
+# Clean public restaurant URL
+/:slug         /menu.html?r=:slug   200

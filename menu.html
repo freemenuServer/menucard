@@ -2196,21 +2196,7 @@ function renderRestaurant(rest) {
           const menuIndex = pathParts.findIndex(part => part.toLowerCase() === "menu");
           if (menuIndex >= 0 && pathParts[menuIndex + 1]) {
             slug = decodeURIComponent(pathParts[menuIndex + 1]).trim().toLowerCase();
-          } else if (pathParts.length === 1) {
-            const reserved = new Set([
-              "about","admin","contact-us","disclaimer","drive","engine","index",
-              "menu","menugrowth","owner","plans","privacy-policy","qr",
-              "signaturemenu","terms-and-conditions","favicon.ico"
-            ]);
-            const candidate = decodeURIComponent(pathParts[0]).trim().toLowerCase();
-            if (!reserved.has(candidate) && !candidate.includes(".")) slug = candidate;
           }
-        }
-
-        // Keep the public URL clean in the browser while this document is
-        // internally reached through the routing engine.
-        if (slug && window.location.pathname !== "/" + encodeURIComponent(slug)) {
-          window.history.replaceState({}, document.title, "/" + encodeURIComponent(slug));
         }
 
         let query = supabaseClient.from("restaurants").select("*");
