@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Owner Dashboard — Digital Menu</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.9.2/lib/qr-code-styling.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
@@ -294,6 +295,11 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
 </head>
 
 <body>
+
+<style id="owner-qr-admin-style">
+.ownerQrWrap{width:100%;max-width:760px;margin:0 auto}.ownerQrActions{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}.ownerQrDesigns{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}.ownerQrDesign{border:1px solid #d9dde2;background:#fff;color:#252a31;border-radius:999px;padding:8px 13px;font-size:12px;font-weight:850;cursor:pointer}.ownerQrDesign.active{background:#151820;color:#fff;border-color:#151820}.ownerQrPoster{position:relative;overflow:hidden;width:100%;background:#fff;border-radius:30px;box-shadow:0 22px 60px rgba(0,0,0,.12);padding:38px 38px 30px}.ownerQrBlob{position:absolute;pointer-events:none}.ownerQrOrange{width:230px;height:230px;left:-115px;top:-135px;background:#ffb52b;border-radius:50% 45% 65% 35%}.ownerQrGreen{width:230px;height:190px;left:-100px;bottom:-125px;background:#4eb84a;border-radius:60% 40% 20% 80%}.ownerQrRed{width:225px;height:210px;right:-105px;bottom:-120px;background:#ff5358;border-radius:45% 55% 70% 30%}.ownerQrDecor{position:absolute;opacity:.13;font-size:38px;z-index:1}.ownerQrD1{left:24px;top:62px;transform:rotate(-15deg)}.ownerQrD2{right:25px;top:55px;transform:rotate(12deg)}.ownerQrD3{left:23px;bottom:180px;transform:rotate(-10deg)}.ownerQrD4{right:25px;bottom:165px;transform:rotate(12deg)}.ownerQrContent{position:relative;z-index:2;text-align:center}.ownerQrNote{font-size:14px;font-style:italic;font-weight:700;color:#6f737b;margin-bottom:8px}.ownerQrSmallTitle{font-size:34px;line-height:1;font-weight:850;letter-spacing:-1.5px}.ownerQrBigTitle{font-size:76px;line-height:.9;font-weight:950;letter-spacing:-4px;margin:0}.ownerQrLines{display:flex;justify-content:center;gap:6px;margin:16px 0 13px}.ownerQrLines i,.ownerQrBrandLines i{display:block;width:88px;height:7px;border-radius:10px}.ownerQrLines .g,.ownerQrBrandLines .g{background:#45ad4d}.ownerQrLines .o,.ownerQrBrandLines .o{background:#ffb21d}.ownerQrLines .r,.ownerQrBrandLines .r{background:#f25459}.ownerQrRestaurant{font-size:21px;font-weight:900;margin:4px 0 8px}.ownerQrBox{width:min(100%,450px);margin:auto;background:#fff;border:1px solid #ededed;border-radius:26px;padding:22px;box-shadow:0 12px 35px rgba(0,0,0,.09)}#ownerQrCode{width:100%;display:flex;justify-content:center;align-items:center}#ownerQrCode canvas,#ownerQrCode svg{display:block;max-width:100%;height:auto!important}.ownerQrScan{margin-top:14px;font-size:13px;font-weight:850;color:#555}.ownerQrBrandArea{margin-top:25px}.ownerQrLogo{width:150px;height:auto;display:block;object-fit:contain;margin:0 auto}.ownerQrTag{margin-top:7px;font-size:10px;font-weight:900;letter-spacing:4px;color:#666}.ownerQrBrandLines{display:flex;justify-content:center;gap:5px;margin-top:12px}.ownerQrBrandLines i{width:28px;height:4px}.ownerQrFeatures{display:grid;grid-template-columns:repeat(3,1fr);margin-top:23px;padding-top:18px;border-top:1px solid #eee}.ownerQrFeatures>div{padding:0 10px;border-right:1px solid #e5e5e5}.ownerQrFeatures>div:last-child{border-right:0}.ownerQrFeatures .fi{font-size:21px;margin-bottom:4px}.ownerQrFeatures .ft{font-size:13px;font-weight:900}.ownerQrFeatures .fs{font-size:10px;color:#777;margin-top:3px}.ownerQrFooter{margin-top:21px;font-size:11px;font-weight:900;letter-spacing:2px;color:#999}.ownerQrFooter2{font-size:12px;font-weight:750;color:#555;margin-top:5px}.ownerQrDesign2{background:#111315;color:#f8f1df;border:1px solid #c79a42}.ownerQrDesign2 .ownerQrOrange{background:#c79532}.ownerQrDesign2 .ownerQrGreen{background:#2f5b43}.ownerQrDesign2 .ownerQrRed{background:#713a2e}.ownerQrDesign2 .ownerQrNote{color:#c7b78e}.ownerQrDesign2 .ownerQrSmallTitle{font-family:Georgia,serif;color:#f5e9c8}.ownerQrDesign2 .ownerQrBigTitle{font-family:Georgia,serif;color:#d8ae55}.ownerQrDesign2 .ownerQrLines .g,.ownerQrDesign2 .ownerQrBrandLines .g{background:#6c9b63}.ownerQrDesign2 .ownerQrLines .o,.ownerQrDesign2 .ownerQrBrandLines .o{background:#d8ae55}.ownerQrDesign2 .ownerQrLines .r,.ownerQrDesign2 .ownerQrBrandLines .r{background:#a85d43}.ownerQrDesign2 .ownerQrBox{border:2px solid #d8ae55;box-shadow:0 14px 35px rgba(0,0,0,.38)}.ownerQrDesign2 .ownerQrScan{color:#5b5141}.ownerQrDesign2 .ownerQrTag,.ownerQrDesign2 .ownerQrFooter2{color:#bfb49a}.ownerQrDesign2 .ownerQrFeatures{border-color:#3a3d3f}.ownerQrDesign2 .ownerQrFeatures>div{border-color:#3a3d3f}.ownerQrDesign3{background:#f7fbf5;color:#183b27;border:1px solid #9ac39a}.ownerQrDesign3 .ownerQrOrange{background:#9fcf67}.ownerQrDesign3 .ownerQrGreen{background:#2f7d4a}.ownerQrDesign3 .ownerQrRed{background:#b74b38}.ownerQrDesign3 .ownerQrNote{color:#52745e}.ownerQrDesign3 .ownerQrBigTitle{color:#2f7d4a}.ownerQrDesign3 .ownerQrLines .g,.ownerQrDesign3 .ownerQrBrandLines .g{background:#2f7d4a}.ownerQrDesign3 .ownerQrLines .o,.ownerQrDesign3 .ownerQrBrandLines .o{background:#8fbd4e}.ownerQrDesign3 .ownerQrLines .r,.ownerQrDesign3 .ownerQrBrandLines .r{background:#b74b38}.ownerQrDesign3 .ownerQrBox{border:2px solid #2f7d4a;box-shadow:0 12px 30px rgba(47,125,74,.13)}.ownerQrDesign3 .ownerQrScan{color:#386148}.ownerQrDesign3 .ownerQrTag,.ownerQrDesign3 .ownerQrFooter2{color:#63806c}.ownerQrDesign4{background:#fff4e8;color:#5a2b18;border:1px solid #e4a26b}.ownerQrDesign4 .ownerQrOrange{background:#ef7c28}.ownerQrDesign4 .ownerQrGreen{background:#6b8d3a}.ownerQrDesign4 .ownerQrRed{background:#9c3f26}.ownerQrDesign4 .ownerQrNote{color:#9a5d3d}.ownerQrDesign4 .ownerQrSmallTitle,.ownerQrDesign4 .ownerQrBigTitle{font-family:Georgia,serif}.ownerQrDesign4 .ownerQrBigTitle{color:#bd4e1f}.ownerQrDesign4 .ownerQrLines .g,.ownerQrDesign4 .ownerQrBrandLines .g{background:#6b8d3a}.ownerQrDesign4 .ownerQrLines .o,.ownerQrDesign4 .ownerQrBrandLines .o{background:#ef7c28}.ownerQrDesign4 .ownerQrLines .r,.ownerQrDesign4 .ownerQrBrandLines .r{background:#9c3f26}.ownerQrDesign4 .ownerQrBox{border:2px solid #bd4e1f;box-shadow:0 12px 30px rgba(120,55,25,.14)}.ownerQrDesign4 .ownerQrScan{color:#7a4a33}.ownerQrDesign4 .ownerQrTag,.ownerQrDesign4 .ownerQrFooter2{color:#95664d}.ownerQrPrintOnly{display:none}@media(max-width:600px){.ownerQrPoster{padding:29px 15px 25px;border-radius:23px}.ownerQrSmallTitle{font-size:27px}.ownerQrBigTitle{font-size:58px}.ownerQrLines i{width:62px;height:6px}.ownerQrBox{padding:14px;border-radius:20px}.ownerQrTag{font-size:8px;letter-spacing:3px}.ownerQrFeatures{margin-top:20px}.ownerQrFeatures>div{padding:0 4px}.ownerQrFeatures .ft{font-size:10px}.ownerQrFeatures .fs{font-size:8px}}
+</style>
+
 <script>(function(){if(new URLSearchParams(location.search).get("auth")==="signup")document.documentElement.classList.add("signup-route");})();</script>
 
 <div id="ownerAuth">
@@ -723,12 +729,43 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
 
 <!-- QR -->
 <section id="section-qr" class="hidden">
-  <div class="card" style="max-width:720px;margin:auto;text-align:center">
-    <div class="cardTitle">Restaurant QR Code</div>
-    <p class="muted" style="font-size:12px">This QR opens the public menu URL for this restaurant.</p>
-    <div style="margin:18px auto;width:240px;height:240px;display:grid;place-items:center;background:#fff;border:1px solid var(--border);border-radius:12px" id="qrBox"></div>
-    <input class="input" id="qrUrl" readonly style="text-align:center;margin-bottom:10px">
-    <div class="actions" style="justify-content:center"><button class="btn primary" id="downloadQR"><i class="fa-solid fa-download"></i> Download QR</button><button class="btn" id="copyQR">Copy Link</button></div>
+  <div class="ownerQrWrap">
+    <div class="ownerQrActions">
+      <button class="btn primary" id="ownerQrPrint"><i class="fa-solid fa-print"></i> Print QR</button>
+      <button class="btn" id="ownerQrDownload"><i class="fa-solid fa-download"></i> Download QR</button>
+      <button class="btn" id="copyQR"><i class="fa-solid fa-copy"></i> Copy Link</button>
+    </div>
+    <div class="ownerQrDesigns" aria-label="QR design selector">
+      <button class="ownerQrDesign active" data-design="1">① Premium Gold</button>
+      <button class="ownerQrDesign" data-design="2">② Black Luxury</button>
+      <button class="ownerQrDesign" data-design="3">③ Fresh Green</button>
+      <button class="ownerQrDesign" data-design="4">④ Warm Classic</button>
+    </div>
+    <div id="ownerQrPoster" class="ownerQrPoster ownerQrDesign1">
+      <div class="ownerQrBlob ownerQrOrange"></div><div class="ownerQrBlob ownerQrGreen"></div><div class="ownerQrBlob ownerQrRed"></div>
+      <div class="ownerQrDecor ownerQrD1">🥬</div><div class="ownerQrDecor ownerQrD2">🍽️</div><div class="ownerQrDecor ownerQrD3">🍕</div><div class="ownerQrDecor ownerQrD4">🥤</div>
+      <div class="ownerQrContent">
+        <div class="ownerQrNote">Tasty Moments Here</div>
+        <div class="ownerQrSmallTitle">Scan for</div>
+        <div class="ownerQrBigTitle">Menu</div>
+        <div class="ownerQrLines"><i class="g"></i><i class="o"></i><i class="r"></i></div>
+        <div id="ownerQrRestaurantName" class="ownerQrRestaurant">Restaurant Menu</div>
+        <div class="ownerQrBox"><div id="ownerQrCode"></div><div class="ownerQrScan">📱 Scan with your phone camera</div></div>
+        <div class="ownerQrBrandArea">
+          <img class="ownerQrLogo" src="./freemenu-logo.png" alt="FreeMenu.in">
+          <div class="ownerQrTag">GOOD FOOD CLOSER TO YOU</div>
+          <div class="ownerQrBrandLines"><i class="g"></i><i class="o"></i><i class="r"></i></div>
+        </div>
+        <div class="ownerQrFeatures">
+          <div><div class="fi">🌿</div><div class="ft">Digital Menu</div><div class="fs">Eco Friendly</div></div>
+          <div><div class="fi">⚡</div><div class="ft">Quick Access</div><div class="fs">No App Needed</div></div>
+          <div><div class="fi">♡</div><div class="ft">Easy Access</div><div class="fs">Simple & Fast</div></div>
+        </div>
+        <div class="ownerQrFooter">FREEMENU.IN</div>
+        <div class="ownerQrFooter2">Eat • Explore • Enjoy</div>
+      </div>
+    </div>
+    <input class="input" id="qrUrl" readonly style="max-width:720px;margin:14px auto 0;text-align:center">
   </div>
 </section>
 
@@ -2278,15 +2315,43 @@ $("saveCategory").onclick=async()=>{
 };
 
 /* ---------- QR ---------- */
-function renderQR(){
- const url=publicUrl();$("qrUrl").value=url;
- $("qrBox").innerHTML=`<img alt="QR Code" style="width:220px;height:220px" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(url)}">`;
+let ownerQrInstance=null,ownerQrDesign=1;
+const ownerQrDesignConfig={
+  1:{dots:'#571b1d',corner:'#d8a73d',cornerDot:'#571b1d',background:'#ffffff',dotType:'dots',cornerType:'extra-rounded',cornerDotType:'dot'},
+  2:{dots:'#111315',corner:'#d8ae55',cornerDot:'#111315',background:'#ffffff',dotType:'classy',cornerType:'extra-rounded',cornerDotType:'dot'},
+  3:{dots:'#183b27',corner:'#2f7d4a',cornerDot:'#183b27',background:'#ffffff',dotType:'rounded',cornerType:'extra-rounded',cornerDotType:'dot'},
+  4:{dots:'#5a2b18',corner:'#ef7c28',cornerDot:'#5a2b18',background:'#ffffff',dotType:'dots',cornerType:'square',cornerDotType:'square'}
+};
+function setOwnerQrDesign(n){
+ ownerQrDesign=Number(n)||1;
+ $("ownerQrPoster").className="ownerQrPoster ownerQrDesign"+ownerQrDesign;
+ document.querySelectorAll(".ownerQrDesign").forEach(b=>b.classList.toggle("active",Number(b.dataset.design)===ownerQrDesign));
+ renderQR();
 }
-$("quickQR").onclick=()=>{showSection("qr");history.replaceState(null,"","#qr")};
+function renderQR(){
+ const url=publicUrl();
+ $("qrUrl").value=url;
+ $("ownerQrRestaurantName").textContent=currentRestaurant?.name||"Restaurant Menu";
+ const c=ownerQrDesignConfig[ownerQrDesign]||ownerQrDesignConfig[1];
+ const box=$("ownerQrCode"); box.innerHTML="";
+ if(typeof QRCodeStyling!=="function")return;
+ ownerQrInstance=new QRCodeStyling({width:390,height:390,type:"canvas",data:url,margin:8,qrOptions:{typeNumber:0,mode:"Byte",errorCorrectionLevel:"H"},dotsOptions:{type:c.dotType,color:c.dots},cornersSquareOptions:{type:c.cornerType,color:c.corner},cornersDotOptions:{type:c.cornerDotType,color:c.cornerDot},backgroundOptions:{color:c.background}});
+ ownerQrInstance.append(box);
+}
+$("quickQR").onclick=()=>{showSection("qr");history.replaceState(null,"","#qr");renderQR()};
 $("menuLiveSwitch").onclick=toggleMenuMaintenance;
 $("copyQR").onclick=async()=>{await navigator.clipboard.writeText(publicUrl());toast("Menu link copied")};
 $("copyMenu").onclick=async()=>{await navigator.clipboard.writeText(publicUrl());toast("Menu link copied")};
-$("downloadQR").onclick=()=>{const a=document.createElement("a");a.href=$("qrBox").querySelector("img").src;a.download=(currentRestaurant.slug||"restaurant")+"-menu-qr.png";a.target="_blank";a.click()};
+document.querySelectorAll(".ownerQrDesign").forEach(b=>b.onclick=()=>setOwnerQrDesign(b.dataset.design));
+$("ownerQrDownload").onclick=()=>{if(ownerQrInstance)ownerQrInstance.download({name:(currentRestaurant?.slug||"restaurant")+"-menu-qr",extension:"png"})};
+$("ownerQrPrint").onclick=()=>{
+ if(!ownerQrInstance)return;
+ const source=$("ownerQrPoster").cloneNode(true); source.style.display="block"; source.removeAttribute("id");
+ const win=window.open("","_blank","width=900,height=1200");
+ if(!win){alert("Please allow pop-ups for FreeMenu to print the QR.");return;}
+ const styles=`@page{size:A4 portrait;margin:0}*{box-sizing:border-box;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}html,body{margin:0!important;padding:0!important;width:210mm!important;height:297mm!important;overflow:hidden!important;background:#fff!important}body{font-family:Inter,Arial,Helvetica,sans-serif}.sheet{width:210mm;height:297mm;overflow:hidden}.ownerQrPoster{position:relative;width:210mm!important;height:297mm!important;margin:0!important;padding:28mm 16mm 16mm!important;border-radius:0!important;box-shadow:none!important;overflow:hidden!important}.ownerQrContent{text-align:center}.ownerQrBox{width:120mm!important;max-width:120mm!important;padding:6mm!important;margin:0 auto!important}#ownerQrCode{display:flex;justify-content:center;align-items:center}#ownerQrCode canvas,#ownerQrCode svg{width:88mm!important;height:88mm!important;max-width:88mm!important;max-height:88mm!important}.ownerQrSmallTitle{font-size:30pt!important}.ownerQrBigTitle{font-size:58pt!important}.ownerQrRestaurant{font-size:16pt!important}.ownerQrNote{font-size:10pt!important}.ownerQrScan{font-size:9pt!important}.ownerQrBrandArea{margin-top:7mm!important}.ownerQrLogo{width:42mm!important}.ownerQrTag{font-size:7pt!important}.ownerQrFeatures{margin-top:7mm!important;padding-top:5mm!important}.ownerQrFeatures .fi{font-size:13pt!important}.ownerQrFeatures .ft{font-size:8.5pt!important}.ownerQrFeatures .fs{font-size:6.5pt!important}.ownerQrFooter{margin-top:6mm!important;font-size:6.5pt!important}.ownerQrFooter2{font-size:7.5pt!important}`;
+ win.document.open();win.document.write('<!doctype html><html><head><meta charset="utf-8"><title>FreeMenu QR</title><style>'+styles+'</style></head><body><div class="sheet">'+source.outerHTML+'</div></body></html>');win.document.close();win.onload=()=>setTimeout(()=>{win.focus();win.print();setTimeout(()=>win.close(),700)},350);
+};
 
 /* ---------- Public menu ---------- */
 function openPublic(){window.open(publicUrl(),"_blank","noopener")}
