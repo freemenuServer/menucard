@@ -449,23 +449,44 @@ function downloadQR(){
 }
 
 async function requireSuperAdmin(){
-  const {data,error}=await db.auth.getSession();
-
-  if(error||!data?.session?.user?.id){
+  const restricted=()=>{
     document.body.innerHTML='<main style="min-height:100vh;display:grid;place-items:center;background:#0b0e0f;color:#fff;font-family:Arial,sans-serif;padding:24px;text-align:center"><div><h1>Access Restricted</h1><p>This QR management page is available only to Super Admin.</p></div></main>';
     return false;
-  }
+  };
 
+  const {data,error}=await db.auth.getSession();
+  const user=data?.session?.user;
+
+  if(error||!user?.id)return restricted();
+
+  /*
+    Admin is the Super Admin role used by the main admin.html gate.
+    On a newly opened tab, the profile query can occasionally be
+    unavailable for a moment because of session/RLS timing. Prefer
+    the profile role, but also accept the same role from the
+    authenticated user's metadata when it is already present.
+  */
+  let profileRole='';
   const {data:profile,error:profileError}=await db
     .from('profiles')
     .select('role')
-    .eq('id',data.session.user.id)
+    .eq('id',user.id)
     .maybeSingle();
 
-  if(profileError||String(profile?.role||'').toLowerCase()!=='admin'){
-    document.body.innerHTML='<main style="min-height:100vh;display:grid;place-items:center;background:#0b0e0f;color:#fff;font-family:Arial,sans-serif;padding:24px;text-align:center"><div><h1>Access Restricted</h1><p>This QR management page is available only to Super Admin.</p></div></main>';
-    return false;
-  }
+  if(!profileError)profileRole=String(profile?.role||'').toLowerCase();
+
+  const metadataRole=String(
+    user.app_metadata?.role ||
+    user.user_metadata?.role ||
+    ''
+  ).toLowerCase();
+
+  const isSuperAdmin=
+    profileRole==='admin' ||
+    metadataRole==='admin' ||
+    metadataRole==='super_admin';
+
+  if(!isSuperAdmin)return restricted();
 
   return true;
 }
