@@ -990,7 +990,7 @@ function qrTargetURL(code){return new URL('/qr.html?code='+encodeURIComponent(co
 function openQRAdmin(id){
   const x=qrCodes.find(q=>q.id===id);
   if(!x)return toast('QR code not found.');
-  window.open('/qr.html?code='+encodeURIComponent(x.code)+'&admin=1','_blank');
+  window.open('/qr.html?code='+encodeURIComponent(x.code)+'&admin=1&view=print','_blank');
 }
 
 const qrPrintDesignConfig={
@@ -1028,7 +1028,7 @@ async function renderPrintQR(items,title){
     return {
       id:x.id,
       code:x.code,
-      url:r?.slug ? new URL('/menu.html?r='+encodeURIComponent(r.slug),location.origin).href : qrTargetURL(x.code),
+      url:qrTargetURL(x.code),
       restaurant:r?.name||'Restaurant Menu',
       label:x.label||''
     };

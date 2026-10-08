@@ -319,6 +319,10 @@ const qrContainer=document.getElementById('qrcode');
 
 let currentCode='',qrInstance=null,currentDesign=1;
 
+function getPermanentQRUrl(code){
+  return new URL('/qr.html?code='+encodeURIComponent(code),window.location.origin).href;
+}
+
 function getMenuUrl(slug){
   return new URL('/menu.html?r='+encodeURIComponent(slug),window.location.origin).href;
 }
@@ -359,7 +363,7 @@ function setDesign(n){
 function createQR(slug){
   window.currentSlugForQR=slug;
   qrContainer.innerHTML='';
-  const scanURL=getMenuUrl(slug);
+  const scanURL=getPermanentQRUrl(currentCode);
   const c=designConfig[currentDesign]||designConfig[1];
 
   qrInstance=new QRCodeStyling({
@@ -449,48 +453,28 @@ function downloadQR(){
 }
 
 async function requireSuperAdmin(){
-  const restricted=()=>{
-    document.body.innerHTML='<main style="min-height:100vh;display:grid;place-items:center;background:#0b0e0f;color:#fff;font-family:Arial,sans-serif;padding:24px;text-align:center"><div><h1>Access Restricted</h1><p>This QR management page is available only to Super Admin.</p></div></main>';
-    return false;
-  };
-
   const {data,error}=await db.auth.getSession();
   const user=data?.session?.user;
 
-  if(error||!user?.id)return restricted();
+  if(error||!user?.id){
+    document.body.innerHTML='<main style="min-height:100vh;display:grid;place-items:center;background:#0b0e0f;color:#fff;font-family:Arial,sans-serif;padding:24px;text-align:center"><div><h1>Access Restricted</h1><p>This QR management view is available only to Super Admin.</p></div></main>';
+    return false;
+  }
 
-  /*
-    Admin is the Super Admin role used by the main admin.html gate.
-    On a newly opened tab, the profile query can occasionally be
-    unavailable for a moment because of session/RLS timing. Prefer
-    the profile role, but also accept the same role from the
-    authenticated user's metadata when it is already present.
-  */
-  let profileRole='';
   const {data:profile,error:profileError}=await db
     .from('profiles')
     .select('role')
     .eq('id',user.id)
     .maybeSingle();
 
-  if(!profileError)profileRole=String(profile?.role||'').toLowerCase();
-
-  const metadataRole=String(
-    user.app_metadata?.role ||
-    user.user_metadata?.role ||
-    ''
-  ).toLowerCase();
-
-  const isSuperAdmin=
-    profileRole==='admin' ||
-    metadataRole==='admin' ||
-    metadataRole==='super_admin';
-
-  if(!isSuperAdmin)return restricted();
-
+  const profileRole=String(profile?.role||'').toLowerCase();
+  const metadataRole=String(user.app_metadata?.role||user.user_metadata?.role||'').toLowerCase();
+  if(profileError || !(profileRole==='admin'||metadataRole==='admin'||metadataRole==='super_admin')){
+    document.body.innerHTML='<main style="min-height:100vh;display:grid;place-items:center;background:#0b0e0f;color:#fff;font-family:Arial,sans-serif;padding:24px;text-align:center"><div><h1>Access Restricted</h1><p>This QR management view is available only to Super Admin.</p></div></main>';
+    return false;
+  }
   return true;
 }
-
 async function openQR(){
   try{
     if(!window.supabase)throw new Error('Menu service could not load. Please try again.');
@@ -536,6 +520,8 @@ async function openQR(){
       throw new Error('Restaurant menu is not available.');
 
     if(!printMode){
+      // Public QR scans never require a login. The QR itself is permanent;
+      // only this lookup decides which restaurant currently owns the code.
       window.location.replace(getMenuUrl(restaurant.slug));
       return;
     }
@@ -565,9 +551,10 @@ async function openQR(){
   }
 }
 
-requireSuperAdmin().then(ok=>{
-  if(ok)openQR();
-});
+// This page is the public QR resolver/print view, not the protected
+// QR management screen. The actual QR management remains protected
+// inside admin.html. A scanned QR must never require a login.
+openQR();
 </script>
 </body>
 </html>
