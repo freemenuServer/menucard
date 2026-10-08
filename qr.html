@@ -9,7 +9,7 @@
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;min-height:100%}
 body{min-height:100vh;background:#f3f5f7;color:#151820;font-family:Inter,Arial,Helvetica,sans-serif;display:flex;justify-content:center;align-items:center;padding:18px}
-.page{width:100%;max-width:720px}
+.page{width:100%;max-width:720px;display:none}
 .actions{display:flex;justify-content:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
 .btn{border:0;border-radius:12px;padding:11px 17px;font-size:14px;font-weight:800;cursor:pointer}
 .print{background:#151820;color:#fff}
@@ -483,6 +483,11 @@ async function openQR(){
     const code=String(params.get('code')||'').trim();
     const printMode=params.get('view')==='print';
 
+    // Public scans must never show the QR management/printing UI.
+    // The page remains hidden until the restaurant lookup succeeds and
+    // the visitor is redirected to the live restaurant menu.
+    if(printMode)document.querySelector('.page').style.display='block';
+
     if(!code)throw new Error('QR code is missing.');
 
     currentCode=code;
@@ -520,8 +525,8 @@ async function openQR(){
       throw new Error('Restaurant menu is not available.');
 
     if(!printMode){
-      // Public QR scans never require a login. The QR itself is permanent;
-      // only this lookup decides which restaurant currently owns the code.
+      // Public QR scans show nothing from this QR page. Resolve the permanent
+      // QR code and go straight to the restaurant's live menu.
       window.location.replace(getMenuUrl(restaurant.slug));
       return;
     }
