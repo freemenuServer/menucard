@@ -63,14 +63,14 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
  h1{font-size:24px}.tagline{font-size:14px}.meta{font-size:12px;margin-top:10px;gap:8px 12px}
  .contact-details{margin-top:12px;gap:8px}
  .call-button{min-height:40px}
- .menu{padding:7px 12px 25px}.filters{gap:7px;padding-bottom:13px}.filter{padding:9px 13px;font-size:12px}
+ .menu{padding:7px 12px 100px}.filters{gap:7px;padding:9px 12px calc(8px + env(safe-area-inset-bottom));position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,1100px);z-index:1000;background:rgba(255,255,255,.97);border-top:1px solid #e7ebef;box-shadow:0 -6px 22px rgba(16,29,44,.10);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overscroll-behavior-x:contain;scroll-padding-inline:12px}.filter{padding:9px 13px;font-size:12px;min-height:40px}.filters .filter:first-child{margin-left:0}.filters .filter:last-child{margin-right:2px}
  .heading h2{font-size:18px}.grid{grid-template-columns:1fr;gap:10px}
  .card{gap:12px;padding:9px;border-radius:15px}
  .thumb{width:92px;flex-basis:92px;max-width:92px;min-width:92px;aspect-ratio:1/1}
  .name{font-size:15px}.price{font-size:20px;margin-top:7px}.desc{font-size:12px;line-height:1.45;margin-top:5px;-webkit-line-clamp:2}
  footer{padding:17px 14px;font-size:12px}
 }
-@media(max-width:350px){.thumb{width:76px;flex-basis:76px;min-width:76px}.card{gap:9px}.name{font-size:14px}.price{font-size:18px}}
+@media(max-width:350px){.thumb{width:76px;flex-basis:76px;min-width:76px}.card{gap:9px}.name{font-size:14px}.price{font-size:18px}.filters{gap:6px;padding-left:8px;padding-right:8px}.filter{padding:8px 11px;font-size:11px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
 </head>
