@@ -384,7 +384,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
     <div class="formgrid">
       <div class="field"><label>Restaurant</label><select id="assignPlanRestaurant"></select></div>
       <div class="field"><label>Plan</label><select id="assignPlanSelect"></select></div>
-      <div class="field"><label>Plan Duration</label><select id="assignPlanExpiry"><option value="lifetime" selected>Lifetime</option></select><small style="display:block;margin-top:5px;color:#667085">Lifetime plan — no expiry date.</small></div>
+      <div class="field"><label>Plan Duration</label><select id="assignPlanExpiry" onchange="toggleAssignPlanDuration()"><option value="date" selected>Calendar / Expiry Date</option><option value="lifetime">Lifetime</option></select><input id="assignPlanExpiryDate" type="date" min="" style="display:block;width:100%;margin-top:7px;padding:9px;border:1px solid #dfe3ea;border-radius:7px" value=""><small id="assignPlanDurationHelp" style="display:block;margin-top:5px;color:#667085">Calendar date tak plan active rahega.</small></div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px"><button class="iconbtn" onclick="openCustomMenuAssignment()">+ Custom Menu</button><button class="primary" onclick="assignRestaurantPlan()">Assign Plan</button></div>
   </div>
@@ -642,7 +642,7 @@ async function deletePlan(id){const p=plans.find(x=>x.id===id);if(!confirm(`Dele
 function renderSubscriptions(){
   if(!$('subsTable'))return;
   const search=($('planAssignmentSearch')?.value||'').toLowerCase().trim();
-  const activePlans=plans.filter(p=>p.is_active);
+  const activePlans=plans;
   if($('assignPlanRestaurant')){
     const current=$('assignPlanRestaurant').value;
     $('assignPlanRestaurant').innerHTML='<option value="">Select restaurant...</option>'+restaurants.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}${r.phone?' — '+esc(r.phone):''}</option>`).join('');
@@ -650,7 +650,7 @@ function renderSubscriptions(){
   }
   if($('assignPlanSelect')){
     const current=$('assignPlanSelect').value;
-    $('assignPlanSelect').innerHTML='<option value="">Select plan...</option>'+activePlans.map(p=>`<option value="${esc(p.id)}">${esc(p.name)} — ₹${Number(p.monthly_price||0).toLocaleString('en-IN')}/month</option>`).join('');
+    $('assignPlanSelect').innerHTML='<option value="">Select plan...</option>'+activePlans.map(p=>`<option value="${esc(p.id)}">${esc(p.name)} — ₹${Number(p.monthly_price||0).toLocaleString('en-IN')}${p.is_active?'':' (Inactive)'}</option>`).join('');
     if(activePlans.some(p=>p.id===current))$('assignPlanSelect').value=current;
   }
   const list=restaurants.filter(r=>`${r.name} ${r.phone||''} ${r.slug||''}`.toLowerCase().includes(search));
@@ -731,13 +731,14 @@ function openAssignRestaurantPlan(rid){
     <div class="field">
       <label>Select Plan</label>
       <select id="modalAssignPlan">
-        ${plans.filter(p=>p.is_active).map(p=>`<option value="${esc(p.id)}" ${p.id===r.plan_id&&!r.custom_plan_enabled?'selected':''}>${esc(p.name)} — ₹${Number(p.monthly_price||0).toLocaleString('en-IN')}/month</option>`).join('')}
+        ${plans.map(p=>`<option value="${esc(p.id)}" ${p.id===r.plan_id&&!r.custom_plan_enabled?'selected':''}>${esc(p.name)} — ₹${Number(p.monthly_price||0).toLocaleString('en-IN')}${p.is_active?'':' (Inactive)'}</option>`).join('')}
       </select>
     </div>
     <div class="field">
-      <label>Plan Expiry Date</label>
-      <input id="modalAssignPlanExpiry" type="date" min="${today}" value="${currentExpiry}">
-      <small style="display:block;margin-top:5px;color:#667085">Is date ke baad plan automatically <b>Free Starter</b> par shift ho jayega.</small>
+      <label>Plan Duration</label>
+      <select id="modalAssignPlanDuration" onchange="toggleModalPlanDuration()"><option value="date" ${currentExpiry?'selected':''}>Calendar / Expiry Date</option><option value="lifetime" ${!currentExpiry?'selected':''}>Lifetime</option></select>
+      <input id="modalAssignPlanExpiry" type="date" min="${today}" value="${currentExpiry}" style="display:${currentExpiry?'block':'none'};width:100%;margin-top:7px;padding:9px;border:1px solid #dfe3ea;border-radius:7px">
+      <small id="modalAssignPlanDurationHelp" style="display:block;margin-top:5px;color:#667085">${currentExpiry?'Expiry date ke baad plan automatically Free Starter par shift ho jayega.':'Lifetime plan — no expiry date.'}</small>
     </div>
     <div class="modalfoot">
       <button class="smallbtn" onclick="closeModal()">Cancel</button>
@@ -821,75 +822,70 @@ async function saveCustomMenuAssignment(){
   toast(`Custom Menu assigned to ${restaurant?.name||'restaurant'} until ${expiry}`);
 }
 
+function toggleAssignPlanDuration(){
+  const mode=$('assignPlanExpiry')?.value||'date';
+  const date=$('assignPlanExpiryDate');
+  const help=$('assignPlanDurationHelp');
+  if(date)date.style.display=mode==='lifetime'?'none':'block';
+  if(date)date.required=mode==='date';
+  if(help)help.textContent=mode==='lifetime'?'Lifetime plan — no expiry date.':'Selected calendar date ke baad plan automatically Free Starter par shift ho jayega.';
+}
+
 async function assignRestaurantPlan(){
-  const rid=$('assignPlanRestaurant')?.value,pid=$('assignPlanSelect')?.value;
-  if(!rid||!pid)return toast('Restaurant aur plan select karein.');
-  const plan=plans.find(p=>p.id===pid),restaurant=restaurants.find(r=>r.id===rid);
-  if(!plan)return toast('Selected plan not found.');
+  const rid=$('assignPlanRestaurant')?.value,pid=$('assignPlanSelect')?.value;
+  const duration=$('assignPlanExpiry')?.value||'date';
+  const expiry=$('assignPlanExpiryDate')?.value||'';
+  if(!rid||!pid)return toast('Restaurant aur plan select karein.');
+  if(duration==='date'&&!expiry)return toast('Plan expiry date select karein.');
+  const selectedExpiry=duration==='date'?new Date(`${expiry}T23:59:59.999`):null;
+  if(duration==='date'&&(Number.isNaN(selectedExpiry.getTime())||selectedExpiry.getTime()<=Date.now()))return toast('Aaj ya future ki valid expiry date select karein.');
+  const plan=plans.find(p=>p.id===pid),restaurant=restaurants.find(r=>r.id===rid);
+  if(!plan)return toast('Selected plan not found.');
+  const r=await db.from('restaurants').update({
+    plan_id:pid,plan_assigned_at:new Date().toISOString(),plan_assigned_by:session.user.id,
+    plan_expires_at:duration==='date'?selectedExpiry.toISOString():null,
+    custom_plan_enabled:false,custom_plan_name:null,custom_monthly_price:0,custom_setup_fee:0,
+    custom_qr_stickers_max:null,custom_signature_3d_dishes_max:0,custom_photo_enabled:false,
+    custom_gallery_enabled:false,custom_ar_enabled:false,custom_features:[],custom_notes:null,
+    custom_plan_assigned_at:null,custom_plan_assigned_by:null,custom_plan_expires_at:null
+  }).eq('id',rid);
+  if(r.error)return toast('Plan assignment failed: '+r.error.message);
+  await logAction(`Assigned ${duration==='lifetime'?'lifetime':`plan until ${expiry}`} plan ${plan.name} to ${restaurant?.name||rid}`,rid);
+  await loadAll();
+  toast(`${plan.name} assigned ${duration==='lifetime'?'for lifetime':`until ${expiry}`} to ${restaurant?.name||'restaurant'}`);
+}
 
-  const r=await db.from('restaurants').update({
-    plan_id:pid,
-    plan_assigned_at:new Date().toISOString(),
-    plan_assigned_by:session.user.id,
-    plan_expires_at:null,
-    custom_plan_enabled:false,
-    custom_plan_name:null,
-    custom_monthly_price:0,
-    custom_setup_fee:0,
-    custom_qr_stickers_max:null,
-    custom_signature_3d_dishes_max:0,
-    custom_photo_enabled:false,
-    custom_gallery_enabled:false,
-    custom_ar_enabled:false,
-    custom_features:[],
-    custom_notes:null,
-    custom_plan_assigned_at:null,
-    custom_plan_assigned_by:null,
-    custom_plan_expires_at:null
-  }).eq('id',rid);
-
-  if(r.error)return toast('Plan assignment failed: '+r.error.message);
-  await logAction(`Assigned lifetime plan ${plan.name} to ${restaurant?.name||rid}`,rid);
-  await loadAll();
-  toast(`${plan.name} assigned for lifetime to ${restaurant?.name||'restaurant'}`);
+function toggleModalPlanDuration(){
+  const mode=$('modalAssignPlanDuration')?.value||'date';
+  const date=$('modalAssignPlanExpiry');
+  const help=$('modalAssignPlanDurationHelp');
+  if(date)date.style.display=mode==='lifetime'?'none':'block';
+  if(date)date.required=mode==='date';
+  if(help)help.textContent=mode==='lifetime'?'Lifetime plan — no expiry date.':'Expiry date ke baad plan automatically Free Starter par shift ho jayega.';
 }
 
 async function saveRestaurantPlan(rid,pidOverride=null){
-  const pid=pidOverride||$('modalAssignPlan')?.value;
-  const expiry=$('modalAssignPlanExpiry')?.value||'';
-  if(!rid||!pid)return toast('Plan select karein.');
-  if(!expiry)return toast('Plan expiry date select karein.');
-  const selectedExpiry=new Date(`${expiry}T23:59:59.999`);
-  if(Number.isNaN(selectedExpiry.getTime())||selectedExpiry.getTime()<=Date.now())return toast('Expiry date aaj ya future ki honi chahiye.');
-  const plan=plans.find(p=>p.id===pid),restaurant=restaurants.find(r=>r.id===rid);
-  if(!plan)return toast('Selected plan not found.');
-
-  const r=await db.from('restaurants').update({
-    plan_id:pid,
-    plan_assigned_at:new Date().toISOString(),
-    plan_assigned_by:session.user.id,
-    plan_expires_at:selectedExpiry.toISOString(),
-    custom_plan_enabled:false,
-    custom_plan_name:null,
-    custom_monthly_price:0,
-    custom_setup_fee:0,
-    custom_qr_stickers_max:null,
-    custom_signature_3d_dishes_max:0,
-    custom_photo_enabled:false,
-    custom_gallery_enabled:false,
-    custom_ar_enabled:false,
-    custom_features:[],
-    custom_notes:null,
-    custom_plan_assigned_at:null,
-    custom_plan_assigned_by:null,
-    custom_plan_expires_at:null
-  }).eq('id',rid);
-
-  if(r.error)return toast('Plan assignment failed: '+r.error.message);
-  await logAction(`Assigned plan ${plan.name} to ${restaurant?.name||rid} until ${expiry}`,rid);
-  closeModal();
-  await loadAll();
-  toast(`${plan.name} assigned to ${restaurant?.name||'restaurant'} until ${expiry}`);
+  const pid=pidOverride||$('modalAssignPlan')?.value;
+  const duration=$('modalAssignPlanDuration')?.value||'date';
+  const expiry=$('modalAssignPlanExpiry')?.value||'';
+  if(!rid||!pid)return toast('Plan select karein.');
+  if(duration==='date'&&!expiry)return toast('Plan expiry date select karein.');
+  const selectedExpiry=duration==='date'?new Date(`${expiry}T23:59:59.999`):null;
+  if(duration==='date'&&(Number.isNaN(selectedExpiry.getTime())||selectedExpiry.getTime()<=Date.now()))return toast('Expiry date aaj ya future ki honi chahiye.');
+  const plan=plans.find(p=>p.id===pid),restaurant=restaurants.find(r=>r.id===rid);
+  if(!plan)return toast('Plan not found.');
+  const r=await db.from('restaurants').update({
+    plan_id:pid,plan_assigned_at:new Date().toISOString(),plan_assigned_by:session.user.id,
+    plan_expires_at:duration==='date'?selectedExpiry.toISOString():null,
+    custom_plan_enabled:false,custom_plan_name:null,custom_monthly_price:0,custom_setup_fee:0,
+    custom_qr_stickers_max:null,custom_signature_3d_dishes_max:0,custom_photo_enabled:false,
+    custom_gallery_enabled:false,custom_ar_enabled:false,custom_features:[],custom_notes:null,
+    custom_plan_assigned_at:null,custom_plan_assigned_by:null,custom_plan_expires_at:null
+  }).eq('id',rid);
+  if(r.error)return toast('Plan assignment failed: '+r.error.message);
+  await logAction(`Assigned ${duration==='lifetime'?'lifetime':`plan until ${expiry}`} plan ${plan.name} to ${restaurant?.name||rid}`,rid);
+  closeModal();await loadAll();
+  toast(`${plan.name} assigned ${duration==='lifetime'?'for lifetime':`until ${expiry}`} to ${restaurant?.name||'restaurant'}`);
 }
 
 async function removeRestaurantPlan(rid){
