@@ -86,8 +86,8 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
     </div>
     <section class="profile">
       <div>
-        <h1 id="restaurantName">Delhi Chaat Corner</h1>
-        <p class="tagline" id="tagline">Authentic Delhi Street Chaat</p>
+        <h1 id="restaurantName">Loading menu…</h1>
+        <p class="tagline" id="tagline">Please wait while we load this restaurant.</p>
         <div class="meta">
           <span class="status" id="status">Open Now</span>
           <span id="hours">11:00 AM – 11:00 PM</span>
@@ -108,7 +108,7 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
       <h2 id="heading">Popular Menu</h2>
       <span class="count" id="count" aria-live="polite"></span>
     </div>
-    <div class="grid" id="grid"></div>
+    <div class="grid" id="grid"><div class="empty">Loading restaurant menu…</div></div>
   </section>
   <footer>
     <div class="footer-info">
@@ -118,41 +118,18 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
     <div class="powered">Powered by <strong>Free<span>Menu</span></strong></div>
   </footer>
 </main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 "use strict";
 
-/* Replace this sample object with the selected cart's database record. */
-const restaurant = {
-  name: "Delhi Chaat Corner",
-  tagline: "Authentic Delhi Street Chaat",
-  address: "Connaught Place, New Delhi",
-  hours: "11:00 AM – 11:00 PM",
-  phone: "+91 98765 43210",
-  openHour: 11,
-  closeHour: 23,
-  coverImage: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1200&q=75",
-  logo: ""
-};
+const SUPABASE_URL="https://pfsrpowopbrevocwsuii.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_r3K8YKzV0ZHQxvXfkNimkw_e5E8EPmE";
+const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+/* Real restaurant and menu data are loaded by URL slug from Supabase. */
+let restaurant = {name:"Loading menu…",tagline:"",address:"",hours:"",phone:"",openHour:0,closeHour:24,coverImage:"",logo:""};
+let menuItems = [];
 
-/* Sample JSON-style menu data. Blank or failed image URLs use an inline SVG. */
-const menuItems = [
-  {id:1,name:"Pani Puri",category:"Chaats",price:30,veg:true,description:"Crispy puris with tangy flavoured water.",image:"https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=220&q=70",special:false},
-  {id:2,name:"Bhel Puri",category:"Chaats",price:40,veg:true,description:"Tasty mix of puffed rice, veggies and chutneys.",image:"https://images.unsplash.com/photo-1606491956689-2ea866880c84?auto=format&fit=crop&w=220&q=70",special:true},
-  {id:3,name:"Sev Puri",category:"Snacks",price:40,veg:true,description:"Crispy puris topped with chutneys and sev.",image:"",special:false},
-  {id:4,name:"Aloo Tikki",category:"Snacks",price:50,veg:true,description:"Crispy potato patties with sweet and spicy chutney.",image:"https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&w=220&q=70",special:true},
-  {id:5,name:"Pav Bhaji",category:"Snacks",price:60,veg:true,description:"Spicy mashed veggies served with butter pav.",image:"https://images.unsplash.com/photo-1606491956689-2ea866880c84?auto=format&fit=crop&w=220&q=70",special:false},
-  {id:6,name:"Masala Dosa",category:"Snacks",price:70,veg:true,description:"Crispy dosa with spiced potato filling.",image:"",special:false},
-  {id:7,name:"Masala Chai",category:"Beverages",price:20,veg:true,description:"Hot and refreshing Indian masala chai.",image:"https://images.unsplash.com/photo-1571934811356-5cc061b6821f?auto=format&fit=crop&w=220&q=70",special:false},
-  {id:8,name:"Cold Coffee",category:"Beverages",price:50,veg:true,description:"Chilled coffee with a creamy finish.",image:"",special:true}
-];
-
-const categories = [
-  {name:"All",icon:"▦"},
-  {name:"Snacks",icon:"♨"},
-  {name:"Chaats",icon:"◉"},
-  {name:"Beverages",icon:"♧"},
-  {name:"Today's Special",icon:"☆"}
-];
+let categories = [{name:"All",icon:"▦"},{name:"Today's Special",icon:"☆"}];
 const state = {category:"All"};
 const $ = s => document.querySelector(s);
 
@@ -189,7 +166,7 @@ function setupRestaurant(){
   $("#footerAddress").textContent=restaurant.address;
   $("#hours").textContent=restaurant.hours;
   $("#footerHours").textContent=restaurant.hours;
-  const phoneDigits=String(restaurant.phone).replace(/\\D/g,"");
+  const phoneDigits=String(restaurant.phone).replace(/\D/g,"");
   $("#callLink").href="tel:"+phoneDigits;
   $("#phoneDisplay").textContent=restaurant.phone;
   loadImage($("#cover"),restaurant.coverImage);
@@ -254,9 +231,35 @@ $("#filters").addEventListener("click",event=>{
   renderFilters();
   renderMenu();
 });
-setupRestaurant();
-renderFilters();
-renderMenu();
+function slugFromUrl(){const u=new URL(location.href);let slug=(u.searchParams.get("r")||u.searchParams.get("slug")||"").trim();if(!slug){const parts=location.pathname.split("/").filter(Boolean);const i=parts.findIndex(x=>x.toLowerCase()==="menu");if(i>=0&&parts[i+1])slug=decodeURIComponent(parts[i+1]);}return slug;}
+function firstValue(obj,keys,fallback=""){for(const k of keys){if(obj&&obj[k]!==undefined&&obj[k]!==null&&String(obj[k]).trim()!=="")return obj[k]}return fallback}
+function asBool(v){if(typeof v==="boolean")return v;return ![false,0,"0","false","no","non-veg","non veg"].includes(String(v??"").toLowerCase())}
+function mapMenuItem(row){const cat=String(firstValue(row,["category","category_name","menu_category","section"],"Other"));return {id:row.id,name:String(firstValue(row,["name","item_name","title"],"Menu item")),category:cat,price:Number(firstValue(row,["price","selling_price","amount"],0))||0,veg:asBool(firstValue(row,["is_veg","veg","vegetarian"],true)),description:String(firstValue(row,["description","desc","details"],"")),image:String(firstValue(row,["image_url","image","photo_url","photo","image_path"],"")),special:asBool(firstValue(row,["is_special","special","is_featured","featured"],false))}}
+async function loadRealMenu(){
+  try{
+    const slug=slugFromUrl();if(!slug)throw new Error("Restaurant URL slug missing");
+    let rq=supabaseClient.from("restaurants").select("*");
+    rq=rq.eq("slug",slug);
+    let {data:rows,error}=await rq.limit(1);if(error)throw error;
+    if(!rows?.length){const {data:byId,error:idError}=await supabaseClient.from("restaurants").select("*").eq("id",slug).limit(1);if(idError)throw idError;rows=byId}
+    if(!rows?.length)throw new Error("Restaurant not found");
+    const r=rows[0];
+    const open=firstValue(r,["opening_time","open_time","opening_hours_start","opening_hour"],"");
+    const close=firstValue(r,["closing_time","close_time","opening_hours_end","closing_hour"],"");
+    const fmt=t=>{if(t===undefined||t===null||t==="")return "";const m=String(t).match(/(\d{1,2}):(\d{2})/);if(!m)return String(t);let h=+m[1],min=m[2],ap=h>=12?"PM":"AM";h=h%12||12;return `${h}:${min} ${ap}`};
+    const hours=firstValue(r,["opening_hours","business_hours","hours"],(open&&close)?`${fmt(open)} – ${fmt(close)}`:"");
+    restaurant={name:String(firstValue(r,["name","restaurant_name"],"Restaurant")),tagline:String(firstValue(r,["tagline","description","subtitle_text"],"Explore our menu")),address:String(firstValue(r,["address","full_address","location"],"")),hours:String(hours),phone:String(firstValue(r,["phone","phone_number","contact_number"],"")),openHour:Number(String(open).split(":")[0])||0,closeHour:Number(String(close).split(":")[0])||24,coverImage:String(firstValue(r,["banner_url","cover_url","cover_image","banner_image"],"")),logo:String(firstValue(r,["logo_url","logo","logo_image"],""))};
+    const {data:rowsItems,error:itemsError}=await supabaseClient.from("menu_items").select("*").eq("restaurant_id",r.id);
+    if(itemsError)throw itemsError;
+    menuItems=(Array.isArray(rowsItems)?rowsItems:[]).filter(x=>x.is_available!==false&&x.available!==false&&x.is_active!==false).sort((a,b)=>Number(a.sort_order??a.position??999999)-Number(b.sort_order??b.position??999999)).map(mapMenuItem);
+    categories=[{name:"All",icon:"▦"},...Array.from(new Set(menuItems.map(x=>x.category).filter(Boolean))).map(name=>({name,icon:"◉"})),...(menuItems.some(x=>x.special)?[{name:"Today's Special",icon:"☆"}]:[])];
+    state.category="All";document.title=`${restaurant.name} Menu | FreeMenu`;
+    const md=document.querySelector('meta[name="description"]');if(md)md.content=`View ${restaurant.name} menu, dishes and prices on FreeMenu.`;
+    setupRestaurant();renderFilters();renderMenu();
+    if(!menuItems.length)$("#grid").innerHTML='<div class="empty">This restaurant has not added menu items yet.</div>';
+  }catch(err){console.error("Cart menu load failed",err);$("#restaurantName").textContent="Menu unavailable";$("#tagline").textContent="We could not load this restaurant menu.";$("#grid").innerHTML='<div class="empty">Unable to load the restaurant menu. Please refresh or try again later.</div>';$("#filters").innerHTML="";}
+}
+loadRealMenu();
 </script>
 </body>
 </html>
