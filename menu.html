@@ -2293,9 +2293,20 @@ function renderRestaurant(rest) {
           resolvedPlanKey.includes("photo_menu_v1");
 
         const isCustomMenu = rest.custom_plan_enabled === true;
+        const compactPlanKey = resolvedPlanKey.replace(/[^a-z0-9]/g, "");
+        const isCartMenu =
+          compactPlanKey.includes("cartmenu") ||
+          compactPlanKey.includes("cartmenupage");
+        const isMenuOne =
+          compactPlanKey.includes("menuone") ||
+          compactPlanKey.includes("menuonepage");
 
         let targetFile = "menu.html";
-        if (isSignature3D || isFull3D || isCustomMenu) {
+        if (isCartMenu) {
+          targetFile = "cartmenu.html";
+        } else if (isMenuOne) {
+          targetFile = "menuone.html";
+        } else if (isSignature3D || isFull3D || isCustomMenu) {
           targetFile = "signaturemenu.html";
         } else if (isGrowthPhotos) {
           targetFile = "menugrowth.html";

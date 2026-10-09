@@ -131,6 +131,17 @@
       planKey.includes("full_3d") ||
       (planKey.includes("full") && planKey.includes("3d"));
 
+    const compactPlanKey = planKey.replace(/[^a-z0-9]/g, "");
+    const isCartMenu =
+      compactPlanKey.includes("cartmenu") ||
+      compactPlanKey.includes("cartmenupage");
+    const isMenuOne =
+      compactPlanKey.includes("menuone") ||
+      compactPlanKey.includes("menuonepage");
+
+    if (isCartMenu) return "cartmenu.html";
+    if (isMenuOne) return "menuone.html";
+
     const isCustomMenu = rest.custom_plan_enabled === true;
 
     if (isSignature3D || isFull3D || isCustomMenu) return "signaturemenu.html";
