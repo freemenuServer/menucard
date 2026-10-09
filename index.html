@@ -26,11 +26,7 @@
   "url": "https://freemenu.in/",
   "applicationCategory": "BusinessApplication",
   "operatingSystem": "Web",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "INR"
-  },
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "INR"},
   "description": "Create a free, mobile-friendly digital QR menu for restaurants and cafes in India."
 }
 </script>
@@ -70,6 +66,37 @@
 .restaurant-card{contain:layout paint}
 .loading-skeleton{height:360px;border-radius:28px;background:linear-gradient(90deg,#f1f3f5 25%,#fafafa 37%,#f1f3f5 63%);background-size:400% 100%;animation:fmShimmer 1.1s ease-in-out infinite}
 @keyframes fmShimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+
+/* Compact restaurant cards on mobile: show 2 or 3 restaurants per row */
+@media(max-width:760px){
+  .main{padding:18px 0 36px;gap:14px}
+  .content-head{gap:8px;align-items:center}
+  .content-head h2{font-size:18px;line-height:1.2}
+  .content-head p{font-size:12px}
+  .sort{gap:4px;font-size:11px}
+  .sort select{max-width:112px;padding:8px 20px 8px 8px;font-size:12px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .restaurant-card{border-radius:14px}
+  .card-img{height:96px;border-radius:14px 14px 0 0}
+  .fav{width:26px;height:26px;right:6px;top:6px;font-size:17px}
+  .rating{left:6px;bottom:6px;font-size:10px;padding:4px 6px}
+  .open-pill{right:6px;bottom:6px;font-size:9px;padding:4px 6px}
+  .card-body{padding:8px 8px 9px}
+  .card-body h3{font-size:12px;line-height:1.25;margin-bottom:4px}
+  .meta{font-size:10px;line-height:1.35;min-height:28px;overflow-wrap:anywhere}
+  .price{font-size:10px;line-height:1.3}
+  .offer{margin-top:6px;padding:6px 7px;font-size:10px;line-height:1.2;border-radius:10px}
+}
+@media(max-width:380px){
+  .container{padding:0 10px}
+  .grid{gap:8px}
+  .card-img{height:82px}
+  .card-body{padding:7px}
+  .card-body h3{font-size:11px}
+  .meta,.price,.offer{font-size:9px}
+  .sort select{max-width:98px}
+}
+
 </style>
 
 <style id="freemenu-footer-logo-helpline">
@@ -216,9 +243,9 @@ async function loadData(){
     }
   }
 }
-function buildCuisines(){const preferred=["North Indian","Chinese","Italian","South Indian","Fast Food","Cafe","Desserts","Biryani","Healthy Food"];const dbCats=[...new Set(menuItems.map(i=>i.category).filter(Boolean))];const all=[...new Set([...preferred,...dbCats])].slice(0,9);document.getElementById("cuisineRow").innerHTML=all.map(c=>`<button class="cuisine" data-cuisine="${escapeHtml(c)}"><div class="cuisine-img"><img src="${cuisineImage(c)}" alt="${escapeHtml(c)} cuisine for your free digital menu search" loading="lazy" decoding="async"></div><span>${escapeHtml(c)}</span></button>`).join("");document.querySelectorAll(".cuisine").forEach(btn=>btn.addEventListener("click",()=>{selectedCuisine=selectedCuisine===btn.dataset.cuisine?"":btn.dataset.cuisine;document.getElementById("mainSearch").value=selectedCuisine;applyFilters();document.getElementById("restaurants").scrollIntoView({behavior:"smooth"})}))}
+function buildCuisines(){const preferred=["North Indian","Chinese","Italian","South Indian","Fast Food","Cafe","Desserts","Biryani","Healthy Food"];const dbCats=[...new Set(menuItems.map(i=>i.category).filter(Boolean))];const all=[...new Set([...preferred,...dbCats])].slice(0,9);document.getElementById("cuisineRow").innerHTML=all.map(c=>`<button class="cuisine" data-cuisine="${escapeHtml(c)}"><div class="cuisine-img"><img src="${cuisineImage(c)}" alt="${escapeHtml(c)}" loading="lazy" decoding="async"></div><span>${escapeHtml(c)}</span></button>`).join("");document.querySelectorAll(".cuisine").forEach(btn=>btn.addEventListener("click",()=>{selectedCuisine=selectedCuisine===btn.dataset.cuisine?"":btn.dataset.cuisine;document.getElementById("mainSearch").value=selectedCuisine;applyFilters();document.getElementById("restaurants").scrollIntoView({behavior:"smooth"})}))}
 function applyFilters(){const q=document.getElementById("mainSearch").value.trim().toLowerCase(),onlyVeg=document.getElementById("onlyVeg").checked,activeOnly=document.getElementById("openNow").checked,offerOnly=document.getElementById("hasOffers").checked,priceRadio=document.querySelector('input[name="price"]:checked'),priceBand=priceRadio?Number(priceRadio.value):null;let list=restaurants.filter(r=>{const items=restaurantItems(r.id),cats=restaurantCategories(r.id),blob=[r.name,r.slug,r.address,r.phone,...cats,...items.map(x=>x.name),...items.map(x=>x.description)].filter(Boolean).join(" ").toLowerCase();if(q&&!blob.includes(q))return false;if(selectedCuisine&&!cats.some(c=>String(c).toLowerCase()===selectedCuisine.toLowerCase()))return false;if(onlyVeg&&!isPureVeg(r.id))return false;if(activeOnly&&!isActive(r))return false;if(offerOnly&&!Boolean(r.offer_text||r.offer||r.discount_text))return false;if(priceBand){const avg=restaurantAvgPrice(r.id);if(avg===null)return false;const costTwo=avg*2;if(priceBand===500&&costTwo>500)return false;if(priceBand===1000&&(costTwo<=500||costTwo>1000))return false;if(priceBand===1500&&(costTwo<=1000||costTwo>1500))return false;if(priceBand===1501&&costTwo<=1500)return false}return true});const sort=document.getElementById("sortSelect").value;if(sort==="name")list.sort((a,b)=>String(a.name||"").localeCompare(String(b.name||"")));if(sort==="priceLow")list.sort((a,b)=>(restaurantAvgPrice(a.id)||999999)-(restaurantAvgPrice(b.id)||999999));if(sort==="priceHigh")list.sort((a,b)=>(restaurantAvgPrice(b.id)||0)-(restaurantAvgPrice(a.id)||0));renderRestaurants(list)}
-function renderRestaurants(list){document.getElementById("resultCount").textContent=`${list.length} restaurant${list.length===1?"":"s"} found`;const grid=document.getElementById("restaurantGrid");if(!list.length){grid.innerHTML='<div class="empty"><b>No restaurants found</b><br>Try changing your search or filters.</div>';return}grid.innerHTML=list.map(r=>{const cats=restaurantCategories(r.id).slice(0,3),avg=restaurantAvgPrice(r.id),priceTwo=avg?Math.max(200,Math.round((avg*2)/50)*50):null,offer=r.offer_text||r.offer||r.discount_text||(r.plan==="premium"?"Premium Restaurant":"Explore Digital Menu"),fav=favorites.has(String(r.id))?"♥":"♡";return`<article class="restaurant-card" onclick="openRestaurant('${encodeURIComponent(String(r.id))}')"><div class="card-img"><img src="${escapeHtml(cardImage(r))}" loading="lazy" decoding="async" fetchpriority="low" onerror="this.src='${FALLBACK_IMG}'" alt="${escapeHtml(r.name||"Restaurant")} restaurant digital menu on Freemenu"><button class="fav" onclick="toggleFav(event,'${String(r.id)}',this)">${fav}</button><span class="rating">★ ${fakeRating(r)}</span><span class="open-pill">${isActive(r)?"Open Menu":"Unavailable"}</span></div><div class="card-body"><h3>${escapeHtml(r.name||"Restaurant")}</h3><div class="meta">${escapeHtml(cats.length?cats.join(", "):"Digital Menu")}<br>${escapeHtml(displayAddress(r))}</div><div class="price">${priceTwo?`₹${priceTwo.toLocaleString("en-IN")} for two`:"View menu for prices"}</div><div class="offer">${escapeHtml(offer)}</div></div></article>`}).join("")}
+function renderRestaurants(list){document.getElementById("resultCount").textContent=`${list.length} restaurant${list.length===1?"":"s"} found`;const grid=document.getElementById("restaurantGrid");if(!list.length){grid.innerHTML='<div class="empty"><b>No restaurants found</b><br>Try changing your search or filters.</div>';return}grid.innerHTML=list.map(r=>{const cats=restaurantCategories(r.id).slice(0,3),avg=restaurantAvgPrice(r.id),priceTwo=avg?Math.max(200,Math.round((avg*2)/50)*50):null,offer=r.offer_text||r.offer||r.discount_text||(r.plan==="premium"?"Premium Restaurant":"Explore Digital Menu"),fav=favorites.has(String(r.id))?"♥":"♡";return`<article class="restaurant-card" onclick="openRestaurant('${encodeURIComponent(String(r.id))}')"><div class="card-img"><img src="${escapeHtml(cardImage(r))}" loading="lazy" decoding="async" fetchpriority="low" onerror="this.src='${FALLBACK_IMG}'" alt="${escapeHtml(r.name||"Restaurant")}"><button class="fav" onclick="toggleFav(event,'${String(r.id)}',this)">${fav}</button><span class="rating">★ ${fakeRating(r)}</span><span class="open-pill">${isActive(r)?"Open Menu":"Unavailable"}</span></div><div class="card-body"><h3>${escapeHtml(r.name||"Restaurant")}</h3><div class="meta">${escapeHtml(cats.length?cats.join(", "):"Digital Menu")}<br>${escapeHtml(displayAddress(r))}</div><div class="price">${priceTwo?`₹${priceTwo.toLocaleString("en-IN")} for two`:"View menu for prices"}</div><div class="offer">${escapeHtml(offer)}</div></div></article>`}).join("")}
 function fmIsUuid(value){return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value||""))}
 function fmSlugify(value){return String(value||"restaurant").toLowerCase().trim().replace(/&/g," and ").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").replace(/-+/g,"-")||"restaurant"}
 function openRestaurant(restaurantId){
