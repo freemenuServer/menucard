@@ -51,7 +51,7 @@ h1{font-size:clamp(22px,3vw,32px);line-height:1.15;letter-spacing:-.8px;margin:0
 .veg:after{content:"";width:8px;height:8px;background:#13843a;border-radius:50%}
 .veg.nonveg{border-color:#c62832}.veg.nonveg:after{background:#c62832}
 .special{display:inline-block;margin-top:6px;padding:3px 7px;border-radius:6px;background:#ffedb0;color:#7a4300;font-size:10px;font-weight:850}
-.price{font-size:21px;font-weight:850;color:var(--red);line-height:1.2;margin-top:8px}
+.price{font-size:21px;font-weight:850;color:var(--red);line-height:1.2;margin-top:8px}.price-portions{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:13px}.price-portions span{white-space:nowrap}.price-portions small{font-size:10px;color:#777;font-weight:700}.price-unavailable{font-size:12px;color:#777;font-weight:650}
 .desc{font-size:12px;line-height:1.5;color:var(--muted);margin:6px 0 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .empty{grid-column:1/-1;text-align:center;padding:40px 15px;color:var(--muted)}
 footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#eff6fd;padding:20px;color:#26384b;font-size:13px}
@@ -219,7 +219,7 @@ function renderMenu(){
           <span class="veg${item.veg?"":" nonveg"}" role="img" aria-label="${item.veg?"Vegetarian":"Non-vegetarian"}" title="${item.veg?"Vegetarian":"Non-vegetarian"}"></span>
         </div>
         ${item.special?'<span class="special">★ SPECIAL</span>':""}
-        <div class="price">₹${Number(item.price).toLocaleString("en-IN")}</div>
+        ${renderItemPrices(item)}
         <p class="desc">${escapeHTML(item.description)}</p>
       </div>
     </article>`).join("");
@@ -234,7 +234,10 @@ $("#filters").addEventListener("click",event=>{
 function slugFromUrl(){const u=new URL(location.href);let slug=(u.searchParams.get("r")||u.searchParams.get("slug")||"").trim();if(!slug){const parts=location.pathname.split("/").filter(Boolean);const i=parts.findIndex(x=>x.toLowerCase()==="menu");if(i>=0&&parts[i+1])slug=decodeURIComponent(parts[i+1]);}return slug;}
 function firstValue(obj,keys,fallback=""){for(const k of keys){if(obj&&obj[k]!==undefined&&obj[k]!==null&&String(obj[k]).trim()!=="")return obj[k]}return fallback}
 function asBool(v){if(typeof v==="boolean")return v;return ![false,0,"0","false","no","non-veg","non veg"].includes(String(v??"").toLowerCase())}
-function mapMenuItem(row){const cat=String(firstValue(row,["category","category_name","menu_category","section"],"Other"));return {id:row.id,name:String(firstValue(row,["name","item_name","title"],"Menu item")),category:cat,price:Number(firstValue(row,["price","selling_price","amount"],0))||0,veg:asBool(firstValue(row,["is_veg","veg","vegetarian"],true)),description:String(firstValue(row,["description","desc","details"],"")),image:String(firstValue(row,["image_url","image","photo_url","photo","image_path"],"")),special:asBool(firstValue(row,["is_special","special","is_featured","featured"],false))}}
+function priceNumber(value){if(value===null||value===undefined||String(value).trim()==="")return null;const cleaned=String(value).replace(/[^0-9.]/g,"");if(!cleaned)return null;const n=Number(cleaned);return Number.isFinite(n)?n:null}
+function formatPrice(value){const n=priceNumber(value);return n===null?"":`₹${n.toLocaleString("en-IN")}`}
+function renderItemPrices(item){const portions=[["Quarter",item.price_quarter],["Half",item.price_half],["Full",item.price_full]].filter(([,v])=>priceNumber(v)!==null);if(portions.length){return `<div class="price price-portions">${portions.map(([label,value])=>`<span><small>${label}</small> ${formatPrice(value)}</span>`).join("")}</div>`;}const price=priceNumber(firstValue(item,["price","price_full","full_price","selling_price","amount"],null));return price===null?'<div class="price price-unavailable">Price unavailable</div>':`<div class="price">${formatPrice(price)}</div>`;}
+function mapMenuItem(row){const cat=String(firstValue(row,["category","category_name","menu_category","section"],"Other"));return {id:row.id,name:String(firstValue(row,["name","item_name","title"],"Menu item")),category:cat,price:firstValue(row,["price","price_full","full_price","selling_price","amount"],null),price_quarter:firstValue(row,["price_quarter","quarter_price","price_qtr"],null),price_half:firstValue(row,["price_half","half_price"],null),price_full:firstValue(row,["price_full","full_price"],null),veg:asBool(firstValue(row,["is_veg","veg","vegetarian","item_type"],true)),description:String(firstValue(row,["description","desc","details"],"")),image:String(firstValue(row,["image_url","image","photo_url","photo","image_path"],"")),special:asBool(firstValue(row,["is_special","special","is_featured","featured"],false))}}
 async function loadRealMenu(){
   try{
     const slug=slugFromUrl();if(!slug)throw new Error("Restaurant URL slug missing");
