@@ -369,7 +369,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
     <div><h2>Plans & Pricing</h2><p style="color:#667085;margin:4px 0 0">Control every plan shown on <b>/owner/plans.html</b>. Changes are stored in Supabase and do not require editing the pricing page code.</p></div>
     <div class="toolbar"><button class="iconbtn" onclick="loadPlans()">↻ Refresh</button><button class="primary" onclick="openPlanModal()">+ Add Plan</button></div>
   </div>
-  <div class="notice">These are the four plans currently configured for the pricing page: Free Starter ₹0, Growth (Photos) ₹99, Signature 3D ₹199, and Full 3D Experience ₹399. Setup fees, limits, feature text, badges, buttons, recommendation status, active status and display order are all controlled here.</div>
+  <div class="notice">Plans are loaded from the Supabase plans table. Current plans include Free Starter, Growth (Photos), Signature 3D, Full 3D Experience, Cart Menu, and MenuOne once the setup SQL has been run. Setup fees, limits, feature text, badges, buttons, recommendation status, active status and display order are controlled here.</div>
   <div class="card"><div id="plansTable" class="tablewrap"></div></div>
   <div class="card" style="margin-top:12px"><div class="card-head"><h3>Plan Control Rules</h3></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:11px;color:#475467"><div><b>Pricing</b><br>Monthly price + one-time setup fee</div><div><b>Limits</b><br>QR stickers + 3D signature dishes</div><div><b>Display</b><br>Active, recommended, order, badge, button</div></div></div>
 </div>
