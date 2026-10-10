@@ -2215,6 +2215,19 @@ function renderRestaurant(rest) {
 
         const rest = restaurants[0];
 
+        // Respect the Owner Page's Menu Update Mode without changing the normal menu flow.
+        // When enabled, show only the maintenance message to public visitors.
+        if (rest.menu_update_mode === true) {
+          $("rest-name").textContent = rest.name || rest.restaurant_name || "Restaurant Menu";
+          $("category-chips").innerHTML = "";
+          $("category-chips").style.display = "none";
+          $("summary-line").style.display = "none";
+          const search = $("menu-search");
+          if (search) search.style.display = "none";
+          showState("Price Now Updating", "Menu will be available soon. Please check back shortly.");
+          return;
+        }
+
         // Read the currently assigned plan, but NEVER redirect the public menu
         // to a template that may not exist. The core menu engine must remain
         // usable for every active restaurant/plan.
@@ -2293,20 +2306,9 @@ function renderRestaurant(rest) {
           resolvedPlanKey.includes("photo_menu_v1");
 
         const isCustomMenu = rest.custom_plan_enabled === true;
-        const compactPlanKey = resolvedPlanKey.replace(/[^a-z0-9]/g, "");
-        const isCartMenu =
-          compactPlanKey.includes("cartmenu") ||
-          compactPlanKey.includes("cartmenupage");
-        const isMenuOne =
-          compactPlanKey.includes("menuone") ||
-          compactPlanKey.includes("menuonepage");
 
         let targetFile = "menu.html";
-        if (isCartMenu) {
-          targetFile = "cartmenu.html";
-        } else if (isMenuOne) {
-          targetFile = "menuone.html";
-        } else if (isSignature3D || isFull3D || isCustomMenu) {
+        if (isSignature3D || isFull3D || isCustomMenu) {
           targetFile = "signaturemenu.html";
         } else if (isGrowthPhotos) {
           targetFile = "menugrowth.html";
