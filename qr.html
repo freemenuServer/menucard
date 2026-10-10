@@ -525,8 +525,18 @@ async function openQR(){
       throw new Error('Restaurant menu is not available.');
 
     if(!printMode){
-      // Public QR scans show nothing from this QR page. Resolve the permanent
-      // QR code and go straight to the restaurant's live menu.
+      // Best-effort analytics only; keep existing QR -> menu redirect unchanged.
+      try {
+        const scanSave = await db.from('qr_scan_events').insert({
+          qr_code: String(qr.code || code).slice(0,100),
+          restaurant_id: qr.restaurant_id,
+          scanned_at: new Date().toISOString(),
+          user_agent: String(navigator.userAgent || '').slice(0,500),
+          referrer: String(document.referrer || '').slice(0,500)
+        });
+        if(scanSave.error) console.warn('QR analytics not saved:', scanSave.error.message);
+      } catch (analyticsError) { console.warn('QR analytics unavailable:', analyticsError); }
+      // Existing permanent QR -> live restaurant menu route is preserved.
       window.location.replace(getMenuUrl(restaurant.slug));
       return;
     }

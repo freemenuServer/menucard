@@ -393,7 +393,13 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
     <div id="subsTable" class="tablewrap"></div>
   </div>
 </div>
-<div id="analytics" class="page"><div class="subpage-head"><h2>Analytics</h2></div><div class="grid3"><div class="card"><h3>Total Menu Views</h3><h1 id="anViews">0</h1></div><div class="card"><h3>Premium Restaurants</h3><h1 id="anPremium">0</h1></div><div class="card"><h3>Active Restaurants</h3><h1 id="anActive">0</h1></div></div><div class="card" style="margin-top:12px"><div class="charts"><canvas id="analyticsChart"></canvas></div></div></div>
+<div id="analytics" class="page">
+ <div class="subpage-head" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h2>QR Analytics</h2><div style="display:flex;gap:8px;flex-wrap:wrap"><select class="input" id="qrAnalyticsPeriod" style="width:auto"><option value="7">Last 7 Days</option><option value="30" selected>Last 30 Days</option><option value="90">Last 90 Days</option></select><select class="input" id="qrAnalyticsRestaurant" style="width:auto"><option value="">All Restaurants</option></select><button class="btn" onclick="loadQRAnalytics()">Refresh</button></div></div>
+ <div class="grid3" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))"><div class="card"><h3>Total QR Scans</h3><h1 id="qaTotal">—</h1><small>Selected period</small></div><div class="card"><h3>Restaurants Scanned</h3><h1 id="qaRestaurants">—</h1><small>Unique restaurants</small></div><div class="card"><h3>Today</h3><h1 id="qaToday">—</h1><small>Recorded scans</small></div><div class="card"><h3>Tracking Status</h3><h3 id="qaStatus" style="color:#d97706">Checking…</h3><small>Live Supabase records</small></div></div>
+ <div class="grid3" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:12px"><div class="card"><h3>QR Scans Over Time</h3><div class="charts"><canvas id="qaTrendChart"></canvas></div></div><div class="card"><h3>Top Restaurants by Scans</h3><div class="charts"><canvas id="qaRestaurantChart"></canvas></div></div></div>
+ <div class="card" style="margin-top:12px"><div class="card-head"><h3>Recent QR Scan Activity</h3><button class="btn" onclick="exportQRScans()">Export CSV</button></div><div class="tablewrap" id="qaRecent"><p>Loading scan history…</p></div></div>
+ <p style="color:var(--muted,#64748b);font-size:12px;margin-top:10px">Only scans recorded after analytics is enabled will appear. Device/location labels are not inferred or fabricated. If the table is not set up yet, run the included SQL file in Supabase first.</p>
+</div>
 <div id="reports" class="page"><div class="subpage-head"><h2>Reports</h2><button class="primary" onclick="exportRestaurantsCSV()">Export Restaurants CSV</button></div><div class="card"><div class="empty">Use the export button to download the current restaurant dataset. More report modules can be added without changing the public menu.</div></div></div>
 <div id="customers" class="page"><div class="subpage-head"><h2>Customers</h2></div><div class="card"><div class="empty">Customer data is shown here when a customer/analytics table is configured.</div></div></div>
 <div id="admins" class="page"><div class="subpage-head"><h2>Admin Users</h2></div><div class="card"><div id="adminsTable"></div></div></div>
@@ -909,7 +915,35 @@ function buildCharts(){
 function monthLabels(){return Array.from({length:9},(_,i)=>new Date(new Date().getFullYear(),new Date().getMonth()-8+i,1).toLocaleString('en',{month:'short'}))}
 function growthData(){const now=new Date();return Array.from({length:9},(_,i)=>restaurants.filter(r=>{const d=new Date(r.created_at||0);const target=new Date(now.getFullYear(),now.getMonth()-8+i+1,1);const start=new Date(now.getFullYear(),now.getMonth()-8+i,1);return d>=start&&d<target}).length)}
 function menuGrowthData(){const now=new Date();return Array.from({length:9},(_,i)=>menuItems.filter(m=>{const d=new Date(m.created_at||0);const start=new Date(now.getFullYear(),now.getMonth()-8+i,1);const end=new Date(now.getFullYear(),now.getMonth()-8+i+1,1);return d>=start&&d<end}).length)}
-function renderAnalytics(){if(!charts.analytics){charts.analytics=new Chart($('analyticsChart'),{type:'line',data:{labels:monthLabels(),datasets:[{label:'Menu Items Added',data:menuGrowthData()}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}})}}
+let qrScanRows=[]; let qaCharts={};
+function renderAnalytics(){ loadQRAnalytics(); }
+function qaDateKey(d){const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')}
+async function loadQRAnalytics(){
+ const status=$('qaStatus'); if(status)status.textContent='Loading…';
+ const period=Number($('qrAnalyticsPeriod')?.value||30); const restaurantId=$('qrAnalyticsRestaurant')?.value||'';
+ const since=new Date();since.setDate(since.getDate()-period+1);since.setHours(0,0,0,0);
+ try{
+  let query=db.from('qr_scan_events').select('id,qr_code,restaurant_id,scanned_at,user_agent,referrer').gte('scanned_at',since.toISOString()).order('scanned_at',{ascending:false}).limit(10000);
+  if(restaurantId)query=query.eq('restaurant_id',restaurantId);
+  const result=await query;if(result.error)throw result.error;
+  qrScanRows=result.data||[];
+  const today=qaDateKey(new Date());$('qaTotal').textContent=qrScanRows.length.toLocaleString();$('qaToday').textContent=qrScanRows.filter(x=>qaDateKey(x.scanned_at)===today).length.toLocaleString();$('qaRestaurants').textContent=new Set(qrScanRows.map(x=>x.restaurant_id).filter(Boolean)).size;
+  status.textContent='Connected';status.style.color='#059669';
+  const restMap=new Map((restaurants||[]).map(r=>[String(r.id),r.name||r.slug||'Restaurant']));
+  const sel=$('qrAnalyticsRestaurant');if(sel&&sel.options.length<2){(restaurants||[]).forEach(r=>{const o=document.createElement('option');o.value=r.id;o.textContent=r.name||r.slug||'Restaurant';sel.appendChild(o)})}
+  const days=[];for(let i=period-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(qaDateKey(d))}
+  const counts=Object.fromEntries(days.map(d=>[d,0]));qrScanRows.forEach(x=>{const k=qaDateKey(x.scanned_at);if(k in counts)counts[k]++});
+  const grouped={};qrScanRows.forEach(x=>{const n=restMap.get(String(x.restaurant_id))||'Restaurant';grouped[n]=(grouped[n]||0)+1});const top=Object.entries(grouped).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  if(typeof Chart!=='undefined'){
+   if(qaCharts.trend)qaCharts.trend.destroy();qaCharts.trend=new Chart($('qaTrendChart'),{type:'line',data:{labels:days.map(d=>d.slice(5)),datasets:[{label:'Scans',data:days.map(d=>counts[d]),borderColor:'#1677ff',backgroundColor:'rgba(22,119,255,.14)',fill:true,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});
+   if(qaCharts.rest)qaCharts.rest.destroy();qaCharts.rest=new Chart($('qaRestaurantChart'),{type:'bar',data:{labels:top.map(x=>x[0]),datasets:[{label:'Scans',data:top.map(x=>x[1]),backgroundColor:'#10b981'}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0}}}}});
+  }
+  const rows=qrScanRows.slice(0,100);$('qaRecent').innerHTML=rows.length?'<table><thead><tr><th>Date & Time</th><th>Restaurant</th><th>QR Code</th><th>Device / Browser</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+esc(new Date(x.scanned_at).toLocaleString())+'</td><td>'+esc(restMap.get(String(x.restaurant_id))||'Restaurant')+'</td><td>'+esc(x.qr_code||'—')+'</td><td>'+esc(qaDevice(x.user_agent))+'</td></tr>').join('')+'</tbody></table>':'<p>No scans recorded for this period yet.</p>';
+ }catch(e){status.textContent='Setup required';status.style.color='#d97706';$('qaTotal').textContent='—';$('qaToday').textContent='—';$('qaRestaurants').textContent='—';$('qaRecent').innerHTML='<p>QR analytics table unavailable. Run <b>supabase_qr_analytics.sql</b> in Supabase, then refresh. Details: '+esc(e.message||e)+'</p>';console.warn('QR analytics:',e)}
+}
+function qaDevice(ua){ua=String(ua||'');if(/iPhone|iPad|iPod/i.test(ua))return 'iPhone / iPad';if(/Android/i.test(ua))return 'Android';if(/Windows/i.test(ua))return 'Windows';if(/Macintosh/i.test(ua))return 'Mac';return ua?'Other device':'Unknown'}
+function exportQRScans(){const rows=[['Date & Time','Restaurant ID','QR Code','User Agent','Referrer'],...qrScanRows.map(x=>[x.scanned_at,x.restaurant_id,x.qr_code,x.user_agent,x.referrer])];const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));a.download='freemenu-qr-scans.csv';a.click();URL.revokeObjectURL(a.href)}
+$('qrAnalyticsPeriod')?.addEventListener('change',loadQRAnalytics);$('qrAnalyticsRestaurant')?.addEventListener('change',loadQRAnalytics);
 async function loadSettings(){const rows=await q('platform_settings');if(!rows?.length)return;const m=Object.fromEntries(rows.map(x=>[x.key,x.value]));$('setName').value=m.platform_name||'FreeMenu.in';$('setEmail').value=m.support_email||'';$('setPublic').value=String(m.public_menus_enabled??true);$('setApproval').value=String(m.approval_required??true)}
 async function savePlatformSettings(){const vals={platform_name:$('setName').value,support_email:$('setEmail').value,public_menus_enabled:$('setPublic').value,approval_required:$('setApproval').value};for(const [key,value] of Object.entries(vals)){const r=await db.from('platform_settings').upsert({key,value,updated_by:session.user.id},{onConflict:'key'});if(r.error)return toast(r.error.message)}await logAction('Updated platform settings');toast('Settings saved')}
 async function loadAdSettings(){const rows=await q('platform_settings');if(!rows)return;const m=Object.fromEntries(rows.map(x=>[x.key,x.value]));$('adsClient').value=m.adsense_client_id||'';$('adsSlot').value=m.ads_default_slot||'';$('adsFree').value=String(m.free_plan_ads??true);$('adsPremium').value=String(m.premium_plan_ads??false);if($('adsPosition'))$('adsPosition').value=m.ads_position||'after_2_categories'}
