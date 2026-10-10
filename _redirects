@@ -1,0 +1,5 @@
+# Keep the existing engine endpoint working normally.
+/engine /engine.html 200
+
+# Clean restaurant share links: /urbanpunjab -> /menu.html?r=urbanpunjab
+/:slug /menu.html?r=:slug 302
