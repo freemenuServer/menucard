@@ -24,7 +24,7 @@
   (() => {
     const pathParts = location.pathname.split('/').filter(Boolean);
     const lastPart = pathParts[pathParts.length - 1] || '';
-    const reserved = new Set(['index.html','menu.html','engine.html','owner.html','admin.html','qr.html','404.html']);
+    const reserved = new Set(['index.html','menu.html','engine.html','owner.html','admin.html','qr.html','404.html','cartmenu.html','menuone.html','signaturemenu.html','menugrowth.html','plans.html','drive.html']);
     let slug = '';
     try { slug = decodeURIComponent(lastPart).trim(); } catch (_) { slug = lastPart.trim(); }
 
@@ -38,6 +38,8 @@
     // Pass the slug explicitly so engine.html never receives a blank restaurant key.
     const target = new URL('/engine.html', location.origin);
     target.searchParams.set('r', slug);
+    // Preserve a debug flag if one was explicitly requested.
+    if (new URLSearchParams(location.search).get('debug') === '1') target.searchParams.set('debug', '1');
     location.replace(target.pathname + target.search);
   })();
   </script>
