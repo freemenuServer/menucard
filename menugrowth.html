@@ -95,6 +95,43 @@
       #categoryTabs .cat { display: inline-flex !important; flex: 0 0 auto !important; visibility: visible !important; }
       .content { padding-bottom: calc(90px + env(safe-area-inset-bottom)) !important; }
     }
+
+    /* Larger, rounded mobile category buttons */
+    @media (max-width:560px) {
+      #categoryTabs.cats {
+        min-height: 84px !important;
+        gap: 10px !important;
+        padding: 9px 12px calc(9px + env(safe-area-inset-bottom)) !important;
+        align-items: center !important;
+      }
+      #categoryTabs .cat {
+        min-width: 76px !important;
+        min-height: 64px !important;
+        padding: 8px 12px !important;
+        border-radius: 20px !important;
+        display: inline-flex !important;
+        flex: 0 0 auto !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 5px !important;
+        font-size: 12px !important;
+        line-height: 1.15 !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,.06) !important;
+      }
+      #categoryTabs .category-icon {
+        display: block !important;
+        width: 24px !important;
+        height: 24px !important;
+        flex: 0 0 24px !important;
+      }
+      #categoryTabs .cat.active {
+        border-radius: 20px !important;
+        box-shadow: 0 4px 12px rgba(159,22,32,.22) !important;
+      }
+      .content { padding-bottom: calc(112px + env(safe-area-inset-bottom)) !important; }
+      .bottom-bar .whatsapp { bottom: calc(94px + env(safe-area-inset-bottom)) !important; }
+    }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 
