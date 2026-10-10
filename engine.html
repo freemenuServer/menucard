@@ -157,11 +157,41 @@
     return "menu.html";
   }
 
-  async function route() {
+  function getRestaurantKey() {
     const params = new URLSearchParams(location.search);
-    const key = (params.get("r") || params.get("slug") || "").trim();
+    // 1) Preserve the existing query-string routes.
+    const queryKey = (params.get("r") || params.get("slug") || "").trim();
+    if (queryKey) return queryKey;
+
+    // 2) Support clean path routes such as /engine/urbanpunjab.
+    const parts = location.pathname.split("/").filter(Boolean);
+    const last = parts.length ? parts[parts.length - 1] : "";
+    if (last && !["engine", "engine.html", "index.html"].includes(last.toLowerCase())) {
+      return decodeURIComponent(last).trim();
+    }
+
+    // 3) If hosting redirected /restaurant-slug to /engine and dropped the
+    // slug, try recovering it from the original same-site referrer path.
+    try {
+      const ref = document.referrer ? new URL(document.referrer) : null;
+      if (ref && ref.origin === location.origin) {
+        const refParts = ref.pathname.split("/").filter(Boolean);
+        const refLast = refParts.length ? refParts[refParts.length - 1] : "";
+        if (refLast && !["engine", "engine.html", "index.html", "404.html"].includes(refLast.toLowerCase())) {
+          return decodeURIComponent(refLast).trim();
+        }
+        const refParams = new URLSearchParams(ref.search);
+        const refKey = (refParams.get("r") || refParams.get("slug") || "").trim();
+        if (refKey) return refKey;
+      }
+    } catch (_) {}
+    return "";
+  }
+
+  async function route() {
+    const key = getRestaurantKey();
     if (!key) {
-      state("Restaurant link missing", "No restaurant slug was supplied.", true);
+      state("Restaurant link missing", "The clean URL reached /engine without a restaurant slug. Configure hosting to forward /<slug> to /engine.html?r=<slug> (or /engine/<slug>).", true);
       return;
     }
 
