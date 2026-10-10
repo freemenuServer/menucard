@@ -426,7 +426,7 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
     <div class="formGroup">
       <label>Menu Slug</label>
       <input class="input" id="signupSlug" type="text" placeholder="my-restaurant-menu">
-      <div class="slugHint">Your public menu: menu.html?r=your-slug</div>
+      <div class="slugHint">Your share link: freemenu.in/your-slug</div>
     </div>
 
     <button type="button" class="loginSubmit" id="signupSubmitNew">📝 Create Restaurant Account</button>
@@ -984,7 +984,7 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const cleanNum=v=>v!==""&&v!==null&&v!==undefined&&!Number.isNaN(Number(v))?Number(v):null;
 function toast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),2300)}
 function initials(name){return (name||"Owner").split(/\s+/).slice(0,2).map(x=>x[0]).join("").toUpperCase()}
-function publicUrl(){return new URL("menu.html?r="+encodeURIComponent(currentRestaurant?.slug||""),location.href).href}
+function publicUrl(){const slug=String(currentRestaurant?.slug||"").trim().toLowerCase();return slug?new URL("/"+encodeURIComponent(slug),location.origin).href:""}
 function permanentQRUrl(code){return new URL("qr.html?code="+encodeURIComponent(code||""),location.href).href}
 let currentAssignedQR=null;
 async function loadAssignedQR(){
@@ -2340,9 +2340,8 @@ function setOwnerQrDesign(n){
 }
 async function renderQR(){
  const assigned=await loadAssignedQR();
- // Always show a shareable restaurant menu link, even before a QR is assigned.
- const url=assigned?.code ? permanentQRUrl(assigned.code) : publicUrl();
- $("qrUrl").value=url;
+ const url=assigned?.code ? permanentQRUrl(assigned.code) : "";
+ $("qrUrl").value=url||"No QR assigned yet";
  $("ownerQrRestaurantName").textContent=currentRestaurant?.name||"Restaurant Menu";
  const c=ownerQrDesignConfig[ownerQrDesign]||ownerQrDesignConfig[1];
  const box=$("ownerQrCode"); box.innerHTML="";
@@ -2357,8 +2356,8 @@ async function renderQR(){
 }
 $("quickQR").onclick=()=>{showSection("qr");history.replaceState(null,"","#qr");renderQR()};
 $("menuLiveSwitch").onclick=toggleMenuMaintenance;
-$("copyQR").onclick=async()=>{const q=currentAssignedQR||await loadAssignedQR();const url=q?.code?permanentQRUrl(q.code):publicUrl();await navigator.clipboard.writeText(url);toast(q?.code?"Permanent QR link copied":"Restaurant menu link copied")};
-$("copyMenu").onclick=async()=>{await navigator.clipboard.writeText(publicUrl());toast("Menu link copied")};
+$("copyQR").onclick=async()=>{const q=currentAssignedQR||await loadAssignedQR();if(!q?.code)return toast("No QR assigned yet");await navigator.clipboard.writeText(permanentQRUrl(q.code));toast("Permanent QR link copied")};
+$("copyMenu").onclick=async()=>{const url=publicUrl();if(!url)return toast("Restaurant link is not available yet");try{await navigator.clipboard.writeText(url);toast("Clean share link copied")}catch(e){window.prompt("Copy your restaurant link",url)}};
 document.querySelectorAll(".ownerQrDesign").forEach(b=>b.onclick=()=>setOwnerQrDesign(b.dataset.design));
 $("ownerQrDownload").onclick=()=>{if(ownerQrInstance)ownerQrInstance.download({name:(currentRestaurant?.slug||"restaurant")+"-menu-qr",extension:"png"})};
 $("ownerQrPrint").onclick=()=>{

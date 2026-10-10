@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Opening FreeMenu…</title>
+  <style>html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#fff;color:#333}main{min-height:100vh;display:grid;place-content:center;text-align:center;padding:24px;box-sizing:border-box}.spinner{width:26px;height:26px;border:3px solid #eee;border-top-color:#7b1e16;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}p{font-size:14px;color:#777}@keyframes spin{to{transform:rotate(360deg)}}</style>
+</head>
+<body>
+  <main><div class="spinner" aria-hidden="true"></div><strong>Opening restaurant menu…</strong><p>Please wait.</p></main>
+  <script>
+  (() => {
+    // A clean share link is a single path segment, e.g. /urbanpunjab.
+    // Existing files load normally and never reach this 404 fallback.
+    let slug = "";
+    try { slug = decodeURIComponent(location.pathname.replace(/^\/+|\/+$/g, "")); } catch (_) {}
+    if (!slug || slug.includes("/") || !/^[a-z0-9][a-z0-9-]*$/i.test(slug)) {
+      document.querySelector("main").innerHTML = "<strong>Page not found</strong><p>This FreeMenu link is not valid.</p>";
+      return;
+    }
+    location.replace(new URL("/engine.html?r=" + encodeURIComponent(slug), location.origin).href);
+  })();
+  </script>
+</body>
+</html>
