@@ -121,6 +121,36 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
 .assign-login-foot{display:flex;justify-content:flex-end;gap:8px;padding:16px 20px;border-top:1px solid #eaecf0}
 .assign-login-save:disabled,.assign-login-cancel:disabled{opacity:.6;cursor:not-allowed}
 </style>
+
+<style>
+/* QR Analytics visual refresh only; other admin pages retain their existing styles. */
+#analytics.qa-page{color:#152238}
+#analytics .qa-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+#analytics .qa-toolbar h2{margin:0;font-size:25px;font-weight:800;letter-spacing:-.4px}
+#analytics .qa-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#analytics .qa-controls .input{min-height:40px;border:1px solid #dce4ef;border-radius:10px;background:#fff;padding:8px 12px;color:#24334a}
+#analytics .qa-pill{border:1px solid #dce4ef;background:#fff;color:#26364e;border-radius:10px;padding:10px 14px;font-weight:650;cursor:pointer}
+#analytics .qa-pill.active{background:#1677ff;color:#fff;border-color:#1677ff}
+#analytics .qa-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+#analytics .qa-kpi{background:#fff;border:1px solid #e3eaf3;border-radius:14px;padding:16px;display:flex;align-items:center;gap:13px;box-shadow:0 4px 16px rgba(23,44,76,.035);min-width:0}
+#analytics .qa-kpi-icon{width:56px;height:56px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:25px;flex:0 0 auto;background:#e8f3ff;color:#1677ff}
+#analytics .qa-kpi:nth-child(2) .qa-kpi-icon{background:#e2fbef;color:#08a968}#analytics .qa-kpi:nth-child(3) .qa-kpi-icon{background:#fff1df;color:#f08b10}#analytics .qa-kpi:nth-child(4) .qa-kpi-icon{background:#f1e8ff;color:#8647e8}
+#analytics .qa-kpi-label{font-size:12px;color:#60718b;margin-bottom:4px}#analytics .qa-kpi-value{font-size:27px;line-height:1.2;font-weight:800;letter-spacing:-.5px;color:#101d32}#analytics .qa-kpi-note{font-size:11px;color:#70809a;margin-top:4px}
+#analytics .qa-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px;margin-bottom:12px}
+#analytics .qa-card{background:#fff;border:1px solid #e2e9f2;border-radius:14px;padding:16px;min-width:0;box-shadow:0 4px 16px rgba(23,44,76,.035)}
+#analytics .qa-card h3{font-size:15px;font-weight:800;color:#17243a;margin:0 0 14px}
+#analytics .qa-col-4{grid-column:span 4}#analytics .qa-col-5{grid-column:span 5}#analytics .qa-col-7{grid-column:span 7}#analytics .qa-col-8{grid-column:span 8}#analytics .qa-col-12{grid-column:span 12}
+#analytics .qa-chart{position:relative;height:220px;min-height:180px}#analytics .qa-chart.tall{height:255px}
+#analytics .qa-status-layout{display:flex;align-items:center;justify-content:space-around;gap:12px;min-height:220px}#analytics .qa-status-layout .qa-chart{width:54%;height:200px;flex:0 1 220px}
+#analytics .qa-legend{display:grid;gap:12px;font-size:12px;color:#43536c;min-width:95px}.qa-legend-row{display:flex;align-items:center;gap:8px}.qa-dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:0 0 auto}
+#analytics .qa-revenue-row{display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid #e6edf5;border-radius:12px;margin-bottom:8px}#analytics .qa-revenue-row:last-child{margin-bottom:0;background:#f8fafc}#analytics .qa-revenue-icon{width:42px;height:42px;border-radius:12px;background:#f0f3f7;display:flex;align-items:center;justify-content:center;font-size:20px}#analytics .qa-revenue-row strong{display:block;font-size:20px;color:#111d30}#analytics .qa-revenue-row small{color:#6a7a93;font-size:11px}
+#analytics .qa-card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}#analytics .qa-card-head h3{margin-bottom:12px}
+#analytics .qa-table-wrap{overflow:auto}#analytics .qa-table{width:100%;border-collapse:collapse;font-size:12px;min-width:600px}#analytics .qa-table th{background:#f4f7fb;color:#596a84;font-weight:750;text-align:left;padding:10px;border-bottom:1px solid #e3eaf2;white-space:nowrap}#analytics .qa-table td{padding:10px;border-bottom:1px solid #edf1f6;color:#3b4b63}#analytics .qa-table tr:last-child td{border-bottom:0}
+#analytics .qa-note{font-size:11px;color:#77869a;margin:8px 2px 0}
+@media(max-width:1000px){#analytics .qa-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}#analytics .qa-col-4,#analytics .qa-col-5,#analytics .qa-col-7,#analytics .qa-col-8{grid-column:span 6}}
+@media(max-width:650px){#analytics .qa-kpis{grid-template-columns:1fr 1fr;gap:8px}#analytics .qa-kpi{padding:11px;gap:9px}#analytics .qa-kpi-icon{width:40px;height:40px;font-size:19px}#analytics .qa-kpi-value{font-size:21px}#analytics .qa-col-4,#analytics .qa-col-5,#analytics .qa-col-7,#analytics .qa-col-8,#analytics .qa-col-12{grid-column:span 12}#analytics .qa-card{padding:12px}#analytics .qa-status-layout{min-height:190px}#analytics .qa-toolbar h2{font-size:22px}}
+</style>
+
 </head>
 <body>
 
@@ -393,12 +423,28 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
     <div id="subsTable" class="tablewrap"></div>
   </div>
 </div>
-<div id="analytics" class="page">
- <div class="subpage-head" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h2>QR Analytics</h2><div style="display:flex;gap:8px;flex-wrap:wrap"><select class="input" id="qrAnalyticsPeriod" style="width:auto"><option value="7">Last 7 Days</option><option value="30" selected>Last 30 Days</option><option value="90">Last 90 Days</option></select><select class="input" id="qrAnalyticsRestaurant" style="width:auto"><option value="">All Restaurants</option></select><button class="btn" onclick="loadQRAnalytics()">Refresh</button></div></div>
- <div class="grid3" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))"><div class="card"><h3>Total QR Scans</h3><h1 id="qaTotal">—</h1><small>Selected period</small></div><div class="card"><h3>Restaurants Scanned</h3><h1 id="qaRestaurants">—</h1><small>Unique restaurants</small></div><div class="card"><h3>Today</h3><h1 id="qaToday">—</h1><small>Recorded scans</small></div><div class="card"><h3>Tracking Status</h3><h3 id="qaStatus" style="color:#d97706">Checking…</h3><small>Live Supabase records</small></div></div>
- <div class="grid3" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:12px"><div class="card"><h3>QR Scans Over Time</h3><div class="charts"><canvas id="qaTrendChart"></canvas></div></div><div class="card"><h3>Top Restaurants by Scans</h3><div class="charts"><canvas id="qaRestaurantChart"></canvas></div></div></div>
- <div class="card" style="margin-top:12px"><div class="card-head"><h3>Recent QR Scan Activity</h3><button class="btn" onclick="exportQRScans()">Export CSV</button></div><div class="tablewrap" id="qaRecent"><p>Loading scan history…</p></div></div>
- <p style="color:var(--muted,#64748b);font-size:12px;margin-top:10px">Only scans recorded after analytics is enabled will appear. Device/location labels are not inferred or fabricated. If the table is not set up yet, run the included SQL file in Supabase first.</p>
+<div id="analytics" class="page qa-page">
+ <div class="qa-toolbar"><div><h2>QR Analytics</h2><div style="font-size:12px;color:#70809a;margin-top:4px">Restaurant QR scan performance and activity</div></div><div class="qa-controls"><select class="input" id="qrAnalyticsPeriod" aria-label="Date range"><option value="1">Today</option><option value="7" selected>7 Days</option><option value="30">30 Days</option><option value="month">This Month</option><option value="90">90 Days</option></select><select class="input" id="qrAnalyticsRestaurant" aria-label="Filter restaurant"><option value="">All Restaurants</option></select><button class="qa-pill" onclick="loadQRAnalytics()">↻ Refresh</button></div></div>
+ <div class="qa-kpis">
+  <div class="qa-kpi"><div class="qa-kpi-icon">▦</div><div><div class="qa-kpi-label">Total QR Scans</div><div class="qa-kpi-value" id="qaTotal">—</div><div class="qa-kpi-note">Selected date range</div></div></div>
+  <div class="qa-kpi"><div class="qa-kpi-icon">▣</div><div><div class="qa-kpi-label">Restaurants Scanned</div><div class="qa-kpi-value" id="qaRestaurants">—</div><div class="qa-kpi-note">Unique restaurants</div></div></div>
+  <div class="qa-kpi"><div class="qa-kpi-icon">♧</div><div><div class="qa-kpi-label">Avg. Scans / Restaurant</div><div class="qa-kpi-value" id="qaAverage">—</div><div class="qa-kpi-note">Selected date range</div></div></div>
+  <div class="qa-kpi"><div class="qa-kpi-icon">▯</div><div><div class="qa-kpi-label">Unique Devices</div><div class="qa-kpi-value" id="qaDevices">—</div><div class="qa-kpi-note">Estimated from browser data</div></div></div>
+ </div>
+ <div class="qa-grid">
+  <div class="qa-card qa-col-4"><h3>Restaurants by Status</h3><div class="qa-status-layout"><div class="qa-chart"><canvas id="qaStatusChart"></canvas></div><div class="qa-legend" id="qaStatusLegend"><div class="qa-legend-row"><span class="qa-dot" style="background:#10b981"></span>Active <b id="qaActiveCount">—</b></div><div class="qa-legend-row"><span class="qa-dot" style="background:#f59e0b"></span>Pending <b id="qaPendingCount">—</b></div><div class="qa-legend-row"><span class="qa-dot" style="background:#ef4444"></span>Blocked <b id="qaBlockedCount">—</b></div></div></div></div>
+  <div class="qa-card qa-col-4"><div class="qa-card-head"><h3>Revenue Overview</h3><span style="font-size:11px;color:#73829a">Existing totals</span></div><div class="qa-revenue-row"><div class="qa-revenue-icon">📣</div><div><strong id="qaAdRevenue">₹0</strong><small>Ad Revenue (if configured)</small></div></div><div class="qa-revenue-row"><div class="qa-revenue-icon">♛</div><div><strong id="qaPremiumRevenue">₹0</strong><small>Premium Subscriptions</small></div></div><div class="qa-revenue-row"><div class="qa-revenue-icon">▤</div><div><strong id="qaTotalRevenue">₹0</strong><small>Total Revenue</small></div></div></div>
+  <div class="qa-card qa-col-4"><h3>Scan Devices</h3><div class="qa-status-layout"><div class="qa-chart"><canvas id="qaDeviceChart"></canvas></div><div class="qa-legend" id="qaDeviceLegend"><div class="qa-legend-row"><span class="qa-dot" style="background:#1677ff"></span>Android <b>—</b></div><div class="qa-legend-row"><span class="qa-dot" style="background:#526071"></span>iOS <b>—</b></div><div class="qa-legend-row"><span class="qa-dot" style="background:#7c3aed"></span>Other <b>—</b></div></div></div></div>
+ </div>
+ <div class="qa-grid">
+  <div class="qa-card qa-col-7"><div class="qa-card-head"><h3>QR Scans Over Time</h3><span id="qaStatus" style="font-size:11px;color:#d97706">Checking connection…</span></div><div class="qa-chart tall"><canvas id="qaTrendChart"></canvas></div></div>
+  <div class="qa-card qa-col-5"><div class="qa-card-head"><h3>Top Restaurants by QR Scans</h3></div><div class="qa-chart tall"><canvas id="qaRestaurantChart"></canvas></div></div>
+ </div>
+ <div class="qa-grid">
+  <div class="qa-card qa-col-7"><div class="qa-card-head"><h3>Recent QR Scan Activity</h3><button class="qa-pill" onclick="exportQRScans()">Export CSV</button></div><div class="qa-table-wrap" id="qaRecent"><p>Loading scan history…</p></div></div>
+  <div class="qa-card qa-col-5"><h3>Scan by Day (This Week)</h3><div class="qa-chart"><canvas id="qaWeekChart"></canvas></div><p class="qa-note">Location and city analytics are not shown unless that data is actually collected.</p></div>
+ </div>
+ <p class="qa-note">Only scans recorded after tracking is enabled appear here. All scan counts are loaded from Supabase; no sample values are used.</p>
 </div>
 <div id="reports" class="page"><div class="subpage-head"><h2>Reports</h2><button class="primary" onclick="exportRestaurantsCSV()">Export Restaurants CSV</button></div><div class="card"><div class="empty">Use the export button to download the current restaurant dataset. More report modules can be added without changing the public menu.</div></div></div>
 <div id="customers" class="page"><div class="subpage-head"><h2>Customers</h2></div><div class="card"><div class="empty">Customer data is shown here when a customer/analytics table is configured.</div></div></div>
@@ -918,30 +964,38 @@ function menuGrowthData(){const now=new Date();return Array.from({length:9},(_,i
 let qrScanRows=[]; let qaCharts={};
 function renderAnalytics(){ loadQRAnalytics(); }
 function qaDateKey(d){const x=new Date(d);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')}
+function qaRange(){const value=$('qrAnalyticsPeriod')?.value||'7';const now=new Date();let since=new Date();if(value==='month')since=new Date(now.getFullYear(),now.getMonth(),1);else{since.setDate(since.getDate()-Number(value)+1)}since.setHours(0,0,0,0);return {since,days:Math.max(1,Math.ceil((now-since)/86400000)+1)}}
+function qaSafeText(id,value){const el=$(id);if(el)el.textContent=String(value)}
 async function loadQRAnalytics(){
- const status=$('qaStatus'); if(status)status.textContent='Loading…';
- const period=Number($('qrAnalyticsPeriod')?.value||30); const restaurantId=$('qrAnalyticsRestaurant')?.value||'';
- const since=new Date();since.setDate(since.getDate()-period+1);since.setHours(0,0,0,0);
- const setText=(id,value)=>{const el=$(id);if(el)el.textContent=String(value)};
+ const status=$('qaStatus');if(status)status.textContent='Loading live data…';
+ const {since,days:period}=qaRange();const restaurantId=$('qrAnalyticsRestaurant')?.value||'';
  try{
   let query=db.from('qr_scan_events').select('id,qr_code,restaurant_id,scanned_at,user_agent,referrer').gte('scanned_at',since.toISOString()).order('scanned_at',{ascending:false}).limit(10000);
   if(restaurantId)query=query.eq('restaurant_id',restaurantId);
-  const result=await query;if(result.error)throw result.error;
-  qrScanRows=result.data||[];
-  const today=qaDateKey(new Date());setText('qaTotal',qrScanRows.length.toLocaleString());setText('qaToday',qrScanRows.filter(x=>qaDateKey(x.scanned_at)===today).length.toLocaleString());setText('qaRestaurants',new Set(qrScanRows.map(x=>x.restaurant_id).filter(Boolean)).size);
-  if(status){status.textContent='Connected';status.style.color='#059669'}
+  const result=await query;if(result.error)throw result.error;qrScanRows=result.data||[];
+  const today=qaDateKey(new Date());const total=qrScanRows.length;const restaurantCount=new Set(qrScanRows.map(x=>x.restaurant_id).filter(Boolean)).size;
+  qaSafeText('qaTotal',total.toLocaleString());qaSafeText('qaRestaurants',restaurantCount.toLocaleString());qaSafeText('qaAverage',restaurantCount?(total/restaurantCount).toFixed(1):'0');
   const restMap=new Map((restaurants||[]).map(r=>[String(r.id),r.name||r.slug||'Restaurant']));
   const sel=$('qrAnalyticsRestaurant');if(sel&&sel.options.length<2){(restaurants||[]).forEach(r=>{const o=document.createElement('option');o.value=r.id;o.textContent=r.name||r.slug||'Restaurant';sel.appendChild(o)})}
-  const days=[];for(let i=period-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(qaDateKey(d))}
-  const counts=Object.fromEntries(days.map(d=>[d,0]));qrScanRows.forEach(x=>{const k=qaDateKey(x.scanned_at);if(k in counts)counts[k]++});
-  const grouped={};qrScanRows.forEach(x=>{const n=restMap.get(String(x.restaurant_id))||'Restaurant';grouped[n]=(grouped[n]||0)+1});const top=Object.entries(grouped).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  if(typeof Chart!=='undefined'){
-   const trendCanvas=$('qaTrendChart'),restaurantCanvas=$('qaRestaurantChart');
-   if(trendCanvas){if(qaCharts.trend)qaCharts.trend.destroy();qaCharts.trend=new Chart(trendCanvas,{type:'line',data:{labels:days.map(d=>d.slice(5)),datasets:[{label:'Scans',data:days.map(d=>counts[d]),borderColor:'#1677ff',backgroundColor:'rgba(22,119,255,.14)',fill:true,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}})}
-   if(restaurantCanvas){if(qaCharts.rest)qaCharts.rest.destroy();qaCharts.rest=new Chart(restaurantCanvas,{type:'bar',data:{labels:top.map(x=>x[0]),datasets:[{label:'Scans',data:top.map(x=>x[1]),backgroundColor:'#10b981'}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0}}}}})}
-  }
-  const recent=$('qaRecent');if(recent){const rows=qrScanRows.slice(0,100);recent.innerHTML=rows.length?'<table><thead><tr><th>Date & Time</th><th>Restaurant</th><th>QR Code</th><th>Device / Browser</th></tr></thead><tbody>'+rows.map(x=>'<tr><td>'+esc(new Date(x.scanned_at).toLocaleString())+'</td><td>'+esc(restMap.get(String(x.restaurant_id))||'Restaurant')+'</td><td>'+esc(x.qr_code||'—')+'</td><td>'+esc(qaDevice(x.user_agent))+'</td></tr>').join('')+'</tbody></table>':'<p>No scans recorded for this period yet.</p>'}
- }catch(e){if(status){status.textContent='Setup required';status.style.color='#d97706'}setText('qaTotal','—');setText('qaToday','—');setText('qaRestaurants','—');const recent=$('qaRecent');if(recent)recent.innerHTML='<p>QR analytics table unavailable. Run <b>supabase_qr_analytics.sql</b> in Supabase, then refresh. Details: '+esc(e.message||e)+'</p>';console.warn('QR analytics:',e)}
+  const uaTypes=qrScanRows.map(x=>String(x.user_agent||''));const deviceType=ua=>/Android/i.test(ua)?'Android':/iPhone|iPad|iPod|Macintosh/i.test(ua)?'iOS':'Other';const uniqueDeviceKeys=new Set(uaTypes.map(ua=>ua||'unknown'));qaSafeText('qaDevices',uniqueDeviceKeys.size.toLocaleString());
+  const deviceCounts={'Android':0,'iOS':0,'Other':0};uaTypes.forEach(ua=>deviceCounts[deviceType(ua)]++);
+  const active=(restaurants||[]).filter(r=>String(r.status||'active').toLowerCase()==='active').length;const pending=(restaurants||[]).filter(r=>String(r.status||'').toLowerCase()==='pending').length;const blocked=(restaurants||[]).filter(r=>['blocked','suspended'].includes(String(r.status||'').toLowerCase())).length;
+  qaSafeText('qaActiveCount',active);qaSafeText('qaPendingCount',pending);qaSafeText('qaBlockedCount',blocked);
+  const safeRevenue=Number((subscriptions||[]).filter(s=>s.status==='active').reduce((sum,s)=>sum+Number(s.amount||0),0));qaSafeText('qaPremiumRevenue','₹'+safeRevenue.toLocaleString('en-IN'));qaSafeText('qaAdRevenue','₹0');qaSafeText('qaTotalRevenue','₹'+safeRevenue.toLocaleString('en-IN'));
+  const dayKeys=[];for(let i=period-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);dayKeys.push(qaDateKey(d))}const counts=Object.fromEntries(dayKeys.map(d=>[d,0]));qrScanRows.forEach(x=>{const k=qaDateKey(x.scanned_at);if(k in counts)counts[k]++});
+  const grouped={};qrScanRows.forEach(x=>{const n=restMap.get(String(x.restaurant_id))||'Unknown restaurant';grouped[n]=(grouped[n]||0)+1});const top=Object.entries(grouped).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const statusLabels=['Active','Pending','Blocked'];const statusData=[active,pending,blocked];
+  const makeChart=(key,canvas,config)=>{const el=$(canvas);if(!el||typeof Chart==='undefined')return;if(qaCharts[key])qaCharts[key].destroy();qaCharts[key]=new Chart(el,config)};
+  makeChart('status','qaStatusChart',{type:'doughnut',data:{labels:statusLabels,datasets:[{data:statusData,backgroundColor:['#10b981','#f59e0b','#ef4444'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false}}}});
+  makeChart('devices','qaDeviceChart',{type:'doughnut',data:{labels:Object.keys(deviceCounts),datasets:[{data:Object.values(deviceCounts),backgroundColor:['#1677ff','#526071','#7c3aed'],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false}}}});
+  const dlegend=$('qaDeviceLegend');if(dlegend)dlegend.innerHTML=Object.entries(deviceCounts).map(([name,count],i)=>'<div class="qa-legend-row"><span class="qa-dot" style="background:'+['#1677ff','#526071','#7c3aed'][i]+'"></span>'+name+' <b>'+count+'</b></div>').join('');
+  makeChart('trend','qaTrendChart',{type:'line',data:{labels:dayKeys.map(d=>d.slice(5)),datasets:[{label:'Scans',data:dayKeys.map(d=>counts[d]),borderColor:'#1677ff',backgroundColor:'rgba(22,119,255,.15)',pointBackgroundColor:'#1677ff',fill:true,tension:.32,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}},x:{grid:{display:false}}}}});
+  makeChart('restaurants','qaRestaurantChart',{type:'bar',data:{labels:top.map(x=>x[0]),datasets:[{label:'Scans',data:top.map(x=>x[1]),backgroundColor:['#1677ff','#21bd86','#f59e0b','#8654e8','#ef5da8','#38b7c5','#9aa9bc','#526071'],borderRadius:5}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0}},y:{grid:{display:false}}}}});
+  const weekDays=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];const weekCounts=Array(7).fill(0);qrScanRows.forEach(x=>{const d=new Date(x.scanned_at);const idx=(d.getDay()+6)%7;if((Date.now()-d.getTime())<=7*86400000)weekCounts[idx]++});
+  makeChart('week','qaWeekChart',{type:'bar',data:{labels:weekDays,datasets:[{label:'Scans',data:weekCounts,backgroundColor:'#18bd83',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}},x:{grid:{display:false}}}}});
+  const recent=$('qaRecent');if(recent){const rows=qrScanRows.slice(0,100);recent.innerHTML=rows.length?'<table class="qa-table"><thead><tr><th>#</th><th>Date & Time</th><th>Restaurant</th><th>QR Code</th><th>Device</th></tr></thead><tbody>'+rows.map((x,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(new Date(x.scanned_at).toLocaleString('en-IN'))+'</td><td>'+esc(restMap.get(String(x.restaurant_id))||'Unknown restaurant')+'</td><td>'+esc(x.qr_code||'—')+'</td><td>'+esc(qaDevice(x.user_agent))+'</td></tr>').join('')+'</tbody></table>':'<p>No scans recorded for this period yet.</p>'}
+  if(status){status.textContent='Connected to Supabase';status.style.color='#059669'}
+ }catch(e){if(status){status.textContent='Setup required';status.style.color='#d97706'}['qaTotal','qaRestaurants','qaAverage','qaDevices'].forEach(id=>qaSafeText(id,'—'));const recent=$('qaRecent');if(recent)recent.innerHTML='<p>QR analytics data is not available yet. Confirm that <b>qr_scan_events</b> exists and admin read permissions are configured. Details: '+esc(e.message||e)+'</p>';console.warn('QR analytics:',e)}
 }
 function qaDevice(ua){ua=String(ua||'');if(/iPhone|iPad|iPod/i.test(ua))return 'iPhone / iPad';if(/Android/i.test(ua))return 'Android';if(/Windows/i.test(ua))return 'Windows';if(/Macintosh/i.test(ua))return 'Mac';return ua?'Other device':'Unknown'}
 function exportQRScans(){const rows=[['Date & Time','Restaurant ID','QR Code','User Agent','Referrer'],...qrScanRows.map(x=>[x.scanned_at,x.restaurant_id,x.qr_code,x.user_agent,x.referrer])];const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));a.download='freemenu-qr-scans.csv';a.click();URL.revokeObjectURL(a.href)}
