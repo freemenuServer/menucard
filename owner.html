@@ -854,7 +854,14 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
     <div class="card">
       <div class="cardTitle">Account & Security</div>
       <div class="formGroup"><label>Logged-in Email</label><input class="input" id="accountEmail" disabled></div>
-      <button class="btn danger" id="logout2"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+      <div style="border-top:1px solid var(--border);margin:18px 0"></div>
+      <div style="font-weight:700;margin-bottom:12px">Change Password</div>
+      <div id="changePasswordError" class="authError" style="display:none;margin-bottom:10px"></div>
+      <div id="changePasswordSuccess" class="authSuccess" style="display:none;margin-bottom:10px"></div>
+      <div class="formGroup"><label>New Password</label><input class="input" id="accountNewPassword" type="password" autocomplete="new-password" placeholder="Minimum 6 characters"></div>
+      <div class="formGroup"><label>Confirm New Password</label><input class="input" id="accountConfirmPassword" type="password" autocomplete="new-password" placeholder="Enter new password again"></div>
+      <button type="button" class="btn" id="changePasswordBtn"><i class="fa-solid fa-key"></i> Update Password</button>
+      <button class="btn danger" id="logout2" style="margin-top:12px"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
     </div>
   </div>
 </section>
@@ -1142,6 +1149,27 @@ async function requestPasswordReset(){
   }
 }
 
+async function changeAccountPassword(){
+  const password=$("accountNewPassword").value;
+  const confirm=$("accountConfirmPassword").value;
+  const err=$("changePasswordError"), success=$("changePasswordSuccess"), btn=$("changePasswordBtn");
+  err.style.display="none"; err.textContent="";
+  success.style.display="none"; success.textContent="";
+  if(password.length<6){err.textContent="Password must be at least 6 characters.";err.style.display="block";return;}
+  if(password!==confirm){err.textContent="Passwords do not match.";err.style.display="block";return;}
+  btn.disabled=true; btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Updating Password...';
+  try{
+    const {error}=await supabaseClient.auth.updateUser({password});
+    if(error) throw error;
+    success.textContent="Password changed successfully."; success.style.display="block";
+    $("accountNewPassword").value=""; $("accountConfirmPassword").value="";
+  }catch(e){
+    err.textContent=e?.message||"Unable to change password. Please try again."; err.style.display="block";
+  }finally{
+    btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-key"></i> Update Password';
+  }
+}
+
 async function updateOwnerPassword(){
   const password=$("resetPasswordNew").value;
   const confirm=$("resetPasswordConfirm").value;
@@ -1351,6 +1379,8 @@ $("goLoginFromSignup").onclick=showLoginForm;
 $("forgotPasswordBtn").onclick=requestPasswordReset;
 $("backResetPasswordBtn").onclick=showLoginForm;
 $("resetPasswordSubmit").onclick=updateOwnerPassword;
+$("changePasswordBtn").onclick=changeAccountPassword;
+$("accountConfirmPassword").addEventListener("keydown",e=>{if(e.key==="Enter")changeAccountPassword()});
 $("resetPasswordNew").addEventListener("keydown",e=>{if(e.key==="Enter")updateOwnerPassword()});
 $("resetPasswordConfirm").addEventListener("keydown",e=>{if(e.key==="Enter")updateOwnerPassword()});
 $("loginSubmitNew").onclick=ownerLogin;
