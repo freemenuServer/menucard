@@ -536,6 +536,8 @@ async function openQR(){
         });
         if(scanSave.error) console.warn('QR analytics not saved:', scanSave.error.message);
       } catch (analyticsError) { console.warn('QR analytics unavailable:', analyticsError); }
+      // Mark the upcoming menu visit as QR-originated without changing the existing destination URL.
+      try { sessionStorage.setItem('fm_visit_source', 'QR'); } catch (_) {}
       // Existing permanent QR -> live restaurant menu route is preserved.
       window.location.replace(getMenuUrl(restaurant.slug));
       return;

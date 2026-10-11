@@ -2215,6 +2215,31 @@ function renderRestaurant(rest) {
 
         const rest = restaurants[0];
 
+        // Best-effort menu visit analytics; does not change menu routing or rendering.
+        try {
+          const ref = String(document.referrer || '');
+          let source = 'Direct';
+          try {
+            const qrFlag = sessionStorage.getItem('fm_visit_source') === 'QR';
+            if (qrFlag) { source = 'QR'; sessionStorage.removeItem('fm_visit_source'); }
+            else if (ref) {
+              const host = new URL(ref).hostname.toLowerCase();
+              if (host.includes('google.') || host.includes('bing.') || host.includes('duckduckgo.')) source = 'Google';
+              else if (host.includes('whatsapp.') || host.includes('wa.me')) source = 'WhatsApp';
+              else source = 'Other';
+            }
+          } catch (_) {}
+          supabaseClient.from('website_visit_events').insert({
+            event_type: 'menu',
+            restaurant_id: rest.id,
+            page_path: location.pathname + location.search,
+            source,
+            referrer: ref.slice(0,500),
+            user_agent: String(navigator.userAgent || '').slice(0,500),
+            device_type: /Android/i.test(navigator.userAgent) ? 'Android' : /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'iPhone/iPad' : /Mobi/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop'
+          }).then(({error}) => { if (error) console.debug('Menu analytics unavailable:', error.message); });
+        } catch (analyticsError) { console.debug('Menu analytics skipped:', analyticsError); }
+
         // Respect the Owner Page's Menu Update Mode without changing the normal menu flow.
         // When enabled, show only the maintenance message to public visitors.
         if (rest.menu_update_mode === true) {

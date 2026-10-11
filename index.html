@@ -270,5 +270,33 @@ document.getElementById("mainSearch").addEventListener("input",()=>{selectedCuis
 </script>
 
 
+
+<script>
+/* FreeMenu visit analytics: best-effort only; never blocks normal page loading. */
+(function(){
+  try {
+    const ref = String(document.referrer || '');
+    let source = 'Direct';
+    if (ref) {
+      const host = new URL(ref).hostname.toLowerCase();
+      if (host.includes('google.') || host.includes('bing.') || host.includes('duckduckgo.')) source = 'Google';
+      else if (host.includes('whatsapp.') || host.includes('wa.me')) source = 'WhatsApp';
+      else source = 'Other';
+    }
+    const event = {
+      event_type: 'website',
+      page_path: location.pathname || '/',
+      source,
+      referrer: ref.slice(0,500),
+      user_agent: String(navigator.userAgent || '').slice(0,500),
+      device_type: /Android/i.test(navigator.userAgent) ? 'Android' : /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'iPhone/iPad' : /Mobi/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop'
+    };
+    if (window.sb && typeof window.sb.from === 'function') {
+      window.sb.from('website_visit_events').insert(event).then(({error}) => { if(error) console.debug('Visit analytics unavailable:',error.message); });
+    }
+  } catch(e) { console.debug('Visit analytics skipped', e); }
+})();
+</script>
+
 </body>
 </html>
