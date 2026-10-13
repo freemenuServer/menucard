@@ -2332,8 +2332,29 @@ function renderRestaurant(rest) {
 
         const isCustomMenu = rest.custom_plan_enabled === true;
 
+        // Route Cart Menu plans to their dedicated public template. The plan is
+        // assigned by Super Admin through restaurants.plan_id; its slug/name and
+        // feature label are checked here so older plan records work without
+        // requiring template_key/template_file columns to be populated.
+        const compactResolvedPlanKey = resolvedPlanKey.replace(/[^a-z0-9]/g, "");
+        const resolvedPlanFeatures = Array.isArray(resolvedPlan?.features)
+          ? resolvedPlan.features.map(feature => typeof feature === "string" ? feature : (feature?.text || feature?.name || "")).join(" ").toLowerCase()
+          : "";
+        const isCartMenuPlan =
+          compactResolvedPlanKey.includes("cartmenu") ||
+          resolvedPlanFeatures.includes("cartmenu.html") ||
+          resolvedPlanFeatures.includes("cart menu page");
+        const isMenuOnePlan =
+          compactResolvedPlanKey.includes("menuone") ||
+          resolvedPlanFeatures.includes("menuone.html") ||
+          resolvedPlanFeatures.includes("menu one page");
+
         let targetFile = "menu.html";
-        if (isSignature3D || isFull3D || isCustomMenu) {
+        if (isCartMenuPlan) {
+          targetFile = "cartmenu.html";
+        } else if (isMenuOnePlan) {
+          targetFile = "menuone.html";
+        } else if (isSignature3D || isFull3D || isCustomMenu) {
           targetFile = "signaturemenu.html";
         } else if (isGrowthPhotos) {
           targetFile = "menugrowth.html";
