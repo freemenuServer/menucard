@@ -1852,13 +1852,19 @@ function updateSignature3DUI(){
 function isGrowthPhotoPlan(){
   if(isCustomMenuPlan) return customMenuSettings.photo_enabled===true;
   const key=`${currentPlan?.slug||""} ${currentPlan?.name||""}`.toLowerCase();
-  return key.includes("growth") || key.includes("signature") || key.includes("full 3d") || key.includes("3d-experience");
+  const planFeatures=Array.isArray(currentPlan?.features)
+    ? currentPlan.features.filter(f=>f && f.enabled!==false).map(f=>String(typeof f==="string"?f:(f.text||f.name||"")).toLowerCase()).join(" ")
+    : "";
+  // Cart Menu and MenuOne photo permission is managed through plans.features in Supabase.
+  const explicitPhotoPermission=planFeatures.includes("food photo upload") || planFeatures.includes("photo upload");
+  const cartOrMenuOne=key.includes("cart-menu") || key.includes("cart menu") || key.includes("cartmenu") || key.includes("menuone") || key.includes("menu one");
+  return explicitPhotoPermission || cartOrMenuOne || key.includes("growth") || key.includes("signature") || key.includes("full 3d") || key.includes("3d-experience");
 }
 function updateMenuPhotoUI(){
   const allowed=isGrowthPhotoPlan();
   if($("chooseMenuPhoto"))$("chooseMenuPhoto").disabled=!allowed;
   if($("uploadMenuPhoto"))$("uploadMenuPhoto").disabled=!allowed;
-  if($("menuPhotoPlanText"))$("menuPhotoPlanText").textContent=allowed?"Photo upload is available on Growth / Signature 3D / Full 3D plans.":"Growth (Photos) or higher plan required for food photos.";
+  if($("menuPhotoPlanText"))$("menuPhotoPlanText").textContent=allowed?"Food photo upload is enabled for this plan.":"Food photo upload is not enabled for this plan.";
 }
 async function uploadSignature3DAsset(file,itemId,assetType){
   if(!file)throw new Error(`Choose a ${assetType.toUpperCase()} file first.`);
@@ -1882,7 +1888,7 @@ async function uploadSignature3DAsset(file,itemId,assetType){
   throw new Error(result?.message||"Cloudflare R2 uploaded the model but returned no public URL.");
 }
 async function uploadMenuPhoto(){
-  if(!isGrowthPhotoPlan())return toast("Growth (Photos) plan or higher is required for food photos.");
+  if(!isGrowthPhotoPlan())return toast("Food photo upload is not enabled for this plan.");
   const file=$("mPhotoFile")?.files?.[0];
   if(!file)return toast("Choose a food photo first.");
   if(!file.type.startsWith("image/"))return toast("Only image files are allowed.");
