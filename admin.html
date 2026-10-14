@@ -558,7 +558,7 @@ function openRestaurantModal(id){
  </div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="saveRestaurant('${id||''}')">Save Restaurant</button></div>`)
 }
 async function saveRestaurant(id){
- const payload={name:$('rf_name').value.trim(),slug:$('rf_slug').value.trim(),phone:$('rf_phone').value.trim(),logo_url:$('rf_logo').value.trim(),address:$('rf_address').value.trim(),status:$('rf_status').value};
+ const payload={name:$('rf_name').value.trim(),slug:$('rf_slug').value.trim().toLowerCase().replace(/[^a-z0-9-]+/g,'-').replace(/^-+|-+$/g,''),phone:$('rf_phone').value.trim(),logo_url:$('rf_logo').value.trim(),address:$('rf_address').value.trim(),status:$('rf_status').value};
  let r=id?await db.from('restaurants').update(payload).eq('id',id):await db.from('restaurants').insert({...payload});
  if(r.error){toast(r.error.message);return}await logAction(id?'Updated restaurant':'Created restaurant',id);closeModal();toast('Restaurant saved');await loadAll()
 }
