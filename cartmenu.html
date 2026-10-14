@@ -69,11 +69,11 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
  .card{flex-direction:column;gap:8px;padding:7px;border-radius:13px}
  .thumb{width:100%;flex:0 0 auto;max-width:none;min-width:0;aspect-ratio:1/1;align-self:stretch}
  .details{width:100%;padding:1px 1px 2px}
- .item-top{flex-direction:column;gap:5px}.item-top .name-row{width:100%}.price{margin:0;text-align:left;font-size:18px}.price-portions{align-items:flex-start;font-size:12px;gap:2px}.price-portions small{font-size:9px}.price-unavailable{max-width:100%}
+ .item-top{flex-direction:column;gap:5px}.item-top .name-row{width:100%}.price{margin:0;text-align:left;font-size:22px}.price-portions{order:-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;width:100%;font-size:16px;font-weight:900;gap:6px}.price-portions span{display:flex;flex-direction:column;align-items:center;justify-content:center;white-space:nowrap;background:#fff3f3;border:1px solid #ffe0e0;border-radius:8px;padding:5px 2px}.price-portions small{font-size:12px;color:#777;font-weight:800}.price-unavailable{max-width:100%}
  .name{font-size:13px;line-height:1.3}.veg{width:14px;height:14px;flex-basis:14px}.veg:after{width:6px;height:6px}.desc{font-size:11px;line-height:1.4;margin-top:5px;-webkit-line-clamp:2}
  footer{padding:17px 14px;font-size:12px}
 }
-@media(max-width:350px){.card{gap:7px;padding:6px}.name{font-size:12px}.price{font-size:17px}.price-portions{font-size:11px}.filters{gap:6px;padding-left:8px;padding-right:8px}.filter{padding:8px 11px;font-size:11px}}
+@media(max-width:350px){.card{gap:7px;padding:6px}.name{font-size:12px}.price{font-size:20px}.price-portions{font-size:14px}.price-portions small{font-size:11px}.filters{gap:6px;padding-left:8px;padding-right:8px}.filter{padding:8px 11px;font-size:11px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
 </head>
@@ -259,7 +259,7 @@ function firstValue(obj,keys,fallback=""){for(const k of keys){if(obj&&obj[k]!==
 function asBool(v){if(typeof v==="boolean")return v;return ![false,0,"0","false","no","non-veg","non veg"].includes(String(v??"").toLowerCase())}
 function priceNumber(value){if(value===null||value===undefined||String(value).trim()==="")return null;const cleaned=String(value).replace(/[^0-9.]/g,"");if(!cleaned)return null;const n=Number(cleaned);return Number.isFinite(n)?n:null}
 function formatPrice(value){const n=priceNumber(value);return n===null?"":`₹${n.toLocaleString("en-IN")}`}
-function renderItemPrices(item){const portions=[["Quarter",item.price_quarter],["Half",item.price_half],["Full",item.price_full]].filter(([,v])=>priceNumber(v)!==null);if(portions.length){return `<div class="price price-portions">${portions.map(([label,value])=>`<span><small>${label}</small> ${formatPrice(value)}</span>`).join("")}</div>`;}const price=priceNumber(firstValue(item,["price","price_full","full_price","selling_price","amount"],null));return price===null?'<div class="price price-unavailable">Price unavailable</div>':`<div class="price">${formatPrice(price)}</div>`;}
+function renderItemPrices(item){const portions=[["Half",item.price_half],["Full",item.price_full],["Quarter",item.price_quarter]].filter(([,v])=>priceNumber(v)!==null);if(portions.length){return `<div class="price price-portions">${portions.map(([label,value])=>`<span><small>${label}</small> ${formatPrice(value)}</span>`).join("")}</div>`;}const price=priceNumber(firstValue(item,["price","price_full","full_price","selling_price","amount"],null));return price===null?'<div class="price price-unavailable">Price unavailable</div>':`<div class="price">${formatPrice(price)}</div>`;}
 function mapMenuItem(row){const cat=String(firstValue(row,["category","category_name","menu_category","section"],"Other"));return {id:row.id,name:String(firstValue(row,["name","item_name","title"],"Menu item")),category:cat,price:firstValue(row,["price","price_full","full_price","selling_price","amount"],null),price_quarter:firstValue(row,["price_quarter","quarter_price","price_qtr"],null),price_half:firstValue(row,["price_half","half_price"],null),price_full:firstValue(row,["price_full","full_price"],null),veg:asBool(firstValue(row,["is_veg","veg","vegetarian","item_type"],true)),description:String(firstValue(row,["description","desc","details"],"")),image:String(firstValue(row,["image_url","image","photo_url","photo","image_path"],"")),special:asBool(firstValue(row,["is_special","special","is_featured","featured"],false))}}
 async function loadRealMenu(){
   try{
