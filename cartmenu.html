@@ -51,7 +51,7 @@ h1{font-size:clamp(22px,3vw,32px);line-height:1.15;letter-spacing:-.8px;margin:0
 .veg:after{content:"";width:8px;height:8px;background:#13843a;border-radius:50%}
 .veg.nonveg{border-color:#c62832}.veg.nonveg:after{background:#c62832}
 .special{display:inline-block;margin-top:6px;padding:3px 7px;border-radius:6px;background:#ffedb0;color:#7a4300;font-size:10px;font-weight:850}
-.price{font-size:21px;font-weight:850;color:var(--red);line-height:1.2;margin-top:8px}.price-portions{display:flex;flex-wrap:wrap;gap:6px 10px;font-size:13px}.price-portions span{white-space:nowrap}.price-portions small{font-size:10px;color:#777;font-weight:700}.price-unavailable{font-size:12px;color:#777;font-weight:650}
+.item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;width:100%}.item-top .name-row{flex:1;min-width:0}.price{flex:0 0 auto;text-align:right;font-size:19px;font-weight:850;color:var(--red);line-height:1.2;margin:0 0 0 auto;white-space:nowrap}.price-portions{display:flex;flex-direction:column;align-items:flex-end;gap:3px;font-size:12px}.price-portions span{white-space:nowrap}.price-portions small{font-size:10px;color:#777;font-weight:700}.price-unavailable{font-size:11px;color:#777;font-weight:650;white-space:normal;max-width:100px}
 .desc{font-size:12px;line-height:1.5;color:var(--muted);margin:6px 0 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .empty{grid-column:1/-1;text-align:center;padding:40px 15px;color:var(--muted)}
 footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#eff6fd;padding:20px;color:#26384b;font-size:13px}
@@ -63,14 +63,14 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
  h1{font-size:24px}.tagline{font-size:14px}.meta{font-size:12px;margin-top:10px;gap:8px 12px}
  .contact-details{margin-top:12px;gap:8px}
  .call-button{min-height:40px}
- .menu{padding:7px 12px 100px}.filters{gap:7px;padding:9px 12px calc(8px + env(safe-area-inset-bottom));position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,1100px);z-index:1000;background:rgba(255,255,255,.97);border-top:1px solid #e7ebef;box-shadow:0 -6px 22px rgba(16,29,44,.10);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overscroll-behavior-x:contain;scroll-padding-inline:12px}.filter{padding:9px 13px;font-size:12px;min-height:40px}.filters .filter:first-child{margin-left:0}.filters .filter:last-child{margin-right:2px}
+ .menu{padding:7px 12px 100px}.filters{gap:7px;padding:9px 12px calc(8px + env(safe-area-inset-bottom));position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(100%,1100px);z-index:1000;background:rgba(255,255,255,.97);border-top:1px solid #e7ebef;box-shadow:0 -6px 22px rgba(16,29,44,.10);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);overscroll-behavior-x:contain;scroll-padding-inline:12px}.filter{flex:0 0 60px;width:60px;height:60px;min-height:60px;padding:5px;border-radius:14px;display:flex;align-items:center;justify-content:center;text-align:center;white-space:normal;line-height:1.15;font-size:11px;overflow-wrap:anywhere}.filters .filter:first-child{margin-left:0}.filters .filter:last-child{margin-right:2px}
  .heading h2{font-size:18px}.grid{grid-template-columns:1fr;gap:10px}
  .card{gap:12px;padding:9px;border-radius:15px}
  .thumb{width:92px;flex-basis:92px;max-width:92px;min-width:92px;aspect-ratio:1/1}
- .name{font-size:15px}.price{font-size:20px;margin-top:7px}.desc{font-size:12px;line-height:1.45;margin-top:5px;-webkit-line-clamp:2}
+ .name{font-size:15px}.price{font-size:18px}.price-portions{font-size:11px}.desc{font-size:12px;line-height:1.45;margin-top:5px;-webkit-line-clamp:2}
  footer{padding:17px 14px;font-size:12px}
 }
-@media(max-width:350px){.thumb{width:76px;flex-basis:76px;min-width:76px}.card{gap:9px}.name{font-size:14px}.price{font-size:18px}.filters{gap:6px;padding-left:8px;padding-right:8px}.filter{padding:8px 11px;font-size:11px}}
+@media(max-width:350px){.thumb{width:76px;flex-basis:76px;min-width:76px}.card{gap:9px}.name{font-size:14px}.price{font-size:16px}.price-portions{font-size:10px}.filters{gap:6px;padding-left:8px;padding-right:8px}.filter{padding:8px 11px;font-size:11px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
 </head>
@@ -214,12 +214,14 @@ function renderMenu(){
         <img src="${item.image?escapeHTML(item.image):placeholder}" alt="${escapeHTML(item.name)}" width="220" height="220" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${placeholder}'">
       </div>
       <div class="details">
-        <div class="name-row">
-          <span class="name">${escapeHTML(item.name)}</span>
-          <span class="veg${item.veg?"":" nonveg"}" role="img" aria-label="${item.veg?"Vegetarian":"Non-vegetarian"}" title="${item.veg?"Vegetarian":"Non-vegetarian"}"></span>
+        <div class="item-top">
+          <div class="name-row">
+            <span class="name">${escapeHTML(item.name)}</span>
+            <span class="veg${item.veg?"":" nonveg"}" role="img" aria-label="${item.veg?"Vegetarian":"Non-vegetarian"}" title="${item.veg?"Vegetarian":"Non-vegetarian"}"></span>
+          </div>
+          ${renderItemPrices(item)}
         </div>
         ${item.special?'<span class="special">★ SPECIAL</span>':""}
-        ${renderItemPrices(item)}
         <p class="desc">${escapeHTML(item.description)}</p>
       </div>
     </article>`).join("");
