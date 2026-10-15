@@ -75,6 +75,26 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
 }
 @media(max-width:350px){.card{gap:7px;padding:6px}.name{font-size:12px}.price{font-size:20px}.price-portions{font-size:14px}.price-portions small{font-size:11px}.filters{gap:6px;padding-left:8px;padding-right:8px}.filter{padding:8px 11px;font-size:11px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* FreeMenu clickable brand links */
+.powered a{color:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.powered-logo{display:block;width:27px;height:27px;object-fit:contain;border-radius:50%}
+.powered a:focus-visible,.freemenu-float:focus-visible{outline:3px solid #f3262f;outline-offset:3px}
+.freemenu-float{
+  position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));
+  z-index:1100;width:50px;height:50px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:#fff;border:1px solid #e9edf0;
+  box-shadow:0 4px 16px rgba(16,29,44,.2);
+  text-decoration:none;color:#101d2c;
+  font-size:14px;font-weight:900;letter-spacing:-1px;
+  -webkit-tap-highlight-color:transparent;transition:transform .15s ease,box-shadow .15s ease;
+}
+.freemenu-float img{display:block;width:36px;height:36px;object-fit:contain;border-radius:50%}
+.freemenu-float:active{transform:scale(.94)}
+@media(min-width:681px){.freemenu-float{right:22px;bottom:22px;width:54px;height:54px;font-size:15px}}
+@media(prefers-reduced-motion:reduce){.freemenu-float{transition:none}}
+
 </style>
 </head>
 <body>
@@ -118,9 +138,12 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
       <span>📍 <span id="footerAddress">Connaught Place, New Delhi</span></span>
       <span>◷ <span id="footerHours">11:00 AM – 11:00 PM</span></span>
     </div>
-    <div class="powered">Powered by <strong>Free<span>Menu</span></strong></div>
+    <div class="powered">Powered by <a href="https://freemenu.in/" aria-label="Visit FreeMenu home"><img class="powered-logo" src="https://raw.githubusercontent.com/freemenuServer/menucard/main/assets/brand/11_social_profile_1.png" alt="FreeMenu logo"><strong>Free<span>Menu</span></strong></a></div>
   </footer>
 </main>
+<a class="freemenu-float" href="https://freemenu.in/" target="_blank" rel="noopener noreferrer" aria-label="Visit FreeMenu home" title="FreeMenu">
+  <img src="https://raw.githubusercontent.com/freemenuServer/menucard/main/assets/brand/11_social_profile_1.png" alt="FreeMenu logo">
+</a>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 "use strict";
