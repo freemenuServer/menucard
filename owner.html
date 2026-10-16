@@ -618,7 +618,7 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
       <select class="select" id="fullCatFilter" style="max-width:190px"><option value="">All Categories</option></select>
       <select class="select" id="fullTypeFilter" style="max-width:150px"><option value="">All Types</option><option value="veg">Veg</option><option value="nonveg">Non-Veg</option><option value="egg">Egg</option></select>
     </div>
-    <div class="menuTableWrap"><table class="menuTable"><thead><tr><th>Item</th><th>Category</th><th>Type</th><th>Single</th><th>Qtr</th><th>Half</th><th>Full</th><th>Status</th><th>Actions</th></tr></thead><tbody id="fullItems"></tbody></table></div>
+    <div class="menuTableWrap"><table class="menuTable"><thead><tr><th>Item</th><th>Category</th><th>Type</th><th>Single</th><th>Small</th><th>Medium</th><th>Large</th><th>Status</th><th>Actions</th></tr></thead><tbody id="fullItems"></tbody></table></div>
   </div>
 </section>
 
@@ -884,11 +884,11 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
   <div class="formGroup"><label>Category *</label><input class="input" id="mCategory" placeholder="Main Course"></div>
   <div class="formGroup"><label>Description</label><textarea class="textarea" id="mDesc"></textarea></div>
   <div class="formGroup"><label>Single Price (use when portions are not needed)</label><input class="input" type="number" id="mPrice" min="0"></div>
-  <label style="display:block;font-size:11px;font-weight:800;color:#64748b;margin-bottom:6px">PORTION PRICES</label>
+  <label style="display:block;font-size:11px;font-weight:800;color:#64748b;margin-bottom:6px">SIZE PRICES</label>
   <div class="threeCol">
-   <input class="input" type="number" id="mQtr" placeholder="Qtr ₹" min="0">
-   <input class="input" type="number" id="mHalf" placeholder="Half ₹" min="0">
-   <input class="input" type="number" id="mFull" placeholder="Full ₹" min="0">
+   <input class="input" type="number" id="mQtr" placeholder="Small ₹" min="0">
+   <input class="input" type="number" id="mHalf" placeholder="Medium ₹" min="0">
+   <input class="input" type="number" id="mFull" placeholder="Large ₹" min="0">
   </div>
   <div class="photoUploadBox" id="menuPhotoBox">
     <label style="display:block;font-size:11px;font-weight:800;color:#64748b;margin-bottom:6px">Food Photo <span class="planBadgeInline planBadgePhotos">GROWTH • PHOTOS</span></label>
