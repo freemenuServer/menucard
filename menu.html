@@ -2007,30 +2007,7 @@ function getSavedCategoryOrder(rest, items) {
     }
 
     function renderMenu() {
-      const rawFiltered = getFilteredItems();
-      // Combine legacy rows such as "Margherita Pizza (Small/Medium/Large)" into one card.
-      const sizeSuffix = /\s*\((small|medium|large|quarter|half|full|qtr)\)\s*$/i;
-      const mergedByKey = new Map();
-      rawFiltered.forEach(original => {
-        const item = { ...original };
-        const match = String(item.name || "").match(sizeSuffix);
-        const size = match ? match[1].toLowerCase() : "";
-        const baseName = match ? String(item.name).replace(sizeSuffix, "").trim() : String(item.name || "").trim();
-        const key = `${categoryKey(item.category)}::${baseName.toLowerCase()}`;
-        if (!mergedByKey.has(key)) mergedByKey.set(key, { ...item, name: baseName });
-        const target = mergedByKey.get(key);
-        if (size) {
-          const val = item.price_full ?? item.price ?? item.price_half ?? item.price_quarter;
-          if (size === "small" || size === "quarter" || size === "qtr") target.price_quarter = val;
-          else if (size === "medium" || size === "half") target.price_half = val;
-          else if (size === "large" || size === "full") target.price_full = val;
-          // Carry useful attributes from size rows if the base row is missing them.
-          ["description", "image_url", "image", "is_veg", "item_type", "sort_order", "position"].forEach(k => {
-            if ((target[k] === null || target[k] === undefined || target[k] === "") && item[k] !== undefined) target[k] = item[k];
-          });
-        }
-      });
-      const filtered = Array.from(mergedByKey.values());
+      const filtered = getFilteredItems();
       const grouped = {};
       filtered.forEach(item => {
         const category = categoryKey(item.category);
