@@ -295,39 +295,6 @@ function renderItemPrices(item){
   return price===null?'<div class="price price-unavailable">Price unavailable</div>':`<div class="price">${formatPrice(price)}</div>`;
 }
 function mapMenuItem(row){const cat=String(firstValue(row,["category","category_name","menu_category","section"],"Other"));return {id:row.id,name:String(firstValue(row,["name","item_name","title"],"Menu item")),category:cat,price:firstValue(row,["price","price_full","full_price","selling_price","amount"],null),price_quarter:firstValue(row,["price_quarter","quarter_price","price_qtr"],null),price_half:firstValue(row,["price_half","half_price"],null),price_full:firstValue(row,["price_full","full_price"],null),price_small:firstValue(row,["price_small","small_price"],null),price_medium:firstValue(row,["price_medium","medium_price","price_med"],null),price_large:firstValue(row,["price_large","large_price"],null),veg:asBool(firstValue(row,["is_veg","veg","vegetarian","item_type"],true)),description:String(firstValue(row,["description","desc","details"],"")),image:String(firstValue(row,["image_url","image","photo_url","photo","image_path"],"")),special:asBool(firstValue(row,["is_special","special","is_featured","featured"],false))}}
-// Pizza page only: merge separate Small/Medium/Large rows into one menu card.
-function groupPizzaSizeItems(items){
-  const grouped=new Map(), result=[];
-  const sizePatterns=[
-    {key:"price_small",re:/\s*\((?:small|sm)\)\s*$/i},
-    {key:"price_small",re:/\s*[-–—]\s*(?:small|sm)\s*$/i},
-    {key:"price_small",re:/\s+(?:small|sm)\s*$/i},
-    {key:"price_medium",re:/\s*\((?:medium|med|m)\)\s*$/i},
-    {key:"price_medium",re:/\s*[-–—]\s*(?:medium|med)\s*$/i},
-    {key:"price_medium",re:/\s+(?:medium|med)\s*$/i},
-    {key:"price_large",re:/\s*\((?:large|lg|l)\)\s*$/i},
-    {key:"price_large",re:/\s*[-–—]\s*(?:large|lg)\s*$/i},
-    {key:"price_large",re:/\s+(?:large|lg)\s*$/i}
-  ];
-  for(const original of items){
-    const item={...original};
-    if(!isPizzaItem(item)){result.push(item);continue;}
-    let base=item.name.trim(), sizeKey=null;
-    for(const pattern of sizePatterns){if(pattern.re.test(base)){base=base.replace(pattern.re,"").trim();sizeKey=pattern.key;break;}}
-    if(!sizeKey){result.push(item);continue;}
-    const key=[item.category,base.toLowerCase()].join("::");
-    let target=grouped.get(key);
-    if(!target){target={...item,name:base,price_small:item.price_small,price_medium:item.price_medium,price_large:item.price_large};grouped.set(key,target);result.push(target);}
-    const rowPrice=firstValue(item,["price","selling_price","amount","price_full","full_price"],null);
-    if(priceNumber(item[sizeKey])===null && priceNumber(rowPrice)!==null)target[sizeKey]=rowPrice;
-    for(const k of ["price_small","price_medium","price_large"]){if(priceNumber(target[k])===null&&priceNumber(item[k])!==null)target[k]=item[k];}
-    if(!target.image&&item.image)target.image=item.image;
-    if(!target.description&&item.description)target.description=item.description;
-    target.special=target.special||item.special;
-  }
-  return result;
-}
-
 async function loadRealMenu(){
   try{
     const slug=slugFromUrl();if(!slug)throw new Error("Restaurant URL slug missing");
@@ -345,7 +312,6 @@ async function loadRealMenu(){
     const {data:rowsItems,error:itemsError}=await supabaseClient.from("menu_items").select("*").eq("restaurant_id",r.id);
     if(itemsError)throw itemsError;
     menuItems=(Array.isArray(rowsItems)?rowsItems:[]).filter(x=>x.is_available!==false&&x.available!==false&&x.is_active!==false).sort((a,b)=>Number(a.sort_order??a.position??999999)-Number(b.sort_order??b.position??999999)).map(mapMenuItem);
-    menuItems=groupPizzaSizeItems(menuItems);
     categories=[{name:"All",icon:"▦"},...Array.from(new Set(menuItems.map(x=>x.category).filter(Boolean))).map(name=>({name,icon:"◉"})),...(menuItems.some(x=>x.special)?[{name:"Today's Special",icon:"☆"}]:[])];
     state.category="All";document.title=`${restaurant.name} Menu | FreeMenu`;
     const md=document.querySelector('meta[name="description"]');if(md)md.content=`View ${restaurant.name} menu, pizza sizes and prices on FreeMenu.`;
