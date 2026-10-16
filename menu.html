@@ -2262,7 +2262,7 @@ function renderRestaurant(rest) {
         if (rest.plan_id) {
           const { data: assignedPlan } = await supabaseClient
             .from("plans")
-            .select("id,name,slug,template_file,plan_type,qr_stickers_max,signature_3d_dishes_max,features,is_active")
+            .select("id,name,slug,plan_type,qr_stickers_max,signature_3d_dishes_max,features,is_active")
             .eq("id", rest.plan_id)
             .maybeSingle();
           if (assignedPlan && assignedPlan.is_active !== false) {
@@ -2291,7 +2291,7 @@ function renderRestaurant(rest) {
           if (legacySlug) {
             const { data: legacyPlan } = await supabaseClient
               .from("plans")
-              .select("id,name,slug,template_file,plan_type,qr_stickers_max,signature_3d_dishes_max,features,is_active")
+              .select("id,name,slug,plan_type,qr_stickers_max,signature_3d_dishes_max,features,is_active")
               .eq("slug", legacySlug)
               .maybeSingle();
             if (legacyPlan && legacyPlan.is_active !== false) {
@@ -2348,21 +2348,23 @@ function renderRestaurant(rest) {
           compactResolvedPlanKey.includes("menuone") ||
           resolvedPlanFeatures.includes("menuone.html") ||
           resolvedPlanFeatures.includes("menu one page");
+        const isPizzaMenuPlan =
+          compactResolvedPlanKey.includes("pizzamenu") ||
+          compactResolvedPlanKey.includes("pizza") ||
+          resolvedPlanFeatures.includes("pizza.html") ||
+          resolvedPlanFeatures.includes("pizza menu page");
 
-        let targetFile = String(resolvedPlan?.template_file || "").trim().toLowerCase();
-        const allowedTemplates = ["menu.html","menugrowth.html","signaturemenu.html","cartmenu.html","menuone.html","pizza.html"];
-        const hasExplicitTemplate = allowedTemplates.includes(targetFile);
-        if (!hasExplicitTemplate) {
-          targetFile = "menu.html";
-          if (isCartMenuPlan) {
-            targetFile = "cartmenu.html";
-          } else if (isMenuOnePlan) {
-            targetFile = "menuone.html";
-          } else if (isSignature3D || isFull3D || isCustomMenu) {
-            targetFile = "signaturemenu.html";
-          } else if (isGrowthPhotos) {
-            targetFile = "menugrowth.html";
-          }
+        let targetFile = "menu.html";
+        if (isPizzaMenuPlan) {
+          targetFile = "pizza.html";
+        } else if (isCartMenuPlan) {
+          targetFile = "cartmenu.html";
+        } else if (isMenuOnePlan) {
+          targetFile = "menuone.html";
+        } else if (isSignature3D || isFull3D || isCustomMenu) {
+          targetFile = "signaturemenu.html";
+        } else if (isGrowthPhotos) {
+          targetFile = "menugrowth.html";
         }
 
         const currentFile = window.location.pathname.split("/").pop().toLowerCase();
