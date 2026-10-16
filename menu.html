@@ -1866,9 +1866,9 @@
       );
 
       return [
-        ...(hasQuarter ? [["quarter", "Small"]] : []),
-        ...(hasHalf ? [["half", "Medium"]] : []),
-        ...(hasFull ? [["full", "Large"]] : [])
+        ...(hasQuarter ? [["quarter", "Quarter"]] : []),
+        ...(hasHalf ? [["half", "Half"]] : []),
+        ...(hasFull ? [["full", "Full"]] : [])
       ];
     }
 
@@ -2348,16 +2348,9 @@ function renderRestaurant(rest) {
           compactResolvedPlanKey.includes("menuone") ||
           resolvedPlanFeatures.includes("menuone.html") ||
           resolvedPlanFeatures.includes("menu one page");
-        const isPizzaMenuPlan =
-          compactResolvedPlanKey.includes("pizzamenu") ||
-          compactResolvedPlanKey.includes("pizza") ||
-          resolvedPlanFeatures.includes("pizza.html") ||
-          resolvedPlanFeatures.includes("pizza menu page");
 
         let targetFile = "menu.html";
-        if (isPizzaMenuPlan) {
-          targetFile = "pizza.html";
-        } else if (isCartMenuPlan) {
+        if (isCartMenuPlan) {
           targetFile = "cartmenu.html";
         } else if (isMenuOnePlan) {
           targetFile = "menuone.html";
