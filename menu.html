@@ -2006,45 +2006,33 @@ function getSavedCategoryOrder(rest, items) {
       });
     }
 
-    function normalizeSizeItemName(name) {
-      return String(name || "Unnamed item").replace(/\s*\((?:small|medium|large|qtr|quarter|half|full)\)\s*$/i, "").trim();
-    }
-
-    function combineSizeVariants(items) {
-      const groups = new Map();
-      const sizePattern = /\s*\((small|medium|large|qtr|quarter|half|full)\)\s*$/i;
-      items.forEach(item => {
-        const match = String(item.name || "").match(sizePattern);
-        // Only combine records explicitly named with a size suffix; leave ordinary items unchanged.
-        if (!match) {
-          const uniqueKey = `single:${item.id ?? Math.random()}`;
-          groups.set(uniqueKey, { ...item, name: item.name || "Unnamed item" });
-          return;
-        }
-        const size = match[1].toLowerCase();
-        const baseName = normalizeSizeItemName(item.name);
-        const key = `${categoryKey(item.category).toLowerCase()}::${baseName.toLowerCase()}`;
-        let combined = groups.get(key);
-        if (!combined) {
-          combined = { ...item, name: baseName, __sizeVariants: true, price_quarter: null, price_half: null, price_full: null, price: null };
-          groups.set(key, combined);
-        }
-        const value = item.price ?? item.price_full ?? item.price_amount ?? null;
-        if (["small", "qtr", "quarter"].includes(size)) combined.price_quarter = value;
-        else if (["medium", "half"].includes(size)) combined.price_half = value;
-        else combined.price_full = value;
-        // Preserve the first available description/photo and other item metadata.
-        if (!combined.description && item.description) combined.description = item.description;
-        if (!combined.image_url && item.image_url) combined.image_url = item.image_url;
-      });
-      return [...groups.values()];
-    }
-
     function renderMenu() {
-      const filtered = getFilteredItems();
+      const rawFiltered = getFilteredItems();
+      // Combine legacy rows such as "Margherita Pizza (Small/Medium/Large)" into one card.
+      const sizeSuffix = /\s*\((small|medium|large|quarter|half|full|qtr)\)\s*$/i;
+      const mergedByKey = new Map();
+      rawFiltered.forEach(original => {
+        const item = { ...original };
+        const match = String(item.name || "").match(sizeSuffix);
+        const size = match ? match[1].toLowerCase() : "";
+        const baseName = match ? String(item.name).replace(sizeSuffix, "").trim() : String(item.name || "").trim();
+        const key = `${categoryKey(item.category)}::${baseName.toLowerCase()}`;
+        if (!mergedByKey.has(key)) mergedByKey.set(key, { ...item, name: baseName });
+        const target = mergedByKey.get(key);
+        if (size) {
+          const val = item.price_full ?? item.price ?? item.price_half ?? item.price_quarter;
+          if (size === "small" || size === "quarter" || size === "qtr") target.price_quarter = val;
+          else if (size === "medium" || size === "half") target.price_half = val;
+          else if (size === "large" || size === "full") target.price_full = val;
+          // Carry useful attributes from size rows if the base row is missing them.
+          ["description", "image_url", "image", "is_veg", "item_type", "sort_order", "position"].forEach(k => {
+            if ((target[k] === null || target[k] === undefined || target[k] === "") && item[k] !== undefined) target[k] = item[k];
+          });
+        }
+      });
+      const filtered = Array.from(mergedByKey.values());
       const grouped = {};
-      const displayItems = combineSizeVariants(filtered);
-      displayItems.forEach(item => {
+      filtered.forEach(item => {
         const category = categoryKey(item.category);
         if (!grouped[category]) grouped[category] = [];
         grouped[category].push(item);
