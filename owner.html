@@ -2096,7 +2096,7 @@ function renderCategories(){
  const html=categories().map(c=>{
    const count=items.filter(i=>(i.category||"General").trim()===c).length;
    const image=items.find(i=>(i.category||"").trim()===c)?.image_url||"";
-   return `<div class="categoryCard" data-category-name="${esc(c)}"><div class="catImage" style="${image?`background-image:url('${esc(image)}')`:""}"></div><div class="catBody"><div class="catName">${esc(c)}</div><div class="catCount">${count} item${count===1?"":"s"}</div></div></div>`;
+   return `<div class="categoryCard" data-category-name="${esc(c)}"><div class="catImage" style="${image?`background-image:url('${esc(image)}')`:""}"></div><div class="catBody"><div class="catName">${esc(c)}</div><div class="catCount">${count} item${count===1?"":"s"}</div><button type="button" class="btn danger sm deleteCategory" data-category="${esc(c)}" style="margin-top:9px;width:100%" title="Delete category and all its menu items"><i class="fa-solid fa-trash"></i> Delete Category</button></div></div>`;
  }).join("");
  $("categoryCards").innerHTML=html||'<div class="muted" style="font-size:12px">No categories yet.</div>';
  $("categoryCardsFull").innerHTML=html||'<div class="muted" style="font-size:12px">No categories yet.</div>';
@@ -2164,6 +2164,24 @@ async function saveItem(){
  }catch(e){console.error(e);toast("Save failed: "+(e?.message||e));}
  finally{$("saveItem").disabled=false;$("saveItem").innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Item';}
 }
+async function deleteCategory(categoryName){
+ const category=String(categoryName||"").trim();
+ if(!category)return;
+ const matching=items.filter(i=>(i.category||"General").trim()===category);
+ if(!matching.length){toast("Category not found");return}
+ if(!confirm(`Delete category "${category}" and all ${matching.length} menu item(s) inside it? This cannot be undone.`))return;
+ const {error}=await supabaseClient.from("menu_items").delete().eq("restaurant_id",currentRestaurantId).eq("category",category);
+ if(error){toast("Category delete failed: "+error.message);return}
+ // Keep manual ordering metadata in sync with the categories that remain.
+ const remainingOrder=(Array.isArray(currentRestaurant?.category_order)?currentRestaurant.category_order:[]).filter(c=>String(c).trim()!==category);
+ const {data:restaurantData,error:orderError}=await supabaseClient.from("restaurants").update({category_order:remainingOrder}).eq("id",currentRestaurantId).select("*").single();
+ if(orderError){console.error("Category order cleanup failed:",orderError);}
+ else currentRestaurant=restaurantData||{...currentRestaurant,category_order:remainingOrder};
+ toast(`Category "${category}" deleted`);
+ await loadItems();
+ await syncManualCategoryOrder();
+ renderAll();
+}
 async function deleteItem(id){
  if(!confirm("Delete this menu item?"))return;
  const {error}=await supabaseClient.from("menu_items").delete().eq("id",id).eq("restaurant_id",currentRestaurantId);
@@ -2190,9 +2208,10 @@ async function toggleAvailability(id,btn){
 document.addEventListener("click",e=>{
  const modalStatus=e.target.closest("#mAvailableSwitch");
  if(modalStatus){ const on=$("mAvailable").value!=="true"; $("mAvailable").value=String(on); $("mAvailableSwitch").className=`switch ${on?"on":""}`; $("mAvailableText").textContent=on?"ON — Visible":"OFF — Hidden"; return; }
- const edit=e.target.closest(".editItem"),del=e.target.closest(".deleteItem"),status=e.target.closest("[data-status]");
+ const edit=e.target.closest(".editItem"),del=e.target.closest(".deleteItem"),catDel=e.target.closest(".deleteCategory"),status=e.target.closest("[data-status]");
  if(edit)openItem(edit.dataset.id);
  if(del)deleteItem(del.dataset.id);
+ if(catDel){e.preventDefault();e.stopPropagation();deleteCategory(catDel.dataset.category);}
  if(status)toggleAvailability(status.dataset.status,status);
 });
 $("saveItem").onclick=saveItem;$("openAdd").onclick=()=>openItem();$("openAdd2").onclick=()=>openItem();
