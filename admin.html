@@ -401,7 +401,8 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
           <li>Description</li>
           <li>Single / Full price</li>
           <li>Half price</li>
-          <li>Quarter price</li>
+          <li>Quarter price (for menus that use quarter/half/full)</li>
+          <li>Small / Medium / Large prices (for pizza and size-based items)</li>
           <li>Veg / Non-Veg when visible</li>
           <li>Bestseller when clearly marked</li>
         </ul>
@@ -425,7 +426,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
       <table class="ai-review-table" id="aiReviewTable">
         <thead>
           <tr>
-            <th>Category</th><th>Name</th><th>Description</th><th>Full</th><th>Price</th><th>Half</th><th>Quarter</th><th>Veg</th><th>Best</th><th>Action</th>
+            <th>Category</th><th>Name</th><th>Description</th><th>Small</th><th>Medium</th><th>Large</th><th>Full</th><th>Price</th><th>Half</th><th>Quarter</th><th>Veg</th><th>Best</th><th>Action</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -1346,6 +1347,9 @@ function aiNormalizeRow(x={}){
     price:aiNormalizeNumber(x.price??x.single_price),
     price_half:aiNormalizeNumber(x.price_half??x.half_price),
     price_quarter:aiNormalizeNumber(x.price_quarter??x.quarter_price),
+    price_small:aiNormalizeNumber(x.price_small??x.small_price??x.small),
+    price_medium:aiNormalizeNumber(x.price_medium??x.medium_price??x.medium),
+    price_large:aiNormalizeNumber(x.price_large??x.large_price??x.large),
     is_veg:typeof x.is_veg==='boolean'?x.is_veg:!['false','no','non-veg','nonveg','non_veg'].includes(String(x.is_veg??'').toLowerCase()),
     is_bestseller:typeof x.is_bestseller==='boolean'?x.is_bestseller:!!x.bestseller,
     confidence:x.confidence??null
@@ -1358,6 +1362,9 @@ function aiRenderReview(){
       <td><input data-ai="category" data-i="${i}" value="${esc(x.category)}"></td>
       <td><input data-ai="name" data-i="${i}" value="${esc(x.name)}"></td>
       <td><textarea data-ai="description" data-i="${i}">${esc(x.description)}</textarea></td>
+      <td><input class="ai-num" type="number" min="0" step="0.01" data-ai="price_small" data-i="${i}" value="${x.price_small??''}" placeholder="Small"></td>
+      <td><input class="ai-num" type="number" min="0" step="0.01" data-ai="price_medium" data-i="${i}" value="${x.price_medium??''}" placeholder="Medium"></td>
+      <td><input class="ai-num" type="number" min="0" step="0.01" data-ai="price_large" data-i="${i}" value="${x.price_large??''}" placeholder="Large"></td>
       <td><input class="ai-num" type="number" min="0" step="0.01" data-ai="price_full" data-i="${i}" value="${x.price_full??''}"></td>
       <td><input class="ai-num" type="number" min="0" step="0.01" data-ai="price" data-i="${i}" value="${x.price??''}"></td>
       <td><input class="ai-num" type="number" min="0" step="0.01" data-ai="price_half" data-i="${i}" value="${x.price_half??''}"></td>
@@ -1377,12 +1384,12 @@ function aiSyncField(el){
   const i=Number(el.dataset.i),field=el.dataset.ai;
   if(!aiScanRows[i])return;
   let v=el.value;
-  if(['price_full','price','price_half','price_quarter'].includes(field))v=aiNormalizeNumber(v);
+  if(['price_full','price','price_half','price_quarter','price_small','price_medium','price_large'].includes(field))v=aiNormalizeNumber(v);
   if(['is_veg','is_bestseller'].includes(field))v=v==='true';
   aiScanRows[i][field]=v;
 }
 function aiAddRow(){
-  aiScanRows.push({category:'',name:'',description:'',price_full:null,price:null,price_half:null,price_quarter:null,is_veg:true,is_bestseller:false,confidence:1});
+  aiScanRows.push({category:'',name:'',description:'',price_small:null,price_medium:null,price_large:null,price_full:null,price:null,price_half:null,price_quarter:null,is_veg:true,is_bestseller:false,confidence:1});
   aiRenderReview();
 }
 function aiRemoveRow(i){aiScanRows.splice(i,1);aiRenderReview();}
@@ -1561,18 +1568,29 @@ async function saveAIScannedMenu(){
   $('aiSaveStatus').textContent=`Saving ${aiScanRows.length} item(s)…`;
   try{
     const maxSort=menuItems.filter(x=>String(x.restaurant_id)===String(rid)).reduce((m,x)=>Math.max(m,Number.isInteger(Number(x.sort_order))?Number(x.sort_order):-1),-1);
-    const rows=aiScanRows.map((x,i)=>{
-      const p={
-        restaurant_id:rid,name:x.name.trim(),category:x.category.trim(),
+    // Size-based items are saved as separate standard menu_items rows because
+    // the existing public menu schema supports price/price_full/half/quarter,
+    // but does not have dedicated small/medium/large database columns.
+    const rows=[];
+    aiScanRows.forEach((x)=>{
+      const base={
+        restaurant_id:rid,category:x.category.trim(),
         item_type:x.item_type || (x.is_veg ? 'veg' : 'nonveg'),
         description:x.description?.trim()||null,is_veg:!!x.is_veg,
-        sort_order:maxSort+i+1
+        is_bestseller:!!x.is_bestseller
       };
-      if(x.price_full!==null)p.price_full=x.price_full;
-      if(x.price!==null)p.price=x.price;
-      if(x.price_half!==null)p.price_half=x.price_half;
-      if(x.price_quarter!==null)p.price_quarter=x.price_quarter;
-      return p;
+      const sizes=[['Small',x.price_small],['Medium',x.price_medium],['Large',x.price_large]]
+        .filter(([label,price])=>price!==null && price!==undefined);
+      if(sizes.length){
+        sizes.forEach(([label,price])=>rows.push({...base,name:`${x.name.trim()} (${label})`,price,sort_order:maxSort+rows.length+1}));
+      }else{
+        const p={...base,name:x.name.trim(),sort_order:maxSort+rows.length+1};
+        if(x.price_full!==null)p.price_full=x.price_full;
+        if(x.price!==null)p.price=x.price;
+        if(x.price_half!==null)p.price_half=x.price_half;
+        if(x.price_quarter!==null)p.price_quarter=x.price_quarter;
+        rows.push(p);
+      }
     });
     const {error}=await db.from('menu_items').insert(rows);
     if(error)throw error;
