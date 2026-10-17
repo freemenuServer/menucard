@@ -284,14 +284,18 @@ function priceNumber(value){if(value===null||value===undefined||String(value).tr
 function formatPrice(value){const n=priceNumber(value);return n===null?"":`₹${n.toLocaleString("en-IN")}`}
 function isPizzaItem(item){return /\bpizza\b/i.test(String(item.name||""))||/\bpizza\b/i.test(String(item.category||""));}
 function renderItemPrices(item){
+  const price=priceNumber(firstValue(item,["price","price_full","full_price","selling_price","amount"],null));
   if(isPizzaItem(item)){
     const sizes=[["S",item.price_small], ["M",item.price_medium], ["L",item.price_large]];
-    // Always show all three sizes together; missing prices are visibly marked with —.
-    return `<div class="price price-portions pizza-prices" aria-label="Small, Medium and Large prices">${sizes.map(([label,value])=>`<span><small>${label}</small> ${priceNumber(value)!==null?formatPrice(value):"—"}</span>`).join("")}</div>`;
+    // Show S/M/L only when at least one actual size price is saved. Single-price pizzas stay single-price.
+    const hasSizePrice=sizes.some(([,value])=>priceNumber(value)!==null);
+    if(hasSizePrice){
+      return `<div class="price price-portions pizza-prices" aria-label="Small, Medium and Large prices">${sizes.map(([label,value])=>`<span><small>${label}</small> ${priceNumber(value)!==null?formatPrice(value):"—"}</span>`).join("")}</div>`;
+    }
+    return price===null?'<div class="price price-unavailable">Price unavailable</div>':`<div class="price">${formatPrice(price)}</div>`;
   }
   const portions=[["Half",item.price_half],["Full",item.price_full],["Quarter",item.price_quarter]].filter(([,v])=>priceNumber(v)!==null);
   if(portions.length){return `<div class="price price-portions">${portions.map(([label,value])=>`<span><small>${label}</small> ${formatPrice(value)}</span>`).join("")}</div>`;}
-  const price=priceNumber(firstValue(item,["price","price_full","full_price","selling_price","amount"],null));
   return price===null?'<div class="price price-unavailable">Price unavailable</div>':`<div class="price">${formatPrice(price)}</div>`;
 }
 function mapMenuItem(row){const cat=String(firstValue(row,["category","category_name","menu_category","section"],"Other"));return {id:row.id,name:String(firstValue(row,["name","item_name","title"],"Menu item")),category:cat,price:firstValue(row,["price","price_full","full_price","selling_price","amount"],null),price_quarter:firstValue(row,["price_quarter","quarter_price","price_qtr"],null),price_half:firstValue(row,["price_half","half_price"],null),price_full:firstValue(row,["price_full","full_price"],null),price_small:firstValue(row,["price_small","small_price"],null),price_medium:firstValue(row,["price_medium","medium_price","price_med"],null),price_large:firstValue(row,["price_large","large_price"],null),veg:asBool(firstValue(row,["is_veg","veg","vegetarian","item_type"],true)),description:String(firstValue(row,["description","desc","details"],"")),image:String(firstValue(row,["image_url","image","photo_url","photo","image_path"],"")),special:asBool(firstValue(row,["is_special","special","is_featured","featured"],false))}}
