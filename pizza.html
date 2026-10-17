@@ -45,14 +45,14 @@ h1{font-size:clamp(22px,3vw,32px);line-height:1.15;letter-spacing:-.8px;margin:0
 .card{min-width:0;display:flex;align-items:stretch;gap:13px;padding:9px;border:1px solid var(--line);border-radius:17px;background:white;box-shadow:0 3px 14px #14263808}
 .thumb{flex:0 0 37%;width:37%;min-width:80px;max-width:180px;aspect-ratio:1/1;align-self:center;overflow:hidden;border-radius:12px;background:#fff0df}
 .thumb img{display:block;width:100%;height:100%;object-fit:cover}
-.details{display:flex;flex-direction:column;align-items:flex-start;min-width:0;flex:1;padding:3px 0}
+.details{display:flex;flex-direction:column;align-items:stretch;min-width:0;flex:1;padding:3px 0}.item-prices{width:100%;min-width:0;margin-top:9px}.item-prices .pizza-prices{width:100%;max-width:360px}.item-prices .price-unavailable{max-width:none}
 .name-row{display:flex;align-items:center;gap:8px;width:100%}
 .name{font-size:15px;font-weight:850;line-height:1.35;overflow-wrap:anywhere}
 .veg{width:17px;height:17px;flex:0 0 17px;border:1.5px solid #13843a;border-radius:3px;display:inline-grid;place-items:center}
 .veg:after{content:"";width:8px;height:8px;background:#13843a;border-radius:50%}
 .veg.nonveg{border-color:#c62832}.veg.nonveg:after{background:#c62832}
 .special{display:inline-block;margin-top:6px;padding:3px 7px;border-radius:6px;background:#ffedb0;color:#7a4300;font-size:10px;font-weight:850}
-.item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;width:100%}.item-top .name-row{flex:1;min-width:0}.price{flex:0 0 auto;text-align:right;font-size:19px;font-weight:850;color:var(--red);line-height:1.2;margin:0 0 0 auto;white-space:nowrap}.price-portions{display:flex;flex-direction:column;align-items:flex-end;gap:3px;font-size:12px}.price-portions span{white-space:nowrap}.pizza-prices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:5px;width:100%;max-width:330px}.pizza-prices span{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;white-space:nowrap;background:#fff3f3;border:1px solid #ffe0e0;border-radius:8px;padding:6px 3px;font-size:14px;font-weight:850;color:var(--red)}.price-portions small{font-size:10px;color:#777;font-weight:700}.price-unavailable{font-size:11px;color:#777;font-weight:650;white-space:normal;max-width:100px}
+.item-top{display:flex;align-items:flex-start;gap:8px;width:100%;min-width:0}.item-top .name-row{flex:1;min-width:0;max-width:100%}.price{flex:0 0 auto;text-align:right;font-size:19px;font-weight:850;color:var(--red);line-height:1.2;margin:0 0 0 auto;white-space:nowrap}.price-portions{display:flex;flex-direction:column;align-items:flex-end;gap:3px;font-size:12px}.price-portions span{white-space:nowrap}.pizza-prices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:5px;width:100%;max-width:330px}.pizza-prices span{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;white-space:nowrap;background:#fff3f3;border:1px solid #ffe0e0;border-radius:8px;padding:6px 3px;font-size:14px;font-weight:850;color:var(--red)}.price-portions small{font-size:10px;color:#777;font-weight:700}.price-unavailable{font-size:11px;color:#777;font-weight:650;white-space:normal;max-width:100px}
 .desc{font-size:12px;line-height:1.5;color:var(--muted);margin:6px 0 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .empty{grid-column:1/-1;text-align:center;padding:40px 15px;color:var(--muted)}
 footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#eff6fd;padding:20px;color:#26384b;font-size:13px}
@@ -69,7 +69,7 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
  .card{flex-direction:column;gap:8px;padding:7px;border-radius:13px}
  .thumb{width:100%;flex:0 0 auto;max-width:none;min-width:0;aspect-ratio:1/1;align-self:stretch}
  .details{width:100%;padding:1px 1px 2px}
- .item-top{flex-direction:column;gap:5px}.item-top .name-row{width:100%}.price{margin:0;text-align:left;font-size:22px}.price-portions{order:-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;width:100%;font-size:16px;font-weight:900;gap:6px}.pizza-prices{grid-template-columns:repeat(3,minmax(0,1fr));max-width:none;font-size:13px;gap:4px}.pizza-prices span{padding:6px 1px;font-size:13px}.pizza-prices small{font-size:10px!important}.price-portions span{display:flex;flex-direction:column;align-items:center;justify-content:center;white-space:nowrap;background:#fff3f3;border:1px solid #ffe0e0;border-radius:8px;padding:5px 2px}.price-portions small{font-size:12px;color:#777;font-weight:800}.price-unavailable{max-width:100%}
+ .item-top{flex-direction:row;gap:5px}.item-top .name-row{width:100%}.item-prices .price{margin:0;text-align:left;font-size:22px}.price-portions{order:-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;width:100%;font-size:16px;font-weight:900;gap:6px}.pizza-prices{grid-template-columns:repeat(3,minmax(0,1fr));max-width:none;font-size:13px;gap:4px}.pizza-prices span{padding:6px 1px;font-size:13px}.pizza-prices small{font-size:10px!important}.price-portions span{display:flex;flex-direction:column;align-items:center;justify-content:center;white-space:nowrap;background:#fff3f3;border:1px solid #ffe0e0;border-radius:8px;padding:5px 2px}.price-portions small{font-size:12px;color:#777;font-weight:800}.price-unavailable{max-width:100%}
  .name{font-size:13px;line-height:1.3}.veg{width:14px;height:14px;flex-basis:14px}.veg:after{width:6px;height:6px}.desc{font-size:11px;line-height:1.4;margin-top:5px;-webkit-line-clamp:2}
  footer{padding:17px 14px;font-size:12px}
 }
@@ -263,8 +263,8 @@ function renderMenu(){
             <span class="name">${escapeHTML(item.name)}</span>
             <span class="veg${item.veg?"":" nonveg"}" role="img" aria-label="${item.veg?"Vegetarian":"Non-vegetarian"}" title="${item.veg?"Vegetarian":"Non-vegetarian"}"></span>
           </div>
-          ${renderItemPrices(item)}
         </div>
+        <div class="item-prices">${renderItemPrices(item)}</div>
         ${item.special?'<span class="special">★ SPECIAL</span>':""}
         <p class="desc">${escapeHTML(item.description)}</p>
       </div>
