@@ -52,7 +52,7 @@ h1{font-size:clamp(22px,3vw,32px);line-height:1.15;letter-spacing:-.8px;margin:0
 .veg:after{content:"";width:8px;height:8px;background:#13843a;border-radius:50%}
 .veg.nonveg{border-color:#c62832}.veg.nonveg:after{background:#c62832}
 .special{display:inline-block;margin-top:6px;padding:3px 7px;border-radius:6px;background:#ffedb0;color:#7a4300;font-size:10px;font-weight:850}
-.item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;width:100%}.item-top .name-row{flex:1;min-width:0}.price{flex:0 0 auto;text-align:right;font-size:19px;font-weight:850;color:var(--red);line-height:1.2;margin:0 0 0 auto;white-space:nowrap}.price-portions{display:flex;flex-direction:column;align-items:flex-end;gap:3px;font-size:12px}.price-portions span{white-space:nowrap}.pizza-prices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:6px;width:100%;margin-top:8px}.pizza-prices span{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;white-space:normal;background:#fff3f3;border:1px solid #ffe0e0;border-radius:8px;padding:7px 3px;text-align:center;font-size:15px;font-weight:900;color:var(--red)}.pizza-prices small{font-size:11px;color:#777;font-weight:800}.price-portions small{font-size:10px;color:#777;font-weight:700}.price-unavailable{font-size:11px;color:#777;font-weight:650;white-space:normal;max-width:100px}
+.item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;width:100%}.item-top .name-row{flex:1;min-width:0}.price{flex:0 0 auto;text-align:right;font-size:19px;font-weight:850;color:var(--red);line-height:1.2;margin:0 0 0 auto;white-space:nowrap}.price-portions{display:flex;flex-direction:column;align-items:flex-end;gap:3px;font-size:12px}.price-portions span{white-space:nowrap}.pizza-prices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:5px;width:100%;max-width:330px}.pizza-prices span{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;white-space:nowrap;background:#fff3f3;border:1px solid #ffe0e0;border-radius:8px;padding:6px 3px;font-size:14px;font-weight:850;color:var(--red)}.price-portions small{font-size:10px;color:#777;font-weight:700}.price-unavailable{font-size:11px;color:#777;font-weight:650;white-space:normal;max-width:100px}
 .desc{font-size:12px;line-height:1.5;color:var(--muted);margin:6px 0 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .empty{grid-column:1/-1;text-align:center;padding:40px 15px;color:var(--muted)}
 footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:#eff6fd;padding:20px;color:#26384b;font-size:13px}
@@ -69,7 +69,7 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
  .card{flex-direction:column;gap:8px;padding:7px;border-radius:13px}
  .thumb{width:100%;flex:0 0 auto;max-width:none;min-width:0;aspect-ratio:1/1;align-self:stretch}
  .details{width:100%;padding:1px 1px 2px}
- .item-top{flex-direction:column;gap:5px}.item-top .name-row{width:100%}.price{margin:0;text-align:left;font-size:22px}.price-portions{order:-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;width:100%;font-size:16px;font-weight:900;gap:6px}.price-portions span{display:flex;flex-direction:column;align-items:center;justify-content:center;white-space:nowrap;background:#fff3f3;border:1px solid #ffe0e0;border-radius:8px;padding:5px 2px}.price-portions small{font-size:12px;color:#777;font-weight:800}.price-unavailable{max-width:100%}
+ .item-top{flex-direction:column;gap:5px}.item-top .name-row{width:100%}.price{margin:0;text-align:left;font-size:22px}.price-portions{order:-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;width:100%;font-size:16px;font-weight:900;gap:6px}.pizza-prices{grid-template-columns:repeat(3,minmax(0,1fr));max-width:none;font-size:13px;gap:4px}.pizza-prices span{padding:6px 1px;font-size:13px}.pizza-prices small{font-size:10px!important}.price-portions span{display:flex;flex-direction:column;align-items:center;justify-content:center;white-space:nowrap;background:#fff3f3;border:1px solid #ffe0e0;border-radius:8px;padding:5px 2px}.price-portions small{font-size:12px;color:#777;font-weight:800}.price-unavailable{max-width:100%}
  .name{font-size:13px;line-height:1.3}.veg{width:14px;height:14px;flex-basis:14px}.veg:after{width:6px;height:6px}.desc{font-size:11px;line-height:1.4;margin-top:5px;-webkit-line-clamp:2}
  footer{padding:17px 14px;font-size:12px}
 }
@@ -285,9 +285,9 @@ function formatPrice(value){const n=priceNumber(value);return n===null?"":`₹${
 function isPizzaItem(item){return /\bpizza\b/i.test(String(item.name||""))||/\bpizza\b/i.test(String(item.category||""));}
 function renderItemPrices(item){
   if(isPizzaItem(item)){
-    const sizes=[["Small",item.price_small],["Medium",item.price_medium],["Large",item.price_large]].filter(([,v])=>priceNumber(v)!==null);
-    if(sizes.length)return `<div class="price price-portions pizza-prices">${sizes.map(([label,value])=>`<span><small>${label}</small> ${formatPrice(value)}</span>`).join("")}</div>`;
-    return '<div class="price price-unavailable">Size prices not set</div>';
+    const sizes=[["S",item.price_small], ["M",item.price_medium], ["L",item.price_large]];
+    // Always show all three sizes together; missing prices are visibly marked with —.
+    return `<div class="price price-portions pizza-prices" aria-label="Small, Medium and Large prices">${sizes.map(([label,value])=>`<span><small>${label}</small> ${priceNumber(value)!==null?formatPrice(value):"—"}</span>`).join("")}</div>`;
   }
   const portions=[["Half",item.price_half],["Full",item.price_full],["Quarter",item.price_quarter]].filter(([,v])=>priceNumber(v)!==null);
   if(portions.length){return `<div class="price price-portions">${portions.map(([label,value])=>`<span><small>${label}</small> ${formatPrice(value)}</span>`).join("")}</div>`;}
@@ -295,6 +295,25 @@ function renderItemPrices(item){
   return price===null?'<div class="price price-unavailable">Price unavailable</div>':`<div class="price">${formatPrice(price)}</div>`;
 }
 function mapMenuItem(row){const cat=String(firstValue(row,["category","category_name","menu_category","section"],"Other"));return {id:row.id,name:String(firstValue(row,["name","item_name","title"],"Menu item")),category:cat,price:firstValue(row,["price","price_full","full_price","selling_price","amount"],null),price_quarter:firstValue(row,["price_quarter","quarter_price","price_qtr"],null),price_half:firstValue(row,["price_half","half_price"],null),price_full:firstValue(row,["price_full","full_price"],null),price_small:firstValue(row,["price_small","small_price"],null),price_medium:firstValue(row,["price_medium","medium_price","price_med"],null),price_large:firstValue(row,["price_large","large_price"],null),veg:asBool(firstValue(row,["is_veg","veg","vegetarian","item_type"],true)),description:String(firstValue(row,["description","desc","details"],"")),image:String(firstValue(row,["image_url","image","photo_url","photo","image_path"],"")),special:asBool(firstValue(row,["is_special","special","is_featured","featured"],false))}}
+function groupPizzaVariants(items){
+  const result=[], groups=new Map();
+  const sizePattern=/\s*(?:\(|\[|[-–—])?\s*(small|medium|large|\bs\b|\bm\b|\bl\b)\s*(?:size)?\s*[)\]]?\s*$/i;
+  const sizeKey=value=>{const v=String(value||"").toLowerCase();return /^(small|s)$/.test(v)?"small":/^(medium|m)$/.test(v)?"medium":/^(large|l)$/.test(v)?"large":null};
+  for(const item of items){
+    const match=String(item.name||"").match(sizePattern), size=match?sizeKey(match[1]):null;
+    if(!size){result.push(item);continue;}
+    const baseName=String(item.name).replace(sizePattern,"").trim();
+    const key=(baseName+"|"+String(item.category||"")).toLowerCase();
+    let group=groups.get(key);
+    if(!group){group={...item,name:baseName||item.name,price_small:null,price_medium:null,price_large:null,_pizzaVariantGroup:true};groups.set(key,group);result.push(group);}
+    const value=firstValue(item,["price_small","small_price","price_medium","medium_price","price_large","large_price","price_full","full_price","price","selling_price","amount"],null);
+    // Prefer the price belonging to the size encoded in the item's name.
+    group[{small:"price_small",medium:"price_medium",large:"price_large"}[size]]=firstValue(item,["price","price_full","full_price","selling_price","amount",`price_${size}`,`${size}_price`],value);
+    if(!group.image&&item.image)group.image=item.image;
+    if(!group.description&&item.description)group.description=item.description;
+  }
+  return result;
+}
 async function loadRealMenu(){
   try{
     const slug=slugFromUrl();if(!slug)throw new Error("Restaurant URL slug missing");
@@ -311,7 +330,7 @@ async function loadRealMenu(){
     restaurant={name:String(firstValue(r,["name","restaurant_name"],"Restaurant")),tagline:String(firstValue(r,["tagline","description","subtitle_text"],"Explore our menu")),address:String(firstValue(r,["address","full_address","location"],"")),hours:String(hours),phone:String(firstValue(r,["phone","phone_number","contact_number"],"")),openHour:Number(String(open).split(":")[0])||0,closeHour:Number(String(close).split(":")[0])||24,coverImage:String(firstValue(r,["banner_url","cover_url","cover_image","banner_image"],"")),logo:String(firstValue(r,["logo_url","logo","logo_image"],""))};
     const {data:rowsItems,error:itemsError}=await supabaseClient.from("menu_items").select("*").eq("restaurant_id",r.id);
     if(itemsError)throw itemsError;
-    menuItems=(Array.isArray(rowsItems)?rowsItems:[]).filter(x=>x.is_available!==false&&x.available!==false&&x.is_active!==false).sort((a,b)=>Number(a.sort_order??a.position??999999)-Number(b.sort_order??b.position??999999)).map(mapMenuItem);
+    menuItems=groupPizzaVariants((Array.isArray(rowsItems)?rowsItems:[]).filter(x=>x.is_available!==false&&x.available!==false&&x.is_active!==false).sort((a,b)=>Number(a.sort_order??a.position??999999)-Number(b.sort_order??b.position??999999)).map(mapMenuItem));
     categories=[{name:"All",icon:"▦"},...Array.from(new Set(menuItems.map(x=>x.category).filter(Boolean))).map(name=>({name,icon:"◉"})),...(menuItems.some(x=>x.special)?[{name:"Today's Special",icon:"☆"}]:[])];
     state.category="All";document.title=`${restaurant.name} Menu | FreeMenu`;
     const md=document.querySelector('meta[name="description"]');if(md)md.content=`View ${restaurant.name} menu, pizza sizes and prices on FreeMenu.`;
