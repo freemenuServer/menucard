@@ -889,9 +889,6 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
    <input class="input" type="number" id="mQtr" placeholder="Qtr ₹" min="0">
    <input class="input" type="number" id="mHalf" placeholder="Half ₹" min="0">
    <input class="input" type="number" id="mFull" placeholder="Full ₹" min="0">
-    <input class="input" type="number" id="mSmall" placeholder="Pizza Small ₹" min="0" step="0.01">
-    <input class="input" type="number" id="mMedium" placeholder="Pizza Medium ₹" min="0" step="0.01">
-    <input class="input" type="number" id="mLarge" placeholder="Pizza Large ₹" min="0" step="0.01">
   </div>
   <div class="photoUploadBox" id="menuPhotoBox">
     <label style="display:block;font-size:11px;font-weight:800;color:#64748b;margin-bottom:6px">Food Photo <span class="planBadgeInline planBadgePhotos">GROWTH • PHOTOS</span></label>
@@ -2059,8 +2056,19 @@ async function syncManualCategoryOrder(){
   return next;
 }
 function fillCategorySelects(){
+  // Rebuild category options without resetting the user's current filters.
+  const filterIds=["menuCategoryFilter","fullCatFilter"];
+  const previousValues={};
+  filterIds.forEach(id=>{ previousValues[id]=$(id)?.value||""; });
   const opts=categories().map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("");
-  ["menuCategoryFilter","fullCatFilter"].forEach(id=>$(id).innerHTML='<option value="">All Categories</option>'+opts);
+  filterIds.forEach(id=>{
+    const select=$(id);
+    if(!select)return;
+    select.innerHTML='<option value="">All Categories</option>'+opts;
+    const previous=previousValues[id];
+    // Restore the selected category when it still exists after the save.
+    select.value=previous && categories().includes(previous) ? previous : "";
+  });
 }
 function renderAll(){
   fillCategorySelects();
@@ -2070,7 +2078,7 @@ function renderAll(){
   $("statViews").textContent="—";
 }
 function typeCell(item){const t=item.item_type||((item.is_veg===false)?"nonveg":"veg");return `<span class="foodType ${t}"></span>`}
-function priceText(i){if(/\bpizza\b/i.test(String(i.name||"")+" "+String(i.category||""))&&[i.price_small,i.price_medium,i.price_large].some(v=>v!==null&&v!==undefined))return `S ₹${i.price_small??"—"} / M ₹${i.price_medium??"—"} / L ₹${i.price_large??"—"}`;return [i.price_quarter,i.price_half,i.price_full].some(v=>v!==null&&v!==undefined)?`${i.price_quarter??"—"} / ${i.price_half??"—"} / ${i.price_full??"—"}`:(i.price!=null?`₹${i.price}`:"—")}
+function priceText(i){return [i.price_quarter,i.price_half,i.price_full].some(v=>v!==null&&v!==undefined)?`${i.price_quarter??"—"} / ${i.price_half??"—"} / ${i.price_full??"—"}`:(i.price!=null?`₹${i.price}`:"—")}
 function filtered(source,search,cat,type){
   const q=(search||"").toLowerCase().trim();
   return source.filter(i=>(!cat||(i.category||"General")===cat)&&(!type||(i.item_type||"veg")===type)&&(!q||[i.name,i.description,i.category].filter(Boolean).join(" ").toLowerCase().includes(q)));
@@ -2088,7 +2096,7 @@ function renderCategories(){
  const html=categories().map(c=>{
    const count=items.filter(i=>(i.category||"General").trim()===c).length;
    const image=items.find(i=>(i.category||"").trim()===c)?.image_url||"";
-   return `<div class="categoryCard" data-category-name="${esc(c)}"><div class="catImage" style="${image?`background-image:url('${esc(image)}')`:""}"></div><div class="catBody"><div class="catName">${esc(c)}</div><div class="catCount">${count} item${count===1?"":"s"}</div></div></div>`;
+   return `<div class="categoryCard" data-category-name="${esc(c)}"><div class="catImage" style="${image?`background-image:url('${esc(image)}')`:""}"></div><div class="catBody"><div class="catName">${esc(c)}</div><div class="catCount">${count} item${count===1?"":"s"}</div><button type="button" class="btn danger sm deleteCategory" data-category="${esc(c)}" style="margin-top:9px;width:100%" title="Delete category and all its menu items"><i class="fa-solid fa-trash"></i> Delete Category</button></div></div>`;
  }).join("");
  $("categoryCards").innerHTML=html||'<div class="muted" style="font-size:12px">No categories yet.</div>';
  $("categoryCardsFull").innerHTML=html||'<div class="muted" style="font-size:12px">No categories yet.</div>';
@@ -2103,7 +2111,7 @@ function openItem(id=null){
  const i=id?items.find(x=>String(x.id)===String(id)):null;
  $("mName").value=i?.name||"";$("mCategory").value=i?.category||"";
  $("mDesc").value=i?.description||"";$("mType").value=i?.item_type||((i?.is_veg===false)?"nonveg":"veg");
- $("mPrice").value=i?.price??"";$("mQtr").value=i?.price_quarter??"";$("mHalf").value=i?.price_half??"";$("mFull").value=i?.price_full??"";$("mSmall").value=i?.price_small??"";$("mMedium").value=i?.price_medium??"";$("mLarge").value=i?.price_large??"";
+ $("mPrice").value=i?.price??"";$("mQtr").value=i?.price_quarter??"";$("mHalf").value=i?.price_half??"";$("mFull").value=i?.price_full??"";
  $("mAvailable").value=String(i?.is_available!==false);
  $("mAvailableSwitch").className=`switch ${i?.is_available!==false?"on":""}`;
  $("mAvailableText").textContent=i?.is_available!==false?"ON — Visible":"OFF — Hidden";
@@ -2124,7 +2132,7 @@ async function saveItem(){
  const existing=id?items.find(x=>String(x.id)===String(id)):null;
  if((glbFile||usdzFile)&&!isSignature3DPlan())return toast("Signature 3D plan is required for 3D/AR uploads.");
  if((glbFile||usdzFile)&&!existing&&signature3dCount>=signature3dLimit)return toast(`Signature 3D limit reached (${signature3dLimit} dishes).`);
- const payload={name,category,description,item_type,is_veg:item_type==="veg",price:cleanNum($("mPrice").value),price_quarter:cleanNum($("mQtr").value),price_half:cleanNum($("mHalf").value),price_full:cleanNum($("mFull").value),price_small:cleanNum($("mSmall").value),price_medium:cleanNum($("mMedium").value),price_large:cleanNum($("mLarge").value),is_available:$("mAvailable").value!=="false"};
+ const payload={name,category,description,item_type,is_veg:item_type==="veg",price:cleanNum($("mPrice").value),price_quarter:cleanNum($("mQtr").value),price_half:cleanNum($("mHalf").value),price_full:cleanNum($("mFull").value),is_available:$("mAvailable").value!=="false"};
  if(photoUrl)payload.image_url=photoUrl;
  $("saveItem").disabled=true;$("saveItem").textContent="Saving...";
  try{
@@ -2156,6 +2164,24 @@ async function saveItem(){
  }catch(e){console.error(e);toast("Save failed: "+(e?.message||e));}
  finally{$("saveItem").disabled=false;$("saveItem").innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Item';}
 }
+async function deleteCategory(categoryName){
+ const category=String(categoryName||"").trim();
+ if(!category)return;
+ const matching=items.filter(i=>(i.category||"General").trim()===category);
+ if(!matching.length){toast("Category not found");return}
+ if(!confirm(`Delete category "${category}" and all ${matching.length} menu item(s) inside it? This cannot be undone.`))return;
+ const {error}=await supabaseClient.from("menu_items").delete().eq("restaurant_id",currentRestaurantId).eq("category",category);
+ if(error){toast("Category delete failed: "+error.message);return}
+ // Keep manual ordering metadata in sync with the categories that remain.
+ const remainingOrder=(Array.isArray(currentRestaurant?.category_order)?currentRestaurant.category_order:[]).filter(c=>String(c).trim()!==category);
+ const {data:restaurantData,error:orderError}=await supabaseClient.from("restaurants").update({category_order:remainingOrder}).eq("id",currentRestaurantId).select("*").single();
+ if(orderError){console.error("Category order cleanup failed:",orderError);}
+ else currentRestaurant=restaurantData||{...currentRestaurant,category_order:remainingOrder};
+ toast(`Category "${category}" deleted`);
+ await loadItems();
+ await syncManualCategoryOrder();
+ renderAll();
+}
 async function deleteItem(id){
  if(!confirm("Delete this menu item?"))return;
  const {error}=await supabaseClient.from("menu_items").delete().eq("id",id).eq("restaurant_id",currentRestaurantId);
@@ -2182,9 +2208,10 @@ async function toggleAvailability(id,btn){
 document.addEventListener("click",e=>{
  const modalStatus=e.target.closest("#mAvailableSwitch");
  if(modalStatus){ const on=$("mAvailable").value!=="true"; $("mAvailable").value=String(on); $("mAvailableSwitch").className=`switch ${on?"on":""}`; $("mAvailableText").textContent=on?"ON — Visible":"OFF — Hidden"; return; }
- const edit=e.target.closest(".editItem"),del=e.target.closest(".deleteItem"),status=e.target.closest("[data-status]");
+ const edit=e.target.closest(".editItem"),del=e.target.closest(".deleteItem"),catDel=e.target.closest(".deleteCategory"),status=e.target.closest("[data-status]");
  if(edit)openItem(edit.dataset.id);
  if(del)deleteItem(del.dataset.id);
+ if(catDel){e.preventDefault();e.stopPropagation();deleteCategory(catDel.dataset.category);}
  if(status)toggleAvailability(status.dataset.status,status);
 });
 $("saveItem").onclick=saveItem;$("openAdd").onclick=()=>openItem();$("openAdd2").onclick=()=>openItem();
@@ -2383,7 +2410,7 @@ $("saveCategory").onclick=async()=>{
  const cat=$("newCat").value.trim();if(!cat)return toast("Enter a category name");
  if(categories().includes(cat))return toast("Category already exists");
  /* Existing schema has no category table. Create a zero-priced placeholder. */
- const {error}=await supabaseClient.from("menu_items").insert([{restaurant_id:currentRestaurantId,name:"New Item",category:cat,description:"",item_type:"veg",is_veg:true,price:null,price_quarter:null,price_half:null,price_full:null,price_small:null,price_medium:null,price_large:null,is_available:true}]);
+ const {error}=await supabaseClient.from("menu_items").insert([{restaurant_id:currentRestaurantId,name:"New Item",category:cat,description:"",item_type:"veg",is_veg:true,price:null,price_quarter:null,price_half:null,price_full:null,is_available:true}]);
  if(error){toast("Could not create category: "+error.message);return}
  $("catModal").classList.remove("show");
  await loadItems();
