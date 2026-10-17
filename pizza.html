@@ -93,9 +93,9 @@ footer{display:flex;justify-content:space-between;align-items:center;gap:12px;fl
 .freemenu-float img{display:block;width:36px;height:36px;object-fit:contain;border-radius:50%}
 .freemenu-float:active{transform:scale(.94)}
 @media(max-width:680px){
-  /* Keep the FreeMenu floating logo centered just above the fixed category bar. */
-  .freemenu-float{left:50%;right:auto;bottom:calc(88px + env(safe-area-inset-bottom));transform:translateX(-50%)}
-  .freemenu-float:active{transform:translateX(-50%) scale(.94)}
+  /* Keep the FreeMenu floating logo sticky at the side, above the fixed category bar. */
+  .freemenu-float{left:auto;right:14px;bottom:calc(88px + env(safe-area-inset-bottom));transform:none}
+  .freemenu-float:active{transform:scale(.94)}
 }
 @media(min-width:681px){.freemenu-float{right:22px;bottom:22px;width:54px;height:54px;font-size:15px}}
 @media(prefers-reduced-motion:reduce){.freemenu-float{transition:none}}
