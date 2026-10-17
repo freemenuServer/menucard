@@ -2348,9 +2348,16 @@ function renderRestaurant(rest) {
           compactResolvedPlanKey.includes("menuone") ||
           resolvedPlanFeatures.includes("menuone.html") ||
           resolvedPlanFeatures.includes("menu one page");
+        const isPizzaMenuPlan =
+          compactResolvedPlanKey.includes("pizzamenu") ||
+          compactResolvedPlanKey.includes("pizza") ||
+          resolvedPlanFeatures.includes("pizza.html") ||
+          resolvedPlanFeatures.includes("pizza menu page");
 
         let targetFile = "menu.html";
-        if (isCartMenuPlan) {
+        if (isPizzaMenuPlan) {
+          targetFile = "pizza.html";
+        } else if (isCartMenuPlan) {
           targetFile = "cartmenu.html";
         } else if (isMenuOnePlan) {
           targetFile = "menuone.html";

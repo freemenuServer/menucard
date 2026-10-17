@@ -889,6 +889,9 @@ html.signup-route #authChoiceCard .authCombinedForm{overflow:visible!important}
    <input class="input" type="number" id="mQtr" placeholder="Qtr ₹" min="0">
    <input class="input" type="number" id="mHalf" placeholder="Half ₹" min="0">
    <input class="input" type="number" id="mFull" placeholder="Full ₹" min="0">
+    <input class="input" type="number" id="mSmall" placeholder="Pizza Small ₹" min="0" step="0.01">
+    <input class="input" type="number" id="mMedium" placeholder="Pizza Medium ₹" min="0" step="0.01">
+    <input class="input" type="number" id="mLarge" placeholder="Pizza Large ₹" min="0" step="0.01">
   </div>
   <div class="photoUploadBox" id="menuPhotoBox">
     <label style="display:block;font-size:11px;font-weight:800;color:#64748b;margin-bottom:6px">Food Photo <span class="planBadgeInline planBadgePhotos">GROWTH • PHOTOS</span></label>
@@ -2067,7 +2070,7 @@ function renderAll(){
   $("statViews").textContent="—";
 }
 function typeCell(item){const t=item.item_type||((item.is_veg===false)?"nonveg":"veg");return `<span class="foodType ${t}"></span>`}
-function priceText(i){return [i.price_quarter,i.price_half,i.price_full].some(v=>v!==null&&v!==undefined)?`${i.price_quarter??"—"} / ${i.price_half??"—"} / ${i.price_full??"—"}`:(i.price!=null?`₹${i.price}`:"—")}
+function priceText(i){if(/\bpizza\b/i.test(String(i.name||"")+" "+String(i.category||""))&&[i.price_small,i.price_medium,i.price_large].some(v=>v!==null&&v!==undefined))return `S ₹${i.price_small??"—"} / M ₹${i.price_medium??"—"} / L ₹${i.price_large??"—"}`;return [i.price_quarter,i.price_half,i.price_full].some(v=>v!==null&&v!==undefined)?`${i.price_quarter??"—"} / ${i.price_half??"—"} / ${i.price_full??"—"}`:(i.price!=null?`₹${i.price}`:"—")}
 function filtered(source,search,cat,type){
   const q=(search||"").toLowerCase().trim();
   return source.filter(i=>(!cat||(i.category||"General")===cat)&&(!type||(i.item_type||"veg")===type)&&(!q||[i.name,i.description,i.category].filter(Boolean).join(" ").toLowerCase().includes(q)));
@@ -2100,7 +2103,7 @@ function openItem(id=null){
  const i=id?items.find(x=>String(x.id)===String(id)):null;
  $("mName").value=i?.name||"";$("mCategory").value=i?.category||"";
  $("mDesc").value=i?.description||"";$("mType").value=i?.item_type||((i?.is_veg===false)?"nonveg":"veg");
- $("mPrice").value=i?.price??"";$("mQtr").value=i?.price_quarter??"";$("mHalf").value=i?.price_half??"";$("mFull").value=i?.price_full??"";
+ $("mPrice").value=i?.price??"";$("mQtr").value=i?.price_quarter??"";$("mHalf").value=i?.price_half??"";$("mFull").value=i?.price_full??"";$("mSmall").value=i?.price_small??"";$("mMedium").value=i?.price_medium??"";$("mLarge").value=i?.price_large??"";
  $("mAvailable").value=String(i?.is_available!==false);
  $("mAvailableSwitch").className=`switch ${i?.is_available!==false?"on":""}`;
  $("mAvailableText").textContent=i?.is_available!==false?"ON — Visible":"OFF — Hidden";
@@ -2121,7 +2124,7 @@ async function saveItem(){
  const existing=id?items.find(x=>String(x.id)===String(id)):null;
  if((glbFile||usdzFile)&&!isSignature3DPlan())return toast("Signature 3D plan is required for 3D/AR uploads.");
  if((glbFile||usdzFile)&&!existing&&signature3dCount>=signature3dLimit)return toast(`Signature 3D limit reached (${signature3dLimit} dishes).`);
- const payload={name,category,description,item_type,is_veg:item_type==="veg",price:cleanNum($("mPrice").value),price_quarter:cleanNum($("mQtr").value),price_half:cleanNum($("mHalf").value),price_full:cleanNum($("mFull").value),is_available:$("mAvailable").value!=="false"};
+ const payload={name,category,description,item_type,is_veg:item_type==="veg",price:cleanNum($("mPrice").value),price_quarter:cleanNum($("mQtr").value),price_half:cleanNum($("mHalf").value),price_full:cleanNum($("mFull").value),price_small:cleanNum($("mSmall").value),price_medium:cleanNum($("mMedium").value),price_large:cleanNum($("mLarge").value),is_available:$("mAvailable").value!=="false"};
  if(photoUrl)payload.image_url=photoUrl;
  $("saveItem").disabled=true;$("saveItem").textContent="Saving...";
  try{
@@ -2380,7 +2383,7 @@ $("saveCategory").onclick=async()=>{
  const cat=$("newCat").value.trim();if(!cat)return toast("Enter a category name");
  if(categories().includes(cat))return toast("Category already exists");
  /* Existing schema has no category table. Create a zero-priced placeholder. */
- const {error}=await supabaseClient.from("menu_items").insert([{restaurant_id:currentRestaurantId,name:"New Item",category:cat,description:"",item_type:"veg",is_veg:true,price:null,price_quarter:null,price_half:null,price_full:null,is_available:true}]);
+ const {error}=await supabaseClient.from("menu_items").insert([{restaurant_id:currentRestaurantId,name:"New Item",category:cat,description:"",item_type:"veg",is_veg:true,price:null,price_quarter:null,price_half:null,price_full:null,price_small:null,price_medium:null,price_large:null,is_available:true}]);
  if(error){toast("Could not create category: "+error.message);return}
  $("catModal").classList.remove("show");
  await loadItems();
