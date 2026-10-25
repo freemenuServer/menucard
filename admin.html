@@ -1168,8 +1168,8 @@ function printTenQRs(id){
   const x=qrCodes.find(q=>q.id===id);
   if(!x)return toast('QR code not found.');
   // Reuse the existing branded QR print design; only duplicate the same QR record.
-  const copies=Array.from({length:10},(_,i)=>({...x,id:`${x.id}-copy-${i+1}`}));
-  renderPrintQR(copies, `${x.code||'QR'} - 10 Copies (6 x 8 cm)`, true);
+  const copies=Array.from({length:12},(_,i)=>({...x,id:`${x.id}-copy-${i+1}`}));
+  renderPrintQR(copies, `${x.code||'QR'} - 12 Copies (6 x 8 cm)`, true);
 }
 
 function openAssignQR(id){
@@ -1253,8 +1253,8 @@ async function renderPrintQR(items,title,copySheet=false){
 <style>
 *{box-sizing:border-box}
 @page{size:A3 portrait;margin:0}
-body.copy-sheet .page{padding:0!important;width:29.7cm!important;height:42cm!important;margin:0!important;display:flex!important;align-items:center!important;justify-content:center!important}
-body.copy-sheet .grid{display:grid!important;grid-template-columns:repeat(3,6cm)!important;grid-template-rows:repeat(4,8cm)!important;gap:0!important;width:18cm!important;height:32cm!important;margin:0 auto!important;max-width:none!important;align-content:start!important;justify-content:center!important}
+body.copy-sheet .page{padding:5cm 0!important;width:29.7cm!important;height:42cm!important;margin:0!important;display:block!important;}
+body.copy-sheet .grid{display:grid!important;grid-template-columns:repeat(3,6cm)!important;grid-template-rows:repeat(4,8cm)!important;gap:0!important;width:18cm!important;height:32cm!important;margin:0 auto!important;max-width:none!important;align-content:start!important;justify-content:center!important;}
 body.copy-sheet .qr-card{width:6cm!important;height:8cm!important;min-width:6cm!important;min-height:8cm!important;overflow:hidden!important;display:block!important;break-inside:avoid!important;page-break-inside:avoid!important}
 body.copy-sheet .poster{position:relative!important;display:block!important;width:6cm!important;height:8cm!important;max-width:6cm!important;min-width:6cm!important;min-height:8cm!important;max-height:8cm!important;overflow:hidden!important;margin:0!important;padding:2mm 1mm!important;box-shadow:none!important;border-radius:0!important;transform:none!important}
 body.copy-sheet .content{zoom:.52!important;width:100%!important;transform-origin:top center!important}
