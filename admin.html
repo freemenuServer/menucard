@@ -1167,23 +1167,11 @@ function renderQRs(){
 function printTenQRs(id){
   const x=qrCodes.find(q=>q.id===id);
   if(!x)return toast('QR code not found.');
-  const r=restaurants.find(y=>y.id===x.restaurant_id);
-  const url=r?.slug ? new URL('/menu.html?r='+encodeURIComponent(r.slug),location.origin).href : qrTargetURL(x.code);
-  const copies=Array.from({length:10},(_,i)=>`<section class="qr-card"><div class="qr" id="copy-${i}"></div><div class="code">${String(x.code||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</div><div class="restaurant">${String(r?.name||'Restaurant Menu').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</div><div class="caption">Scan to open menu</div></section>`).join('');
-  const w=window.open('','_blank');
-  if(!w)return toast('Please allow pop-ups to print QR copies.');
-  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${String(x.code||'QR').replace(/[<>]/g,'')} - 10 Copies</title><style>
-  *{box-sizing:border-box} @page{size:A4 portrait;margin:0.25in} body{margin:0;font-family:Arial,sans-serif;color:#111;background:#fff}.toolbar{position:sticky;top:0;background:#fff;padding:10px;text-align:center;border-bottom:1px solid #ddd;z-index:2}.toolbar button{padding:9px 16px;border:0;border-radius:6px;background:#b91c3b;color:#fff;font-weight:700;cursor:pointer}.grid{display:grid;grid-template-columns:repeat(3,2in);grid-auto-rows:3in;gap:.12in;justify-content:center;padding:.08in}.qr-card{width:2in;height:3in;border:1px dashed #bbb;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.12in;break-inside:avoid;overflow:hidden}.qr{width:1.45in;height:1.45in;display:flex;align-items:center;justify-content:center}.qr svg,.qr canvas{width:1.45in!important;height:1.45in!important;display:block}.code{font-size:11pt;font-weight:800;margin-top:.1in}.restaurant{font-size:9pt;font-weight:700;text-align:center;margin-top:.04in;max-width:100%;overflow-wrap:anywhere}.caption{font-size:7pt;color:#555;margin-top:.04in}@media print{.toolbar{display:none}.grid{gap:.12in;padding:0}.qr-card{border:0.5pt dashed #aaa}}
-  </style></head><body><div class="toolbar"><button onclick="window.print()">Print / Save as PDF</button> <span>10 identical copies · 2 × 3 inch · ${String(x.code||'')}</span></div><main class="grid">${copies}</main><script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.9.2/lib/qr-code-styling.js"><\/script><script>const target=${JSON.stringify(url)};for(let i=0;i<10;i++){new QRCodeStyling({width:360,height:360,type:'svg',data:target,margin:4,qrOptions:{typeNumber:0,mode:'Byte',errorCorrectionLevel:'H'},dotsOptions:{type:'square',color:'#000000'},cornersSquareOptions:{type:'square',color:'#000000'},cornersDotOptions:{type:'square',color:'#000000'},backgroundOptions:{color:'#ffffff'}}).append(document.getElementById('copy-'+i));}<\/script></body></html>`);
-  w.document.close();
+  // Reuse the existing branded QR print design; only duplicate the same QR record.
+  const copies=Array.from({length:10},(_,i)=>({...x,id:`${x.id}-copy-${i+1}`}));
+  renderPrintQR(copies, `${x.code||'QR'} - 10 Copies`);
 }
 
-async function generateQRBatch(n=100){
-  if(!confirm(`Generate the next ${n} QR codes?`))return;
-  const r=await db.rpc('generate_qr_batch',{p_count:n});
-  if(r.error)return toast(r.error.message);
-  await logAction(`Generated ${n} QR codes`); await loadQRs(); toast(`${n} QR codes generated successfully`);
-}
 function openAssignQR(id){
   const x=qrCodes.find(q=>q.id===id); if(!x)return;
   modal('Assign QR Code',`<div class="notice"><b>${esc(x.code)}</b> can be assigned to one restaurant. A restaurant can have maximum 10 active QR codes.</div><div class="field"><label>Restaurant</label><select id="qrAssignRest">${restaurants.map(r=>`<option value="${esc(r.id)}">${esc(r.name)}</option>`).join('')}</select></div><div class="field" style="margin-top:10px"><label>Label (optional)</label><input id="qrAssignLabel" placeholder="Table 1"></div><div class="modalfoot"><button class="smallbtn" onclick="closeModal()">Cancel</button><button class="primary" onclick="assignQR('${x.id}')">Assign QR</button></div>`);
