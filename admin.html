@@ -1169,7 +1169,7 @@ function printTenQRs(id){
   if(!x)return toast('QR code not found.');
   // Reuse the existing branded QR print design; only duplicate the same QR record.
   const copies=Array.from({length:10},(_,i)=>({...x,id:`${x.id}-copy-${i+1}`}));
-  renderPrintQR(copies, `${x.code||'QR'} - 10 Copies`);
+  renderPrintQR(copies, `${x.code||'QR'} - 10 Copies (6 x 8 cm)`);
 }
 
 function openAssignQR(id){
@@ -1275,7 +1275,24 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;margin:0;background:#f3f5f7;co
 .poster.design-3{background:#f7fbf5;color:#183b27;border-color:#9ac39a}.design-3 .orange{background:#9fcf67}.design-3 .green{background:#2f7d4a}.design-3 .red{background:#b74b38}.design-3 .note{color:#52745e}.design-3 .smallTitle{font-family:Inter,Arial,sans-serif}.design-3 .bigTitle{font-family:Inter,Arial,sans-serif;color:#2f7d4a}.design-3 .lines .g{background:#2f7d4a}.design-3 .lines .o{background:#8fbd4e}.design-3 .lines .r{background:#b74b38}.design-3 .qrBox{border:2px solid #2f7d4a;border-radius:30px;box-shadow:0 12px 30px rgba(47,125,74,.13)}.design-3 .scan{color:#386148}.design-3 .brandName{color:#225d38}.design-3 .brandName span{color:#7aa63d}.design-3 .tag,.design-3 .footer2{color:#63806c}.design-3 .brandLines .g{background:#2f7d4a}.design-3 .brandLines .o{background:#8fbd4e}.design-3 .brandLines .r{background:#b74b38}
 .poster.design-4{background:#fff4e8;color:#5a2b18;border-color:#e4a26b}.design-4 .orange{background:#ef7c28}.design-4 .green{background:#6b8d3a}.design-4 .red{background:#9c3f26}.design-4 .note{color:#9a5d3d}.design-4 .smallTitle{font-family:Georgia,serif}.design-4 .bigTitle{font-family:Georgia,serif;color:#bd4e1f}.design-4 .lines .g{background:#6b8d3a}.design-4 .lines .o{background:#ef7c28}.design-4 .lines .r{background:#9c3f26}.design-4 .qrBox{border:2px solid #bd4e1f;border-radius:18px;box-shadow:0 12px 30px rgba(120,55,25,.14)}.design-4 .scan{color:#7a4a33}.design-4 .brandName{color:#7b321c}.design-4 .brandName span{color:#ef7c28}.design-4 .tag,.design-4 .footer2{color:#95664d}.design-4 .brandLines .g{background:#6b8d3a}.design-4 .brandLines .o{background:#ef7c28}.design-4 .brandLines .r{background:#9c3f26}
 @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.grid{grid-template-columns:1fr}.poster{width:min(4in,calc(100vw - 24px));max-width:none;height:auto;min-height:0;aspect-ratio:2/3}}
-@media print{@page{size:4in 6in;margin:0}html,body{width:4in;height:6in;margin:0;padding:0;background:#fff}.toolbar{display:none!important}.page{padding:0;margin:0;width:4in;height:6in}.grid{display:block;width:4in;margin:0;padding:0}.qr-card{display:block;width:4in;height:6in;margin:0;padding:0}.poster{width:4in;height:6in;max-width:4in;min-height:6in;margin:0;box-shadow:none;break-inside:avoid;page-break-after:always;border-radius:0;padding:10mm 4mm 7mm}.qrBox{width:44mm;padding:2.5mm}.qrbox{width:39mm;height:39mm}.qrbox svg,.qrbox canvas{width:39mm!important;height:39mm!important}.restaurant{font-size:10pt}.code{font-size:7pt}.smallTitle{font-size:16pt}.bigTitle{font-size:32pt}.brandName{font-size:19pt}.qr-card:last-child .poster{page-break-after:auto}}
+@media print{
+@page{size:18cm 32cm;margin:0}
+html,body{width:18cm;height:32cm;margin:0;padding:0;background:#fff;overflow:hidden}
+.toolbar{display:none!important}
+.page{padding:0;margin:0;width:18cm;height:32cm}
+.grid{display:grid!important;grid-template-columns:repeat(3,6cm)!important;grid-template-rows:repeat(4,8cm)!important;gap:0!important;width:18cm;height:32cm;margin:0;padding:0;}
+.qr-card{display:block;width:6cm;height:8cm;margin:0;padding:0;overflow:hidden;break-inside:avoid;page-break-inside:avoid;}
+.poster{width:6cm!important;height:8cm!important;max-width:6cm!important;min-height:8cm!important;margin:0!important;padding:3mm 1.5mm 1.5mm!important;box-shadow:none!important;border-radius:0!important;overflow:hidden;border-width:.25mm!important;break-after:auto!important;page-break-after:auto!important;}
+.blob.orange{width:25mm;height:25mm;left:-13mm;top:-15mm}.blob.green{width:25mm;height:22mm;left:-12mm;bottom:-14mm}.blob.red{width:24mm;height:22mm;right:-12mm;bottom:-13mm}
+.decor{font-size:10pt}.d1{left:2mm;top:10mm}.d2{right:2mm;top:10mm}.d3{left:2mm;bottom:17mm}.d4{right:2mm;bottom:15mm}
+.content{width:100%}.note{font-size:4.5pt;margin-bottom:1mm}.smallTitle{font-size:9pt;letter-spacing:0}.bigTitle{font-size:21pt;letter-spacing:-.5pt}
+.lines{gap:1mm;margin:2mm 0 1.5mm}.lines i{width:8mm;height:.7mm}
+.restaurant{font-size:6.5pt;margin:1mm 0;max-width:100%}.code{font-size:4pt;padding:.5mm 1mm;margin-bottom:1mm}
+.qrBox{width:31mm;padding:1mm;border-width:.4mm!important;border-radius:3mm!important;box-shadow:none!important}.qrbox{width:28mm;height:28mm}.qrbox svg,.qrbox canvas{width:28mm!important;height:28mm!important}
+.scan{margin-top:1mm;font-size:4pt}.brandArea{margin-top:2mm}.leaf{font-size:7pt}.brandName{font-size:10pt;letter-spacing:-.3pt}.tag{margin-top:.5mm;font-size:3pt;letter-spacing:.5mm}.brandLines{gap:.5mm;margin-top:.7mm}.brandLines i{width:4mm;height:.4mm}
+.features{margin-top:1.5mm;padding-top:1mm}.feature{padding:0 .5mm}.fi{font-size:6pt;margin-bottom:0}.ft{font-size:3.5pt}.fs{font-size:3pt;margin-top:.3mm}.footer{margin-top:1mm;font-size:3.5pt;letter-spacing:.3mm}.footer2{font-size:3pt;margin-top:.3mm}
+.qr-card:last-child .poster{page-break-after:auto}
+}
 </style></head><body>
 <div class="toolbar">
   <span style="font-size:12px;font-weight:900;margin-right:4px">QR Design:</span>
