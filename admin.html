@@ -1252,11 +1252,18 @@ async function renderPrintQR(items,title,copySheet=false){
   w.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title>
 <style>
 *{box-sizing:border-box}
-body.copy-sheet .page{padding:0!important}
-body.copy-sheet .grid{grid-template-columns:repeat(3,6cm)!important;grid-template-rows:repeat(4,8cm)!important;gap:0!important;width:18cm!important;height:32cm!important;margin:0 auto!important}
-body.copy-sheet .qr-card{width:6cm!important;height:8cm!important}
-body.copy-sheet .poster{width:6cm!important;height:8cm!important;max-width:6cm!important;min-height:8cm!important;margin:0!important;padding:3mm 1.5mm 1.5mm!important;box-shadow:none!important;border-radius:0!important}
-@media print{body.copy-sheet .toolbar{display:none!important} body.copy-sheet .page{width:18cm!important;height:32cm!important} body.copy-sheet .grid{page-break-inside:avoid!important;break-inside:avoid!important} body.copy-sheet .qr-card{page-break-inside:avoid!important;break-inside:avoid!important}}
+@page{size:18cm 32cm;margin:0}
+body.copy-sheet .page{padding:0!important;width:18cm!important;height:32cm!important;margin:0!important}
+body.copy-sheet .grid{display:grid!important;grid-template-columns:repeat(3,6cm)!important;grid-template-rows:repeat(4,8cm)!important;gap:0!important;width:18cm!important;height:32cm!important;margin:0!important;max-width:none!important;align-content:start!important;justify-content:start!important}
+body.copy-sheet .qr-card{width:6cm!important;height:8cm!important;min-width:6cm!important;min-height:8cm!important;overflow:hidden!important;display:block!important;break-inside:avoid!important;page-break-inside:avoid!important}
+body.copy-sheet .poster{position:relative!important;display:block!important;width:6cm!important;height:8cm!important;max-width:6cm!important;min-width:6cm!important;min-height:8cm!important;max-height:8cm!important;overflow:hidden!important;margin:0!important;padding:2mm 1mm!important;box-shadow:none!important;border-radius:0!important;transform:none!important}
+body.copy-sheet .content{zoom:.52!important;width:100%!important;transform-origin:top center!important}
+body.copy-sheet .qrBox{max-width:100%!important;padding:4px!important}
+body.copy-sheet .qrbox{width:150px!important;height:150px!important}
+body.copy-sheet .qrbox svg,body.copy-sheet .qrbox canvas{width:150px!important;height:150px!important}
+body.copy-sheet .features{margin-top:6px!important;padding-top:5px!important}
+body.copy-sheet .brandArea{margin-top:6px!important}
+@media print{body.copy-sheet .toolbar{display:none!important} body.copy-sheet,body.copy-sheet html{margin:0!important;padding:0!important;width:18cm!important;height:32cm!important} body.copy-sheet .page,body.copy-sheet .grid{page-break-inside:avoid!important;break-inside:avoid!important} body.copy-sheet .qr-card,body.copy-sheet .poster{page-break-inside:avoid!important;break-inside:avoid!important}}
 body{font-family:Inter,Arial,Helvetica,sans-serif;margin:0;background:#f3f5f7;color:#151820}
 .toolbar{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid #e5e7eb;padding:12px;display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap}
 .toolbar button{border:1px solid #d9dde2;background:#fff;color:#252a31;border-radius:999px;padding:8px 13px;font-size:12px;font-weight:850;cursor:pointer}
