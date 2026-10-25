@@ -1252,9 +1252,9 @@ async function renderPrintQR(items,title,copySheet=false){
   w.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title>
 <style>
 *{box-sizing:border-box}
-@page{size:18cm 32cm;margin:0}
-body.copy-sheet .page{padding:0!important;width:18cm!important;height:32cm!important;margin:0!important}
-body.copy-sheet .grid{display:grid!important;grid-template-columns:repeat(3,6cm)!important;grid-template-rows:repeat(4,8cm)!important;gap:0!important;width:18cm!important;height:32cm!important;margin:0!important;max-width:none!important;align-content:start!important;justify-content:start!important}
+@page{size:A3 portrait;margin:0}
+body.copy-sheet .page{padding:0!important;width:29.7cm!important;height:42cm!important;margin:0!important;display:flex!important;align-items:center!important;justify-content:center!important}
+body.copy-sheet .grid{display:grid!important;grid-template-columns:repeat(3,6cm)!important;grid-template-rows:repeat(4,8cm)!important;gap:0!important;width:18cm!important;height:32cm!important;margin:0 auto!important;max-width:none!important;align-content:start!important;justify-content:center!important}
 body.copy-sheet .qr-card{width:6cm!important;height:8cm!important;min-width:6cm!important;min-height:8cm!important;overflow:hidden!important;display:block!important;break-inside:avoid!important;page-break-inside:avoid!important}
 body.copy-sheet .poster{position:relative!important;display:block!important;width:6cm!important;height:8cm!important;max-width:6cm!important;min-width:6cm!important;min-height:8cm!important;max-height:8cm!important;overflow:hidden!important;margin:0!important;padding:2mm 1mm!important;box-shadow:none!important;border-radius:0!important;transform:none!important}
 body.copy-sheet .content{zoom:.52!important;width:100%!important;transform-origin:top center!important}
@@ -1263,7 +1263,7 @@ body.copy-sheet .qrbox{width:150px!important;height:150px!important}
 body.copy-sheet .qrbox svg,body.copy-sheet .qrbox canvas{width:150px!important;height:150px!important}
 body.copy-sheet .features{margin-top:6px!important;padding-top:5px!important}
 body.copy-sheet .brandArea{margin-top:6px!important}
-@media print{body.copy-sheet .toolbar{display:none!important} body.copy-sheet,body.copy-sheet html{margin:0!important;padding:0!important;width:18cm!important;height:32cm!important} body.copy-sheet .page,body.copy-sheet .grid{page-break-inside:avoid!important;break-inside:avoid!important} body.copy-sheet .qr-card,body.copy-sheet .poster{page-break-inside:avoid!important;break-inside:avoid!important}}
+@media print{body.copy-sheet .toolbar{display:none!important} body.copy-sheet,body.copy-sheet html{margin:0!important;padding:0!important;width:29.7cm!important;height:42cm!important} body.copy-sheet .page,body.copy-sheet .grid{page-break-inside:avoid!important;break-inside:avoid!important} body.copy-sheet .qr-card,body.copy-sheet .poster{page-break-inside:avoid!important;break-inside:avoid!important}}
 body{font-family:Inter,Arial,Helvetica,sans-serif;margin:0;background:#f3f5f7;color:#151820}
 .toolbar{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid #e5e7eb;padding:12px;display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap}
 .toolbar button{border:1px solid #d9dde2;background:#fff;color:#252a31;border-radius:999px;padding:8px 13px;font-size:12px;font-weight:850;cursor:pointer}
@@ -1288,11 +1288,11 @@ body{font-family:Inter,Arial,Helvetica,sans-serif;margin:0;background:#f3f5f7;co
 .poster.design-4{background:#fff4e8;color:#5a2b18;border-color:#e4a26b}.design-4 .orange{background:#ef7c28}.design-4 .green{background:#6b8d3a}.design-4 .red{background:#9c3f26}.design-4 .note{color:#9a5d3d}.design-4 .smallTitle{font-family:Georgia,serif}.design-4 .bigTitle{font-family:Georgia,serif;color:#bd4e1f}.design-4 .lines .g{background:#6b8d3a}.design-4 .lines .o{background:#ef7c28}.design-4 .lines .r{background:#9c3f26}.design-4 .qrBox{border:2px solid #bd4e1f;border-radius:18px;box-shadow:0 12px 30px rgba(120,55,25,.14)}.design-4 .scan{color:#7a4a33}.design-4 .brandName{color:#7b321c}.design-4 .brandName span{color:#ef7c28}.design-4 .tag,.design-4 .footer2{color:#95664d}.design-4 .brandLines .g{background:#6b8d3a}.design-4 .brandLines .o{background:#ef7c28}.design-4 .brandLines .r{background:#9c3f26}
 @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:600px){.grid{grid-template-columns:1fr}.poster{width:min(4in,calc(100vw - 24px));max-width:none;height:auto;min-height:0;aspect-ratio:2/3}}
 @media print{
-@page{size:18cm 32cm;margin:0}
-html,body{width:18cm;height:32cm;margin:0;padding:0;background:#fff;overflow:hidden}
+@page{size:A3 portrait;margin:0}
+html,body{width:29.7cm;height:42cm;margin:0;padding:0;background:#fff;overflow:hidden}
 .toolbar{display:none!important}
-.page{padding:0;margin:0;width:18cm;height:32cm}
-.grid{display:grid!important;grid-template-columns:repeat(3,6cm)!important;grid-template-rows:repeat(4,8cm)!important;gap:0!important;width:18cm;height:32cm;margin:0;padding:0;}
+.page{padding:0;margin:0;width:29.7cm;height:42cm;display:flex;align-items:center;justify-content:center}
+.grid{display:grid!important;grid-template-columns:repeat(3,6cm)!important;grid-template-rows:repeat(4,8cm)!important;gap:0!important;width:18cm;height:32cm;margin:0 auto;padding:0;justify-content:center;align-content:start;}
 .qr-card{display:block;width:6cm;height:8cm;margin:0;padding:0;overflow:hidden;break-inside:avoid;page-break-inside:avoid;}
 .poster{width:6cm!important;height:8cm!important;max-width:6cm!important;min-height:8cm!important;margin:0!important;padding:3mm 1.5mm 1.5mm!important;box-shadow:none!important;border-radius:0!important;overflow:hidden;border-width:.25mm!important;break-after:auto!important;page-break-after:auto!important;}
 .blob.orange{width:25mm;height:25mm;left:-13mm;top:-15mm}.blob.green{width:25mm;height:22mm;left:-12mm;bottom:-14mm}.blob.red{width:24mm;height:22mm;right:-12mm;bottom:-13mm}
