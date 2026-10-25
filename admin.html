@@ -1169,7 +1169,7 @@ function printTenQRs(id){
   if(!x)return toast('QR code not found.');
   // Reuse the existing branded QR print design; only duplicate the same QR record.
   const copies=Array.from({length:10},(_,i)=>({...x,id:`${x.id}-copy-${i+1}`}));
-  renderPrintQR(copies, `${x.code||'QR'} - 10 Copies (6 x 8 cm)`);
+  renderPrintQR(copies, `${x.code||'QR'} - 10 Copies (6 x 8 cm)`, true);
 }
 
 function openAssignQR(id){
@@ -1215,7 +1215,7 @@ async function printAvailableQRs(){
   await renderPrintQR(available,'FreeMenu QR Codes');
 }
 
-async function renderPrintQR(items,title){
+async function renderPrintQR(items,title,copySheet=false){
   setQRPrintDesign($('qrPrintDesign')?.value||qrPrintDesign);
   const w=window.open('','_blank');
   if(!w)return toast('Please allow pop-ups for printing QR codes.');
@@ -1252,6 +1252,11 @@ async function renderPrintQR(items,title){
   w.document.write(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)}</title>
 <style>
 *{box-sizing:border-box}
+body.copy-sheet .page{padding:0!important}
+body.copy-sheet .grid{grid-template-columns:repeat(3,6cm)!important;grid-template-rows:repeat(4,8cm)!important;gap:0!important;width:18cm!important;height:32cm!important;margin:0 auto!important}
+body.copy-sheet .qr-card{width:6cm!important;height:8cm!important}
+body.copy-sheet .poster{width:6cm!important;height:8cm!important;max-width:6cm!important;min-height:8cm!important;margin:0!important;padding:3mm 1.5mm 1.5mm!important;box-shadow:none!important;border-radius:0!important}
+@media print{body.copy-sheet .toolbar{display:none!important} body.copy-sheet .page{width:18cm!important;height:32cm!important} body.copy-sheet .grid{page-break-inside:avoid!important;break-inside:avoid!important} body.copy-sheet .qr-card{page-break-inside:avoid!important;break-inside:avoid!important}}
 body{font-family:Inter,Arial,Helvetica,sans-serif;margin:0;background:#f3f5f7;color:#151820}
 .toolbar{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid #e5e7eb;padding:12px;display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap}
 .toolbar button{border:1px solid #d9dde2;background:#fff;color:#252a31;border-radius:999px;padding:8px 13px;font-size:12px;font-weight:850;cursor:pointer}
@@ -1293,7 +1298,7 @@ html,body{width:18cm;height:32cm;margin:0;padding:0;background:#fff;overflow:hid
 .features{margin-top:1.5mm;padding-top:1mm}.feature{padding:0 .5mm}.fi{font-size:6pt;margin-bottom:0}.ft{font-size:3.5pt}.fs{font-size:3pt;margin-top:.3mm}.footer{margin-top:1mm;font-size:3.5pt;letter-spacing:.3mm}.footer2{font-size:3pt;margin-top:.3mm}
 .qr-card:last-child .poster{page-break-after:auto}
 }
-</style></head><body>
+</style></head><body class="${copySheet ? "copy-sheet" : ""}">
 <div class="toolbar">
   <span style="font-size:12px;font-weight:900;margin-right:4px">QR Design:</span>
   <button data-design="1" onclick="applyDesign(1)">① Premium Gold</button>
