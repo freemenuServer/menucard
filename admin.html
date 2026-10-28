@@ -226,7 +226,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}.app{display:fle
   <div style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;width:min(410px,100%);padding:28px;box-shadow:0 20px 60px #10182818">
     <div style="text-align:center;margin-bottom:20px"><div style="font-size:34px">👑</div><h2 style="margin:5px 0">Super Admin Login</h2><p style="margin:0;color:#667085;font-size:13px">FreeMenu.in Administration</p></div>
     <label style="display:block;font-size:12px;color:#475467;margin:10px 0 5px">Email</label>
-    <input id="loginEmail" class="input" style="width:100%" value="athravsharma2828@gmail.com" readonly>
+    <input id="loginEmail" class="input" style="width:100%" type="email" autocomplete="username" placeholder="Enter email address" required onkeydown="if(event.key==='Enter')adminLogin()">
     <label style="display:block;font-size:12px;color:#475467;margin:10px 0 5px">Password</label>
     <input id="loginPassword" class="input" style="width:100%" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')adminLogin()">
     <button class="primary" style="width:100%;margin-top:12px;padding:11px" onclick="adminLogin()">Login as Super Admin</button>
@@ -552,7 +552,8 @@ async function q(table,select='*'){const r=await db.from(table).select(select);i
 async function adminLogin(){
  const email=$('loginEmail').value.trim(),password=$('loginPassword').value;
  $('loginError').textContent='';
- if(!password)return $('loginError').textContent='Password enter karein.';
+ if(!email)return $('loginError').textContent='Email enter karein.';
+ if(!password)return $('loginError').textContent='Password enter karein.';
  const {data,error}=await db.auth.signInWithPassword({email,password});
  if(error)return $('loginError').textContent=error.message;
  session=data.session;
